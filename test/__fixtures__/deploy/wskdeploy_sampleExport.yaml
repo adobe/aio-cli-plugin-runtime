@@ -1,0 +1,154 @@
+project:
+  name: proj
+  namespace: ""
+  credential: ""
+  apiHost: ""
+  apigwAccessToken: ""
+  version: ""
+  packages: {}
+  inputs: {}
+packages:
+  testSeq:
+    name: testSeq
+    version: 0.0.10
+    license: ""
+    dependencies: {}
+    namespace: "53444_51981"
+    credential: ""
+    apiHost: ""
+    apigwAccessToken: ""
+    actions:
+      four:
+        name: four
+        location: ""
+        version: 0.0.9
+        function: /deploy/hello.js
+        code: ""
+        runtime: nodejs:10
+        namespace: 53444_51981/testSeq
+        credential: ""
+        exposedUrl: ""
+        web-export: ""
+        web: ""
+        main: split
+        limits: null
+        inputs: {}
+        outputs: {}
+        annotations:
+          exec: nodejs:10
+      helloAction:
+        name: helloAction
+        location: ""
+        version: 0.0.9
+        function: /deploy/hello.js
+        code: ""
+        runtime: nodejs:10
+        namespace: 53444_51981/testSeq
+        credential: ""
+        exposedUrl: ""
+        web-export: ""
+        web: ""
+        main: ""
+        limits: null
+        inputs:
+          children:
+            value: "0"
+          height:
+            value: "0"
+          name:
+            value: ""
+          place:
+            value: ""
+        outputs: {}
+        annotations:
+          exec: nodejs:10
+      one:
+        name: one
+        location: ""
+        version: 0.0.9
+        function: /deploy/hello.js
+        code: ""
+        runtime: nodejs:10
+        namespace: 53444_51981/testSeq
+        credential: ""
+        exposedUrl: ""
+        web-export: ""
+        web: ""
+        main: ""
+        limits: null
+        inputs:
+          member:
+            value: ""
+        outputs: {}
+        annotations:
+          exec: nodejs:10
+      two:
+        name: two
+        location: ""
+        version: 0.0.9
+        function: /deploy/hello.js
+        code: ""
+        runtime: nodejs:10
+        namespace: 53444_51981/testSeq
+        credential: ""
+        exposedUrl: ""
+        web-export: ""
+        web: ""
+        main: ""
+        limits: null
+        inputs:
+          member:
+            value: ""
+        outputs: {}
+        annotations:
+          exec: nodejs:10
+      zero:
+        name: zero
+        location: ""
+        version: 0.0.9
+        function: /deploy/hello.js
+        code: ""
+        runtime: nodejs:10
+        namespace: 53444_51981/testSeq
+        credential: ""
+        exposedUrl: ""
+        web-export: ""
+        web: ""
+        main: ""
+        limits: null
+        inputs:
+          job:
+            value: "0"
+          name:
+            value: unknown
+          place:
+            value: unknown
+        outputs: {}
+        annotations:
+          exec: nodejs:10
+          final: true
+          raw-http: false
+          require-whisk-auth: true
+          web-export: true
+    triggers:
+      meetPerson:
+        feed: ""
+        namespace: "53444_51981"
+        credential: ""
+        inputs: {}
+        name: meetPerson
+        source: ""
+    feeds: {}
+    rules:
+      meetPersonRule:
+        trigger: meetPerson
+        action: testSeq/three
+        rule: ""
+        name: meetPersonRule
+    inputs: {}
+    sequences:
+      three:
+        actions: testSeq/zero,testSeq/one,testSeq/two
+        web: ""
+    apis: {}
+filepath: ""
