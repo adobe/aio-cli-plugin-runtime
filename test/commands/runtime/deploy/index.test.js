@@ -101,6 +101,7 @@ describe('instance methods', () => {
       'deploy/deployment_syncMissingAction.yaml': fixtureFile('deploy/deployment_syncMissingAction.yaml'),
       'deploy/manifest_multiple_packages.yaml': fixtureFile('deploy/manifest_multiple_packages.yaml'),
       'deploy/manifest.yml': fixtureFile('deploy/manifest.yml'),
+      'deploy/wskdeploy_sampleExport.yaml': fixtureFile('deploy/wskdeploy_sampleExport.yaml'),
       'deploy/hello.js': fixtureFile('deploy/hello.js'),
       'deploy/hello_plus.js': fixtureFile('deploy/hello_plus.js'),
       'deploy/main.js': fixtureFile('deploy/main.js'),
@@ -216,6 +217,16 @@ describe('instance methods', () => {
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalledTimes(2)
+          expect(stdout.output).toMatch('')
+        })
+    })
+
+    test('deploys the sample manifest file exported from wskdeploy', () => {
+      let cmd = ow.mockResolved(owPackage, '')
+      command.argv = ['-m', '/deploy/wskdeploy_sampleExport.yaml']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalled()
           expect(stdout.output).toMatch('')
         })
     })

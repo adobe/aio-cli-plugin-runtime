@@ -60,9 +60,9 @@ async function addAnnotationsandDeploy (entities, ow, logger, manifestPath, proj
         {
           'key': 'whisk-managed',
           'value': {
-            'file': manifestPath, // relative path to the manifest file
+            'file': manifestPath,
             'projectDeps': [],
-            'projectHash': projectHash, // generate sha project hash
+            'projectHash': projectHash,
             'projectName': projectName
           }
         }
@@ -79,9 +79,9 @@ async function addAnnotationsandDeploy (entities, ow, logger, manifestPath, proj
       })
     }
     action['annotations']['whisk-managed'] = {
-      'file': manifestPath, // relative path to the manifest file
+      'file': manifestPath,
       'projectDeps': [],
-      'projectHash': projectHash, // generate sha project hash
+      'projectHash': projectHash,
       'projectName': projectName
     }
     logger(`Info: Deploying action [${action.name}]...`)
@@ -93,9 +93,9 @@ async function addAnnotationsandDeploy (entities, ow, logger, manifestPath, proj
     let managedAnnotation = {
       'key': 'whisk-managed',
       'value': {
-        'file': manifestPath, // relative path to the manifest file
+        'file': manifestPath,
         'projectDeps': [],
-        'projectHash': projectHash, // generate sha project hash
+        'projectHash': projectHash,
         'projectName': projectName
       }
     }

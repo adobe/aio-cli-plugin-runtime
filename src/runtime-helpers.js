@@ -262,7 +262,11 @@ function createSequenceObject (thisSequence, options, key) {
     actionArray = actionArray.map((action) => {
       // remove space between two actions after split
       let actionItem = action.replace(/\s+/g, '')
-      return `${key}/${actionItem}`
+      if (actionItem.split('/').length > 1) {
+        return actionItem
+      } else {
+        return `${key}/${actionItem}`
+      }
     })
   } else {
     throw new Error('Actions for the sequence not provided.')
@@ -400,6 +404,9 @@ function processPackage (packages, deploymentPackages, deploymentTriggers, param
         if (packages[key]['rules'][ruleName]['trigger'] && packages[key]['rules'][ruleName]['action']) {
           objRule['trigger'] = packages[key]['rules'][ruleName]['trigger']
           objRule['action'] = packages[key]['rules'][ruleName]['action']
+          if (objRule['action'].split('/').length > 1) {
+            objRule['action'] = objRule['action'].split('/').pop()
+          }
         } else {
           throw new Error('Trigger and Action are both required for rule creation')
         }
@@ -465,7 +472,9 @@ function setPaths (flags) {
   if (manifest.project) {
     projectName = manifest.project.name || ''
     packages = manifest.project.packages
-  } else {
+  }
+  // yaml files from wskdeploy export sometimes have projects and packages at same level (indentation)
+  if (manifest.packages) {
     packages = manifest.packages
   }
 
