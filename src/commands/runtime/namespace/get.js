@@ -19,15 +19,18 @@ function createColumns (columnName) {
     firstColumn: {
       header: columnName,
       minWidth: 50,
+      'no-truncate': true,
       get: row => `/${row.namespace}/${row.name}`
     },
     published: {
       header: '',
+      'no-truncate': true,
       get: row => `${row.publish === false ? 'private' : 'public'}`
     },
     exec: {
       header: '',
       minWidth: 15,
+      'no-truncate': true,
       get: (row) => {
         const filtered = row.annotations.filter(elem => elem.key === 'exec')
         if (filtered.length) {
@@ -39,6 +42,7 @@ function createColumns (columnName) {
     status: {
       header: '',
       minWidth: 10,
+      'no-truncate': true,
       get: row => row.status ? row.status : ''
     }
   }

@@ -70,7 +70,7 @@ class RouteList extends RuntimeBaseCommand {
           Action: { minWidth: 10 },
           Verb: { minWidth: 10 },
           APIName: { header: 'API Name', minWidth: 10 },
-          URL: { minWidth: 15 }
+          URL: { minWidth: 15, 'no-truncate': true }
         },
         {
           printLine: this.log,
