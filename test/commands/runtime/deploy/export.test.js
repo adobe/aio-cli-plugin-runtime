@@ -18,6 +18,7 @@ const owPackageList = 'packages.list'
 const owRulesList = 'rules.list'
 const owTriggerList = 'triggers.list'
 const fs = require('fs')
+const eol = require('eol')
 
 test('exports', async () => {
   expect(typeof TheCommand).toEqual('function')
@@ -410,7 +411,8 @@ describe('instance methods', () => {
       ow.mockResolved(owRulesList, ruleslist)
       fs.writeFileSync = jest.fn()
       command.argv = [ '--projectname', 'proj', '-m', '/deploy/manifest.yaml' ]
-      let yaml = fixtureFile('deploy/export_yaml.yaml')
+      // yaml.safeDump writes out line endings as `\n`, and doesn't follow system line endings
+      let yaml = eol.lf(fixtureFile('deploy/export_yaml.yaml'))
       return command.run()
         .then(() => {
           expect(fs.writeFileSync).toHaveBeenCalledWith('/deploy/manifest.yaml', yaml)
@@ -426,7 +428,8 @@ describe('instance methods', () => {
       ow.mockResolved(owRulesList, ruleslist)
       fs.writeFileSync = jest.fn()
       command.argv = [ '--projectname', 'proj', '-m', '/deploy/manifest.yaml' ]
-      let yaml = fixtureFile('deploy/export_yaml_Sequence.yaml')
+      // yaml.safeDump writes out line endings as `\n`, and doesn't follow system line endings
+      let yaml = eol.lf(fixtureFile('deploy/export_yaml_Sequence.yaml'))
       return command.run()
         .then(() => {
           expect(fs.writeFileSync).toHaveBeenCalledWith('/deploy/manifest.yaml', yaml)
@@ -453,7 +456,8 @@ describe('instance methods', () => {
       ow.mockResolved(owRulesList, '')
       fs.writeFileSync = jest.fn()
       command.argv = [ '--projectname', 'proj', '-m', '/deploy/manifest.yaml' ]
-      let yaml = fixtureFile('deploy/export_yaml_noAnnotations.yaml')
+      // yaml.safeDump writes out line endings as `\n`, and doesn't follow system line endings
+      let yaml = eol.lf(fixtureFile('deploy/export_yaml_noAnnotations.yaml'))
       return command.run()
         .then(() => {
           expect(fs.writeFileSync).toHaveBeenCalledWith('/deploy/manifest.yaml', yaml)
@@ -466,7 +470,8 @@ describe('instance methods', () => {
       ow.mockResolved(owTriggerList, '')
       ow.mockResolved(owRulesList, '')
       command.argv = [ '--projectname', 'proj', '-m', '/deploy/manifest.yaml' ]
-      let yaml = fixtureFile('deploy/export_yaml_noAnnotations.yaml')
+      // yaml.safeDump writes out line endings as `\n`, and doesn't follow system line endings
+      let yaml = eol.lf(fixtureFile('deploy/export_yaml_noAnnotations.yaml'))
       return command.run()
         .then(() => {
           expect(fs.writeFileSync).toHaveBeenCalledWith('/deploy/manifest.yaml', yaml)
@@ -503,7 +508,8 @@ describe('instance methods', () => {
       ow.mockResolved(owTriggerList, '')
       ow.mockResolved(owRulesList, rulesNoAnnotations)
       command.argv = [ '--projectname', 'proj', '-m', '/deploy/manifest.yaml' ]
-      let yaml = fixtureFile('deploy/export_yaml_noAnnotations.yaml')
+      // yaml.safeDump writes out line endings as `\n`, and doesn't follow system line endings
+      let yaml = eol.lf(fixtureFile('deploy/export_yaml_noAnnotations.yaml'))
       return command.run()
         .then(() => {
           expect(fs.writeFileSync).toHaveBeenCalledWith('/deploy/manifest.yaml', yaml)
