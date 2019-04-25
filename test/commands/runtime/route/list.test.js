@@ -83,10 +83,9 @@ describe('instance methods', () => {
 
     test('no required args (all are optional) - should not throw exception', () => {
       ow.mockResolvedFixture(owAction, 'route/list.json')
-      return command.run()
-        .then(() => {
-          expect(stdout.output).toMatchFixture('route/list.txt')
-        })
+      return expect(() => {
+        return command.run()
+      }).not.toThrow()
     })
 
     test('no required args (all are optional) - should not throw exception, --json flag', () => {
