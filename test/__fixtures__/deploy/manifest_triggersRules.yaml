@@ -1,0 +1,54 @@
+# Licensed to the Apache Software Foundation (ASF) under one or more contributor
+# license agreements; and to You under the Apache License, Version 2.0.
+
+# Example: processing data in a sequence
+packages:
+  testSeq:
+    version: 1.0
+    license: Apache-2.0
+    actions:
+      zero:
+        function: /deploy/hello.js
+        inputs:
+          name:
+            type: string
+            description: name of person
+            default: unknown
+          place:
+            type: string
+            description: location of person
+            default: unknown
+          job:
+            type: string
+            description: current occupation
+            default: 0
+        outputs:
+          member:
+            type: json
+            description: member record
+      one:
+        function: /deploy/hello.js
+        inputs:
+          member: {}
+      two:
+        function: /deploy/hello.js
+        inputs:
+          member: {}
+      helloAction:
+        function: /deploy/hello.js
+        inputs:
+          name: string
+          place: string
+          children: integer
+          height: integer
+    sequences:
+      three:
+        actions: zero,one,two
+    triggers:
+      meetPerson:
+        inputs:
+          name: Sam
+    rules:
+      meetPersonRule:
+        trigger: meetPerson
+        action: three

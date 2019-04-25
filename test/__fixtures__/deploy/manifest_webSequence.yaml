@@ -1,0 +1,26 @@
+# Licensed to the Apache Software Foundation (ASF) under one or more contributor
+# license agreements; and to You under the Apache License, Version 2.0.
+
+# Example: processing APIs
+packages:
+  hello_world_package:
+    version: 1.0
+    license: Apache-2.0
+    actions:
+      hello_validate:
+        function: /deploy/hello.js
+      hello:
+        function: /deploy/hello.js
+      hello_wrap:
+        function: /deploy/hello.js
+    sequences:
+      hello_world:
+        actions: hello_validate, hello, hello_wrap
+        web: true
+    apis:
+      hello-world:
+        hello:
+          world:
+            hello_world:
+              method: GET
+              response: http

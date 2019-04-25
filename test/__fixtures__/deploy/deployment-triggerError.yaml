@@ -1,0 +1,7 @@
+project:
+  name: prj
+  packages:
+      testSeq:
+        triggers:
+          meetPerson:
+            inputs:

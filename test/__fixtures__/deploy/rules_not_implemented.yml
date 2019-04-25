@@ -1,0 +1,30 @@
+packages:
+  hello_world_package:
+    version: 1.0
+    license: Apache-2.0
+    actions:
+      hello_world:
+          function: /deploy/hello.js
+          web-export: true
+      hello_world_triggerrule:
+        function: /deploy/hello_plus.js
+        runtime: nodejs
+        inputs:
+          name: string
+          place: string
+          children: integer
+          height: float
+        outputs:
+          greeting: string
+          details: string
+    triggers:
+      meetPerson:
+        inputs:
+          name: Sam
+          place: the Shire
+          children: 13
+          height: 1.2
+    rules:
+      meetPersonRule:
+        trigger: meetPerson
+        action: hello_world_triggerrule

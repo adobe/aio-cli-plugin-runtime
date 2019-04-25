@@ -1,0 +1,23 @@
+{
+  "name": "",
+  "Inputs": {}
+}
+{
+  "name": "demo_package",
+  "Inputs": {}
+}
+{
+  "name": "demo_package_no_actions",
+  "Inputs": {}
+}
+{
+  "name": "sampleAction",
+  "Inputs": {
+    "name": "Adobe",
+    "message": "Demo"
+  }
+}
+{
+  "name": "anotherAction",
+  "Inputs": {}
+}

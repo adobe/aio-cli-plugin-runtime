@@ -1,0 +1,14 @@
+Entities in namespace:
+packages                                                                     
+actions                                                                            
+/53444_41603/timtest                              public  nodejs:10                
+/53444_41603/hello                                private nodejs:10-fat            
+/53444_41603/my-service-dev-hello                 private nodejs:6                 
+/53444_41603/action2                              private nodejs:6                 
+/53444_41603/action1                              private nodejs:6                 
+triggers                                                                           
+/53444_41603/foo2                                 private                          
+/53444_41603/foo1                                 private                          
+rules                                                                              
+/53444_41603/testRule                             private                active    
+/53444_41603/asdf                                 private                inactive  

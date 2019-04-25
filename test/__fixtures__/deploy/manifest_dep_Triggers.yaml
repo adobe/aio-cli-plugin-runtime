@@ -1,0 +1,35 @@
+# Licensed to the Apache Software Foundation (ASF) under one or more contributor
+# license agreements; and to You under the Apache License, Version 2.0.
+
+# Example: processing data in a sequence
+packages:
+  testSeq:
+    version: 1.0
+    license: Apache-2.0
+    actions:
+      helloAction:
+        function: /deploy/hello.js
+        limits:
+          unknownkey: 6
+        inputs:
+          name: string
+          place: string
+          children: integer
+          height: integer
+    triggers:
+      meetPerson:
+        inputs:
+          name: string
+          place: string
+          children: string
+          height: string
+      meetPerson22:
+        inputs:
+          name: string
+          place: string
+          children: string
+          height: string
+    rules:
+      meetPersonRule:
+        trigger: meetPerson
+        action: helloAction

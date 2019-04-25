@@ -1,0 +1,49 @@
+{
+  "name": "",
+  "Inputs": {}
+}
+{
+  "name": "testSeq",
+  "Inputs": {}
+}
+{
+  "name": "zero",
+  "Inputs": {
+    "name": "unknown",
+    "place": "unknown",
+    "job": 0
+  }
+}
+{
+  "name": "one",
+  "Inputs": {
+    "member": {}
+  }
+}
+{
+  "name": "two",
+  "Inputs": {
+    "member": {}
+  }
+}
+{
+  "name": "helloAction",
+  "Inputs": {
+    "name": "",
+    "place": "",
+    "children": 0,
+    "height": 0
+  }
+}
+{
+  "name": "three",
+  "Inputs": {}
+}
+{
+  "name": "meetPerson",
+  "Inputs": {
+    "name": "Sam",
+    "place": "",
+    "children": 0
+  }
+}

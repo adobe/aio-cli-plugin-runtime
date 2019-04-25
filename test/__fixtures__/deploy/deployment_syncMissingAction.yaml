@@ -1,0 +1,12 @@
+project:
+  name: proj
+  packages:
+      testSeq:
+        triggers:
+          meetPerson:
+            inputs:
+              name: Elrond
+              children: 3
+            annotations:
+              val1: value1
+              val2: value2

@@ -1,0 +1,10 @@
+Property                Value                         
+whisk auth              some-gibberish-not-a-real-key 
+whisk API host          some.host                     
+whisk API version       v1                            
+client cert                                           
+client key                                            
+whisk namespace         some_namespace                
+whisk CLI version       1.0                           
+whisk API build version error                         
+whisk API build number  error                         

@@ -1,0 +1,9 @@
+project:
+  name: proj
+  packages:
+      testSeq:
+        triggers:
+          meetPerson:
+            inputs:
+              name: Elrond
+              children: 3

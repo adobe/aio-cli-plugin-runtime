@@ -1,0 +1,3 @@
+triggers                                                  
+/namespace1/trigger1                              private 
+/namespace1/trigger2                              public  

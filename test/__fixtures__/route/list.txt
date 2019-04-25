@@ -1,0 +1,2 @@
+Action                            Verb      API Name  Url                                                        
+/53444_41603/default/action1.json get       /myapi    https://runtime.adobe.io:443/apis/53444_41603/myapi/mypath 

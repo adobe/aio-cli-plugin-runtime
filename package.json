@@ -1,0 +1,94 @@
+{
+  "name": "@adobe/aio-cli-plugin-runtime",
+  "description": "Adobe I/O Runtime commands for the Adobe I/O CLI",
+  "version": "0.0.3",
+  "author": "Adobe Inc.",
+  "bugs": "https://github.com/adobe/aio-cli-plugin-runtime/issues",
+  "dependencies": {
+    "@oclif/command": "^1.5.6",
+    "@oclif/config": "^1.9.0",
+    "@oclif/errors": "^1.1.2",
+    "@oclif/plugin-help": "^1",
+    "cli-ux": "^5.2.0",
+    "js-yaml": "^3.13.1",
+    "node-fetch": "^2.3.0",
+    "openwhisk": "^3.19.0",
+    "properties-reader": "0.0.16",
+    "sha1": "^1.1.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.3.3",
+    "@babel/preset-env": "^7.3.1",
+    "@oclif/dev-cli": "^1",
+    "@oclif/test": "^1",
+    "babel-jest": "^24.1.0",
+    "babel-runtime": "^6.26.0",
+    "dedent-js": "^1.0.1",
+    "eol": "^0.9.1",
+    "eslint": "^5",
+    "eslint-config-oclif": "^1",
+    "eslint-config-standard": "^12.0.0",
+    "eslint-plugin-import": "^2.13.10",
+    "eslint-plugin-jest": "^22.1.2",
+    "eslint-plugin-node": "^7.0.0",
+    "eslint-plugin-promise": "^4.0.0",
+    "eslint-plugin-standard": "^4.0.0",
+    "jest": "^24.1.0",
+    "jest-junit": "^6.3.0",
+    "jest-plugin-fs": "^2.9.0",
+    "stdout-stderr": "^0.1.9"
+  },
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "files": [
+    "/oclif.manifest.json",
+    "/src"
+  ],
+  "homepage": "https://github.com/adobe/aio-cli-plugin-runtime",
+  "keywords": [
+    "oclif-plugin"
+  ],
+  "license": "Apache-2.0",
+  "oclif": {
+    "commands": "./src/commands",
+    "bin": "./bin/run",
+    "devPlugins": [
+      "@oclif/plugin-help"
+    ]
+  },
+  "main": "src/index.js",
+  "repository": "adobe/aio-cli-plugin-runtime",
+  "scripts": {
+    "posttest": "eslint src test",
+    "test": "npm run unit-tests",
+    "unit-tests": "jest --ci",
+    "prepack": "oclif-dev manifest && oclif-dev readme",
+    "postpack": "rm -f oclif.manifest.json",
+    "version": "oclif-dev readme && git add README.md"
+  },
+  "jest": {
+    "collectCoverage": true,
+    "collectCoverageFrom": [
+      "src/**/*.js"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 100,
+        "lines": 100,
+        "statements": 100
+      }
+    },
+    "testPathIgnorePatterns": [
+      "<rootDir>/jest.setup.js"
+    ],
+    "reporters": [
+      "default",
+      "jest-junit"
+    ],
+    "testEnvironment": "node",
+    "setupFilesAfterEnv": [
+      "./test/jest.setup.js"
+    ]
+  }
+}

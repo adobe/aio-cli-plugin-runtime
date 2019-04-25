@@ -1,0 +1,13 @@
+project:
+  packages:
+      testSeq_differentName:
+        actions:
+          helloAction: 
+            function: /deploy/hello.js
+            inputs:
+              name: Runtime
+        triggers:
+          meetPerson:
+            inputs:
+              name: Elrond
+              children: 3

@@ -1,0 +1,39 @@
+{
+    "apis": [
+      {
+        "value": {
+          "apidoc": {
+            "basePath": "/myapi",
+            "info": {
+              "title": "/myapi",
+              "version": "1.0.0"
+            },
+            "paths": {
+              "openwhisk": {},
+              "/mypath": {
+                "get": {
+                  "operationId": "53444_41603/default/action1.json",
+                  "responses": {
+                    "default": {
+                      "description": "Default response"
+                    }
+                  },
+                  "x-openwhisk": {
+                    "action": "action1.json",
+                    "namespace": "53444_41603",
+                    "package": "default",
+                    "url": "not-used"
+                  }
+                }
+              }
+            },
+            "swagger": "2.0"
+          },
+          "gwApiActivated": true,
+          "gwApiUrl": "https://runtime.adobe.io:443/apis/53444_41603/myapi",
+          "namespace": "Not Used",
+          "tenantId": "Not Used"
+        }
+      }
+    ]
+  }

@@ -1,0 +1,16 @@
+{
+  "action": {
+    "name": "action2",
+    "path": "53444_41603"
+  },
+  "annotations": [],
+  "name": "testRule",
+  "namespace": "53444_41603",
+  "publish": false,
+  "status": "active",
+  "trigger": {
+    "name": "foo1",
+    "path": "53444_41603"
+  },
+  "version": "0.0.3"
+}

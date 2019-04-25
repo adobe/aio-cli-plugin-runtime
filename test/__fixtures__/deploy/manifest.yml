@@ -1,0 +1,66 @@
+# Licensed to the Apache Software Foundation (ASF) under one or more contributor
+# license agreements; and to You under the Apache License, Version 2.0.
+
+# Example: Basic Hello World using a NodeJS (JavaScript) action
+packages:
+  demo_package:
+    version: 1.0
+    license: Apache-2.0
+    actions:
+      demo_basic_params:
+        function: /deploy/hello.js
+        runtime: nodejs:8
+        web-export: raw
+        inputs:
+          name: Adobe
+          message: Demo      
+      demo_typed_params:
+        function: /deploy/hello_plus.js
+        inputs:
+          name: $NAME
+          place: string
+          employees: integer
+          address: string         
+        limits:
+          memorySize: 128
+          logSize: 5
+          timeout: 10000
+        web: no
+      demo_typed_params_for_coverage:
+        function: /deploy/hello_plus.js
+        inputs:
+          name: $NAME
+          place: string
+          employees: integer
+          address: string         
+        limits:
+          unknownKey: 0
+        require-whisk-auth: true
+        raw-http: yes
+        web: false
+      demo_advanced_params:
+        runtime: nodejs:10
+        function: /deploy/hello_plus.js
+        inputs:
+          name:
+            type: string
+            description: name of person
+            default: unknown person
+          place:
+            type: string
+            description: location of person
+            value: California
+          employees:
+            type: integer
+            description: Number of employees
+            default: 0
+          address:
+            type: string
+            description: Address
+            default: unknown address
+        web: true
+        require-whisk-auth: true
+        raw-http: true
+      demo_zip:
+        function: /deploy/app.zip
+        runtime: nodejs:10

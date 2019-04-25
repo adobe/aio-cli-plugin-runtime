@@ -1,0 +1,13 @@
+project:
+  packages:
+      testSeq:
+        actions:
+          helloAction: 
+            function: /deploy/hello.js
+            inputs:
+              name: Runtime
+        triggers:
+          meetPerson:
+            inputs:
+              name: Elrond
+              children: 3

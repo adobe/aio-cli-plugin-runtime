@@ -1,0 +1,8 @@
+project:
+  packages:
+      testSeq1:
+        triggers:
+          meetPerson:
+            inputs:
+              name: Elrond
+              children: 3

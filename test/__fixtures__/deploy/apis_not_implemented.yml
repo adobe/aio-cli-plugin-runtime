@@ -1,0 +1,14 @@
+packages:
+  hello_world_package:
+    version: 1.0
+    license: Apache-2.0
+    actions:
+      hello_world:
+          function: /deploy/hello.js
+          web-export: true
+    apis:
+        hello-world:
+          hello:
+            world:
+              hello_world:
+                method: GET
