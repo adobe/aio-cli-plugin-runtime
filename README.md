@@ -32,11 +32,11 @@ Adobe I/O Runtime plugin for the Adobe I/O CLI
 # Usage
 <!-- usage -->
 ```sh-session
-$ npm install -g @io-dev-tools/aio-cli-plugin-runtime
+$ npm install -g @adobe/aio-cli-plugin-runtime
 $ ./bin/run COMMAND
 running command...
 $ ./bin/run (-v|--version|version)
-@io-dev-tools/aio-cli-plugin-runtime/0.0.3 darwin-x64 node-v11.4.0
+@adobe/aio-cli-plugin-runtime/0.0.3 darwin-x64 node-v8.9.4
 $ ./bin/run --help [COMMAND]
 USAGE
   $ ./bin/run COMMAND
@@ -109,13 +109,16 @@ USAGE
   $ ./bin/run runtime
 
 OPTIONS
-  -i, --insecure     bypass certificate check
-  -u, --auth=auth    authorization KEY
-  -v, --verbose      Verbose output
-  --apihost=apihost  whisk API HOST
-  --debug=debug      Debug level output
-  --help             Show help
-  --version          Show version
+  -i, --insecure           bypass certificate check
+  -u, --auth=auth          whisk auth
+  -v, --verbose            Verbose output
+  --apihost=apihost        whisk API host
+  --apiversion=apiversion  whisk API version
+  --cert=cert              client cert
+  --debug=debug            Debug level output
+  --help                   Show help
+  --key=key                client key
+  --version                Show version
 ```
 
 _See code: [src/commands/runtime/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v0.0.3/src/commands/runtime/index.js)_
@@ -129,13 +132,16 @@ USAGE
   $ ./bin/run runtime:action
 
 OPTIONS
-  -i, --insecure     bypass certificate check
-  -u, --auth=auth    authorization KEY
-  -v, --verbose      Verbose output
-  --apihost=apihost  whisk API HOST
-  --debug=debug      Debug level output
-  --help             Show help
-  --version          Show version
+  -i, --insecure           bypass certificate check
+  -u, --auth=auth          whisk auth
+  -v, --verbose            Verbose output
+  --apihost=apihost        whisk API host
+  --apiversion=apiversion  whisk API version
+  --cert=cert              client cert
+  --debug=debug            Debug level output
+  --help                   Show help
+  --key=key                client key
+  --version                Show version
 ```
 
 _See code: [src/commands/runtime/action/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v0.0.3/src/commands/runtime/action/index.js)_
@@ -160,17 +166,23 @@ OPTIONS
   -t, --timeout=timeout                  the timeout LIMIT in milliseconds after which the action is terminated (default
                                          60000)
 
-  -u, --auth=auth                        authorization KEY
+  -u, --auth=auth                        whisk auth
 
   -v, --verbose                          Verbose output
 
-  --apihost=apihost                      whisk API HOST
+  --apihost=apihost                      whisk API host
+
+  --apiversion=apiversion                whisk API version
+
+  --cert=cert                            client cert
 
   --debug=debug                          Debug level output
 
   --help                                 Show help
 
   --json                                 output raw json
+
+  --key=key                              client key
 
   --kind=kind                            [default: nodejs:10] the KIND of the action runtime (example: swift:default,
                                          nodejs:default)
@@ -210,16 +222,19 @@ USAGE
   $ ./bin/run runtime:action:get ACTIONNAME
 
 OPTIONS
-  -i, --insecure     bypass certificate check
-  -r, --url          get action url
-  -u, --auth=auth    authorization KEY
-  -v, --verbose      Verbose output
-  --apihost=apihost  whisk API HOST
-  --debug=debug      Debug level output
-  --help             Show help
-  --save             save action code to file corresponding with action name
-  --save-as=save-as  file to save action code to
-  --version          Show version
+  -i, --insecure           bypass certificate check
+  -r, --url                get action url
+  -u, --auth=auth          whisk auth
+  -v, --verbose            Verbose output
+  --apihost=apihost        whisk API host
+  --apiversion=apiversion  whisk API version
+  --cert=cert              client cert
+  --debug=debug            Debug level output
+  --help                   Show help
+  --key=key                client key
+  --save                   save action code to file corresponding with action name
+  --save-as=save-as        file to save action code to
+  --version                Show version
 ```
 
 _See code: [src/commands/runtime/action/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v0.0.3/src/commands/runtime/action/get.js)_
@@ -238,11 +253,14 @@ OPTIONS
   -i, --insecure               bypass certificate check
   -p, --param=param            parameter values in KEY VALUE format
   -r, --result                 blocking invoke; show only activation result (unless there is a failure)
-  -u, --auth=auth              authorization KEY
+  -u, --auth=auth              whisk auth
   -v, --verbose                Verbose output
-  --apihost=apihost            whisk API HOST
+  --apihost=apihost            whisk API host
+  --apiversion=apiversion      whisk API version
+  --cert=cert                  client cert
   --debug=debug                Debug level output
   --help                       Show help
+  --key=key                    client key
   --version                    Show version
 ```
 
@@ -257,16 +275,19 @@ USAGE
   $ ./bin/run runtime:action:list
 
 OPTIONS
-  -i, --insecure     bypass certificate check
-  -l, --limit=limit  only return LIMIT number of actions from the collection (default 30)
-  -s, --skip=skip    exclude the first SKIP number of actions from the result
-  -u, --auth=auth    authorization KEY
-  -v, --verbose      Verbose output
-  --apihost=apihost  whisk API HOST
-  --debug=debug      Debug level output
-  --help             Show help
-  --json             output raw json
-  --version          Show version
+  -i, --insecure           bypass certificate check
+  -l, --limit=limit        only return LIMIT number of actions from the collection (default 30)
+  -s, --skip=skip          exclude the first SKIP number of actions from the result
+  -u, --auth=auth          whisk auth
+  -v, --verbose            Verbose output
+  --apihost=apihost        whisk API host
+  --apiversion=apiversion  whisk API version
+  --cert=cert              client cert
+  --debug=debug            Debug level output
+  --help                   Show help
+  --json                   output raw json
+  --key=key                client key
+  --version                Show version
 ```
 
 _See code: [src/commands/runtime/action/list.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v0.0.3/src/commands/runtime/action/list.js)_
@@ -291,17 +312,23 @@ OPTIONS
   -t, --timeout=timeout                  the timeout LIMIT in milliseconds after which the action is terminated (default
                                          60000)
 
-  -u, --auth=auth                        authorization KEY
+  -u, --auth=auth                        whisk auth
 
   -v, --verbose                          Verbose output
 
-  --apihost=apihost                      whisk API HOST
+  --apihost=apihost                      whisk API host
+
+  --apiversion=apiversion                whisk API version
+
+  --cert=cert                            client cert
 
   --debug=debug                          Debug level output
 
   --help                                 Show help
 
   --json                                 output raw json
+
+  --key=key                              client key
 
   --kind=kind                            the KIND of the action runtime (example: swift:default, nodejs:default)
 
@@ -327,13 +354,16 @@ USAGE
   $ ./bin/run runtime:activation
 
 OPTIONS
-  -i, --insecure     bypass certificate check
-  -u, --auth=auth    authorization KEY
-  -v, --verbose      Verbose output
-  --apihost=apihost  whisk API HOST
-  --debug=debug      Debug level output
-  --help             Show help
-  --version          Show version
+  -i, --insecure           bypass certificate check
+  -u, --auth=auth          whisk auth
+  -v, --verbose            Verbose output
+  --apihost=apihost        whisk API host
+  --apiversion=apiversion  whisk API version
+  --cert=cert              client cert
+  --debug=debug            Debug level output
+  --help                   Show help
+  --key=key                client key
+  --version                Show version
 ```
 
 _See code: [src/commands/runtime/activation/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v0.0.3/src/commands/runtime/activation/index.js)_
@@ -347,13 +377,16 @@ USAGE
   $ ./bin/run runtime:activation:get ACTIVATIONID
 
 OPTIONS
-  -i, --insecure     bypass certificate check
-  -u, --auth=auth    authorization KEY
-  -v, --verbose      Verbose output
-  --apihost=apihost  whisk API HOST
-  --debug=debug      Debug level output
-  --help             Show help
-  --version          Show version
+  -i, --insecure           bypass certificate check
+  -u, --auth=auth          whisk auth
+  -v, --verbose            Verbose output
+  --apihost=apihost        whisk API host
+  --apiversion=apiversion  whisk API version
+  --cert=cert              client cert
+  --debug=debug            Debug level output
+  --help                   Show help
+  --key=key                client key
+  --version                Show version
 ```
 
 _See code: [src/commands/runtime/activation/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v0.0.3/src/commands/runtime/activation/get.js)_
@@ -367,32 +400,38 @@ USAGE
   $ ./bin/run runtime:activation:list [ACTIVATIONID]
 
 OPTIONS
-  -i, --insecure     bypass certificate check
+  -i, --insecure           bypass certificate check
 
-  -l, --limit=limit  only return LIMIT number of activations from the collection with a maximum LIMIT of 200 activations
-                     (default 30)
+  -l, --limit=limit        only return LIMIT number of activations from the collection with a maximum LIMIT of 200
+                           activations (default 30)
 
-  -s, --skip=skip    exclude the first SKIP number of activations from the result
+  -s, --skip=skip          exclude the first SKIP number of activations from the result
 
-  -u, --auth=auth    authorization KEY
+  -u, --auth=auth          whisk auth
 
-  -v, --verbose      Verbose output
+  -v, --verbose            Verbose output
 
-  --apihost=apihost  whisk API HOST
+  --apihost=apihost        whisk API host
 
-  --debug=debug      Debug level output
+  --apiversion=apiversion  whisk API version
 
-  --help             Show help
+  --cert=cert              client cert
 
-  --json             output raw json
+  --debug=debug            Debug level output
 
-  --since=since      return activations with timestamps later than SINCE; measured in milliseconds since Th, 01, Jan
-                     1970
+  --help                   Show help
 
-  --upto=upto        return activations with timestamps earlier than UPTO; measured in milliseconds since Th, 01, Jan
-                     1970
+  --json                   output raw json
 
-  --version          Show version
+  --key=key                client key
+
+  --since=since            return activations with timestamps later than SINCE; measured in milliseconds since Th, 01,
+                           Jan 1970
+
+  --upto=upto              return activations with timestamps earlier than UPTO; measured in milliseconds since Th, 01,
+                           Jan 1970
+
+  --version                Show version
 ```
 
 _See code: [src/commands/runtime/activation/list.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v0.0.3/src/commands/runtime/activation/list.js)_
@@ -406,13 +445,16 @@ USAGE
   $ ./bin/run runtime:activation:logs ACTIVATIONID
 
 OPTIONS
-  -i, --insecure     bypass certificate check
-  -u, --auth=auth    authorization KEY
-  -v, --verbose      Verbose output
-  --apihost=apihost  whisk API HOST
-  --debug=debug      Debug level output
-  --help             Show help
-  --version          Show version
+  -i, --insecure           bypass certificate check
+  -u, --auth=auth          whisk auth
+  -v, --verbose            Verbose output
+  --apihost=apihost        whisk API host
+  --apiversion=apiversion  whisk API version
+  --cert=cert              client cert
+  --debug=debug            Debug level output
+  --help                   Show help
+  --key=key                client key
+  --version                Show version
 ```
 
 _See code: [src/commands/runtime/activation/logs.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v0.0.3/src/commands/runtime/activation/logs.js)_
@@ -426,13 +468,16 @@ USAGE
   $ ./bin/run runtime:activation:result ACTIVATIONID
 
 OPTIONS
-  -i, --insecure     bypass certificate check
-  -u, --auth=auth    authorization KEY
-  -v, --verbose      Verbose output
-  --apihost=apihost  whisk API HOST
-  --debug=debug      Debug level output
-  --help             Show help
-  --version          Show version
+  -i, --insecure           bypass certificate check
+  -u, --auth=auth          whisk auth
+  -v, --verbose            Verbose output
+  --apihost=apihost        whisk API host
+  --apiversion=apiversion  whisk API version
+  --cert=cert              client cert
+  --debug=debug            Debug level output
+  --help                   Show help
+  --key=key                client key
+  --version                Show version
 ```
 
 _See code: [src/commands/runtime/activation/result.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v0.0.3/src/commands/runtime/activation/result.js)_
@@ -450,11 +495,14 @@ OPTIONS
   -d, --deployment=deployment  the path to the deployment file
   -i, --insecure               bypass certificate check
   -m, --manifest=manifest      the manifest file location
-  -u, --auth=auth              authorization KEY
+  -u, --auth=auth              whisk auth
   -v, --verbose                Verbose output
-  --apihost=apihost            whisk API HOST
+  --apihost=apihost            whisk API host
+  --apiversion=apiversion      whisk API version
+  --cert=cert                  client cert
   --debug=debug                Debug level output
   --help                       Show help
+  --key=key                    client key
   --param=param                parameter values in KEY VALUE format
   --version                    Show version
 ```
@@ -470,13 +518,18 @@ USAGE
   $ ./bin/run runtime:deploy:export
 
 OPTIONS
-  -i, --insecure     bypass certificate check
-  -u, --auth=auth    authorization KEY
-  -v, --verbose      Verbose output
-  --apihost=apihost  whisk API HOST
-  --debug=debug      Debug level output
-  --help             Show help
-  --version          Show version
+  -i, --insecure             bypass certificate check
+  -m, --manifest=manifest    (required) the manifest file location
+  -u, --auth=auth            whisk auth
+  -v, --verbose              Verbose output
+  --apihost=apihost          whisk API host
+  --apiversion=apiversion    whisk API version
+  --cert=cert                client cert
+  --debug=debug              Debug level output
+  --help                     Show help
+  --key=key                  client key
+  --projectname=projectname  (required) the name of the project to be undeployed
+  --version                  Show version
 ```
 
 _See code: [src/commands/runtime/deploy/export.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v0.0.3/src/commands/runtime/deploy/export.js)_
@@ -493,11 +546,14 @@ OPTIONS
   -d, --deployment=deployment  the deployment file location
   -i, --insecure               bypass certificate check
   -m, --manifest=manifest      the manifest file location
-  -u, --auth=auth              authorization KEY
+  -u, --auth=auth              whisk auth
   -v, --verbose                Verbose output
-  --apihost=apihost            whisk API HOST
+  --apihost=apihost            whisk API host
+  --apiversion=apiversion      whisk API version
+  --cert=cert                  client cert
   --debug=debug                Debug level output
   --help                       Show help
+  --key=key                    client key
   --version                    Show version
 ```
 
@@ -512,13 +568,18 @@ USAGE
   $ ./bin/run runtime:deploy:sync
 
 OPTIONS
-  -i, --insecure     bypass certificate check
-  -u, --auth=auth    authorization KEY
-  -v, --verbose      Verbose output
-  --apihost=apihost  whisk API HOST
-  --debug=debug      Debug level output
-  --help             Show help
-  --version          Show version
+  -d, --deployment=deployment  the path to the deployment file
+  -i, --insecure               bypass certificate check
+  -m, --manifest=manifest      the manifest file location
+  -u, --auth=auth              whisk auth
+  -v, --verbose                Verbose output
+  --apihost=apihost            whisk API host
+  --apiversion=apiversion      whisk API version
+  --cert=cert                  client cert
+  --debug=debug                Debug level output
+  --help                       Show help
+  --key=key                    client key
+  --version                    Show version
 ```
 
 _See code: [src/commands/runtime/deploy/sync.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v0.0.3/src/commands/runtime/deploy/sync.js)_
@@ -532,14 +593,18 @@ USAGE
   $ ./bin/run runtime:deploy:undeploy
 
 OPTIONS
-  -i, --insecure           bypass certificate check
-  -m, --manifest=manifest  the manifest file location
-  -u, --auth=auth          authorization KEY
-  -v, --verbose            Verbose output
-  --apihost=apihost        whisk API HOST
-  --debug=debug            Debug level output
-  --help                   Show help
-  --version                Show version
+  -i, --insecure             bypass certificate check
+  -m, --manifest=manifest    the manifest file location
+  -u, --auth=auth            whisk auth
+  -v, --verbose              Verbose output
+  --apihost=apihost          whisk API host
+  --apiversion=apiversion    whisk API version
+  --cert=cert                client cert
+  --debug=debug              Debug level output
+  --help                     Show help
+  --key=key                  client key
+  --projectname=projectname  the name of the project to be undeployed
+  --version                  Show version
 ```
 
 _See code: [src/commands/runtime/deploy/undeploy.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v0.0.3/src/commands/runtime/deploy/undeploy.js)_
@@ -553,13 +618,16 @@ USAGE
   $ ./bin/run runtime:deploy:version
 
 OPTIONS
-  -i, --insecure     bypass certificate check
-  -u, --auth=auth    authorization KEY
-  -v, --verbose      Verbose output
-  --apihost=apihost  whisk API HOST
-  --debug=debug      Debug level output
-  --help             Show help
-  --version          Show version
+  -i, --insecure           bypass certificate check
+  -u, --auth=auth          whisk auth
+  -v, --verbose            Verbose output
+  --apihost=apihost        whisk API host
+  --apiversion=apiversion  whisk API version
+  --cert=cert              client cert
+  --debug=debug            Debug level output
+  --help                   Show help
+  --key=key                client key
+  --version                Show version
 ```
 
 _See code: [src/commands/runtime/deploy/version.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v0.0.3/src/commands/runtime/deploy/version.js)_
@@ -573,13 +641,16 @@ USAGE
   $ ./bin/run runtime:namespace
 
 OPTIONS
-  -i, --insecure     bypass certificate check
-  -u, --auth=auth    authorization KEY
-  -v, --verbose      Verbose output
-  --apihost=apihost  whisk API HOST
-  --debug=debug      Debug level output
-  --help             Show help
-  --version          Show version
+  -i, --insecure           bypass certificate check
+  -u, --auth=auth          whisk auth
+  -v, --verbose            Verbose output
+  --apihost=apihost        whisk API host
+  --apiversion=apiversion  whisk API version
+  --cert=cert              client cert
+  --debug=debug            Debug level output
+  --help                   Show help
+  --key=key                client key
+  --version                Show version
 ```
 
 _See code: [src/commands/runtime/namespace/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v0.0.3/src/commands/runtime/namespace/index.js)_
@@ -593,14 +664,17 @@ USAGE
   $ ./bin/run runtime:namespace:get
 
 OPTIONS
-  -i, --insecure     bypass certificate check
-  -u, --auth=auth    authorization KEY
-  -v, --verbose      Verbose output
-  --apihost=apihost  whisk API HOST
-  --debug=debug      Debug level output
-  --help             Show help
-  --json             output raw json
-  --version          Show version
+  -i, --insecure           bypass certificate check
+  -u, --auth=auth          whisk auth
+  -v, --verbose            Verbose output
+  --apihost=apihost        whisk API host
+  --apiversion=apiversion  whisk API version
+  --cert=cert              client cert
+  --debug=debug            Debug level output
+  --help                   Show help
+  --json                   output raw json
+  --key=key                client key
+  --version                Show version
 
 ALIASES
   $ ./bin/run runtime:list
@@ -617,14 +691,17 @@ USAGE
   $ ./bin/run runtime:namespace:list
 
 OPTIONS
-  -i, --insecure     bypass certificate check
-  -u, --auth=auth    authorization KEY
-  -v, --verbose      Verbose output
-  --apihost=apihost  whisk API HOST
-  --debug=debug      Debug level output
-  --help             Show help
-  --json             output raw json
-  --version          Show version
+  -i, --insecure           bypass certificate check
+  -u, --auth=auth          whisk auth
+  -v, --verbose            Verbose output
+  --apihost=apihost        whisk API host
+  --apiversion=apiversion  whisk API version
+  --cert=cert              client cert
+  --debug=debug            Debug level output
+  --help                   Show help
+  --json                   output raw json
+  --key=key                client key
+  --version                Show version
 ```
 
 _See code: [src/commands/runtime/namespace/list.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v0.0.3/src/commands/runtime/namespace/list.js)_
@@ -638,13 +715,16 @@ USAGE
   $ ./bin/run runtime:package
 
 OPTIONS
-  -i, --insecure     bypass certificate check
-  -u, --auth=auth    authorization KEY
-  -v, --verbose      Verbose output
-  --apihost=apihost  whisk API HOST
-  --debug=debug      Debug level output
-  --help             Show help
-  --version          Show version
+  -i, --insecure           bypass certificate check
+  -u, --auth=auth          whisk auth
+  -v, --verbose            Verbose output
+  --apihost=apihost        whisk API host
+  --apiversion=apiversion  whisk API version
+  --cert=cert              client cert
+  --debug=debug            Debug level output
+  --help                   Show help
+  --key=key                client key
+  --version                Show version
 ```
 
 _See code: [src/commands/runtime/package/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v0.0.3/src/commands/runtime/package/index.js)_
@@ -663,12 +743,15 @@ OPTIONS
   -a, --annotation=annotation            annotation values in KEY VALUE format
   -i, --insecure                         bypass certificate check
   -p, --param=param                      parameters in key value pairs to be passed to the package
-  -u, --auth=auth                        authorization KEY
+  -u, --auth=auth                        whisk auth
   -v, --verbose                          Verbose output
-  --apihost=apihost                      whisk API HOST
+  --apihost=apihost                      whisk API host
+  --apiversion=apiversion                whisk API version
+  --cert=cert                            client cert
   --debug=debug                          Debug level output
   --help                                 Show help
   --json                                 output raw json
+  --key=key                              client key
   --version                              Show version
 ```
 
@@ -688,12 +771,15 @@ OPTIONS
   -a, --annotation=annotation            annotation values in KEY VALUE format
   -i, --insecure                         bypass certificate check
   -p, --param=param                      parameters in key value pairs to be passed to the package
-  -u, --auth=auth                        authorization KEY
+  -u, --auth=auth                        whisk auth
   -v, --verbose                          Verbose output
-  --apihost=apihost                      whisk API HOST
+  --apihost=apihost                      whisk API host
+  --apiversion=apiversion                whisk API version
+  --cert=cert                            client cert
   --debug=debug                          Debug level output
   --help                                 Show help
   --json                                 output raw json
+  --key=key                              client key
   --shared=true|yes|false|no             parameter to be passed to indicate whether package is shared or private
   --version                              Show version
 ```
@@ -723,13 +809,16 @@ USAGE
   $ ./bin/run runtime:package:get PACKAGENAME
 
 OPTIONS
-  -i, --insecure     bypass certificate check
-  -u, --auth=auth    authorization KEY
-  -v, --verbose      Verbose output
-  --apihost=apihost  whisk API HOST
-  --debug=debug      Debug level output
-  --help             Show help
-  --version          Show version
+  -i, --insecure           bypass certificate check
+  -u, --auth=auth          whisk auth
+  -v, --verbose            Verbose output
+  --apihost=apihost        whisk API host
+  --apiversion=apiversion  whisk API version
+  --cert=cert              client cert
+  --debug=debug            Debug level output
+  --help                   Show help
+  --key=key                client key
+  --version                Show version
 ```
 
 _See code: [src/commands/runtime/package/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v0.0.3/src/commands/runtime/package/get.js)_
@@ -743,16 +832,19 @@ USAGE
   $ ./bin/run runtime:package:list [NAMESPACE]
 
 OPTIONS
-  -i, --insecure     bypass certificate check
-  -l, --limit=limit  only return LIMIT number of packages from the collection (default 30)
-  -s, --skip=skip    exclude the first SKIP number of packages from the result
-  -u, --auth=auth    authorization KEY
-  -v, --verbose      Verbose output
-  --apihost=apihost  whisk API HOST
-  --debug=debug      Debug level output
-  --help             Show help
-  --json             output raw json
-  --version          Show version
+  -i, --insecure           bypass certificate check
+  -l, --limit=limit        only return LIMIT number of packages from the collection (default 30)
+  -s, --skip=skip          exclude the first SKIP number of packages from the result
+  -u, --auth=auth          whisk auth
+  -v, --verbose            Verbose output
+  --apihost=apihost        whisk API host
+  --apiversion=apiversion  whisk API version
+  --cert=cert              client cert
+  --debug=debug            Debug level output
+  --help                   Show help
+  --json                   output raw json
+  --key=key                client key
+  --version                Show version
 ```
 
 _See code: [src/commands/runtime/package/list.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v0.0.3/src/commands/runtime/package/list.js)_
@@ -771,12 +863,15 @@ OPTIONS
   -a, --annotation=annotation            annotation values in KEY VALUE format
   -i, --insecure                         bypass certificate check
   -p, --param=param                      parameter values in KEY VALUE format
-  -u, --auth=auth                        authorization KEY
+  -u, --auth=auth                        whisk auth
   -v, --verbose                          Verbose output
-  --apihost=apihost                      whisk API HOST
+  --apihost=apihost                      whisk API host
+  --apiversion=apiversion                whisk API version
+  --cert=cert                            client cert
   --debug=debug                          Debug level output
   --help                                 Show help
   --json                                 output raw json
+  --key=key                              client key
   --shared=true|yes|false|no             parameter to be passed to indicate whether package is shared or private
   --version                              Show version
 ```
@@ -792,13 +887,16 @@ USAGE
   $ ./bin/run runtime:property
 
 OPTIONS
-  -i, --insecure     bypass certificate check
-  -u, --auth=auth    authorization KEY
-  -v, --verbose      Verbose output
-  --apihost=apihost  whisk API HOST
-  --debug=debug      Debug level output
-  --help             Show help
-  --version          Show version
+  -i, --insecure  bypass certificate check
+  -u, --auth      whisk auth
+  -v, --verbose   Verbose output
+  --apihost       whisk API host
+  --apiversion    whisk API version
+  --cert          client cert
+  --debug=debug   Debug level output
+  --help          Show help
+  --key           client key
+  --version       Show version
 ```
 
 _See code: [src/commands/runtime/property/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v0.0.3/src/commands/runtime/property/index.js)_
@@ -812,18 +910,21 @@ USAGE
   $ ./bin/run runtime:property:get
 
 OPTIONS
-  -v, --verbose  Verbose output
-  --all          all properties
-  --apibuild     whisk API build version
-  --apibuildno   whisk API build number
-  --apihost      whisk API host
-  --apiversion   whisk API version
-  --auth         whisk auth
-  --cliversion   whisk CLI version
-  --debug=debug  Debug level output
-  --help         Show help
-  --namespace    whisk namespace
-  --version      Show version
+  -i, --insecure  bypass certificate check
+  -u, --auth      whisk auth
+  -v, --verbose   Verbose output
+  --all           all properties
+  --apibuild      whisk API build version
+  --apibuildno    whisk API build number
+  --apihost       whisk API host
+  --apiversion    whisk API version
+  --cert          client cert
+  --cliversion    whisk CLI version
+  --debug=debug   Debug level output
+  --help          Show help
+  --key           client key
+  --namespace     whisk namespace
+  --version       Show version
 ```
 
 _See code: [src/commands/runtime/property/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v0.0.3/src/commands/runtime/property/get.js)_
@@ -837,14 +938,17 @@ USAGE
   $ ./bin/run runtime:property:set
 
 OPTIONS
-  -v, --verbose            Verbose output
-  --apihost=apihost        whisk API host
-  --apiversion=apiversion  whisk API version
-  --auth=auth              whisk auth
-  --debug=debug            Debug level output
-  --help                   Show help
-  --namespace=namespace    whisk namespace
-  --version                Show version
+  -i, --insecure         bypass certificate check
+  -u, --auth             whisk auth
+  -v, --verbose          Verbose output
+  --apihost              whisk API host
+  --apiversion           whisk API version
+  --cert                 client cert
+  --debug=debug          Debug level output
+  --help                 Show help
+  --key                  client key
+  --namespace=namespace  whisk namespace
+  --version              Show version
 ```
 
 _See code: [src/commands/runtime/property/set.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v0.0.3/src/commands/runtime/property/set.js)_
@@ -858,14 +962,17 @@ USAGE
   $ ./bin/run runtime:property:unset
 
 OPTIONS
-  -v, --verbose  Verbose output
-  --apihost      whisk API host
-  --apiversion   whisk API version
-  --auth         whisk auth
-  --debug=debug  Debug level output
-  --help         Show help
-  --namespace    whisk namespace
-  --version      Show version
+  -i, --insecure  bypass certificate check
+  -u, --auth      whisk auth
+  -v, --verbose   Verbose output
+  --apihost       whisk API host
+  --apiversion    whisk API version
+  --cert          client cert
+  --debug=debug   Debug level output
+  --help          Show help
+  --key           client key
+  --namespace     whisk namespace
+  --version       Show version
 ```
 
 _See code: [src/commands/runtime/property/unset.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v0.0.3/src/commands/runtime/property/unset.js)_
@@ -879,13 +986,16 @@ USAGE
   $ ./bin/run runtime:route
 
 OPTIONS
-  -i, --insecure     bypass certificate check
-  -u, --auth=auth    authorization KEY
-  -v, --verbose      Verbose output
-  --apihost=apihost  whisk API HOST
-  --debug=debug      Debug level output
-  --help             Show help
-  --version          Show version
+  -i, --insecure  bypass certificate check
+  -u, --auth      whisk auth
+  -v, --verbose   Verbose output
+  --apihost       whisk API host
+  --apiversion    whisk API version
+  --cert          client cert
+  --debug=debug   Debug level output
+  --help          Show help
+  --key           client key
+  --version       Show version
 
 ALIASES
   $ ./bin/run api
@@ -915,15 +1025,21 @@ OPTIONS
 
   -r, --response-type=html|http|json|text|svg|json  [default: json] Set the web action response TYPE.
 
-  -u, --auth=auth                                   authorization KEY
+  -u, --auth                                        whisk auth
 
   -v, --verbose                                     Verbose output
 
-  --apihost=apihost                                 whisk API HOST
+  --apihost                                         whisk API host
+
+  --apiversion                                      whisk API version
+
+  --cert                                            client cert
 
   --debug=debug                                     Debug level output
 
   --help                                            Show help
+
+  --key                                             client key
 
   --version                                         Show version
 
@@ -947,13 +1063,16 @@ ARGUMENTS
   APIVERB            (get|post|put|patch|delete|head|options) The http verb
 
 OPTIONS
-  -i, --insecure     bypass certificate check
-  -u, --auth=auth    authorization KEY
-  -v, --verbose      Verbose output
-  --apihost=apihost  whisk API HOST
-  --debug=debug      Debug level output
-  --help             Show help
-  --version          Show version
+  -i, --insecure  bypass certificate check
+  -u, --auth      whisk auth
+  -v, --verbose   Verbose output
+  --apihost       whisk API host
+  --apiversion    whisk API version
+  --cert          client cert
+  --debug=debug   Debug level output
+  --help          Show help
+  --key           client key
+  --version       Show version
 
 ALIASES
   $ ./bin/run api:delete
@@ -973,13 +1092,16 @@ ARGUMENTS
   BASEPATHORAPINAME  The base path or api name
 
 OPTIONS
-  -i, --insecure     bypass certificate check
-  -u, --auth=auth    authorization KEY
-  -v, --verbose      Verbose output
-  --apihost=apihost  whisk API HOST
-  --debug=debug      Debug level output
-  --help             Show help
-  --version          Show version
+  -i, --insecure  bypass certificate check
+  -u, --auth      whisk auth
+  -v, --verbose   Verbose output
+  --apihost       whisk API host
+  --apiversion    whisk API version
+  --cert          client cert
+  --debug=debug   Debug level output
+  --help          Show help
+  --key           client key
+  --version       Show version
 
 ALIASES
   $ ./bin/run api:get
@@ -1004,12 +1126,15 @@ OPTIONS
   -i, --insecure     bypass certificate check
   -l, --limit=limit  [default: 30] only return LIMIT number of triggers from the collection (default 30)
   -s, --skip=skip    exclude the first SKIP number of triggers from the result
-  -u, --auth=auth    authorization KEY
+  -u, --auth         whisk auth
   -v, --verbose      Verbose output
-  --apihost=apihost  whisk API HOST
+  --apihost          whisk API host
+  --apiversion       whisk API version
+  --cert             client cert
   --debug=debug      Debug level output
   --help             Show help
   --json             output raw json
+  --key              client key
   --version          Show version
 
 ALIASES
@@ -1027,13 +1152,16 @@ USAGE
   $ ./bin/run runtime:rule
 
 OPTIONS
-  -i, --insecure     bypass certificate check
-  -u, --auth=auth    authorization KEY
-  -v, --verbose      Verbose output
-  --apihost=apihost  whisk API HOST
-  --debug=debug      Debug level output
-  --help             Show help
-  --version          Show version
+  -i, --insecure  bypass certificate check
+  -u, --auth      whisk auth
+  -v, --verbose   Verbose output
+  --apihost       whisk API host
+  --apiversion    whisk API version
+  --cert          client cert
+  --debug=debug   Debug level output
+  --help          Show help
+  --key           client key
+  --version       Show version
 ```
 
 _See code: [src/commands/runtime/rule/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v0.0.3/src/commands/runtime/rule/index.js)_
@@ -1052,14 +1180,17 @@ ARGUMENTS
   ACTION   Name of the action
 
 OPTIONS
-  -i, --insecure     bypass certificate check
-  -u, --auth=auth    authorization KEY
-  -v, --verbose      Verbose output
-  --apihost=apihost  whisk API HOST
-  --debug=debug      Debug level output
-  --help             Show help
-  --json             output raw json
-  --version          Show version
+  -i, --insecure  bypass certificate check
+  -u, --auth      whisk auth
+  -v, --verbose   Verbose output
+  --apihost       whisk API host
+  --apiversion    whisk API version
+  --cert          client cert
+  --debug=debug   Debug level output
+  --help          Show help
+  --json          output raw json
+  --key           client key
+  --version       Show version
 ```
 
 _See code: [src/commands/runtime/rule/create.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v0.0.3/src/commands/runtime/rule/create.js)_
@@ -1076,13 +1207,16 @@ ARGUMENTS
   NAME  Name of the rule
 
 OPTIONS
-  -i, --insecure     bypass certificate check
-  -u, --auth=auth    authorization KEY
-  -v, --verbose      Verbose output
-  --apihost=apihost  whisk API HOST
-  --debug=debug      Debug level output
-  --help             Show help
-  --version          Show version
+  -i, --insecure  bypass certificate check
+  -u, --auth      whisk auth
+  -v, --verbose   Verbose output
+  --apihost       whisk API host
+  --apiversion    whisk API version
+  --cert          client cert
+  --debug=debug   Debug level output
+  --help          Show help
+  --key           client key
+  --version       Show version
 ```
 
 _See code: [src/commands/runtime/rule/delete.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v0.0.3/src/commands/runtime/rule/delete.js)_
@@ -1099,13 +1233,16 @@ ARGUMENTS
   NAME  Name of the rule
 
 OPTIONS
-  -i, --insecure     bypass certificate check
-  -u, --auth=auth    authorization KEY
-  -v, --verbose      Verbose output
-  --apihost=apihost  whisk API HOST
-  --debug=debug      Debug level output
-  --help             Show help
-  --version          Show version
+  -i, --insecure  bypass certificate check
+  -u, --auth      whisk auth
+  -v, --verbose   Verbose output
+  --apihost       whisk API host
+  --apiversion    whisk API version
+  --cert          client cert
+  --debug=debug   Debug level output
+  --help          Show help
+  --key           client key
+  --version       Show version
 ```
 
 _See code: [src/commands/runtime/rule/disable.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v0.0.3/src/commands/runtime/rule/disable.js)_
@@ -1122,13 +1259,16 @@ ARGUMENTS
   NAME  Name of the rule
 
 OPTIONS
-  -i, --insecure     bypass certificate check
-  -u, --auth=auth    authorization KEY
-  -v, --verbose      Verbose output
-  --apihost=apihost  whisk API HOST
-  --debug=debug      Debug level output
-  --help             Show help
-  --version          Show version
+  -i, --insecure  bypass certificate check
+  -u, --auth      whisk auth
+  -v, --verbose   Verbose output
+  --apihost       whisk API host
+  --apiversion    whisk API version
+  --cert          client cert
+  --debug=debug   Debug level output
+  --help          Show help
+  --key           client key
+  --version       Show version
 ```
 
 _See code: [src/commands/runtime/rule/enable.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v0.0.3/src/commands/runtime/rule/enable.js)_
@@ -1145,13 +1285,16 @@ ARGUMENTS
   NAME  Name of the rule
 
 OPTIONS
-  -i, --insecure     bypass certificate check
-  -u, --auth=auth    authorization KEY
-  -v, --verbose      Verbose output
-  --apihost=apihost  whisk API HOST
-  --debug=debug      Debug level output
-  --help             Show help
-  --version          Show version
+  -i, --insecure  bypass certificate check
+  -u, --auth      whisk auth
+  -v, --verbose   Verbose output
+  --apihost       whisk API host
+  --apiversion    whisk API version
+  --cert          client cert
+  --debug=debug   Debug level output
+  --help          Show help
+  --key           client key
+  --version       Show version
 ```
 
 _See code: [src/commands/runtime/rule/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v0.0.3/src/commands/runtime/rule/get.js)_
@@ -1168,12 +1311,15 @@ OPTIONS
   -i, --insecure     bypass certificate check
   -l, --limit=limit  [default: 30] Limit number of rules returned. Default 30
   -s, --skip=skip    Skip number of rules returned
-  -u, --auth=auth    authorization KEY
+  -u, --auth         whisk auth
   -v, --verbose      Verbose output
-  --apihost=apihost  whisk API HOST
+  --apihost          whisk API host
+  --apiversion       whisk API version
+  --cert             client cert
   --debug=debug      Debug level output
   --help             Show help
   --json             output raw json
+  --key              client key
   --version          Show version
 ```
 
@@ -1191,13 +1337,16 @@ ARGUMENTS
   NAME  Name of the rule
 
 OPTIONS
-  -i, --insecure     bypass certificate check
-  -u, --auth=auth    authorization KEY
-  -v, --verbose      Verbose output
-  --apihost=apihost  whisk API HOST
-  --debug=debug      Debug level output
-  --help             Show help
-  --version          Show version
+  -i, --insecure  bypass certificate check
+  -u, --auth      whisk auth
+  -v, --verbose   Verbose output
+  --apihost       whisk API host
+  --apiversion    whisk API version
+  --cert          client cert
+  --debug=debug   Debug level output
+  --help          Show help
+  --key           client key
+  --version       Show version
 ```
 
 _See code: [src/commands/runtime/rule/status.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v0.0.3/src/commands/runtime/rule/status.js)_
@@ -1216,14 +1365,17 @@ ARGUMENTS
   ACTION   Name of the action
 
 OPTIONS
-  -i, --insecure     bypass certificate check
-  -u, --auth=auth    authorization KEY
-  -v, --verbose      Verbose output
-  --apihost=apihost  whisk API HOST
-  --debug=debug      Debug level output
-  --help             Show help
-  --json             output raw json
-  --version          Show version
+  -i, --insecure  bypass certificate check
+  -u, --auth      whisk auth
+  -v, --verbose   Verbose output
+  --apihost       whisk API host
+  --apiversion    whisk API version
+  --cert          client cert
+  --debug=debug   Debug level output
+  --help          Show help
+  --json          output raw json
+  --key           client key
+  --version       Show version
 ```
 
 _See code: [src/commands/runtime/rule/update.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v0.0.3/src/commands/runtime/rule/update.js)_
@@ -1237,13 +1389,16 @@ USAGE
   $ ./bin/run runtime:trigger
 
 OPTIONS
-  -i, --insecure     bypass certificate check
-  -u, --auth=auth    authorization KEY
-  -v, --verbose      Verbose output
-  --apihost=apihost  whisk API HOST
-  --debug=debug      Debug level output
-  --help             Show help
-  --version          Show version
+  -i, --insecure  bypass certificate check
+  -u, --auth      whisk auth
+  -v, --verbose   Verbose output
+  --apihost       whisk API host
+  --apiversion    whisk API version
+  --cert          client cert
+  --debug=debug   Debug level output
+  --help          Show help
+  --key           client key
+  --version       Show version
 ```
 
 _See code: [src/commands/runtime/trigger/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v0.0.3/src/commands/runtime/trigger/index.js)_
@@ -1265,11 +1420,14 @@ OPTIONS
   -a, --annotation=annotation            annotation values in KEY VALUE format
   -i, --insecure                         bypass certificate check
   -p, --param=param                      parameter values in KEY VALUE format
-  -u, --auth=auth                        authorization KEY
+  -u, --auth                             whisk auth
   -v, --verbose                          Verbose output
-  --apihost=apihost                      whisk API HOST
+  --apihost                              whisk API host
+  --apiversion                           whisk API version
+  --cert                                 client cert
   --debug=debug                          Debug level output
   --help                                 Show help
+  --key                                  client key
   --version                              Show version
 ```
 
@@ -1287,13 +1445,16 @@ ARGUMENTS
   TRIGGERPATH  The name of the trigger, in the format /NAMESPACE/NAME
 
 OPTIONS
-  -i, --insecure     bypass certificate check
-  -u, --auth=auth    authorization KEY
-  -v, --verbose      Verbose output
-  --apihost=apihost  whisk API HOST
-  --debug=debug      Debug level output
-  --help             Show help
-  --version          Show version
+  -i, --insecure  bypass certificate check
+  -u, --auth      whisk auth
+  -v, --verbose   Verbose output
+  --apihost       whisk API host
+  --apiversion    whisk API version
+  --cert          client cert
+  --debug=debug   Debug level output
+  --help          Show help
+  --key           client key
+  --version       Show version
 ```
 
 _See code: [src/commands/runtime/trigger/delete.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v0.0.3/src/commands/runtime/trigger/delete.js)_
@@ -1313,11 +1474,14 @@ OPTIONS
   -P, --param-file=param-file  FILE containing parameter values in JSON format
   -i, --insecure               bypass certificate check
   -p, --param=param            parameter values in KEY VALUE format
-  -u, --auth=auth              authorization KEY
+  -u, --auth                   whisk auth
   -v, --verbose                Verbose output
-  --apihost=apihost            whisk API HOST
+  --apihost                    whisk API host
+  --apiversion                 whisk API version
+  --cert                       client cert
   --debug=debug                Debug level output
   --help                       Show help
+  --key                        client key
   --version                    Show version
 ```
 
@@ -1335,13 +1499,16 @@ ARGUMENTS
   TRIGGERPATH  The name/path of the trigger, in the format /NAMESPACE/NAME
 
 OPTIONS
-  -i, --insecure     bypass certificate check
-  -u, --auth=auth    authorization KEY
-  -v, --verbose      Verbose output
-  --apihost=apihost  whisk API HOST
-  --debug=debug      Debug level output
-  --help             Show help
-  --version          Show version
+  -i, --insecure  bypass certificate check
+  -u, --auth      whisk auth
+  -v, --verbose   Verbose output
+  --apihost       whisk API host
+  --apiversion    whisk API version
+  --cert          client cert
+  --debug=debug   Debug level output
+  --help          Show help
+  --key           client key
+  --version       Show version
 ```
 
 _See code: [src/commands/runtime/trigger/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v0.0.3/src/commands/runtime/trigger/get.js)_
@@ -1358,12 +1525,15 @@ OPTIONS
   -i, --insecure     bypass certificate check
   -l, --limit=limit  [default: 30] only return LIMIT number of triggers from the collection (default 30)
   -s, --skip=skip    exclude the first SKIP number of triggers from the result
-  -u, --auth=auth    authorization KEY
+  -u, --auth         whisk auth
   -v, --verbose      Verbose output
-  --apihost=apihost  whisk API HOST
+  --apihost          whisk API host
+  --apiversion       whisk API version
+  --cert             client cert
   --debug=debug      Debug level output
   --help             Show help
   --json             output raw json
+  --key              client key
   --version          Show version
 ```
 
@@ -1386,11 +1556,14 @@ OPTIONS
   -a, --annotation=annotation            annotation values in KEY VALUE format
   -i, --insecure                         bypass certificate check
   -p, --param=param                      parameter values in KEY VALUE format
-  -u, --auth=auth                        authorization KEY
+  -u, --auth                             whisk auth
   -v, --verbose                          Verbose output
-  --apihost=apihost                      whisk API HOST
+  --apihost                              whisk API host
+  --apiversion                           whisk API version
+  --cert                                 client cert
   --debug=debug                          Debug level output
   --help                                 Show help
+  --key                                  client key
   --version                              Show version
 ```
 
