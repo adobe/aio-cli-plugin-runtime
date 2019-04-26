@@ -1,0 +1,24 @@
+project:
+  name: proj
+  packages:
+    testSeq:
+      version: 0.0.2
+      namespace: ns
+      annotations: {}
+      actions: {}
+      triggers:
+        meetPerson:
+          namespace: '53444_51981'
+          inputs:
+            name: Sam
+            place: ''
+            children: 0
+          annotations: {}
+      sequences:
+        four:
+          actions: 'zero,one,two'
+      rules:
+        meetPersonRule:
+          action: three
+          annotations: {}
+          trigger: meetPerson
