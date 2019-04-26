@@ -6,8 +6,7 @@ git:
 os:
  - windows
  - linux
- - osx
-
+ 
 node_js:
   - "8"
   - "10"
@@ -21,3 +20,8 @@ script:
 
 after_success:
 - ./node_modules/.bin/codecov
+
+# safelist (prevent double builds in PRs)
+branches:
+  only:
+  - master
