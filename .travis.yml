@@ -3,12 +3,21 @@ sudo: false
 git:
   depth: 10
 
+os:
+ - windows
+ - linux
+ - osx
+
 node_js:
   - "8"
   - "10"
+  - "12"
 
 install:
   - npm version
   - npm install
 script:
   - npm test
+
+after_success:
+- ./node_modules/.bin/codecov
