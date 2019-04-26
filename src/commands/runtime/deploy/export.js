@@ -15,7 +15,6 @@ const { flags } = require('@oclif/command')
 const fs = require('fs')
 let yaml = require('js-yaml')
 const path = require('path')
-const eol = require('eol')
 
 class DeployExport extends RuntimeBaseCommand {
   async run () {
@@ -27,7 +26,7 @@ class DeployExport extends RuntimeBaseCommand {
       let fileDirectory = path.dirname(manifest)
       let projectJSON = await createProjectJSON(projectEntities, flags.projectname, ow, fileDirectory)
       let yamlObject = { project: projectJSON }
-      fs.writeFileSync(manifest, eol.auto(yaml.safeDump(yamlObject)))
+      fs.writeFileSync(manifest, yaml.safeDump(yamlObject))
     } catch (err) {
       this.handleError('Failed to export', err)
     }
