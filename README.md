@@ -15,7 +15,7 @@ governing permissions and limitations under the License.
 [![Downloads/week](https://img.shields.io/npm/dw/@adobe/aio-cli-plugin-runtime.svg)](https://npmjs.org/package/@adobe/aio-cli-plugin-runtime)
 [![Build Status](https://travis-ci.org/adobe/aio-cli-plugin-runtime.svg?branch=master)](https://travis-ci.org/adobe/aio-cli-plugin-runtime)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Codecov Coverage](https://img.shields.io/codecov/c/github/adobe/aio-cli-plugin-runtime/master.svg?style=flat-square)](https://codecov.io/gh/adobe/aio-cli-plugin-runtime/)
+[![Codecov Coverage](https://img.shields.io/codecov/c/github/adobe/aio-cli-plugin-runtime/master.svg?style=flat-square)](https://codecov.io/gh/adobe/aio-cli-plugin-runtime/) [![Greenkeeper badge](https://badges.greenkeeper.io/adobe/aio-cli-plugin-runtime.svg)](https://greenkeeper.io/)
 
 # aio-cli-plugin-runtime
 
