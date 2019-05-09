@@ -12,7 +12,7 @@ governing permissions and limitations under the License.
 
 const fs = require('fs')
 let yaml = require('js-yaml')
-const debug = require('debug')('deploy')
+const debug = require('debug')('aio-cli-plugin-runtime/deploy')
 /**
  * @description returns key value array from the parameters supplied. Used to create --param and --annotation key value pairs
  * @param flag : flags.param or flags.annotation

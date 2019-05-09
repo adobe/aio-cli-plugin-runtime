@@ -14,7 +14,7 @@ const { flags } = require('@oclif/command')
 const { cli } = require('cli-ux')
 const fetch = require('node-fetch')
 const { PropertyKey, PropertyDefault, propertiesFile } = require('../../../properties')
-const debug = require('debug')('property')
+const debug = require('debug')('aio-cli-plugin-runtime/property')
 
 class PropertyGet extends RuntimeBaseCommand {
   async run () {

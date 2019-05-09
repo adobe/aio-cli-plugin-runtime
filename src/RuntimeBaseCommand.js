@@ -12,8 +12,9 @@ governing permissions and limitations under the License.
 
 const { Command, flags } = require('@oclif/command')
 
-const debug = require('debug')
 const { propertiesFile, PropertyEnv } = require('./properties')
+const createDebug = require('debug')
+const debug = createDebug('aio-cli-plugin-runtime')
 const OpenWhisk = require('openwhisk')
 
 class RuntimeBaseCommand extends Command {
@@ -40,6 +41,8 @@ class RuntimeBaseCommand extends Command {
         }
       })
 
+    debug(options)
+
     return OpenWhisk(options)
   }
 
@@ -49,9 +52,9 @@ class RuntimeBaseCommand extends Command {
     // See https://www.npmjs.com/package/debug for usage in commands
     if (flags.verbose) {
       // verbose just sets the debug filter to everything (*)
-      debug.enable('*')
+      createDebug.enable('*')
     } else if (flags.debug) {
-      debug.enable(flags.debug)
+      createDebug.enable(flags.debug)
     }
   }
 
@@ -63,7 +66,7 @@ class RuntimeBaseCommand extends Command {
       msg = `${msg}: ${err.message}`
 
       if (flags.verbose) {
-        debug.log(err) // for stacktrace when verbose
+        debug(err)
       }
     }
     return this.error(msg)
