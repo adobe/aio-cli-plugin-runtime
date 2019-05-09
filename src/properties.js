@@ -33,7 +33,7 @@ const PropertyEnv = {
 
 const PropertyDefault = {
   AUTH: '',
-  APIHOST: '',
+  APIHOST: 'https://adobeioruntime.net',
   APIVERSION: 'v1',
   NAMESPACE: '_',
   CERT: '',

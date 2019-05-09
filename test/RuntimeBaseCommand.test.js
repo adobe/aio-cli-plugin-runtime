@@ -15,6 +15,10 @@ const { Command } = require('@oclif/command')
 const { PropertyEnv } = require('../src/properties')
 const ow = require('openwhisk')
 
+beforeEach(() => {
+  fakeFileSystem.reset()
+})
+
 test('exports', async () => {
   expect(typeof TheCommand).toEqual('function')
   expect(TheCommand.prototype).toBeInstanceOf(Command)
@@ -48,6 +52,16 @@ describe('instance methods', () => {
       expect(command.init).toBeInstanceOf(Function)
     })
 
+    test('apihost default', async () => {
+      fakeFileSystem.reset({ emptyWskProps: true })
+      return command.wsk().then(() => {
+        expect(ow).toHaveBeenCalledWith(
+          { 'apihost': 'https://adobeioruntime.net', 'apiversion': 'v1' }
+        )
+        delete process.env[PropertyEnv.APIHOST]
+      })
+    })
+
     test('apihost flag with env', async () => {
       const value = 'http://my-server'
       process.env[PropertyEnv.APIHOST] = value
@@ -58,7 +72,8 @@ describe('instance methods', () => {
           {
             api_key: 'some-gibberish-not-a-real-key',
             namespace: 'some_namespace',
-            apihost: value
+            apihost: value,
+            apiversion: 'v1'
           }
         )
         delete process.env[PropertyEnv.APIHOST]
@@ -75,7 +90,8 @@ describe('instance methods', () => {
           {
             api_key: value,
             namespace: 'some_namespace',
-            apihost: 'some.host'
+            apihost: 'some.host',
+            apiversion: 'v1'
           }
         )
         delete process.env[PropertyEnv.AUTH]
@@ -166,16 +182,10 @@ describe('instance methods', () => {
     })
 
     test('calls error', () => {
-      const debug = require('debug')
-      const spy = jest.spyOn(debug, 'log').mockImplementation(() => {})
-
       command.error = jest.fn()
       command.argv = ['--verbose']
       command.handleError('msg', new Error('an error'))
       expect(command.error).toHaveBeenCalledWith('msg: an error')
-      expect(spy).toHaveBeenCalled()
-
-      spy.mockRestore()
     })
 
     test('optional error object', () => {

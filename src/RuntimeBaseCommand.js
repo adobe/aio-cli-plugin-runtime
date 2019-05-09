@@ -12,7 +12,7 @@ governing permissions and limitations under the License.
 
 const { Command, flags } = require('@oclif/command')
 
-const { propertiesFile, PropertyEnv } = require('./properties')
+const { propertiesFile, PropertyEnv, PropertyDefault } = require('./properties')
 const createDebug = require('debug')
 const debug = createDebug('aio-cli-plugin-runtime')
 const OpenWhisk = require('openwhisk')
@@ -25,8 +25,8 @@ class RuntimeBaseCommand extends Command {
     const options = {
       cert: flags.cert || properties.get('CERT'),
       key: flags.key || properties.get('KEY'),
-      apiversion: flags.apiversion || properties.get('APIVERSION'),
-      apihost: flags.apihost || properties.get('APIHOST'),
+      apiversion: flags.apiversion || properties.get('APIVERSION') || PropertyDefault.APIVERSION,
+      apihost: flags.apihost || properties.get('APIHOST') || PropertyDefault.APIHOST,
       namespace: properties.get('NAMESPACE'),
       api_key: flags.auth || properties.get('AUTH'),
       ignore_certs: flags.insecure
