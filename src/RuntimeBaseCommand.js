@@ -16,6 +16,7 @@ const { propertiesFile, PropertyEnv, PropertyDefault } = require('./properties')
 const createDebug = require('debug')
 const debug = createDebug('aio-cli-plugin-runtime')
 const OpenWhisk = require('openwhisk')
+const config = require('@adobe/aio-cli-config')
 
 class RuntimeBaseCommand extends Command {
   async wsk () {
@@ -23,13 +24,13 @@ class RuntimeBaseCommand extends Command {
     const properties = propertiesFile()
 
     const options = {
-      cert: flags.cert || properties.get('CERT'),
-      key: flags.key || properties.get('KEY'),
-      apiversion: flags.apiversion || properties.get('APIVERSION') || PropertyDefault.APIVERSION,
-      apihost: flags.apihost || properties.get('APIHOST') || PropertyDefault.APIHOST,
-      namespace: properties.get('NAMESPACE'),
-      api_key: flags.auth || properties.get('AUTH'),
-      ignore_certs: flags.insecure
+      cert: flags.cert || config.get('runtime.cert') || properties.get('CERT'),
+      key: flags.key || config.get('runtime.key') || properties.get('KEY'),
+      apiversion: flags.apiversion || config.get('runtime.apiversion') || properties.get('APIVERSION') || PropertyDefault.APIVERSION,
+      apihost: flags.apihost || config.get('runtime.apihost') || properties.get('APIHOST') || PropertyDefault.APIHOST,
+      namespace: config.get('runtime.namespace') || properties.get('NAMESPACE'),
+      api_key: flags.auth || config.get('runtime.auth') || properties.get('AUTH'),
+      ignore_certs: flags.insecure || config.get('runtime.insecure')
     }
 
     // remove any null or undefined keys

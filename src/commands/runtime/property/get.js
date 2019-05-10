@@ -15,6 +15,7 @@ const { cli } = require('cli-ux')
 const fetch = require('node-fetch')
 const { PropertyKey, PropertyDefault, propertiesFile, PropertyEnv } = require('../../../properties')
 const debug = require('debug')('aio-cli-plugin-runtime/property')
+const config = require('@adobe/aio-cli-config')
 
 class PropertyGet extends RuntimeBaseCommand {
   async run () {
@@ -32,32 +33,32 @@ class PropertyGet extends RuntimeBaseCommand {
     const properties = propertiesFile()
 
     // get property data
-    const auth = process.env[PropertyEnv.AUTH] || properties.get(PropertyKey.AUTH) || PropertyDefault.AUTH
+    const auth = process.env[PropertyEnv.AUTH] || config.get('runtime.auth') || properties.get(PropertyKey.AUTH) || PropertyDefault.AUTH
     if (flags.all || flags.auth) {
       data.push({ Property: PropertyGet.flags.auth.description, Value: auth })
     }
 
-    const apiHost = process.env[PropertyEnv.APIHOST] || properties.get(PropertyKey.APIHOST) || PropertyDefault.APIHOST
+    const apiHost = process.env[PropertyEnv.APIHOST] || config.get('runtime.apihost') || properties.get(PropertyKey.APIHOST) || PropertyDefault.APIHOST
     if (flags.all || flags.apihost) {
       data.push({ Property: PropertyGet.flags.apihost.description, Value: apiHost })
     }
 
-    const apiVersion = process.env[PropertyEnv.APIVERSION] || properties.get(PropertyKey.APIVERSION) || PropertyDefault.APIVERSION
+    const apiVersion = process.env[PropertyEnv.APIVERSION] || config.get('runtime.apiversion') || properties.get(PropertyKey.APIVERSION) || PropertyDefault.APIVERSION
     if (flags.all || flags.apiversion) {
       data.push({ Property: PropertyGet.flags.apiversion.description, Value: apiVersion })
     }
 
-    const cert = properties.get(PropertyKey.CERT) || PropertyDefault.CERT
+    const cert = config.get('runtime.cert') || properties.get(PropertyKey.CERT) || PropertyDefault.CERT
     if (flags.all || flags.cert) {
       data.push({ Property: PropertyGet.flags.cert.description, Value: cert })
     }
 
-    const key = properties.get(PropertyKey.KEY) || PropertyDefault.KEY
+    const key = config.get('runtime.key') || properties.get(PropertyKey.KEY) || PropertyDefault.KEY
     if (flags.all || flags.key) {
       data.push({ Property: PropertyGet.flags.key.description, Value: key })
     }
 
-    const namespace = process.env[PropertyEnv.NAMESPACE] || properties.get(PropertyKey.NAMESPACE) || PropertyDefault.NAMESPACE
+    const namespace = process.env[PropertyEnv.NAMESPACE] || config.get('runtime.namespace') || properties.get(PropertyKey.NAMESPACE) || PropertyDefault.NAMESPACE
     if (flags.all || flags.namespace) {
       data.push({ Property: PropertyGet.flags.namespace.description, Value: namespace })
     }
