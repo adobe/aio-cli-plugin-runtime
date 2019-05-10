@@ -23,6 +23,13 @@ jest.mock('fs', () => require('jest-plugin-fs/mock'))
 // ensure a mocked openwhisk module for unit-tests
 jest.mock('openwhisk')
 
+// clear env variables
+delete process.env['WHISK_AUTH']
+delete process.env['WHISK_APIHOST']
+delete process.env['WHISK_APIVERSION']
+delete process.env['WHISK_NAMESPACE']
+delete process.env['WSK_CONFIG_FILE']
+
 // trap console log
 beforeEach(() => { stdout.start() })
 afterEach(() => { stdout.stop() })
