@@ -13,6 +13,7 @@ governing permissions and limitations under the License.
 const TheCommand = require('../../../../src/commands/runtime/property/get.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
 const { stdout } = require('stdout-stderr')
+const { PropertyEnv } = require('../../../../src/properties')
 
 jest.mock('node-fetch')
 
@@ -81,29 +82,16 @@ describe('instance methods', () => {
       expect(command.run).toBeInstanceOf(Function)
     })
 
-    // 38,41,52
-
-    test('error exception, unknown flag', (done) => {
-      command.argv = ['--unknown-flag']
-      return command.run()
-        .then(() => done.fail('this should not succeeed'))
-        .catch((err) => {
-          expect(err).toMatchObject(new Error('Unexpected argument: --unknown-flag\nSee more help with --help'))
-          done()
-        })
-    })
-
-    test('no flags', (done) => {
+    test('no flags', () => {
       // cli version
       command.config = fixtureJson('property/config.json')
       return command.run()
         .then(() => {
           expect(stdout.output).toMatchFixture('property/all.txt')
-          done()
         })
     })
 
-    test('no flags, api server unreachable', (done) => {
+    test('no flags, api server unreachable', () => {
       // apibuild and apibuildno
       rp.mockImplementation(() => {
         throw new Error('no connection')
@@ -114,11 +102,10 @@ describe('instance methods', () => {
       return command.run()
         .then(() => {
           expect(stdout.output).toMatchFixture('property/all-server-error.txt')
-          done()
         })
     })
 
-    test('--all', (done) => {
+    test('--all', () => {
       // cli version
       command.config = fixtureJson('property/config.json')
       // set flag
@@ -126,11 +113,10 @@ describe('instance methods', () => {
       return command.run()
         .then(() => {
           expect(stdout.output).toMatchFixture('property/all.txt')
-          done()
         })
     })
 
-    test('--namespace', (done) => {
+    test('--namespace', () => {
       // cli version
       command.config = fixtureJson('property/config.json')
       // set flag
@@ -138,11 +124,10 @@ describe('instance methods', () => {
       return command.run()
         .then(() => {
           expect(stdout.output).toMatchFixture('property/namespace.txt')
-          done()
         })
     })
 
-    test('--auth', (done) => {
+    test('--auth', () => {
       // cli version
       command.config = fixtureJson('property/config.json')
       // set flag
@@ -150,11 +135,10 @@ describe('instance methods', () => {
       return command.run()
         .then(() => {
           expect(stdout.output).toMatchFixture('property/auth.txt')
-          done()
         })
     })
 
-    test('--apihost', (done) => {
+    test('--apihost', () => {
       // cli version
       command.config = fixtureJson('property/config.json')
       // set flag
@@ -162,11 +146,10 @@ describe('instance methods', () => {
       return command.run()
         .then(() => {
           expect(stdout.output).toMatchFixture('property/apihost.txt')
-          done()
         })
     })
 
-    test('--apiversion', (done) => {
+    test('--apiversion', () => {
       // cli version
       command.config = fixtureJson('property/config.json')
       // set flag
@@ -174,11 +157,10 @@ describe('instance methods', () => {
       return command.run()
         .then(() => {
           expect(stdout.output).toMatchFixture('property/apiversion.txt')
-          done()
         })
     })
 
-    test('--cliversion', (done) => {
+    test('--cliversion', () => {
       // cli version
       command.config = fixtureJson('property/config.json')
       // set flag
@@ -186,11 +168,10 @@ describe('instance methods', () => {
       return command.run()
         .then(() => {
           expect(stdout.output).toMatchFixture('property/cliversion.txt')
-          done()
         })
     })
 
-    test('--apibuild', (done) => {
+    test('--apibuild', () => {
       // cli version
       command.config = fixtureJson('property/config.json')
       // set flag
@@ -198,11 +179,10 @@ describe('instance methods', () => {
       return command.run()
         .then(() => {
           expect(stdout.output).toMatchFixture('property/apibuild.txt')
-          done()
         })
     })
 
-    test('--apibuildno', (done) => {
+    test('--apibuildno', () => {
       // cli version
       command.config = fixtureJson('property/config.json')
       // set flag
@@ -210,11 +190,10 @@ describe('instance methods', () => {
       return command.run()
         .then(() => {
           expect(stdout.output).toMatchFixture('property/apibuildno.txt')
-          done()
         })
     })
 
-    test('keys not found in .wskconfig, use defaults', (done) => {
+    test('keys not found in .wskconfig, use defaults', () => {
       fakeFileSystem.reset({ emptyWskProps: true })
 
       // cli version
@@ -225,7 +204,22 @@ describe('instance methods', () => {
         .then(() => {
           expect(stdout.output).toMatchFixture('property/all-empty-wskprops.txt')
           fakeFileSystem.reset()
-          done()
+        })
+    })
+
+    test('ENV overrides', () => {
+      fakeFileSystem.reset({ emptyWskProps: true })
+      process.env[PropertyEnv.APIHOST] = 'https://google.com'
+      process.env[PropertyEnv.AUTH] = 'foobar'
+      process.env[PropertyEnv.APIVERSION] = 'v12.4'
+      process.env[PropertyEnv.NAMESPACE] = '1234_5678'
+
+      command.config = fixtureJson('property/config.json')
+      // set flag
+      command.argv = [ ]
+      return command.run()
+        .then(() => {
+          expect(stdout.output).toMatchFixture('property/cli-override-wskprops.txt')
         })
     })
   })
