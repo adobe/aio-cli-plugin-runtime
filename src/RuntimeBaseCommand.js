@@ -43,6 +43,14 @@ class RuntimeBaseCommand extends Command {
 
     debug(options)
 
+    if (!(options.apihost).toString().trim()) {
+      throw new Error('An API host must be specified')
+    }
+
+    if (!(options.api_key || '').toString().trim()) {
+      throw new Error('An AUTH key must be specified')
+    }
+
     return OpenWhisk(options)
   }
 

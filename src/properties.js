@@ -42,11 +42,13 @@ const PropertyDefault = {
 }
 
 function propertiesFile () {
+  let properties = { get: () => null }
   let wskConfigFile = process.env[PropertyEnv.CONFIG_FILE] || PropertyDefault.CONFIG_FILE
-  if (!fs.existsSync(wskConfigFile)) {
-    throw new Error(`OpenWhisk config file '${wskConfigFile}' does not exist.`)
+
+  if (fs.existsSync(wskConfigFile)) {
+    properties = PropertiesReader(wskConfigFile)
   }
-  const properties = PropertiesReader(wskConfigFile)
+
   properties.save = function () {
     let saved = []
     this.each((key, val) => saved.push(`${key}=${val}`))

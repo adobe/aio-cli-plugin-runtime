@@ -78,7 +78,7 @@ class NamespaceGet extends RuntimeBaseCommand {
         cli.table(data.rules, createColumns('rules'))
       }
     } catch (err) {
-      this.handleError(`failed to get the data for a namespace: ${JSON.stringify(err)}`)
+      this.handleError('failed to get the data for a namespace', err)
     }
   }
 }

@@ -97,12 +97,12 @@ describe('instance methods', () => {
     })
 
     test('namespace list, error', (done) => {
-      const namespaceError = 'namespace error'
+      const namespaceError = new Error('namespace error')
       ow.mockRejected(owAction, namespaceError)
       return command.run()
         .then(() => done.fail('does not throw error'))
         .catch((err) => {
-          expect(err).toMatchObject(new Error(`failed to get the data for a namespace: "namespace error"`))
+          expect(err).toMatchObject(new Error(`failed to get the data for a namespace: namespace error`))
           done()
         })
     })
