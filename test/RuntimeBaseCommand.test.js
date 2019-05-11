@@ -14,6 +14,7 @@ const TheCommand = require('../src/RuntimeBaseCommand.js')
 const { Command } = require('@oclif/command')
 const { PropertyEnv } = require('../src/properties')
 const ow = require('openwhisk')
+const OpenWhiskError = require('openwhisk/lib/openwhisk_error')
 
 beforeEach(() => {
   fakeFileSystem.reset()
@@ -236,6 +237,7 @@ describe('instance methods', () => {
   })
 
   describe('handleError', () => {
+    let suffix = '\n specify --verbose flag for more information'
     test('is a function', async () => {
       expect(command.handleError).toBeInstanceOf(Function)
     })
@@ -244,7 +246,7 @@ describe('instance methods', () => {
       command.error = jest.fn()
       command.argv = ['--verbose']
       command.handleError('msg', new Error('an error'))
-      expect(command.error).toHaveBeenCalledWith('msg: an error')
+      expect(command.error).toHaveBeenCalledWith('msg: an error' + suffix)
     })
 
     test('optional error object', () => {
@@ -257,6 +259,59 @@ describe('instance methods', () => {
       command.error = jest.fn()
       command.handleError()
       expect(command.error).toHaveBeenCalledWith('unknown error')
+    })
+
+    test('openwhisk error', () => {
+      command.error = jest.fn()
+      command.handleError('msg', new OpenWhiskError('an error'))
+      expect(command.error).toHaveBeenCalledWith('msg: an error' + suffix)
+    })
+
+    test('openwhisk error, with internal error', () => {
+      command.error = jest.fn()
+      const err = new Error('is')
+      err.error = 'The real error'
+      command.handleError('msg', new OpenWhiskError('what', err))
+      expect(command.error).toHaveBeenCalledWith('msg: the real error' + suffix)
+    })
+
+    test('openwhisk error, with internal error and statusCode', () => {
+      command.error = jest.fn()
+      const err = new Error('is')
+      err.error = 'The real error'
+      command.handleError('msg', new OpenWhiskError('what', err, 404))
+      expect(command.error).toHaveBeenCalledWith('msg: the real error (404 Not Found)' + suffix)
+    })
+
+    test('openwhisk error, with internal error and code', () => {
+      command.error = jest.fn()
+      const err = new Error('is')
+      err.error = 'The real error'
+      err.code = 12
+      command.handleError('msg', new OpenWhiskError('what', err))
+      expect(command.error).toHaveBeenCalledWith('msg: the real error (12)' + suffix)
+    })
+
+    test('openwhisk error, with status code', () => {
+      command.error = jest.fn()
+      const err = new Error('is')
+      err.error = 'The real error'
+      command.handleError('msg', new OpenWhiskError('what', null, 401))
+      expect(command.error).toHaveBeenCalledWith('msg: 401 Unauthorized' + suffix)
+    })
+
+    test('openwhisk error, with weird status code', () => {
+      command.error = jest.fn()
+      const err = new Error('is')
+      err.error = 'The real error'
+      command.handleError('msg', new OpenWhiskError('what', null, 999999))
+      expect(command.error).toHaveBeenCalledWith('msg: 999999' + suffix)
+    })
+
+    test('with no message', () => {
+      command.error = jest.fn()
+      command.handleError('msg', new Error(''))
+      expect(command.error).toHaveBeenCalledWith('msg' + suffix)
     })
   })
 })

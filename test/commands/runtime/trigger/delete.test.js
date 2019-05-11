@@ -80,15 +80,13 @@ describe('instance methods', () => {
 
     test('trigger delete, error', (done) => {
       let err = new Error('an error')
-      err.error = new Error('another error')
-      err.error.code = 42
       ow.mockRejected(owAction, err)
 
       command.argv = ['trigger1']
       return command.run()
         .then(() => done.fail('does not throw error'))
         .catch(() => {
-          expect(handleError).toHaveBeenLastCalledWith("Unable to delete trigger 'trigger1': undefined (code 42)")
+          expect(handleError).toHaveBeenLastCalledWith("Unable to delete trigger 'trigger1'", new Error('an error'))
           done()
         })
     })
