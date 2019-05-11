@@ -38,10 +38,11 @@ test('base flags included in command flags',
 )
 
 describe('instance methods', () => {
-  let command
+  let command, handleError
 
   beforeEach(() => {
     command = new TheCommand([])
+    handleError = jest.spyOn(command, 'handleError')
   })
 
   describe('run', () => {
@@ -73,13 +74,13 @@ describe('instance methods', () => {
     })
 
     test('namespace list, error', (done) => {
-      const namespaceError = new Error('namespace error')
+      const namespaceError = new Error('an error')
 
       ow.mockRejected(owAction, namespaceError)
       return command.run()
         .then(() => done.fail('does not throw error'))
-        .catch((err) => {
-          expect(err).toMatchObject(new Error(`failed to list namespaces: namespace error`))
+        .catch(() => {
+          expect(handleError).toHaveBeenLastCalledWith('failed to list namespaces', new Error('an error'))
           done()
         })
     })

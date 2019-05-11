@@ -42,7 +42,7 @@ test('flags', async () => {
 })
 
 describe('instance methods', () => {
-  let command
+  let command, handleError
   let cwdSpy
   let packagelist = [{
     annotations: [{
@@ -97,6 +97,7 @@ describe('instance methods', () => {
 
   beforeEach(() => {
     command = new TheCommand([])
+    handleError = jest.spyOn(command, 'handleError')
     const json = {
       'deploy/manifest_triggersRules.yaml': fixtureFile('deploy/manifest_triggersRules.yaml'),
       'deploy/manifest.yaml': fixtureFile('deploy/manifest.yaml'),
@@ -265,8 +266,8 @@ describe('instance methods', () => {
       command.argv = [ ]
       return command.run()
         .then(() => done.fail('does not throw error'))
-        .catch((err) => {
-          expect(err).toMatchObject(new Error('Failed to undeploy: Manifest file not found'))
+        .catch(() => {
+          expect(handleError).toHaveBeenLastCalledWith('Failed to undeploy', new Error('Manifest file not found'))
           done()
         })
     })

@@ -12,7 +12,6 @@ governing permissions and limitations under the License.
 
 const TheCommand = require('../../../../src/commands/runtime/rule/update.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
-const dedent = require('dedent-js')
 const owAction = 'rules.update'
 const { stdout } = require('stdout-stderr')
 const ow = require('openwhisk')()
@@ -58,29 +57,16 @@ test('flags', async () => {
 })
 
 describe('instance methods', () => {
-  let command
+  let command, handleError
 
   beforeEach(() => {
     command = new TheCommand([])
+    handleError = jest.spyOn(command, 'handleError')
   })
 
   describe('run', () => {
     test('exists', async () => {
       expect(command.run).toBeInstanceOf(Function)
-    })
-
-    test('no required args - throws exception', (done) => {
-      return command.run()
-        .then(() => done.fail('does not throw error'))
-        .catch((err) => {
-          expect(err).toMatchObject(new Error(dedent`
-          Missing 3 required args:
-          name     Name of the rule
-          trigger  Name of the trigger
-          action   Name of the action
-          See more help with --help`))
-          done()
-        })
     })
 
     test('update simple rule', () => {
@@ -116,8 +102,8 @@ describe('instance methods', () => {
       command.argv = ['nameFoo', 'triggerFoo', 'actionFoo']
       return command.run()
         .then(() => done.fail('does not throw error'))
-        .catch((err) => {
-          expect(err).toMatchObject(new Error('failed to update rule: an error'))
+        .catch(() => {
+          expect(handleError).toHaveBeenLastCalledWith('failed to update rule', new Error('an error'))
           done()
         })
     })

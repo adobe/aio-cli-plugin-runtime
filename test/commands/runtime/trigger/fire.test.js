@@ -58,7 +58,7 @@ test('flags', () => {
 })
 
 describe('instance methods', () => {
-  let command
+  let command, handleError
 
   beforeAll(() => {
     const fsJson = {
@@ -75,20 +75,12 @@ describe('instance methods', () => {
 
   beforeEach(() => {
     command = new TheCommand([])
+    handleError = jest.spyOn(command, 'handleError')
   })
 
   describe('run', () => {
     test('exists', async () => {
       expect(command.run).toBeInstanceOf(Function)
-    })
-
-    test('no args - throws exception', (done) => {
-      return command.run()
-        .then(() => done.fail('does not throw error'))
-        .catch((err) => {
-          expect(err).toMatchObject(new Error('Missing 1 required arg:\ntriggerName  The name of the trigger\nSee more help with --help'))
-          done()
-        })
     })
 
     test('fire a simple trigger', () => {
@@ -102,12 +94,12 @@ describe('instance methods', () => {
     })
 
     test('fire a simple trigger, error', (done) => {
-      ow.mockRejected(owAction, new Error('some error'))
+      ow.mockRejected(owAction, new Error('an error'))
       command.argv = ['trigger1']
       return command.run()
         .then(() => done.fail('does not throw error'))
-        .catch((err) => {
-          expect(err).toMatchObject(new Error('failed to fire the trigger: some error'))
+        .catch(() => {
+          expect(handleError).toHaveBeenLastCalledWith('failed to fire the trigger', new Error('an error'))
           done()
         })
     })

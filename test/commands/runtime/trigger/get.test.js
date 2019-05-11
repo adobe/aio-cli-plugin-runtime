@@ -43,10 +43,11 @@ test('base flags included in command flags',
 )
 
 describe('instance methods', () => {
-  let command
+  let command, handleError
 
   beforeEach(() => {
     command = new TheCommand([])
+    handleError = jest.spyOn(command, 'handleError')
   })
 
   describe('run', () => {
@@ -97,19 +98,16 @@ describe('instance methods', () => {
     })
 
     test('trigger get, error', (done) => {
-      const triggerError = {
-        error: {
-          error: 'trigger error',
-          code: '42'
-        }
-      }
+      let err = new Error('an error')
+      err.error = new Error('another error')
+      err.error.code = 42
+      ow.mockRejected(owAction, err)
 
-      ow.mockRejected(owAction, triggerError)
       command.argv = ['trigger1']
       return command.run()
         .then(() => done.fail('does not throw error'))
-        .catch((err) => {
-          expect(err).toMatchObject(new Error(`Unable to get trigger 'trigger1': trigger error (code 42)`))
+        .catch(() => {
+          expect(handleError).toHaveBeenLastCalledWith('Unable to get trigger \'trigger1\': undefined (code 42)')
           done()
         })
     })

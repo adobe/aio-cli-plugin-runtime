@@ -70,10 +70,11 @@ test('flags', async () => {
 })
 
 describe('instance methods', () => {
-  let command
+  let command, handleError
 
   beforeEach(() => {
     command = new TheCommand([])
+    handleError = jest.spyOn(command, 'handleError')
   })
 
   describe('run', () => {
@@ -99,11 +100,11 @@ describe('instance methods', () => {
     })
 
     test('error, throws exception', (done) => {
-      ow.mockRejected(owAction, new Error('route list error'))
+      ow.mockRejected(owAction, new Error('an error'))
       return command.run()
         .then(() => done.fail('should not succeed'))
-        .catch((err) => {
-          expect(err).toMatchObject(new Error('failed to list the api: route list error'))
+        .catch(() => {
+          expect(handleError).toHaveBeenLastCalledWith('failed to list the api', new Error('an error'))
           done()
         })
     })

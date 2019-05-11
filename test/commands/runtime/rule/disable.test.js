@@ -12,7 +12,6 @@ governing permissions and limitations under the License.
 
 const TheCommand = require('../../../../src/commands/runtime/rule/disable.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
-const dedent = require('dedent-js')
 const owAction = 'rules.disable'
 const { stdout } = require('stdout-stderr')
 const ow = require('openwhisk')()
@@ -50,27 +49,16 @@ test('flags', async () => {
 })
 
 describe('instance methods', () => {
-  let command
+  let command, handleError
 
   beforeEach(() => {
     command = new TheCommand([])
+    handleError = jest.spyOn(command, 'handleError')
   })
 
   describe('run', () => {
     test('exists', async () => {
       expect(command.run).toBeInstanceOf(Function)
-    })
-
-    test('no required args - throws exception', (done) => {
-      return command.run()
-        .then(() => done.fail('does not throw error'))
-        .catch((err) => {
-          expect(err).toMatchObject(new Error(dedent`
-          Missing 1 required arg:
-          name  Name of the rule
-          See more help with --help`))
-          done()
-        })
     })
 
     test('disable simple rule', () => {
@@ -90,8 +78,8 @@ describe('instance methods', () => {
       command.argv = ['nameFoo']
       return command.run()
         .then(() => done.fail('does not throw error'))
-        .catch((err) => {
-          expect(err).toMatchObject(new Error('failed to disable rule: an error'))
+        .catch(() => {
+          expect(handleError).toHaveBeenLastCalledWith('failed to disable rule', new Error('an error'))
           done()
         })
     })

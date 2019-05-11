@@ -39,7 +39,7 @@ test('aliases', async () => {
 })
 
 describe('instance methods', () => {
-  let command
+  let command, handleError
   let cwdSpy
   let projectHash = 'xyz'
   let packagelist = [{
@@ -301,6 +301,7 @@ describe('instance methods', () => {
 
   beforeEach(() => {
     command = new TheCommand([])
+    handleError = jest.spyOn(command, 'handleError')
     const json = {
       'deploy/deployment_syncSequences.yaml': fixtureFile('deploy/deployment_syncSequences.yaml'),
       'deploy/manifest.yaml': fixtureFile('deploy/manifest.yaml'),
@@ -592,8 +593,8 @@ describe('instance methods', () => {
       command.argv = [ ]
       return command.run()
         .then(() => done.fail('does not throw error'))
-        .catch((err) => {
-          expect(err).toMatchObject(new Error('Failed to sync: Manifest file not found'))
+        .catch(() => {
+          expect(handleError).toHaveBeenLastCalledWith('Failed to sync', new Error('Manifest file not found'))
           done()
         })
     })
@@ -602,8 +603,8 @@ describe('instance methods', () => {
       command.argv = [ ]
       return command.run()
         .then(() => done.fail('does not throw error'))
-        .catch((err) => {
-          expect(err).toMatchObject(new Error('Failed to sync: The mandatory key [project name] is missing'))
+        .catch(() => {
+          expect(handleError).toHaveBeenLastCalledWith('Failed to sync', new Error('The mandatory key [project name] is missing'))
           done()
         })
     })
@@ -612,8 +613,8 @@ describe('instance methods', () => {
       command.argv = [ '-m', '/deploy/deployment_syncMissingAction.yaml', '-d', '/deploy/deployment.yml' ]
       return command.run()
         .then(() => done.fail('does not throw error'))
-        .catch((err) => {
-          expect(err).toMatchObject(new Error('Failed to sync: The project name in the deployment file does not match the project name in the manifest file'))
+        .catch(() => {
+          expect(handleError).toHaveBeenLastCalledWith('Failed to sync', new Error('The project name in the deployment file does not match the project name in the manifest file'))
           done()
         })
     })

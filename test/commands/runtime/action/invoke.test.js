@@ -62,10 +62,11 @@ test('args', async () => {
 })
 
 describe('instance methods', () => {
-  let command
+  let command, handleError
 
   beforeEach(() => {
     command = new TheCommand([])
+    handleError = jest.spyOn(command, 'handleError')
   })
 
   afterAll(() => {
@@ -174,8 +175,8 @@ describe('instance methods', () => {
       command.argv = ['hello', '--param', 'a', 'b', 'c', '--blocking']
       return command.run()
         .then(() => done.fail('does not throw error'))
-        .catch((err) => {
-          expect(err).toMatchObject(new Error('failed to invoke the action: Please provide correct values for flags'))
+        .catch(() => {
+          expect(handleError).toHaveBeenLastCalledWith('failed to invoke the action', new Error('Please provide correct values for flags'))
           done()
         })
     })
@@ -185,8 +186,8 @@ describe('instance methods', () => {
       command.argv = ['hello']
       return command.run()
         .then(() => done.fail('does not throw error'))
-        .catch((err) => {
-          expect(err).toMatchObject(new Error('failed to invoke the action: an error'))
+        .catch(() => {
+          expect(handleError).toHaveBeenLastCalledWith('failed to invoke the action', new Error('an error'))
           done()
         })
     })
