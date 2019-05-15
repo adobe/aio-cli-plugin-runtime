@@ -33,7 +33,7 @@ class NamespaceList extends RuntimeBaseCommand {
         cli.table(result, columns)
       }
     } catch (err) {
-      this.handleError(`failed to list namespaces: ${JSON.stringify(err)}`)
+      this.handleError('failed to list namespaces', err)
     }
   }
 }

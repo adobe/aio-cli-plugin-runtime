@@ -14,6 +14,7 @@ const TheCommand = require('../src/RuntimeBaseCommand.js')
 const { Command } = require('@oclif/command')
 const { PropertyEnv } = require('../src/properties')
 const ow = require('openwhisk')
+const OpenWhiskError = require('openwhisk/lib/openwhisk_error')
 
 beforeEach(() => {
   fakeFileSystem.reset()
@@ -53,10 +54,63 @@ describe('instance methods', () => {
     })
 
     test('apihost default', async () => {
-      fakeFileSystem.reset({ emptyWskProps: true })
+      let files = {}
+      files[require('path').join(require('os').homedir(), '.wskprops')] = 'AUTH=1234'
+      fakeFileSystem.addJson(files)
+
       return command.wsk().then(() => {
-        expect(ow).toHaveBeenCalledWith(
-          { 'apihost': 'https://adobeioruntime.net', 'apiversion': 'v1' }
+        expect(ow).toHaveBeenLastCalledWith(
+          { 'apihost': 'https://adobeioruntime.net', 'api_key': 1234, 'apiversion': 'v1' }
+        )
+      })
+    })
+
+    test('empty APIHOST should throw', async (done) => {
+      process.env[PropertyEnv.APIHOST] = '    '
+
+      return command.wsk()
+        .then(() => done.fail('should have thrown'))
+        .catch((e) => {
+          expect(e).toEqual(new Error('An API host must be specified'))
+          done()
+        })
+    })
+
+    test('null AUTH should throw', async (done) => {
+      delete process.env[PropertyEnv.APIHOST]
+      delete process.env[PropertyEnv.AUTH]
+      let files = {}
+      files[require('path').join(require('os').homedir(), '.wskprops')] = ''
+      fakeFileSystem.addJson(files)
+
+      return command.wsk()
+        .then(() => done.fail('should have thrown'))
+        .catch((e) => {
+          expect(e).toEqual(new Error('An AUTH key must be specified'))
+          done()
+        })
+    })
+
+    test('empty AUTH should throw', async (done) => {
+      process.env[PropertyEnv.AUTH] = '    '
+
+      return command.wsk()
+        .then(() => done.fail('should have thrown'))
+        .catch((e) => {
+          expect(e).toEqual(new Error('An AUTH key must be specified'))
+          delete process.env[PropertyEnv.AUTH]
+          done()
+        })
+    })
+
+    test('not string AUTH should not throw', async () => {
+      let files = {}
+      files[require('path').join(require('os').homedir(), '.wskprops')] = 'AUTH=1234'
+      fakeFileSystem.addJson(files)
+
+      return command.wsk().then(() => {
+        expect(ow).toHaveBeenLastCalledWith(
+          { 'api_key': 1234, 'apihost': 'https://adobeioruntime.net', 'apiversion': 'v1' }
         )
         delete process.env[PropertyEnv.APIHOST]
       })
@@ -67,7 +121,7 @@ describe('instance methods', () => {
       process.env[PropertyEnv.APIHOST] = value
 
       return command.wsk().then(() => {
-        expect(ow).toHaveBeenCalledWith(
+        expect(ow).toHaveBeenLastCalledWith(
           // the values are from the wsk.properties fixture
           {
             api_key: 'some-gibberish-not-a-real-key',
@@ -85,7 +139,7 @@ describe('instance methods', () => {
       process.env[PropertyEnv.AUTH] = value
 
       return command.wsk().then(() => {
-        expect(ow).toHaveBeenCalledWith(
+        expect(ow).toHaveBeenLastCalledWith(
           // the values are from the wsk.properties fixture
           {
             api_key: value,
@@ -103,7 +157,7 @@ describe('instance methods', () => {
       process.env[PropertyEnv.APIVERSION] = value
 
       return command.wsk().then(() => {
-        expect(ow).toHaveBeenCalledWith(
+        expect(ow).toHaveBeenLastCalledWith(
           // the values are from the wsk.properties fixture
           {
             api_key: 'some-gibberish-not-a-real-key',
@@ -122,7 +176,7 @@ describe('instance methods', () => {
 
       command.argv = ['--verbose']
       return command.init().then(() => {
-        expect(spy).toHaveBeenCalledWith('*')
+        expect(spy).toHaveBeenLastCalledWith('*')
         spy.mockClear()
       })
     })
@@ -133,7 +187,7 @@ describe('instance methods', () => {
 
       command.argv = ['--debug', 'foo,bar']
       return command.init().then(() => {
-        expect(spy).toHaveBeenCalledWith('foo,bar')
+        expect(spy).toHaveBeenLastCalledWith('foo,bar')
         spy.mockClear()
       })
     })
@@ -161,22 +215,29 @@ describe('instance methods', () => {
       })
     })
 
-    test('no config file', (done) => {
+    test('no config file, no problem', () => {
       fakeFileSystem.clear()
+      process.env[PropertyEnv.AUTH] = '1234'
 
-      return command.wsk()
-        .then(() => done.fail('does not throw error'))
-        .catch((err) => {
-          fakeFileSystem.reset()
+      return command.wsk().then(() => {
+        delete process.env[PropertyEnv.AUTH]
+      })
+    })
 
-          const wskprops = require('path').join(require('os').homedir(), '.wskprops')
-          expect(err).toMatchObject(new Error(`OpenWhisk config file '${wskprops}' does not exist.`))
-          done()
-        })
+    test('should not throw if config file specified but doesnt exist', () => {
+      fakeFileSystem.clear()
+      process.env[PropertyEnv.CONFIG_FILE] = '/foo'
+      process.env[PropertyEnv.AUTH] = '1234'
+
+      return command.wsk().then(() => {
+        delete process.env[PropertyEnv.CONFIG_FILE]
+        delete process.env[PropertyEnv.AUTH]
+      })
     })
   })
 
   describe('handleError', () => {
+    let suffix = '\n specify --verbose flag for more information'
     test('is a function', async () => {
       expect(command.handleError).toBeInstanceOf(Function)
     })
@@ -185,7 +246,7 @@ describe('instance methods', () => {
       command.error = jest.fn()
       command.argv = ['--verbose']
       command.handleError('msg', new Error('an error'))
-      expect(command.error).toHaveBeenCalledWith('msg: an error')
+      expect(command.error).toHaveBeenCalledWith('msg: an error' + suffix)
     })
 
     test('optional error object', () => {
@@ -198,6 +259,59 @@ describe('instance methods', () => {
       command.error = jest.fn()
       command.handleError()
       expect(command.error).toHaveBeenCalledWith('unknown error')
+    })
+
+    test('openwhisk error', () => {
+      command.error = jest.fn()
+      command.handleError('msg', new OpenWhiskError('an error'))
+      expect(command.error).toHaveBeenCalledWith('msg: an error' + suffix)
+    })
+
+    test('openwhisk error, with internal error', () => {
+      command.error = jest.fn()
+      const err = new Error('is')
+      err.error = 'The real error'
+      command.handleError('msg', new OpenWhiskError('what', err))
+      expect(command.error).toHaveBeenCalledWith('msg: the real error' + suffix)
+    })
+
+    test('openwhisk error, with internal error and statusCode', () => {
+      command.error = jest.fn()
+      const err = new Error('is')
+      err.error = 'The real error'
+      command.handleError('msg', new OpenWhiskError('what', err, 404))
+      expect(command.error).toHaveBeenCalledWith('msg: the real error (404 Not Found)' + suffix)
+    })
+
+    test('openwhisk error, with internal error and code', () => {
+      command.error = jest.fn()
+      const err = new Error('is')
+      err.error = 'The real error'
+      err.code = 12
+      command.handleError('msg', new OpenWhiskError('what', err))
+      expect(command.error).toHaveBeenCalledWith('msg: the real error (12)' + suffix)
+    })
+
+    test('openwhisk error, with status code', () => {
+      command.error = jest.fn()
+      const err = new Error('is')
+      err.error = 'The real error'
+      command.handleError('msg', new OpenWhiskError('what', null, 401))
+      expect(command.error).toHaveBeenCalledWith('msg: 401 Unauthorized' + suffix)
+    })
+
+    test('openwhisk error, with weird status code', () => {
+      command.error = jest.fn()
+      const err = new Error('is')
+      err.error = 'The real error'
+      command.handleError('msg', new OpenWhiskError('what', null, 999999))
+      expect(command.error).toHaveBeenCalledWith('msg: 999999' + suffix)
+    })
+
+    test('with no message', () => {
+      command.error = jest.fn()
+      command.handleError('msg', new Error(''))
+      expect(command.error).toHaveBeenCalledWith('msg' + suffix)
     })
   })
 })

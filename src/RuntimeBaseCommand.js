@@ -15,7 +15,9 @@ const { Command, flags } = require('@oclif/command')
 const { propertiesFile, PropertyEnv, PropertyDefault } = require('./properties')
 const createDebug = require('debug')
 const debug = createDebug('aio-cli-plugin-runtime')
+const http = require('http')
 const OpenWhisk = require('openwhisk')
+const config = require('@adobe/aio-cli-config')
 
 class RuntimeBaseCommand extends Command {
   async wsk () {
@@ -23,13 +25,13 @@ class RuntimeBaseCommand extends Command {
     const properties = propertiesFile()
 
     const options = {
-      cert: flags.cert || properties.get('CERT'),
-      key: flags.key || properties.get('KEY'),
-      apiversion: flags.apiversion || properties.get('APIVERSION') || PropertyDefault.APIVERSION,
-      apihost: flags.apihost || properties.get('APIHOST') || PropertyDefault.APIHOST,
-      namespace: properties.get('NAMESPACE'),
-      api_key: flags.auth || properties.get('AUTH'),
-      ignore_certs: flags.insecure
+      cert: flags.cert || config.get('runtime.cert') || properties.get('CERT'),
+      key: flags.key || config.get('runtime.key') || properties.get('KEY'),
+      apiversion: flags.apiversion || config.get('runtime.apiversion') || properties.get('APIVERSION') || PropertyDefault.APIVERSION,
+      apihost: flags.apihost || config.get('runtime.apihost') || properties.get('APIHOST') || PropertyDefault.APIHOST,
+      namespace: config.get('runtime.namespace') || properties.get('NAMESPACE'),
+      api_key: flags.auth || config.get('runtime.auth') || properties.get('AUTH'),
+      ignore_certs: flags.insecure || config.get('runtime.insecure')
     }
 
     // remove any null or undefined keys
@@ -42,6 +44,14 @@ class RuntimeBaseCommand extends Command {
       })
 
     debug(options)
+
+    if (!(options.apihost).toString().trim()) {
+      throw new Error('An API host must be specified')
+    }
+
+    if (!(options.api_key || '').toString().trim()) {
+      throw new Error('An AUTH key must be specified')
+    }
 
     return OpenWhisk(options)
   }
@@ -59,15 +69,30 @@ class RuntimeBaseCommand extends Command {
   }
 
   handleError (msg, err) {
-    const { flags } = this.parse(this.constructor)
+    this.parse(this.constructor)
 
     msg = msg || 'unknown error'
-    if (err) {
-      msg = `${msg}: ${err.message}`
 
-      if (flags.verbose) {
-        debug(err)
+    const getStatusCode = (code) => `${code} ${http.STATUS_CODES[code] || ''}`.trim()
+
+    if (err) {
+      let pretty = err.message || ''
+      if (err.name === 'OpenWhiskError') {
+        if (err.error && err.error.error) {
+          pretty = err.error.error.toLowerCase()
+          if (err.statusCode) pretty = `${pretty} (${getStatusCode(err.statusCode)})`
+          else if (err.error.code) pretty = `${pretty} (${err.error.code})`
+        } else if (err.statusCode) {
+          pretty = getStatusCode(err.statusCode)
+        }
       }
+
+      if ((pretty || '').toString().trim()) {
+        msg = `${msg}: ${pretty}`
+      }
+
+      debug(err)
+      msg = msg + '\n specify --verbose flag for more information'
     }
     return this.error(msg)
   }

@@ -54,10 +54,11 @@ test('flags', async () => {
 })
 
 describe('instance methods', () => {
-  let command
+  let command, handleError
 
   beforeEach(() => {
     command = new TheCommand([])
+    handleError = jest.spyOn(command, 'handleError')
   })
 
   describe('run', () => {
@@ -119,11 +120,11 @@ describe('instance methods', () => {
     })
 
     test('trigger list, error', (done) => {
-      ow.mockRejected('triggers.list', new Error('trigger error'))
+      ow.mockRejected('triggers.list', new Error('an error'))
       return command.run()
         .then(() => done.fail('does not throw error'))
-        .catch((err) => {
-          expect(err).toMatchObject(new Error('failed to list triggers: trigger error'))
+        .catch(() => {
+          expect(handleError).toHaveBeenLastCalledWith('failed to list triggers', new Error('an error'))
           done()
         })
     })

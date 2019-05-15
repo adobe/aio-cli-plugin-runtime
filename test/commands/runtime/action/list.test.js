@@ -38,10 +38,11 @@ test('args', async () => {
 })
 
 describe('instance methods', () => {
-  let command
+  let command, handleError
 
   beforeEach(() => {
     command = new TheCommand([])
+    handleError = jest.spyOn(command, 'handleError')
   })
 
   describe('run', () => {
@@ -104,8 +105,8 @@ describe('instance methods', () => {
       ow.mockRejected(owAction, new Error('an error'))
       return command.run()
         .then(() => done.fail('does not throw error'))
-        .catch((err) => {
-          expect(err).toMatchObject(new Error('failed to list the actions: an error'))
+        .catch(() => {
+          expect(handleError).toHaveBeenLastCalledWith('failed to list the actions', new Error('an error'))
           done()
         })
     })

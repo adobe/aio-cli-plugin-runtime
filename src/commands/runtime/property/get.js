@@ -13,96 +13,94 @@ const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 const { flags } = require('@oclif/command')
 const { cli } = require('cli-ux')
 const fetch = require('node-fetch')
-const { PropertyKey, PropertyDefault, propertiesFile } = require('../../../properties')
+const { PropertyKey, PropertyDefault, propertiesFile, PropertyEnv } = require('../../../properties')
 const debug = require('debug')('aio-cli-plugin-runtime/property')
+const config = require('@adobe/aio-cli-config')
 
 class PropertyGet extends RuntimeBaseCommand {
   async run () {
-    try {
-      const { flags } = this.parse(PropertyGet)
+    const { flags } = this.parse(PropertyGet)
 
-      // if no property flags specified, default to all
-      if (!(flags.all || flags.apiversion ||
+    // if no property flags specified, default to all
+    if (!(flags.all || flags.apiversion ||
       flags.auth || flags.cliversion || flags.namespace ||
       flags.apibuild || flags.apihost || flags.apibuildno
-      )) {
-        flags.all = true
-      }
-
-      let data = []
-      const properties = propertiesFile()
-
-      // get property data
-
-      if (flags.all || flags.auth) {
-        data.push({ Property: PropertyGet.flags.auth.description, Value: properties.get(PropertyKey.AUTH) || PropertyDefault.AUTH })
-      }
-
-      const apiHost = properties.get(PropertyKey.APIHOST) || PropertyDefault.APIHOST
-      if (flags.all || flags.apihost) {
-        data.push({ Property: PropertyGet.flags.apihost.description, Value: apiHost })
-      }
-
-      const apiVersion = properties.get(PropertyKey.APIVERSION) || PropertyDefault.APIVERSION
-      if (flags.all || flags.apiversion) {
-        data.push({ Property: PropertyGet.flags.apiversion.description, Value: apiVersion })
-      }
-
-      const cert = properties.get(PropertyKey.CERT) || PropertyDefault.CERT
-      if (flags.all || flags.cert) {
-        data.push({ Property: PropertyGet.flags.cert.description, Value: cert })
-      }
-
-      const key = properties.get(PropertyKey.KEY) || PropertyDefault.KEY
-      if (flags.all || flags.key) {
-        data.push({ Property: PropertyGet.flags.key.description, Value: key })
-      }
-
-      if (flags.all || flags.namespace) {
-        data.push({ Property: PropertyGet.flags.namespace.description, Value: properties.get(PropertyKey.NAMESPACE) || PropertyDefault.NAMESPACE })
-      }
-
-      if (flags.all || flags.cliversion) {
-        data.push({ Property: PropertyGet.flags.cliversion.description, Value: this.config.userAgent })
-      }
-
-      // to get apibuild and apibuildno, we need to do a server call
-      if (flags.all || flags.apibuild || flags.apibuildno) {
-        const uri = `${apiHost}/api/${apiVersion}`
-
-        let result = { build: 'error', buildno: 'error' }
-
-        try {
-          debug(`Getting data from url ${uri} ...\n`)
-          let response = await fetch(uri)
-          result = await response.json()
-          debug(JSON.stringify(result, null, 2))
-        } catch (err) {
-          debug(err)
-        }
-
-        if (flags.all || flags.apibuild) {
-          data.push({ Property: PropertyGet.flags.apibuild.description, Value: result.build })
-        }
-
-        if (flags.all || flags.apibuildno) {
-          data.push({ Property: PropertyGet.flags.apibuildno.description, Value: result.buildno })
-        }
-      }
-
-      cli.table(data,
-        {
-          Property: { minWidth: 10 },
-          Value: { minWidth: 20 }
-        },
-        {
-          printLine: this.log,
-          'no-truncate': true,
-          ...flags // parsed flags
-        })
-    } catch (err) {
-      this.handleError('failed to get the property', err)
+    )) {
+      flags.all = true
     }
+
+    let data = []
+    const properties = propertiesFile()
+
+    // get property data
+    const auth = process.env[PropertyEnv.AUTH] || config.get('runtime.auth') || properties.get(PropertyKey.AUTH) || PropertyDefault.AUTH
+    if (flags.all || flags.auth) {
+      data.push({ Property: PropertyGet.flags.auth.description, Value: auth })
+    }
+
+    const apiHost = process.env[PropertyEnv.APIHOST] || config.get('runtime.apihost') || properties.get(PropertyKey.APIHOST) || PropertyDefault.APIHOST
+    if (flags.all || flags.apihost) {
+      data.push({ Property: PropertyGet.flags.apihost.description, Value: apiHost })
+    }
+
+    const apiVersion = process.env[PropertyEnv.APIVERSION] || config.get('runtime.apiversion') || properties.get(PropertyKey.APIVERSION) || PropertyDefault.APIVERSION
+    if (flags.all || flags.apiversion) {
+      data.push({ Property: PropertyGet.flags.apiversion.description, Value: apiVersion })
+    }
+
+    const cert = config.get('runtime.cert') || properties.get(PropertyKey.CERT) || PropertyDefault.CERT
+    if (flags.all || flags.cert) {
+      data.push({ Property: PropertyGet.flags.cert.description, Value: cert })
+    }
+
+    const key = config.get('runtime.key') || properties.get(PropertyKey.KEY) || PropertyDefault.KEY
+    if (flags.all || flags.key) {
+      data.push({ Property: PropertyGet.flags.key.description, Value: key })
+    }
+
+    const namespace = process.env[PropertyEnv.NAMESPACE] || config.get('runtime.namespace') || properties.get(PropertyKey.NAMESPACE) || PropertyDefault.NAMESPACE
+    if (flags.all || flags.namespace) {
+      data.push({ Property: PropertyGet.flags.namespace.description, Value: namespace })
+    }
+
+    if (flags.all || flags.cliversion) {
+      data.push({ Property: PropertyGet.flags.cliversion.description, Value: this.config.userAgent })
+    }
+
+    // to get apibuild and apibuildno, we need to do a server call
+    if (flags.all || flags.apibuild || flags.apibuildno) {
+      const uri = `${apiHost}/api/${apiVersion}`
+
+      let result = { build: 'error', buildno: 'error' }
+
+      try {
+        debug(`Getting data from url ${uri} ...\n`)
+        let response = await fetch(uri)
+        result = await response.json()
+        debug(JSON.stringify(result, null, 2))
+      } catch (err) {
+        debug(err)
+      }
+
+      if (flags.all || flags.apibuild) {
+        data.push({ Property: PropertyGet.flags.apibuild.description, Value: result.build })
+      }
+
+      if (flags.all || flags.apibuildno) {
+        data.push({ Property: PropertyGet.flags.apibuildno.description, Value: result.buildno })
+      }
+    }
+
+    cli.table(data,
+      {
+        Property: { minWidth: 10 },
+        Value: { minWidth: 20 }
+      },
+      {
+        printLine: this.log,
+        'no-truncate': true,
+        ...flags // parsed flags
+      })
   }
 }
 

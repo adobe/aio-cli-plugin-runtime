@@ -12,7 +12,6 @@ governing permissions and limitations under the License.
 
 const TheCommand = require('../../../../src/commands/runtime/route/create.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
-const dedent = require('dedent-js')
 const owAction = 'routes.create'
 const { stdout } = require('stdout-stderr')
 const ow = require('openwhisk')()
@@ -73,30 +72,16 @@ test('flags', async () => {
 })
 
 describe('instance methods', () => {
-  let command
+  let command, handleError
 
   beforeEach(() => {
     command = new TheCommand([])
+    handleError = jest.spyOn(command, 'handleError')
   })
 
   describe('run', () => {
     test('exists', async () => {
       expect(command.run).toBeInstanceOf(Function)
-    })
-
-    test('no required args - throws exception', (done) => {
-      return command.run()
-        .then(() => done.fail('does not throw error'))
-        .catch((err) => {
-          expect(err).toMatchObject(new Error(dedent`
-          Missing 4 required args:
-          basePath  The base path of the api
-          relPath   The path of the api relative to the base path
-          apiVerb   The http verb
-          action    The action to call
-          See more help with --help`))
-          done()
-        })
     })
 
     test('create a simple api, no flags', () => {
@@ -137,12 +122,12 @@ describe('instance methods', () => {
     })
 
     test('create a simple api, error', (done) => {
-      ow.mockRejected(owAction, new Error('duplicate api'))
+      ow.mockRejected(owAction, new Error('an error'))
       command.argv = ['/mybase', '/myapi', 'get', 'myaction']
       return command.run()
         .then(() => done.fail('does not throw error'))
-        .catch((err) => {
-          expect(err).toMatchObject(new Error('failed to create the api: duplicate api'))
+        .catch(() => {
+          expect(handleError).toHaveBeenLastCalledWith('failed to create the api', new Error('an error'))
           done()
         })
     })

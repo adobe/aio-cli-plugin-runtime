@@ -37,7 +37,7 @@ test('flags', async () => {
 })
 
 describe('instance methods', () => {
-  let command
+  let command, handleError
   let cwdSpy
 
   beforeAll(() => {
@@ -52,6 +52,7 @@ describe('instance methods', () => {
 
   beforeEach(() => {
     command = new TheCommand([])
+    handleError = jest.spyOn(command, 'handleError')
     const json = {
       'deploy/manifest_triggersRules.yaml': fixtureFile('deploy/manifest_triggersRules.yaml'),
       'deploy/manifest.yaml': fixtureFile('deploy/manifest.yaml'),
@@ -132,8 +133,8 @@ describe('instance methods', () => {
       command.argv = [ '-m', '/deploy/deployment_syncMissingAction.yaml', '-d', '/deploy/deployment-triggerError.yaml' ]
       return command.run()
         .then(() => done.fail('does not throw error'))
-        .catch((err) => {
-          expect(err).toMatchObject(new Error('Failed to report: The project name in the deployment file does not match the project name in the manifest file'))
+        .catch(() => {
+          expect(handleError).toHaveBeenLastCalledWith('Failed to report', new Error('The project name in the deployment file does not match the project name in the manifest file'))
           done()
         })
     })
@@ -145,8 +146,8 @@ describe('instance methods', () => {
       command.argv = [ ]
       return command.run()
         .then(() => done.fail('does not throw error'))
-        .catch((err) => {
-          expect(err).toMatchObject(new Error('Failed to report: Manifest file not found'))
+        .catch(() => {
+          expect(handleError).toHaveBeenLastCalledWith('Failed to report', new Error('Manifest file not found'))
           done()
         })
     })
