@@ -35,6 +35,11 @@ class ActivationList extends RuntimeBaseCommand {
       if (flags.upto) {
         options['upto'] = flags.upto
       }
+      if (flags.full) {
+        options['docs'] = flags.full
+        // implies --json
+        flags.json = true
+      }
       const ow = await this.wsk()
       let listActivation
       if (Object.entries(options).length === 0) {
@@ -104,6 +109,10 @@ ActivationList.flags = {
   }),
   'json': flags.boolean({
     description: 'output raw json'
+  }),
+  'full': flags.boolean({
+    char: 'f',
+    description: 'include full activation description'
   })
 }
 
