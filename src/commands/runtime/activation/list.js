@@ -40,6 +40,7 @@ class ActivationList extends RuntimeBaseCommand {
         // implies --json
         flags.json = true
       }
+
       const ow = await this.wsk()
       let listActivation
       if (Object.entries(options).length === 0) {
@@ -68,9 +69,10 @@ class ActivationList extends RuntimeBaseCommand {
           },
           Start: {
             get: (row) => {
-              return row.annotations.find((elem) => {
+              const elem = row.annotations.find((elem) => {
                 return (elem.key === 'initTime')
-              }).value ? 'cold' : 'warm'
+              })
+              return elem ? 'cold' : 'warm'
             }
           },
           Duration: {
@@ -78,7 +80,7 @@ class ActivationList extends RuntimeBaseCommand {
           },
           Status: {
             get: (row) => {
-              let statusStrings = ["success", "application error", "developer error", "internal error"]
+              let statusStrings = ['success', 'application error', 'developer error', 'internal error']
               return statusStrings[row.statusCode]
             }
           },
