@@ -52,17 +52,49 @@ class ActivationList extends RuntimeBaseCommand {
         this.logJSON('', listActivation)
       } else {
         const columns = {
-          actions: {
-            header: 'activations',
+          Datetime: {
+            get: row => `${new Date(row.start).toLocaleString()}`
+          },
+          ActivationID: {
+            header: 'Activation ID',
             get: row => `${row.activationId}`
           },
-          published: {
-            header: '',
-            get: row => `${row.name}`
+          Kind: {
+            get: (row) => {
+              return row.annotations.find((elem) => {
+                return (elem.key === 'kind')
+              }).value
+            }
+          },
+          Start: {
+            get: (row) => {
+              return row.annotations.find((elem) => {
+                return (elem.key === 'initTime')
+              }).value ? 'cold' : 'warm'
+            }
+          },
+          Duration: {
+            get: row => `${row.duration}ms`
+          },
+          Status: {
+            get: (row) => {
+              let statusStrings = ["success", "application error", "developer error", "internal error"]
+              return statusStrings[row.statusCode]
+            }
+          },
+          Entity: {
+            get: (row) => {
+              const path = row.annotations.find((elem) => {
+                return (elem.key === 'path')
+              }).value
+              return `${path}:${row.version}`
+            }
           }
         }
         if (listActivation) {
-          cli.table(listActivation, columns)
+          cli.table(listActivation, columns, {
+            'no-truncate': true
+          })
         }
       }
     } catch (err) {
