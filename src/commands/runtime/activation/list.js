@@ -35,6 +35,12 @@ class ActivationList extends RuntimeBaseCommand {
       if (flags.upto) {
         options['upto'] = flags.upto
       }
+      if (flags.full) {
+        options['docs'] = flags.full
+        // implies --json
+        flags.json = true
+      }
+
       const ow = await this.wsk()
       let listActivation
       if (Object.entries(options).length === 0) {
@@ -47,17 +53,50 @@ class ActivationList extends RuntimeBaseCommand {
         this.logJSON('', listActivation)
       } else {
         const columns = {
-          actions: {
-            header: 'activations',
+          Datetime: {
+            get: row => `${new Date(row.start).toLocaleString()}`
+          },
+          ActivationID: {
+            header: 'Activation ID',
             get: row => `${row.activationId}`
           },
-          published: {
-            header: '',
-            get: row => `${row.name}`
+          Kind: {
+            get: (row) => {
+              return row.annotations.find((elem) => {
+                return (elem.key === 'kind')
+              }).value
+            }
+          },
+          Start: {
+            get: (row) => {
+              const elem = row.annotations.find((elem) => {
+                return (elem.key === 'initTime')
+              })
+              return elem ? 'cold' : 'warm'
+            }
+          },
+          Duration: {
+            get: row => `${row.duration}ms`
+          },
+          Status: {
+            get: (row) => {
+              let statusStrings = ['success', 'application error', 'developer error', 'internal error']
+              return statusStrings[row.statusCode]
+            }
+          },
+          Entity: {
+            get: (row) => {
+              const path = row.annotations.find((elem) => {
+                return (elem.key === 'path')
+              }).value
+              return `${path}:${row.version}`
+            }
           }
         }
         if (listActivation) {
-          cli.table(listActivation, columns)
+          cli.table(listActivation, columns, {
+            'no-truncate': true
+          })
         }
       }
     } catch (err) {
@@ -104,6 +143,10 @@ ActivationList.flags = {
   }),
   'json': flags.boolean({
     description: 'output raw json'
+  }),
+  'full': flags.boolean({
+    char: 'f',
+    description: 'include full activation description'
   })
 }
 
