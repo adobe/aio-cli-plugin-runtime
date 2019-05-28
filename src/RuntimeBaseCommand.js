@@ -102,7 +102,11 @@ RuntimeBaseCommand.flags = {
   debug: flags.string({ description: 'Debug level output' }),
   verbose: flags.boolean({ char: 'v', description: 'Verbose output' }),
   version: flags.boolean({ description: 'Show version' }),
-  help: flags.boolean({ description: 'Show help' })
+  help: flags.boolean({ description: 'Show help' }),
+  'User-Agent': flags.string({
+    hidden: true,
+    default: 'aio-cli-plugin-runtime@' + require('../package.json').version
+  })
 }
 
 module.exports = RuntimeBaseCommand

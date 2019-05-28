@@ -36,7 +36,7 @@ $ npm install -g @adobe/aio-cli-plugin-runtime
 $ ./bin/run COMMAND
 running command...
 $ ./bin/run (-v|--version|version)
-@adobe/aio-cli-plugin-runtime/1.0.0 darwin-x64 node-v8.9.4
+@adobe/aio-cli-plugin-runtime/1.0.0 darwin-x64 node-v12.2.0
 $ ./bin/run --help [COMMAND]
 USAGE
   $ ./bin/run COMMAND

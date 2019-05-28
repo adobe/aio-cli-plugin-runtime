@@ -14,11 +14,11 @@ const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 
 class ActivationResult extends RuntimeBaseCommand {
   async run () {
-    const { args } = this.parse(ActivationResult)
+    const { args, flags } = this.parse(ActivationResult)
     const id = args.activationID
     try {
       const ow = await this.wsk()
-      const result = await ow.activations.result(id)
+      const result = await ow.activations.result({ name: id, 'User-Agent': flags['User-Agent'] })
       this.logJSON('', result)
     } catch (err) {
       this.handleError('failed to fetch activation result', err)

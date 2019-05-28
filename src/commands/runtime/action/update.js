@@ -106,6 +106,8 @@ class ActionUpdate extends RuntimeBaseCommand {
       }
       options['params'] = paramsAction
       options['annotations'] = annotationParams
+      options['User-Agent'] = flags['User-Agent']
+
       const result = await ow.actions.update(options)
       if (flags.json) {
         this.logJSON('', result)

@@ -32,7 +32,8 @@ class ActionInvoke extends RuntimeBaseCommand {
         name,
         params: paramsAction,
         blocking: flags.blocking || flags.result,
-        result: flags.result
+        result: flags.result,
+        ...flags
       })
       this.logJSON('', result)
     } catch (err) {

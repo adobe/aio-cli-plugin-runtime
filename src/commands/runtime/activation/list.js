@@ -35,13 +35,11 @@ class ActivationList extends RuntimeBaseCommand {
       if (flags.upto) {
         options['upto'] = flags.upto
       }
+
+      options['User-Agent'] = flags['User-Agent']
+
       const ow = await this.wsk()
-      let listActivation
-      if (Object.entries(options).length === 0) {
-        listActivation = await ow.activations.list()
-      } else {
-        listActivation = await ow.activations.list(options)
-      }
+      let listActivation = await ow.activations.list(options)
 
       if (flags.json) {
         this.logJSON('', listActivation)

@@ -19,7 +19,7 @@ class ActionDelete extends RuntimeBaseCommand {
     const name = args.actionName
     try {
       const ow = await this.wsk()
-      const result = await ow.actions.delete(name)
+      const result = await ow.actions.delete({ name: name, 'User-Agent': flags['User-Agent'] })
       if (flags.json) {
         this.logJSON('', result)
       }
