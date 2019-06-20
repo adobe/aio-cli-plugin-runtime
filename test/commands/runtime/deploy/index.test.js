@@ -81,7 +81,11 @@ describe('instance methods', () => {
       'deploy/manifest_webSequence.yaml': fixtureFile('deploy/manifest_webSequence.yaml'),
       'deploy/deployment_triggersMissingInputs.yaml': fixtureFile('deploy/deployment_triggersMissingInputs.yaml'),
       'deploy/deployment_triggersMissing.yaml': fixtureFile('deploy/deployment_triggersMissing.yaml'),
+      'deploy/manifest_dependencies.yaml': fixtureFile('deploy/manifest_dependencies.yaml'),
+      'deploy/manifest_dependencies_error.yaml': fixtureFile('deploy/manifest_dependencies_error.yaml'),
       'deploy/manifest_dep.yaml': fixtureFile('deploy/manifest_dep.yaml'),
+      'deploy/manifest_dep_dependencies.yaml': fixtureFile('deploy/manifest_dep_dependencies.yaml'),
+      'deploy/deployment_dependencies.yaml': fixtureFile('deploy/deployment_dependencies.yaml'),
       'deploy/deployment_wrongPackageName.yaml': fixtureFile('deploy/deployment_wrongPackageName.yaml'),
       'deploy/deployment-triggerError.yaml': fixtureFile('deploy/deployment-triggerError.yaml'),
       'deploy/deployment_wrongTrigger.yaml': fixtureFile('deploy/deployment_wrongTrigger.yaml'),
@@ -408,6 +412,60 @@ describe('instance methods', () => {
             }
           })
           expect(stdout.output).toMatch('')
+        })
+    })
+
+    test('deploys dependencies', () => {
+      let cmd = ow.mockResolved(owPackage, '')
+      command.argv = ['-m', '/deploy/manifest_dependencies.yaml']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith({
+            name: 'mypackage',
+            package: {
+              binding: {
+                namespace: 'adobeio',
+                name: 'oauth'
+              },
+              parameters: [{
+                'key': 'client_id',
+                'value': 'myclientID123'
+              }]
+            }
+          })
+          expect(stdout.output).toMatch('')
+        })
+    })
+
+    test('deploys dependencies with deployment flag', () => {
+      let cmd = ow.mockResolved(owPackage, '')
+      command.argv = ['-m', '/deploy/manifest_dep_dependencies.yaml', '--deployment', '/deploy/deployment_dependencies.yaml']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith({
+            name: 'mypackage',
+            package: {
+              binding: {
+                namespace: 'adobeio',
+                name: 'oauth'
+              },
+              parameters: [{
+                'key': 'client_id',
+                'value': 'myclientID123'
+              }]
+            }
+          })
+          expect(stdout.output).toMatch('')
+        })
+    })
+
+    test('errors out on deploying dependencies without location flag', (done) => {
+      command.argv = ['-m', '/deploy/manifest_dependencies_error.yaml']
+      return command.run()
+        .then(() => done.fail('does not throw error'))
+        .catch(() => {
+          expect(handleError).toHaveBeenLastCalledWith('Failed to deploy', new Error('Invalid or missing location in the manifest for this action: mypackage'))
+          done()
         })
     })
 

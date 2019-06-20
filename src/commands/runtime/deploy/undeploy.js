@@ -45,6 +45,11 @@ class DeployUndeploy extends RuntimeBaseCommand {
       let apis = []
       Object.keys(packages).forEach((key) => {
         pkg.push(key)
+        if (packages[key]['dependencies']) {
+          Object.keys(packages[key]['dependencies']).forEach((depName) => {
+            pkg.push(depName)
+          })
+        }
         if (packages[key]['actions']) {
           Object.keys(packages[key]['actions']).forEach((action) => {
             action = `${key}/${action}`

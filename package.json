@@ -62,6 +62,7 @@
   "main": "src/index.js",
   "repository": "adobe/aio-cli-plugin-runtime",
   "scripts": {
+    "eslint-fix": "eslint src test --fix",
     "posttest": "eslint src test",
     "test": "npm run unit-tests",
     "unit-tests": "jest --ci",
