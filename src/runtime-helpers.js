@@ -540,7 +540,11 @@ async function deployPackage (entities, ow, logger) {
   for (let action of entities.actions) {
     if (action['exec'] && action['exec']['kind']) {
       action['exec']['components'] = action['exec']['components'].map(sequence => {
-        return `/${ns}/${sequence}`
+        let actionItemCount = sequence.split('/').length
+        let startsWithSlash = sequence.startsWith('/')
+        return (startsWithSlash && actionItemCount > 3) || (!startsWithSlash && actionItemCount > 2)
+          ? `/${sequence}`
+          : `/${ns}/${sequence}`
       })
     }
     logger(`Info: Deploying action [${action.name}]...`)
