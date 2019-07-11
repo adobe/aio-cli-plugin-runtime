@@ -18,7 +18,7 @@ class ActivationLogs extends RuntimeBaseCommand {
     const id = args.activationID
     try {
       const ow = await this.wsk()
-      const result = await ow.activations.logs({ name: id, 'User-Agent': flags['User-Agent'] })
+      const result = await ow.activations.logs({ name: id, 'User-Agent': flags.useragent })
       this.logJSON('', result)
     } catch (err) {
       this.handleError('failed to retrieve the logs', err)
@@ -34,5 +34,7 @@ ActivationLogs.args = [
 ]
 
 ActivationLogs.description = 'Retrieves the Logs for an Activation'
+
+ActivationLogs.flags = { ...RuntimeBaseCommand.flags }
 
 module.exports = ActivationLogs
