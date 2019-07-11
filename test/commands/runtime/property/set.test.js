@@ -53,10 +53,11 @@ test('flags', async () => {
 })
 
 describe('instance methods', () => {
-  let command
+  let command, handleError
 
   beforeEach(() => {
     command = new TheCommand([])
+    handleError = jest.spyOn(command, 'handleError')
   })
 
   describe('run', () => {
@@ -133,8 +134,8 @@ describe('instance methods', () => {
     command.argv = [ '--unknown-flag', 'some-value' ]
     return command.run()
       .then(() => done.fail('this should not succeed'))
-      .catch((err) => {
-        expect(err).toMatchObject(new Error('Unexpected arguments: --unknown-flag, some-value\nSee more help with --help'))
+      .catch(() => {
+        expect(handleError).toHaveBeenLastCalledWith('failed to set the property', new Error('Unexpected arguments: --unknown-flag, some-value\nSee more help with --help'))
         done()
       })
   })

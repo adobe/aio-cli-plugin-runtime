@@ -47,10 +47,11 @@ test('args', async () => {
 })
 
 describe('instance methods', () => {
-  let command
+  let command, handleError
 
   beforeEach(() => {
     command = new TheCommand([])
+    handleError = jest.spyOn(command, 'handleError')
   })
 
   describe('run', () => {
@@ -123,6 +124,16 @@ describe('instance methods', () => {
         })
     })
 
+    test('return list of actions with activation id, --full flag', () => {
+      let cmd = ow.mockResolved(owAction, '')
+      command.argv = ['12345', '--full']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith({ name: '12345', docs: true })
+          expect(stdout.output).toMatch('')
+        })
+    })
+
     test('return list of actions with activation id --json', () => {
       let cmd = ow.mockResolved(owAction, '')
       command.argv = ['12345', '--json']
@@ -136,8 +147,48 @@ describe('instance methods', () => {
         })
     })
 
-    test('return list of actions with activation id + data', () => {
-      let cmd = ow.mockResolved(owAction, [{ activationId: '12345', name: '12345' }])
+    test('return list of actions with activation id + data (cold)', () => {
+      const data = [
+        {
+          'activationId': '12345',
+          'annotations': [
+            { 'key': 'path', 'value': '8888_9999/foo' },
+            { 'key': 'kind', 'value': 'nodejs:10' },
+            { 'key': 'initTime', 'value': 20 }
+          ],
+          'duration': 23,
+          'name': 'foo',
+          'namespace': '8888_9999',
+          'start': 1558507178861,
+          'statusCode': 0,
+          'version': '0.0.1'
+        }]
+      let cmd = ow.mockResolved(owAction, data)
+      command.argv = ['12345']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith({ name: '12345' })
+          expect(stdout.output).toMatch('')
+        })
+    })
+
+    test('return list of actions with activation id + data (warm)', () => {
+      const data = [
+        {
+          'activationId': '12345',
+          'annotations': [
+            { 'key': 'path', 'value': '8888_9999/foo' },
+            { 'key': 'kind', 'value': 'nodejs:10' }
+          // no initTime key
+          ],
+          'duration': 23,
+          'name': 'foo',
+          'namespace': '8888_9999',
+          'start': 1558507178861,
+          'statusCode': 0,
+          'version': '0.0.1'
+        }]
+      let cmd = ow.mockResolved(owAction, data)
       command.argv = ['12345']
       return command.run()
         .then(() => {
@@ -153,8 +204,8 @@ describe('instance methods', () => {
       ow.mockRejected(owAction, new Error('an error'))
       return command.run()
         .then(() => done.fail('does not throw error'))
-        .catch((err) => {
-          expect(err).toMatchObject(new Error('failed to list the activations: an error'))
+        .catch(() => {
+          expect(handleError).toHaveBeenLastCalledWith('failed to list the activations', new Error('an error'))
           done()
         })
     })

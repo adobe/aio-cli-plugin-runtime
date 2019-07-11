@@ -91,10 +91,11 @@ test('args', async () => {
 })
 
 describe('instance methods', () => {
-  let command
+  let command, handleError
 
   beforeEach(() => {
     command = new TheCommand([])
+    handleError = jest.spyOn(command, 'handleError')
   })
 
   beforeAll(() => {
@@ -427,8 +428,8 @@ describe('instance methods', () => {
       command.argv = ['hello', '/action/actionFile.js', '--param', 'a', 'b', 'c']
       return command.run()
         .then(() => done.fail('does not throw error'))
-        .catch((err) => {
-          expect(err).toMatchObject(new Error('failed to create the action: Please provide correct values for flags'))
+        .catch(() => {
+          expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error('Please provide correct values for flags'))
           done()
         })
     })
@@ -438,8 +439,8 @@ describe('instance methods', () => {
       command.argv = ['hello', '--sequence', ' ,a,b,c']
       return command.run()
         .then(() => done.fail('does not throw error'))
-        .catch((err) => {
-          expect(err).toMatchObject(new Error('failed to create the action: Provide a valid sequence component'))
+        .catch(() => {
+          expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error('Provide a valid sequence component'))
           done()
         })
     })
@@ -449,8 +450,8 @@ describe('instance methods', () => {
       command.argv = ['hello', '/action/file.js', '--kind', 'nodejs:10']
       return command.run()
         .then(() => done.fail('does not throw error'))
-        .catch((err) => {
-          expect(err).toMatchObject(new Error('failed to create the action: Provide a valid path for ACTION'))
+        .catch(() => {
+          expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error('Provide a valid path for ACTION'))
           done()
         })
     })
@@ -460,8 +461,8 @@ describe('instance methods', () => {
       command.argv = ['hello', '/action/file.zip', '--kind', 'nodejs:10']
       return command.run()
         .then(() => done.fail('does not throw error'))
-        .catch((err) => {
-          expect(err).toMatchObject(new Error('failed to create the action: Provide a valid path for ACTION'))
+        .catch(() => {
+          expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error('Provide a valid path for ACTION'))
           done()
         })
     })
@@ -471,8 +472,8 @@ describe('instance methods', () => {
       command.argv = ['hello', '/action/actionFile.js', '--annotation', 'a', 'b', 'c']
       return command.run()
         .then(() => done.fail('does not throw error'))
-        .catch((err) => {
-          expect(err).toMatchObject(new Error('failed to create the action: Please provide correct values for flags'))
+        .catch(() => {
+          expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error('Please provide correct values for flags'))
           done()
         })
     })
@@ -482,8 +483,8 @@ describe('instance methods', () => {
       command.argv = ['hello', '/action/actionFile.js']
       return command.run()
         .then(() => done.fail('does not throw error'))
-        .catch((err) => {
-          expect(err).toMatchObject(new Error('failed to create the action: an error'))
+        .catch(() => {
+          expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error('an error'))
           done()
         })
     })

@@ -38,10 +38,12 @@ test('args', async () => {
 })
 
 describe('instance methods', () => {
-  let command
+  let command, handleError
 
   beforeEach(() => {
     command = new TheCommand([])
+    handleError = jest.spyOn(command, 'handleError')
+    handleError = jest.spyOn(command, 'handleError')
   })
 
   describe('run', () => {
@@ -128,8 +130,8 @@ describe('instance methods', () => {
       command.argv = ['hello']
       return command.run()
         .then(() => done.fail('does not throw error'))
-        .catch((err) => {
-          expect(err).toMatchObject(new Error('failed to retrieve the action: an error'))
+        .catch(() => {
+          expect(handleError).toHaveBeenLastCalledWith('failed to retrieve the action', new Error('an error'))
           done()
         })
     })
@@ -149,7 +151,6 @@ describe('instance methods', () => {
             'User-Agent': agentString
           })
           expect(fs.writeFileSync).toHaveBeenCalledWith('hello.js', 'this is the code')
-          // expect(stdout.output).toMatch('api/web/namespace/default/hello')
         })
     })
 
@@ -164,7 +165,6 @@ describe('instance methods', () => {
             'User-Agent': agentString
           })
           expect(fs.writeFileSync).toHaveBeenCalledWith('filename.js', 'this is the code')
-          // expect(stdout.output).toMatch('api/web/namespace/default/hello')
         })
     })
 

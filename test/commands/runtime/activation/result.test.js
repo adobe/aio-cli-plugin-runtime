@@ -37,10 +37,11 @@ test('args', async () => {
 })
 
 describe('instance methods', () => {
-  let command
+  let command, handleError
 
   beforeEach(() => {
     command = new TheCommand([])
+    handleError = jest.spyOn(command, 'handleError')
   })
 
   describe('run', () => {
@@ -66,8 +67,8 @@ describe('instance methods', () => {
       command.argv = ['hello']
       return command.run()
         .then(() => done.fail('does not throw error'))
-        .catch((err) => {
-          expect(err).toMatchObject(new Error('failed to fetch activation result: an error'))
+        .catch(() => {
+          expect(handleError).toHaveBeenLastCalledWith('failed to fetch activation result', new Error('an error'))
           done()
         })
     })

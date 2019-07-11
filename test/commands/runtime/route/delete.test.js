@@ -12,7 +12,6 @@ governing permissions and limitations under the License.
 
 const TheCommand = require('../../../../src/commands/runtime/route/delete.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
-const dedent = require('dedent-js')
 const { stdout } = require('stdout-stderr')
 const owAction = 'routes.delete'
 const ow = require('openwhisk')()
@@ -54,10 +53,11 @@ test('base flags included in command flags',
 )
 
 describe('instance methods', () => {
-  let command
+  let command, handleError
 
   beforeEach(() => {
     command = new TheCommand([])
+    handleError = jest.spyOn(command, 'handleError')
   })
 
   describe('run', () => {
@@ -66,25 +66,13 @@ describe('instance methods', () => {
     })
   })
 
-  test('no required args - throws exception', (done) => {
-    return command.run()
-      .then(() => done.fail('does not throw error'))
-      .catch((err) => {
-        expect(err).toMatchObject(new Error(dedent`
-        Missing 1 required arg:
-        basePathOrApiName  The base path or api name
-        See more help with --help`))
-        done()
-      })
-  })
-
   test('error, throws exception', (done) => {
-    ow.mockRejected(owAction, new Error('route delete error'))
+    ow.mockRejected(owAction, new Error('an error'))
     command.argv = [ '/myapi' ]
     return command.run()
       .then(() => done.fail('should not succeed'))
-      .catch((err) => {
-        expect(err).toMatchObject(new Error('failed to delete the api: route delete error'))
+      .catch(() => {
+        expect(handleError).toHaveBeenLastCalledWith('failed to delete the api', new Error('an error'))
         done()
       })
   })

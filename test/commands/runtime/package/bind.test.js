@@ -64,10 +64,11 @@ test('args', async () => {
 })
 
 describe('instance methods', () => {
-  let command
+  let command, handleError
 
   beforeEach(() => {
     command = new TheCommand([])
+    handleError = jest.spyOn(command, 'handleError')
   })
 
   afterAll(() => {
@@ -305,8 +306,8 @@ describe('instance methods', () => {
       command.argv = ['packageName', 'bindPackageName', '--param', 'a', 'b', 'c']
       return command.run()
         .then(() => done.fail('does not throw error'))
-        .catch((err) => {
-          expect(err).toMatchObject(new Error('failed to bind the package: Please provide correct values for flags'))
+        .catch(() => {
+          expect(handleError).toHaveBeenLastCalledWith('failed to bind the package', new Error('Please provide correct values for flags'))
           done()
         })
     })
@@ -316,8 +317,8 @@ describe('instance methods', () => {
       command.argv = ['packageName', 'bindPackageName', '--annotation', 'a', 'b', 'c']
       return command.run()
         .then(() => done.fail('does not throw error'))
-        .catch((err) => {
-          expect(err).toMatchObject(new Error('failed to bind the package: Please provide correct values for flags'))
+        .catch(() => {
+          expect(handleError).toHaveBeenLastCalledWith('failed to bind the package', new Error('Please provide correct values for flags'))
           done()
         })
     })
@@ -327,8 +328,8 @@ describe('instance methods', () => {
       command.argv = ['packageName', 'bindPackageName']
       return command.run()
         .then(() => done.fail('does not throw error'))
-        .catch((err) => {
-          expect(err).toMatchObject(new Error('failed to bind the package: an error'))
+        .catch(() => {
+          expect(handleError).toHaveBeenLastCalledWith('failed to bind the package', new Error('an error'))
           done()
         })
     })

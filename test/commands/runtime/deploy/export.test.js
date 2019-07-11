@@ -33,7 +33,7 @@ test('aliases', async () => {
 })
 
 describe('instance methods', () => {
-  let command
+  let command, handleError
   let packagelist = [{
     annotations: [{
       key: 'whisk-managed',
@@ -326,6 +326,7 @@ describe('instance methods', () => {
 
   beforeEach(() => {
     command = new TheCommand([])
+    handleError = jest.spyOn(command, 'handleError')
     const json = {
       'deploy/deployment_syncSequences.yaml': fixtureFile('deploy/deployment_syncSequences.yaml'),
       'deploy/manifest.yaml': fixtureFile('deploy/manifest.yaml'),
@@ -515,8 +516,8 @@ describe('instance methods', () => {
       command.argv = [ '--projectname', 'proj', '-m', '/deploy/manifest.yaml' ]
       return command.run()
         .then(() => done.fail('does not throw error'))
-        .catch((err) => {
-          expect(err).toMatchObject(new Error('Failed to export: an error'))
+        .catch(() => {
+          expect(handleError).toHaveBeenLastCalledWith('Failed to export', new Error('an error'))
           done()
         })
     })

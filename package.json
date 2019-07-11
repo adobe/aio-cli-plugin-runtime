@@ -1,10 +1,11 @@
 {
   "name": "@adobe/aio-cli-plugin-runtime",
   "description": "Adobe I/O Runtime commands for the Adobe I/O CLI",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": "Adobe Inc.",
   "bugs": "https://github.com/adobe/aio-cli-plugin-runtime/issues",
   "dependencies": {
+    "@adobe/aio-cli-config": "^1.0.7",
     "@oclif/command": "^1.5.6",
     "@oclif/config": "^1.9.0",
     "@oclif/errors": "^1.1.2",
@@ -13,7 +14,7 @@
     "js-yaml": "^3.13.1",
     "node-fetch": "^2.3.0",
     "openwhisk": "^3.19.0",
-    "properties-reader": "0.0.16",
+    "properties-reader": "0.2.0",
     "sha1": "^1.1.1"
   },
   "devDependencies": {
@@ -26,12 +27,12 @@
     "codecov": "^3.3.0",
     "dedent-js": "^1.0.1",
     "eol": "^0.9.1",
-    "eslint": "^5",
+    "eslint": "^6.0.0",
     "eslint-config-oclif": "^3.1.0",
     "eslint-config-standard": "^12.0.0",
     "eslint-plugin-import": "^2.13.10",
     "eslint-plugin-jest": "^22.1.2",
-    "eslint-plugin-node": "^8.0.1",
+    "eslint-plugin-node": "^9.0.0",
     "eslint-plugin-promise": "^4.0.0",
     "eslint-plugin-standard": "^4.0.0",
     "jest": "^24.1.0",

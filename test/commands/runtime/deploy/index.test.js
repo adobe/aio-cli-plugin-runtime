@@ -51,7 +51,7 @@ test('flags', async () => {
 })
 
 describe('instance methods', () => {
-  let command
+  let command, handleError
   let cwdSpy
 
   beforeAll(() => {
@@ -66,6 +66,7 @@ describe('instance methods', () => {
 
   beforeEach(() => {
     command = new TheCommand([])
+    handleError = jest.spyOn(command, 'handleError')
     const json = {
       'deploy/parameters.json': fixtureFile('deploy/parameters.json'),
       'deploy/apis_not_implemented.yml': fixtureFile('deploy/apis_not_implemented.yml'),
@@ -555,8 +556,8 @@ describe('instance methods', () => {
       command.argv = ['-m', '/deploy/manifest_triggersRules_NoTrigger.yaml']
       return command.run()
         .then(() => done.fail('does not throw error'))
-        .catch((err) => {
-          expect(err).toMatchObject(new Error('Failed to deploy: Trigger and Action are both required for rule creation'))
+        .catch(() => {
+          expect(handleError).toHaveBeenLastCalledWith('Failed to deploy', new Error('Trigger and Action are both required for rule creation'))
           done()
         })
     })
@@ -566,8 +567,8 @@ describe('instance methods', () => {
       command.argv = ['-m', '/deploy/manifest_triggersRules_IncorrectAction.yaml']
       return command.run()
         .then(() => done.fail('does not throw error'))
-        .catch((err) => {
-          expect(err).toMatchObject(new Error('Failed to deploy: Action/Trigger provided in the rule not found in manifest file'))
+        .catch(() => {
+          expect(handleError).toHaveBeenLastCalledWith('Failed to deploy', new Error('Action/Trigger provided in the rule not found in manifest file'))
           done()
         })
     })
@@ -668,8 +669,8 @@ describe('instance methods', () => {
       command.argv = ['-m', '/deploy/manifest_zip.yaml']
       return command.run()
         .then(() => done.fail('does not throw error'))
-        .catch((err) => {
-          expect(err).toMatchObject(new Error('Failed to deploy: Invalid or missing runtime in the manifest for this action: demo_package/sampleAction'))
+        .catch(() => {
+          expect(handleError).toHaveBeenLastCalledWith('Failed to deploy', new Error('Invalid or missing runtime in the manifest for this action: demo_package/sampleAction'))
           done()
         })
     })
@@ -679,8 +680,8 @@ describe('instance methods', () => {
       command.argv = ['-m', '/deploy/manifest_api_incorrect.yaml']
       return command.run()
         .then(() => done.fail('does not throw error'))
-        .catch((err) => {
-          expect(err).toMatchObject(new Error('Failed to deploy: Arguments to create API not provided'))
+        .catch(() => {
+          expect(handleError).toHaveBeenLastCalledWith('Failed to deploy', new Error('Arguments to create API not provided'))
           done()
         })
     })
@@ -693,8 +694,8 @@ describe('instance methods', () => {
       command.argv = [ ]
       return command.run()
         .then(() => done.fail('does not throw error'))
-        .catch((err) => {
-          expect(err).toMatchObject(new Error('Failed to deploy: Manifest file not found'))
+        .catch(() => {
+          expect(handleError).toHaveBeenLastCalledWith('Failed to deploy', new Error('Manifest file not found'))
           done()
         })
     })
@@ -714,8 +715,8 @@ describe('instance methods', () => {
       command.argv = [ '-m', '/deploy/sequences_missing_actions.yml' ]
       return command.run()
         .then(() => done.fail('does not throw error'))
-        .catch((err) => {
-          expect(err).toMatchObject(new Error('Failed to deploy: Actions for the sequence not provided.'))
+        .catch(() => {
+          expect(handleError).toHaveBeenLastCalledWith('Failed to deploy', new Error('Actions for the sequence not provided.'))
           done()
         })
     })
@@ -725,8 +726,8 @@ describe('instance methods', () => {
       command.argv = [ '-m', '/deploy/manifest_not_webAction.yaml' ]
       return command.run()
         .then(() => done.fail('does not throw error'))
-        .catch((err) => {
-          expect(err).toMatchObject(new Error('Failed to deploy: Action provided in api is not a web action'))
+        .catch(() => {
+          expect(handleError).toHaveBeenLastCalledWith('Failed to deploy', new Error('Action provided in api is not a web action'))
           done()
         })
     })
@@ -736,8 +737,8 @@ describe('instance methods', () => {
       command.argv = [ '-m', '/deploy/manifest_not_webSequence.yaml' ]
       return command.run()
         .then(() => done.fail('does not throw error'))
-        .catch((err) => {
-          expect(err).toMatchObject(new Error('Failed to deploy: Sequence provided in api is not a web action'))
+        .catch(() => {
+          expect(handleError).toHaveBeenLastCalledWith('Failed to deploy', new Error('Sequence provided in api is not a web action'))
           done()
         })
     })
@@ -746,8 +747,8 @@ describe('instance methods', () => {
       command.argv = [ '-m', '/deploy/deployment_syncMissingAction.yaml', '-d', '/deploy/deployment.yml' ]
       return command.run()
         .then(() => done.fail('does not throw error'))
-        .catch((err) => {
-          expect(err).toMatchObject(new Error('Failed to deploy: The project name in the deployment file does not match the project name in the manifest file'))
+        .catch(() => {
+          expect(handleError).toHaveBeenLastCalledWith('Failed to deploy', new Error('The project name in the deployment file does not match the project name in the manifest file'))
           done()
         })
     })
@@ -757,8 +758,8 @@ describe('instance methods', () => {
       command.argv = [ '-m', '/deploy/manifest_not_present_action.yaml' ]
       return command.run()
         .then(() => done.fail('does not throw error'))
-        .catch((err) => {
-          expect(err).toMatchObject(new Error('Failed to deploy: Action provided in the api not present in the package'))
+        .catch(() => {
+          expect(handleError).toHaveBeenLastCalledWith('Failed to deploy', new Error('Action provided in the api not present in the package'))
           done()
         })
     })
