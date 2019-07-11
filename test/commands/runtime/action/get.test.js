@@ -56,7 +56,7 @@ describe('instance methods', () => {
         .then(() => {
           expect(cmd).toHaveBeenCalledWith({
             'name': 'hello',
-            'User-Agent': 'aio-cli-plugin-runtime@1.0.0'
+            'User-Agent': agentString
           })
           expect(stdout.output).toMatch('')
         })
@@ -117,7 +117,7 @@ describe('instance methods', () => {
         .then(() => {
           expect(cmd).toHaveBeenCalledWith({
             'name': 'hello',
-            'User-Agent': 'aio-cli-plugin-runtime@1.0.0'
+            'User-Agent': agentString
           })
           expect(stdout.output).toMatch('') // TODO: json output
         })
@@ -146,7 +146,7 @@ describe('instance methods', () => {
         .then(() => {
           expect(cmd).toHaveBeenCalledWith({
             'name': 'hello',
-            'User-Agent': 'aio-cli-plugin-runtime@1.0.0'
+            'User-Agent': agentString
           })
           expect(fs.writeFileSync).toHaveBeenCalledWith('hello.js', 'this is the code')
           // expect(stdout.output).toMatch('api/web/namespace/default/hello')
@@ -161,7 +161,7 @@ describe('instance methods', () => {
         .then(() => {
           expect(cmd).toHaveBeenCalledWith({
             'name': 'hello',
-            'User-Agent': 'aio-cli-plugin-runtime@1.0.0'
+            'User-Agent': agentString
           })
           expect(fs.writeFileSync).toHaveBeenCalledWith('filename.js', 'this is the code')
           // expect(stdout.output).toMatch('api/web/namespace/default/hello')
@@ -176,7 +176,7 @@ describe('instance methods', () => {
         .then(() => {
           expect(cmd).toHaveBeenCalledWith({
             'name': 'hello',
-            'User-Agent': 'aio-cli-plugin-runtime@1.0.0'
+            'User-Agent': agentString
           })
           expect(fs.writeFileSync).toHaveBeenCalledWith('hello.zip',
             bufferData, 'buffer')
@@ -191,7 +191,7 @@ describe('instance methods', () => {
         .then(() => {
           expect(cmd).toHaveBeenCalledWith({
             'name': 'hello',
-            'User-Agent': 'aio-cli-plugin-runtime@1.0.0'
+            'User-Agent': agentString
           })
           expect(fs.writeFileSync).toHaveBeenCalledWith('filename.zip',
             bufferData, 'buffer')

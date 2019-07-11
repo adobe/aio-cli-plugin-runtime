@@ -15,7 +15,6 @@ const TheCommand = require('../../../../src/commands/runtime/action/update.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
 const ow = require('openwhisk')()
 const owAction = 'actions.update'
-const agentString = 'aio-cli-plugin-runtime@1.0.0'
 
 test('exports', async () => {
   expect(typeof TheCommand).toEqual('function')
