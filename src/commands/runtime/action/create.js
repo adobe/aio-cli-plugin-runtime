@@ -98,8 +98,7 @@ class ActionCreate extends RuntimeBaseCommand {
       options['kind'] = flags.kind
       options['params'] = paramsAction
       options['annotations'] = annotationParams
-      options['User-Agent'] = flags['User-Agent']
-      
+      options['User-Agent'] = flags.useragent
       const result = await ow.actions.create(options)
       if (flags.json) {
         this.logJSON('', result)

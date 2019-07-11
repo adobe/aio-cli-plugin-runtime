@@ -15,6 +15,7 @@ const TheCommand = require('../../../../src/commands/runtime/action/create.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
 const ow = require('openwhisk')()
 const owAction = 'actions.create'
+const agentString = 'aio-cli-plugin-runtime@1.0.0'
 
 test('exports', async () => {
   expect(typeof TheCommand).toEqual('function')
@@ -123,7 +124,14 @@ describe('instance methods', () => {
       command.argv = ['hello', '/action/actionFile.js']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ 'name': 'hello', 'action': jsFile, 'annotations': {}, kind: 'nodejs:10', 'limits': {}, 'params': {} })
+          expect(cmd).toHaveBeenCalledWith({
+            'name': 'hello',
+            'action': jsFile,
+            'annotations': {},
+            kind: 'nodejs:10',
+            'limits': {},
+            'params': {},
+            'User-Agent': agentString })
           expect(stdout.output).toMatch('')
         })
     })
@@ -144,7 +152,8 @@ describe('instance methods', () => {
             exec: {
               kind: 'sequence',
               components: [ '/ns/a', '/ns/b', '/ns/c' ]
-            }
+            },
+            'User-Agent': agentString
           })
           expect(stdout.output).toMatch('')
         })
@@ -161,7 +170,9 @@ describe('instance methods', () => {
             'annotations': {},
             'kind': 'nodejs:10',
             'limits': {},
-            'params': {} })
+            'params': {},
+            'User-Agent': agentString
+          })
 
           expect(stdout.output).toMatch('') // TODO: json version
         })
@@ -173,7 +184,15 @@ describe('instance methods', () => {
       command.argv = ['hello', '/action/zipAction.zip', '--kind', 'nodejs:8']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ 'name': 'hello', 'action': zipFile, 'annotations': {}, kind: 'nodejs:8', 'limits': {}, 'params': {} })
+          expect(cmd).toHaveBeenCalledWith({
+            'name': 'hello',
+            'action': zipFile,
+            'annotations': {},
+            kind: 'nodejs:8',
+            'limits': {},
+            'params': {},
+            'User-Agent': agentString
+          })
           expect(stdout.output).toMatch('')
         })
     })
@@ -189,7 +208,8 @@ describe('instance methods', () => {
             'action': jsFile,
             'kind': 'nodejs:10',
             'annotations': {},
-            'limits': {}
+            'limits': {},
+            'User-Agent': agentString
           })
           expect(stdout.output).toMatch('')
         })
@@ -206,7 +226,8 @@ describe('instance methods', () => {
             action: jsFile,
             annotations: {},
             'kind': 'nodejs:10',
-            limits: {}
+            limits: {},
+            'User-Agent': agentString
           })
           expect(stdout.output).toMatch('')
         })
@@ -227,7 +248,8 @@ describe('instance methods', () => {
               'logs': 8,
               'memory': 128,
               'timeout': 20000
-            }
+            },
+            'User-Agent': agentString
           })
           expect(stdout.output).toMatch('')
         })
@@ -248,7 +270,8 @@ describe('instance methods', () => {
               'logs': 8,
               'memory': 128,
               'timeout': 20000
-            }
+            },
+            'User-Agent': agentString
           })
           expect(stdout.output).toMatch('')
         })
@@ -268,7 +291,8 @@ describe('instance methods', () => {
             limits: {
               'logs': 8,
               'memory': 128
-            }
+            },
+            'User-Agent': agentString
           })
           expect(stdout.output).toMatch('')
         })
@@ -287,7 +311,8 @@ describe('instance methods', () => {
               desc: 'Description'
             },
             'kind': 'nodejs:10',
-            limits: {}
+            limits: {},
+            'User-Agent': agentString
           })
           expect(stdout.output).toMatch('')
         })
@@ -307,7 +332,8 @@ describe('instance methods', () => {
               param2: 'param2value'
             },
             'kind': 'nodejs:10',
-            limits: {}
+            limits: {},
+            'User-Agent': agentString
           })
           expect(stdout.output).toMatch('')
         })
@@ -327,7 +353,8 @@ describe('instance methods', () => {
               'raw-http': true
             },
             'kind': 'nodejs:10',
-            limits: {}
+            limits: {},
+            'User-Agent': agentString
           })
           expect(stdout.output).toMatch('')
         })
@@ -347,7 +374,8 @@ describe('instance methods', () => {
               desc: 'Description'
             },
             'kind': 'nodejs:10',
-            limits: {}
+            limits: {},
+            'User-Agent': agentString
           })
           expect(stdout.output).toMatch('')
         })
@@ -365,7 +393,8 @@ describe('instance methods', () => {
             action: jsFile,
             annotations: {},
             'kind': 'nodejs:10',
-            limits: {}
+            limits: {},
+            'User-Agent': agentString
           })
           expect(stdout.output).toMatch('')
         })
@@ -387,7 +416,8 @@ describe('instance methods', () => {
             action: jsFile,
             annotations: {},
             'kind': 'nodejs:10',
-            limits: {}
+            limits: {},
+            'User-Agent': agentString
           })
           expect(stdout.output).toMatch('')
         })

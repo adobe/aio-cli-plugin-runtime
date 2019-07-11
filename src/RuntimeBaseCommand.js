@@ -103,7 +103,7 @@ RuntimeBaseCommand.flags = {
   verbose: flags.boolean({ char: 'v', description: 'Verbose output' }),
   version: flags.boolean({ description: 'Show version' }),
   help: flags.boolean({ description: 'Show help' }),
-  'User-Agent': flags.string({
+  'useragent': flags.string({
     hidden: true,
     default: 'aio-cli-plugin-runtime@' + require('../package.json').version
   })
