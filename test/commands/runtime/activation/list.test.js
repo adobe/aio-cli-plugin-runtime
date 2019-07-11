@@ -78,7 +78,6 @@ describe('instance methods', () => {
         .then(() => {
           expect(cmd).toHaveBeenCalledWith({
             'skip': 3,
-            'limit': 30,
             'User-Agent': agentString
           })
           expect(stdout.output).toMatch('')
@@ -91,7 +90,6 @@ describe('instance methods', () => {
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalledWith({
-            'limit': 30,
             'since': 3,
             'User-Agent': agentString
           })
@@ -105,7 +103,6 @@ describe('instance methods', () => {
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalledWith({
-            'limit': 30,
             'upto': 3,
             'User-Agent': agentString
           })
@@ -119,7 +116,6 @@ describe('instance methods', () => {
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalledWith({
-            'limit': 30,
             'name': '12345',
             'User-Agent': agentString
           })
@@ -133,7 +129,6 @@ describe('instance methods', () => {
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalledWith({
-            'limit': 30,
             'name': '12345',
             'User-Agent': agentString
           })
@@ -147,7 +142,6 @@ describe('instance methods', () => {
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalledWith({
-            'limit': 30,
             'name': '12345',
             'User-Agent': agentString
           })

@@ -19,8 +19,8 @@ class RuleList extends RuntimeBaseCommand {
     try {
       const ow = await this.wsk()
       const RuleListObject = { 'limit': flags.limit,
-      'skip': flags.skip,
-      'User-Agent': flags.useragent }
+        'skip': flags.skip,
+        'User-Agent': flags.useragent }
       const result = await ow.rules.list(RuleListObject)
       let p = Promise.all(
         result.map(item => {

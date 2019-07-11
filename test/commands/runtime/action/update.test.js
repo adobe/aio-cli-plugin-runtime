@@ -140,7 +140,7 @@ describe('instance methods', () => {
       command.argv = ['hello', '/action/actionFile.js', '--json']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ 
+          expect(cmd).toHaveBeenCalledWith({
             'name': 'hello',
             'action': jsFile,
             'annotations': {},

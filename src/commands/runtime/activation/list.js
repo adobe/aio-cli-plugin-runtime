@@ -76,8 +76,7 @@ ActivationList.flags = {
   // example usage:  aio runtime:activation:list --limit 10 --skip 2
   'limit': flags.integer({
     char: 'l',
-    description: 'only return LIMIT number of activations from the collection with a maximum LIMIT of 200 activations (default 30)',
-    default: 30
+    description: 'only return LIMIT number of activations from the collection with a maximum LIMIT of 200 activations (default 30)'
   }),
   'skip': flags.integer({
     char: 's',

@@ -83,7 +83,7 @@ describe('instance methods', () => {
       command.argv = ['hello']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ 
+          expect(cmd).toHaveBeenCalledWith({
             'name': 'hello',
             'blocking': false,
             'params': {},
