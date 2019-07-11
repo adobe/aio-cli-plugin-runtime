@@ -35,7 +35,7 @@ beforeEach(() => { stdout.start() })
 afterEach(() => { stdout.stop() })
 
 // TODO: get this from package.json
-global.agentString = 'aio-cli-plugin-runtime@1.0.0'
+global.agentString = 'aio-cli-plugin-runtime@' + require('../package.json').version
 
 // helper for fixtures
 global.fixtureFile = (output) => {

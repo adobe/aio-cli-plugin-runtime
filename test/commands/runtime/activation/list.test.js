@@ -129,7 +129,11 @@ describe('instance methods', () => {
       command.argv = ['12345', '--full']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ name: '12345', docs: true })
+          expect(cmd).toHaveBeenCalledWith({
+            name: '12345',
+            docs: true,
+            'User-Agent': agentString
+          })
           expect(stdout.output).toMatch('')
         })
     })
@@ -167,7 +171,10 @@ describe('instance methods', () => {
       command.argv = ['12345']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ name: '12345' })
+          expect(cmd).toHaveBeenCalledWith({
+            name: '12345',
+            'User-Agent': agentString
+          })
           expect(stdout.output).toMatch('')
         })
     })
