@@ -18,6 +18,7 @@
         "no-var": 2
     },
     "globals": {
+      "agentString": true,
       "fixtureFile": true,
       "fixtureJson": true,
       "fixtureZip": true,

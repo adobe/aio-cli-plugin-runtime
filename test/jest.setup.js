@@ -27,6 +27,9 @@ jest.mock('openwhisk')
 beforeEach(() => { stdout.start() })
 afterEach(() => { stdout.stop() })
 
+// TODO: get this from package.json
+global.agentString = 'aio-cli-plugin-runtime@1.0.0'
+
 // helper for fixtures
 global.fixtureFile = (output) => {
   return fs.readFileSync(`./test/__fixtures__/${output}`).toString()
