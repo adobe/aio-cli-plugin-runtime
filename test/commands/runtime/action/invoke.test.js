@@ -83,7 +83,13 @@ describe('instance methods', () => {
       command.argv = ['hello']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ 'name': 'hello', 'blocking': false, 'params': {}, 'result': false })
+          expect(cmd).toHaveBeenCalledWith({ 
+            'name': 'hello',
+            'blocking': false,
+            'params': {},
+            'result': false,
+            'User-Agent': agentString
+          })
           expect(stdout.output).toMatch('')
         })
     })
@@ -97,7 +103,8 @@ describe('instance methods', () => {
             name: 'hello',
             params: { a: 'b', c: 'd' },
             blocking: false,
-            result: false
+            result: false,
+            'User-Agent': agentString
           })
           expect(stdout.output).toMatch('')
         })
@@ -112,7 +119,8 @@ describe('instance methods', () => {
             name: 'hello',
             params: { a: 'b', c: 'd' },
             blocking: true,
-            result: false
+            result: false,
+            'User-Agent': agentString
           })
           expect(stdout.output).toMatch('')
         })
@@ -127,7 +135,8 @@ describe('instance methods', () => {
             name: 'hello',
             blocking: true,
             params: {},
-            result: true
+            result: true,
+            'User-Agent': agentString
           })
           expect(stdout.output).toMatch('')
         })
@@ -142,7 +151,8 @@ describe('instance methods', () => {
             name: 'hello',
             params: { a: 'b', c: 'd' },
             blocking: true,
-            result: true
+            result: true,
+            'User-Agent': agentString
           })
           expect(stdout.output).toMatch('')
         })
@@ -163,7 +173,8 @@ describe('instance methods', () => {
             name: 'hello',
             params: { param1: 'param1value', 'param2': 'param2value' },
             blocking: true,
-            result: true
+            result: true,
+            'User-Agent': agentString
           })
           expect(stdout.output).toMatch('')
         })

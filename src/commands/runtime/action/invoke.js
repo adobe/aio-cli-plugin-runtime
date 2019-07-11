@@ -33,7 +33,7 @@ class ActionInvoke extends RuntimeBaseCommand {
         params: paramsAction,
         blocking: flags.blocking || flags.result,
         result: flags.result,
-        ...flags
+        'User-Agent': flags.useragent
       })
       this.logJSON('', result)
     } catch (err) {
