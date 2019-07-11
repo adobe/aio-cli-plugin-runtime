@@ -17,9 +17,16 @@ const { cli } = require('cli-ux')
 class ActionList extends RuntimeBaseCommand {
   async run () {
     const { flags } = this.parse(ActionList)
+
     try {
       const ow = await this.wsk()
-      const result = await ow.actions.list(flags)
+
+      let options = {
+        'limit': flags.limit,
+        'skip': flags.skip,
+        'User-Agent': flags.useragent
+      }
+      const result = await ow.actions.list(options)
       if (flags.json) {
         this.logJSON('', result)
       } else {
@@ -53,15 +60,12 @@ ActionList.flags = {
   'limit': flags.integer({
     char: 'l',
     description: 'only return LIMIT number of actions from the collection (default 30)',
-    hidden: false, // hide from help
-    multiple: false, // allow setting this flag multiple times
-    required: false // not mandatory
+    default: 30
   }),
   'skip': flags.integer({
     char: 's',
     description: 'exclude the first SKIP number of actions from the result',
-    multiple: false, // allow setting this flag multiple times
-    required: false // not mandatory
+    default: 0
   }),
   'json': flags.boolean({
     description: 'output raw json'

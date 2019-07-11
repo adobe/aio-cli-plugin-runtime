@@ -30,7 +30,8 @@ test('aliases', async () => {
 })
 
 test('flags', async () => {
-  expect(TheCommand.flags).toMatchObject({ 'limit': { 'char': 'l', 'description': 'only return LIMIT number of actions from the collection (default 30)', 'hidden': false, 'multiple': false, 'required': false }, 'skip': { 'char': 's', 'description': 'exclude the first SKIP number of actions from the result', 'multiple': false, 'required': false } })
+  expect(Object.keys(TheCommand.flags)).toEqual(expect.arrayContaining(Object.keys(RuntimeBaseCommand.flags)))
+  expect(Object.keys(TheCommand.flags)).toEqual(expect.arrayContaining(['limit', 'skip']))
 })
 
 test('args', async () => {
@@ -54,7 +55,11 @@ describe('instance methods', () => {
       command.argv = ['--limit', '1']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ 'limit': 1 })
+          expect(cmd).toHaveBeenCalledWith({
+            'limit': 1,
+            'skip': 0,
+            'User-Agent': agentString
+          })
           expect(stdout.output).toMatchFixture('action/list-output.txt')
         })
     })
@@ -95,7 +100,11 @@ describe('instance methods', () => {
       command.argv = ['--skip', '3']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ 'skip': 3 })
+          expect(cmd).toHaveBeenCalledWith({
+            'limit': 30,
+            'skip': 3,
+            'User-Agent': agentString
+          })
           expect(stdout.output).toMatch('actions                                           ')
         })
     })
