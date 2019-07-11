@@ -15,6 +15,7 @@ const TheCommand = require('../../../../src/commands/runtime/action/delete.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
 const ow = require('openwhisk')()
 const owAction = 'actions.delete'
+const agentString = 'aio-cli-plugin-runtime@1.0.0'
 
 test('exports', async () => {
   expect(typeof TheCommand).toEqual('function')
@@ -53,7 +54,10 @@ describe('instance methods', () => {
       command.argv = ['hello']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith('hello')
+          expect(cmd).toHaveBeenCalledWith({
+            'name': 'hello',
+            'User-Agent': agentString
+          })
           expect(stdout.output).toMatch('')
         })
     })
@@ -63,7 +67,10 @@ describe('instance methods', () => {
       command.argv = ['hello', '--json']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith('hello')
+          expect(cmd).toHaveBeenCalledWith({
+            'name': 'hello',
+            'User-Agent': agentString
+          })
           expect(stdout.output).toMatch('') // TODO: json text
         })
     })
