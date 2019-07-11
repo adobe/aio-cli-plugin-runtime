@@ -54,7 +54,10 @@ describe('instance methods', () => {
       command.argv = ['hello']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith('hello')
+          expect(cmd).toHaveBeenCalledWith({
+            'name': 'hello',
+            'User-Agent': 'aio-cli-plugin-runtime@1.0.0'
+          })
           expect(stdout.output).toMatch('')
         })
     })
@@ -112,7 +115,10 @@ describe('instance methods', () => {
       command.argv = ['hello']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith('hello')
+          expect(cmd).toHaveBeenCalledWith({
+            'name': 'hello',
+            'User-Agent': 'aio-cli-plugin-runtime@1.0.0'
+          })
           expect(stdout.output).toMatch('') // TODO: json output
         })
     })
@@ -138,7 +144,10 @@ describe('instance methods', () => {
       command.argv = ['hello', '--save']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith('hello')
+          expect(cmd).toHaveBeenCalledWith({
+            'name': 'hello',
+            'User-Agent': 'aio-cli-plugin-runtime@1.0.0'
+          })
           expect(fs.writeFileSync).toHaveBeenCalledWith('hello.js', 'this is the code')
           // expect(stdout.output).toMatch('api/web/namespace/default/hello')
         })
@@ -150,7 +159,10 @@ describe('instance methods', () => {
       command.argv = ['hello', '--save-as', 'filename.js']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith('hello')
+          expect(cmd).toHaveBeenCalledWith({
+            'name': 'hello',
+            'User-Agent': 'aio-cli-plugin-runtime@1.0.0'
+          })
           expect(fs.writeFileSync).toHaveBeenCalledWith('filename.js', 'this is the code')
           // expect(stdout.output).toMatch('api/web/namespace/default/hello')
         })
@@ -162,7 +174,10 @@ describe('instance methods', () => {
       command.argv = ['hello', '--save']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith('hello')
+          expect(cmd).toHaveBeenCalledWith({
+            'name': 'hello',
+            'User-Agent': 'aio-cli-plugin-runtime@1.0.0'
+          })
           expect(fs.writeFileSync).toHaveBeenCalledWith('hello.zip',
             bufferData, 'buffer')
         })
@@ -174,7 +189,10 @@ describe('instance methods', () => {
       command.argv = ['hello', '--save-as', 'filename.zip']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith('hello')
+          expect(cmd).toHaveBeenCalledWith({
+            'name': 'hello',
+            'User-Agent': 'aio-cli-plugin-runtime@1.0.0'
+          })
           expect(fs.writeFileSync).toHaveBeenCalledWith('filename.zip',
             bufferData, 'buffer')
         })

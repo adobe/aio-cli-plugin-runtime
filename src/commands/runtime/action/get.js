@@ -17,11 +17,15 @@ const fs = require('fs')
 class ActionGet extends RuntimeBaseCommand {
   async run () {
     const { args, flags } = this.parse(ActionGet)
+    const options = {
+      name:args.actionName,
+      'User-Agent':flags.useragent
+    }
     const name = args.actionName
     const ow = await this.wsk()
 
     try {
-      const result = await ow.actions.get(name)
+      const result = await ow.actions.get(options)
       if (flags.url) {
         /*
           wsk go client uses :
