@@ -15,6 +15,7 @@ const TheCommand = require('../../../../src/commands/runtime/action/update.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
 const ow = require('openwhisk')()
 const owAction = 'actions.update'
+const agentString = 'aio-cli-plugin-runtime@1.0.0'
 
 test('exports', async () => {
   expect(typeof TheCommand).toEqual('function')
@@ -123,7 +124,14 @@ describe('instance methods', () => {
       command.argv = ['hello', '/action/actionFile.js']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ 'name': 'hello', 'action': jsFile, 'annotations': {}, 'limits': {}, 'params': {} })
+          expect(cmd).toHaveBeenCalledWith({
+            'name': 'hello',
+            'action': jsFile,
+            'annotations': {},
+            'limits': {},
+            'params': {},
+            'User-Agent': agentString
+          })
           expect(stdout.output).toMatch('')
         })
     })
@@ -133,7 +141,14 @@ describe('instance methods', () => {
       command.argv = ['hello', '/action/actionFile.js', '--json']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ 'name': 'hello', 'action': jsFile, 'annotations': {}, 'limits': {}, 'params': {} })
+          expect(cmd).toHaveBeenCalledWith({ 
+            'name': 'hello',
+            'action': jsFile,
+            'annotations': {},
+            'limits': {},
+            'params': {},
+            'User-Agent': agentString
+          })
           expect(stdout.output).toMatch('')
         })
     })
@@ -144,7 +159,15 @@ describe('instance methods', () => {
       command.argv = ['hello', '/action/zipAction.zip', '--kind', 'nodejs:10']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ 'name': 'hello', 'action': zipFile, 'annotations': {}, kind: 'nodejs:10', 'limits': {}, 'params': {} })
+          expect(cmd).toHaveBeenCalledWith({
+            'name': 'hello',
+            'action': zipFile,
+            'annotations': {},
+            'kind': 'nodejs:10',
+            'limits': {},
+            'params': {},
+            'User-Agent': agentString
+          })
           expect(stdout.output).toMatch('')
         })
     })
@@ -159,7 +182,8 @@ describe('instance methods', () => {
             params: { a: 'b', c: 'd' },
             action: jsFile,
             annotations: {},
-            limits: {}
+            limits: {},
+            'User-Agent': agentString
           })
           expect(stdout.output).toMatch('')
         })
@@ -180,7 +204,8 @@ describe('instance methods', () => {
             exec: {
               kind: 'sequence',
               components: [ '/ns/a', '/ns/b', '/ns/c' ]
-            }
+            },
+            'User-Agent': agentString
           })
           expect(stdout.output).toMatch('')
         })
@@ -197,7 +222,8 @@ describe('instance methods', () => {
             params: {},
             action: jsFile,
             annotations: {},
-            limits: {}
+            limits: {},
+            'User-Agent': agentString
           })
           expect(stdout.output).toMatch('')
         })
@@ -218,7 +244,8 @@ describe('instance methods', () => {
             params: {},
             action: jsFile,
             annotations: {},
-            limits: {}
+            limits: {},
+            'User-Agent': agentString
           })
           expect(stdout.output).toMatch('')
         })
@@ -234,7 +261,8 @@ describe('instance methods', () => {
             params: { param1: 'param1value', param2: 'param2value' },
             action: jsFile,
             annotations: {},
-            limits: {}
+            limits: {},
+            'User-Agent': agentString
           })
           expect(stdout.output).toMatch('')
         })
@@ -254,7 +282,8 @@ describe('instance methods', () => {
               'logs': 8,
               'memory': 128,
               'timeout': 20000
-            }
+            },
+            'User-Agent': agentString
           })
           expect(stdout.output).toMatch('')
         })
@@ -274,7 +303,8 @@ describe('instance methods', () => {
               'logs': 8,
               'memory': 128,
               'timeout': 20000
-            }
+            },
+            'User-Agent': agentString
           })
           expect(stdout.output).toMatch('')
         })
@@ -294,7 +324,8 @@ describe('instance methods', () => {
             limits: {
               'logs': 8,
               'memory': 128
-            }
+            },
+            'User-Agent': agentString
           })
           expect(stdout.output).toMatch('')
         })
@@ -312,7 +343,8 @@ describe('instance methods', () => {
             annotations: {
               desc: 'Description'
             },
-            limits: {}
+            limits: {},
+            'User-Agent': agentString
           })
           expect(stdout.output).toMatch('')
         })
@@ -331,7 +363,8 @@ describe('instance methods', () => {
               param1: 'param1value',
               param2: 'param2value'
             },
-            limits: {}
+            limits: {},
+            'User-Agent': agentString
           })
           expect(stdout.output).toMatch('')
         })
@@ -350,7 +383,8 @@ describe('instance methods', () => {
               'web-export': true,
               'raw-http': true
             },
-            limits: {}
+            limits: {},
+            'User-Agent': agentString
           })
           expect(stdout.output).toMatch('')
         })
@@ -368,7 +402,8 @@ describe('instance methods', () => {
             annotations: {
               'web-export': false
             },
-            limits: {}
+            limits: {},
+            'User-Agent': agentString
           })
           expect(stdout.output).toMatch('')
         })
@@ -387,7 +422,8 @@ describe('instance methods', () => {
               'web-export': true,
               desc: 'Description'
             },
-            limits: {}
+            limits: {},
+            'User-Agent': agentString
           })
           expect(stdout.output).toMatch('')
         })
