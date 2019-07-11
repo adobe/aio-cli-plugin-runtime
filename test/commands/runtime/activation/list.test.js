@@ -30,24 +30,13 @@ test('aliases', async () => {
 })
 
 test('flags', async () => {
-  expect(TheCommand.flags.limit.required).toBe(false)
-  expect(TheCommand.flags.limit.hidden).toBe(false)
-  expect(TheCommand.flags.limit.multiple).toBe(false)
-  expect(TheCommand.flags.limit.char).toBe('l')
-  expect(typeof TheCommand.flags.limit).toBe('object')
-  expect(TheCommand.flags.skip.required).toBe(false)
-  expect(TheCommand.flags.skip.hidden).toBe(false)
-  expect(TheCommand.flags.skip.multiple).toBe(false)
-  expect(TheCommand.flags.skip.char).toBe('s')
-  expect(typeof TheCommand.flags.skip).toBe('object')
-  expect(TheCommand.flags.since.required).toBe(false)
-  expect(TheCommand.flags.since.hidden).toBe(false)
-  expect(TheCommand.flags.since.multiple).toBe(false)
-  expect(typeof TheCommand.flags.since).toBe('object')
-  expect(TheCommand.flags.upto.required).toBe(false)
-  expect(TheCommand.flags.upto.hidden).toBe(false)
-  expect(TheCommand.flags.upto.multiple).toBe(false)
-  expect(typeof TheCommand.flags.upto).toBe('object')
+  expect(TheCommand.flags).toEqual(
+    expect.objectContaining({
+      'limit': expect.any(Object),
+      'skip': expect.any(Object),
+      'since': expect.any(Object),
+      'upto': expect.any(Object)
+    }))
 })
 
 test('args', async () => {
@@ -74,7 +63,10 @@ describe('instance methods', () => {
       command.argv = ['--limit', '3']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ 'limit': 3 })
+          expect(cmd).toHaveBeenCalledWith({
+            'limit': 3,
+            'User-Agent': agentString
+          })
           expect(stdout.output).toMatch('')
         })
     })
@@ -84,7 +76,11 @@ describe('instance methods', () => {
       command.argv = ['--skip', '3']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ 'skip': 3 })
+          expect(cmd).toHaveBeenCalledWith({
+            'skip': 3,
+            'limit': 30,
+            'User-Agent': agentString
+          })
           expect(stdout.output).toMatch('')
         })
     })
@@ -94,7 +90,11 @@ describe('instance methods', () => {
       command.argv = ['--since', '3']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ 'since': 3 })
+          expect(cmd).toHaveBeenCalledWith({
+            'limit': 30,
+            'since': 3,
+            'User-Agent': agentString
+          })
           expect(stdout.output).toMatch('')
         })
     })
@@ -104,7 +104,11 @@ describe('instance methods', () => {
       command.argv = ['--upto', '3']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ 'upto': 3 })
+          expect(cmd).toHaveBeenCalledWith({
+            'limit': 30,
+            'upto': 3,
+            'User-Agent': agentString
+          })
           expect(stdout.output).toMatch('')
         })
     })
@@ -114,7 +118,11 @@ describe('instance methods', () => {
       command.argv = ['12345']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ name: '12345' })
+          expect(cmd).toHaveBeenCalledWith({
+            'limit': 30,
+            'name': '12345',
+            'User-Agent': agentString
+          })
           expect(stdout.output).toMatch('')
         })
     })
@@ -124,7 +132,11 @@ describe('instance methods', () => {
       command.argv = ['12345', '--json']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ name: '12345' })
+          expect(cmd).toHaveBeenCalledWith({
+            'limit': 30,
+            'name': '12345',
+            'User-Agent': agentString
+          })
           expect(stdout.output).toMatch('')
         })
     })
@@ -134,7 +146,11 @@ describe('instance methods', () => {
       command.argv = ['12345']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ name: '12345' })
+          expect(cmd).toHaveBeenCalledWith({
+            'limit': 30,
+            'name': '12345',
+            'User-Agent': agentString
+          })
           expect(stdout.output).toMatch('')
         })
     })

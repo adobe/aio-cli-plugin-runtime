@@ -36,7 +36,7 @@ class ActivationList extends RuntimeBaseCommand {
         options['upto'] = flags.upto
       }
 
-      options['User-Agent'] = flags['User-Agent']
+      options['User-Agent'] = flags.useragent
 
       const ow = await this.wsk()
       let listActivation = await ow.activations.list(options)
@@ -77,16 +77,12 @@ ActivationList.flags = {
   'limit': flags.integer({
     char: 'l',
     description: 'only return LIMIT number of activations from the collection with a maximum LIMIT of 200 activations (default 30)',
-    hidden: false, // hide from help
-    multiple: false, // allow setting this flag multiple times
-    required: false // not mandatory
+    default: 30
   }),
   'skip': flags.integer({
     char: 's',
     description: 'exclude the first SKIP number of activations from the result',
-    hidden: false, // hide from help
-    multiple: false, // allow setting this flag multiple times
-    required: false // not mandatory
+    default: 0
   }),
   'since': flags.integer({
     description: 'return activations with timestamps later than SINCE; measured in milliseconds since Th, 01, Jan 1970',
