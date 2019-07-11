@@ -18,7 +18,7 @@ class ActivationResult extends RuntimeBaseCommand {
     const id = args.activationID
     try {
       const ow = await this.wsk()
-      const result = await ow.activations.result({ name: id, 'User-Agent': flags['User-Agent'] })
+      const result = await ow.activations.result({ name: id, 'User-Agent': flags.useragent })
       this.logJSON('', result)
     } catch (err) {
       this.handleError('failed to fetch activation result', err)
@@ -32,6 +32,10 @@ ActivationResult.args = [
     required: true
   }
 ]
+
+ActivationResult.flags = {
+  ...RuntimeBaseCommand.flags
+}
 
 ActivationResult.description = 'Retrieves the Results for an Activation'
 
