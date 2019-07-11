@@ -18,7 +18,7 @@ class ActivationGet extends RuntimeBaseCommand {
     const id = args.activationID
     try {
       const ow = await this.wsk()
-      const result = await ow.activations.get({ name: id, 'User-Agent': flags['User-Agent'] })
+      const result = await ow.activations.get({ name: id, 'User-Agent': flags.useragent })
       this.logJSON('', result)
     } catch (err) {
       this.handleError('failed to retrieve the activation', err)
@@ -34,5 +34,8 @@ ActivationGet.args = [
 ]
 
 ActivationGet.description = 'Retrieves an Activation'
+ActivationGet.flags = {
+  ...RuntimeBaseCommand.flags
+}
 
 module.exports = ActivationGet
