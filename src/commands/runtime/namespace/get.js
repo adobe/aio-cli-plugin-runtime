@@ -48,12 +48,12 @@ function createColumns (columnName) {
   }
 }
 
-async function getRulesWithStatus (ow, rules) {
+async function getRulesWithStatus (ow, rules, options) {
   // unfortunately for rules, we need to do a 'get' for each to get the status
   // (this is done the same way in the Go CLI)
 
   const fetchRules = rules.map(async (rule) => {
-    return ow.rules.get({ name: rule.name })
+    return ow.rules.get({ name: rule.name, ...options })
   })
 
   return Promise.all(fetchRules)
@@ -64,8 +64,10 @@ class NamespaceGet extends RuntimeBaseCommand {
     const { flags } = this.parse(NamespaceGet)
     try {
       const ow = await this.wsk()
-      const data = await ow.namespaces.get()
-      data.rules = await getRulesWithStatus(ow, data.rules)
+      let options = { 'User-Agent': flags.useragent }
+
+      const data = await ow.namespaces.get(options)
+      data.rules = await getRulesWithStatus(ow, data.rules, options)
 
       if (flags.json) {
         this.logJSON('', data)
