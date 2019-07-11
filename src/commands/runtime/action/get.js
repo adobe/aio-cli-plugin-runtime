@@ -18,8 +18,8 @@ class ActionGet extends RuntimeBaseCommand {
   async run () {
     const { args, flags } = this.parse(ActionGet)
     const options = {
-      name:args.actionName,
-      'User-Agent':flags.useragent
+      name: args.actionName,
+      'User-Agent': flags.useragent
     }
     const name = args.actionName
     const ow = await this.wsk()
