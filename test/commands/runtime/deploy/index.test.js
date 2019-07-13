@@ -683,6 +683,23 @@ describe('instance methods', () => {
       command.argv = [ '-m', '/deploy/manifest_webSequence.yaml' ]
       return command.run()
         .then(() => {
+          expect(cmd).toHaveBeenCalledWith({
+            name: 'hello_world_package/hello_world',
+            action: '',
+            annotations: { 'web-export': true },
+            exec: {
+              components: [
+                '/ns/hello_world_package/hello_validate',
+                '/ns/hello_world_package/hello',
+                '/ns/hello_world_package/hello_wrap',
+                '/ns/spackage/saction',
+                '/ns/spackage/saction',
+                '/snamespace/spackage/saction',
+                '/snamespace/spackage/saction'
+              ],
+              kind: 'sequence'
+            }
+          })
           expect(cmd).toHaveBeenCalledTimes(4)
           expect(stdout.output).toMatch('')
         })

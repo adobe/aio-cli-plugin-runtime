@@ -15,7 +15,7 @@ packages:
         function: /deploy/hello.js
     sequences:
       hello_world:
-        actions: hello_validate, hello, hello_wrap
+        actions: hello_validate, hello, hello_wrap, spackage/saction, /spackage/saction, snamespace/spackage/saction,  /snamespace/spackage/saction
         web: true
     apis:
       hello-world:
