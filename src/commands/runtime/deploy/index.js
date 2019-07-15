@@ -10,6 +10,7 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
+const HHelp = require('@oclif/plugin-help').default
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 const { createKeyValueObjectFromFlag, createKeyValueObjectFromFile, deployPackage, setPaths, processPackage } = require('../../../runtime-helpers')
 const { flags } = require('@oclif/command')
@@ -17,25 +18,30 @@ const { flags } = require('@oclif/command')
 class IndexCommand extends RuntimeBaseCommand {
   async run () {
     const { flags } = this.parse(IndexCommand)
-    try {
-      // in case of 'aio runtime:deploy' (without the path to the manifest file) the program looks for the manifest file in the current directory.
-      let components = setPaths(flags)
-      let packages = components.packages
-      let deploymentTriggers = components.deploymentTriggers
-      let deploymentPackages = components.deploymentPackages
-      let params = {}
-      if (flags.param) {
-        params = createKeyValueObjectFromFlag(flags.param)
-      } else if (flags['param-file']) {
-        params = createKeyValueObjectFromFile(flags['param-file'])
-      }
+    if (Object.keys(flags).length > 0) {
+      try {
+        // in case of 'aio runtime:deploy' (without the path to the manifest file) the program looks for the manifest file in the current directory.
+        let components = setPaths(flags)
+        let packages = components.packages
+        let deploymentTriggers = components.deploymentTriggers
+        let deploymentPackages = components.deploymentPackages
+        let params = {}
+        if (flags.param) {
+          params = createKeyValueObjectFromFlag(flags.param)
+        } else if (flags['param-file']) {
+          params = createKeyValueObjectFromFile(flags['param-file'])
+        }
 
-      let entities = processPackage(packages, deploymentPackages, deploymentTriggers, params)
-      const ow = await this.wsk()
-      let logger = this.log
-      await deployPackage(entities, ow, logger)
-    } catch (err) {
-      this.handleError('Failed to deploy', err)
+        let entities = processPackage(packages, deploymentPackages, deploymentTriggers, params)
+        const ow = await this.wsk()
+        let logger = this.log
+        await deployPackage(entities, ow, logger)
+      } catch (err) {
+        this.handleError('Failed to deploy', err)
+      }
+    } else {
+      const help = new HHelp(this.config)
+      return help.showHelp(['runtime:action', '--help'])
     }
   }
 }

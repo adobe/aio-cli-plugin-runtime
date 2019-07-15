@@ -16,7 +16,7 @@ const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 class IndexCommand extends RuntimeBaseCommand {
   async run () {
     const help = new HHelp(this.config)
-    help.showHelp(['runtime:action', '--help'])
+    help.showHelp(['runtime:activation', '--help'])
   }
 }
 
