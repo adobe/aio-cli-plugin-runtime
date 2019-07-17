@@ -17,6 +17,7 @@ const { flags } = require('@oclif/command')
 class IndexCommand extends RuntimeBaseCommand {
   async run () {
     const { flags } = this.parse(IndexCommand)
+
     try {
       // in case of 'aio runtime:deploy' (without the path to the manifest file) the program looks for the manifest file in the current directory.
       let components = setPaths(flags)

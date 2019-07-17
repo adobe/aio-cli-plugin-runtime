@@ -47,7 +47,7 @@ describe('instance methods', () => {
       let spy = jest.spyOn(HHelp.prototype, 'showHelp').mockReturnValue(true)
       command.id = 'pgb'
       return command.run().then(() => {
-        expect(spy).toHaveBeenCalledWith(['runtime:action', '--help'])
+        expect(spy).toHaveBeenCalledWith(['runtime:activation', '--help'])
       })
     })
   })
