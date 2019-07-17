@@ -10,7 +10,6 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const HHelp = require('@oclif/plugin-help').default
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 const { createKeyValueObjectFromFlag, createKeyValueObjectFromFile, deployPackage, setPaths, processPackage } = require('../../../runtime-helpers')
 const { flags } = require('@oclif/command')
