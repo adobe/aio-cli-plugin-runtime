@@ -18,30 +18,26 @@ const { flags } = require('@oclif/command')
 class IndexCommand extends RuntimeBaseCommand {
   async run () {
     const { flags } = this.parse(IndexCommand)
-    if (Object.keys(flags).length > 0) {
-      try {
-        // in case of 'aio runtime:deploy' (without the path to the manifest file) the program looks for the manifest file in the current directory.
-        let components = setPaths(flags)
-        let packages = components.packages
-        let deploymentTriggers = components.deploymentTriggers
-        let deploymentPackages = components.deploymentPackages
-        let params = {}
-        if (flags.param) {
-          params = createKeyValueObjectFromFlag(flags.param)
-        } else if (flags['param-file']) {
-          params = createKeyValueObjectFromFile(flags['param-file'])
-        }
 
-        let entities = processPackage(packages, deploymentPackages, deploymentTriggers, params)
-        const ow = await this.wsk()
-        let logger = this.log
-        await deployPackage(entities, ow, logger)
-      } catch (err) {
-        this.handleError('Failed to deploy', err)
+    try {
+      // in case of 'aio runtime:deploy' (without the path to the manifest file) the program looks for the manifest file in the current directory.
+      let components = setPaths(flags)
+      let packages = components.packages
+      let deploymentTriggers = components.deploymentTriggers
+      let deploymentPackages = components.deploymentPackages
+      let params = {}
+      if (flags.param) {
+        params = createKeyValueObjectFromFlag(flags.param)
+      } else if (flags['param-file']) {
+        params = createKeyValueObjectFromFile(flags['param-file'])
       }
-    } else {
-      const help = new HHelp(this.config)
-      return help.showHelp(['runtime:action', '--help'])
+
+      let entities = processPackage(packages, deploymentPackages, deploymentTriggers, params)
+      const ow = await this.wsk()
+      let logger = this.log
+      await deployPackage(entities, ow, logger)
+    } catch (err) {
+      this.handleError('Failed to deploy', err)
     }
   }
 }
