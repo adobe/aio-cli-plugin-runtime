@@ -15,7 +15,7 @@ const { cli } = require('cli-ux')
 const fetch = require('node-fetch')
 const { PropertyKey, PropertyDefault, propertiesFile, PropertyEnv } = require('../../../properties')
 const debug = require('debug')('aio-cli-plugin-runtime/property')
-const config = require('@adobe/aio-cli-config')
+const config = require('@adobe/aio-cna-core-config')
 
 class PropertyGet extends RuntimeBaseCommand {
   async run () {
