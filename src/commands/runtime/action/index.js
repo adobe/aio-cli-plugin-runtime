@@ -22,4 +22,6 @@ class IndexCommand extends RuntimeBaseCommand {
 
 IndexCommand.description = 'Manage your actions'
 
+IndexCommand.aliases = ['rt:action']
+
 module.exports = IndexCommand

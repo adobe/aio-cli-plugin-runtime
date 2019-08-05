@@ -22,4 +22,6 @@ class IndexCommand extends RuntimeBaseCommand {
 
 IndexCommand.description = 'Execute runtime commands'
 
+IndexCommand.aliases = ['rt']
+
 module.exports = IndexCommand

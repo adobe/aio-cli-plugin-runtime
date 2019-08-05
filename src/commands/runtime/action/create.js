@@ -16,6 +16,7 @@ const { createKeyValueObjectFromFlag, createKeyValueObjectFromFile, createCompon
 const { flags } = require('@oclif/command')
 
 class ActionCreate extends RuntimeBaseCommand {
+
   async run () {
     const { args, flags } = this.parse(ActionCreate)
     const name = args.actionName
@@ -198,5 +199,7 @@ ActionCreate.flags = {
 }
 
 ActionCreate.description = 'Creates an Action'
+
+ActionCreate.aliases = ['rt:action:create']
 
 module.exports = ActionCreate
