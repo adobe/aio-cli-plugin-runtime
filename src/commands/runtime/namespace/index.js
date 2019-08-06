@@ -22,6 +22,6 @@ class IndexCommand extends RuntimeBaseCommand {
 
 IndexCommand.description = 'Manage your namespaces'
 
-IndexCommand.aliases = [ 'runtime:ns', 'rt:namespace', 'rt:ns']
+IndexCommand.aliases = ['runtime:ns', 'rt:namespace', 'rt:ns']
 
 module.exports = IndexCommand

@@ -70,7 +70,7 @@ ActionList.flags = {
 
 ActionList.description = 'Lists all the Actions'
 
-ActionList.aliases = [ 
+ActionList.aliases = [
   'runtime:action:ls',
   'runtime:actions:list',
   'runtime:actions:ls',

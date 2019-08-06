@@ -16,7 +16,6 @@ const { createKeyValueObjectFromFlag, createKeyValueObjectFromFile, createCompon
 const { flags } = require('@oclif/command')
 
 class ActionCreate extends RuntimeBaseCommand {
-
   async run () {
     const { args, flags } = this.parse(ActionCreate)
     const name = args.actionName

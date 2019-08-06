@@ -44,7 +44,7 @@ ActionDelete.flags = {
 
 ActionDelete.description = 'Deletes an Action'
 
-ActionDelete.aliases = ['runtime:action:del', 
+ActionDelete.aliases = ['runtime:action:del',
   'rt:action:delete',
   'rt:action:del']
 
