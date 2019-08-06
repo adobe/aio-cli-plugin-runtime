@@ -34,5 +34,8 @@ ActivationGet.args = [
 ]
 
 ActivationGet.description = 'Retrieves an Activation'
+ActivationGet.aliases = [
+  'rt:activation:get'
+]
 
 module.exports = ActivationGet

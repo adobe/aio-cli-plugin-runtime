@@ -35,4 +35,10 @@ ActivationLogs.args = [
 
 ActivationLogs.description = 'Retrieves the Logs for an Activation'
 
+ActivationLogs.aliases = [
+  'runtime:activation:log',
+  'rt:activation:logs',
+  'rt:activation:log'
+]
+
 module.exports = ActivationLogs

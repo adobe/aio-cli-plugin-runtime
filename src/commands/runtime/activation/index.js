@@ -22,4 +22,6 @@ class IndexCommand extends RuntimeBaseCommand {
 
 IndexCommand.description = 'Manage your activations'
 
+IndexCommand.aliases = ['rt:activation']
+
 module.exports = IndexCommand
