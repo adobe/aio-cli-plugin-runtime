@@ -207,4 +207,8 @@ DeployExport.flags = {
 
 DeployExport.description = 'Exports managed project assets from Runtime to manifest and function files'
 
+DeployExport.aliases = [
+  'rt:deploy:export'
+]
+
 module.exports = DeployExport
