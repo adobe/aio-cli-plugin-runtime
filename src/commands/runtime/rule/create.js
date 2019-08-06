@@ -55,4 +55,8 @@ RuleCreate.flags = {
   })
 }
 
+RuleCreate.aliases = [
+  'rt:rule:create'
+]
+
 module.exports = RuleCreate
