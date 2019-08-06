@@ -58,7 +58,9 @@ RouteDelete.flags = {
 RouteDelete.description = 'delete an API'
 
 RouteDelete.aliases = [
-  'api:delete'
+  'runtime:api:delete',
+  'rt:route:delete',
+  'rt:api:delete'
 ]
 
 module.exports = RouteDelete

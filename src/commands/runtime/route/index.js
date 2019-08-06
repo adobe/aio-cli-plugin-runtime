@@ -23,7 +23,8 @@ class IndexCommand extends RuntimeBaseCommand {
 IndexCommand.description = 'Manage your routes'
 
 IndexCommand.aliases = [
-  'api'
+  'runtime:api',
+  'rt:api'
 ]
 
 module.exports = IndexCommand
