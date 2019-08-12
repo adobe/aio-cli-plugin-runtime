@@ -101,4 +101,8 @@ TriggerUpdate.flags = {
 
 TriggerUpdate.description = 'Update or create a trigger for Adobe I/O Runtime'
 
+TriggerUpdate.aliases = [
+  'rt:trigger:update'
+]
+
 module.exports = TriggerUpdate

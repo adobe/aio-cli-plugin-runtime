@@ -114,4 +114,10 @@ PackageUpdate.flags = {
 
 PackageUpdate.description = 'Updates a Package'
 
+PackageUpdate.aliases = [
+  'runtime:pkg:update',
+  'rt:package:update',
+  'rt:pkg:update'
+]
+
 module.exports = PackageUpdate

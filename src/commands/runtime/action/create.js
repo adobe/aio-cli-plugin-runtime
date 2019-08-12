@@ -199,4 +199,6 @@ ActionCreate.flags = {
 
 ActionCreate.description = 'Creates an Action'
 
+ActionCreate.aliases = ['rt:action:create']
+
 module.exports = ActionCreate

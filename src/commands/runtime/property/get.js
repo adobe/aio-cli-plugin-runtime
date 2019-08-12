@@ -126,4 +126,10 @@ PropertyGet.flags = {
 
 PropertyGet.description = 'get property'
 
+PropertyGet.aliases = [
+  'runtime:prop:get',
+  'rt:property:get',
+  'rt:prop:get'
+]
+
 module.exports = PropertyGet

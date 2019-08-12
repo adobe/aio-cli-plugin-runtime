@@ -64,4 +64,10 @@ PropertyUnset.flags = {
 
 PropertyUnset.description = 'unset property'
 
+PropertyUnset.aliases = [
+  'runtime:prop:unset',
+  'rt:property:unset',
+  'rt:prop:unset'
+]
+
 module.exports = PropertyUnset

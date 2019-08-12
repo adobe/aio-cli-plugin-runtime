@@ -152,4 +152,14 @@ ActivationList.flags = {
 
 ActivationList.description = 'Lists all the Activations'
 
+ActivationList.aliases = [
+  'runtime:activations:list',
+  'runtime:activation:ls',
+  'runtime:activations:ls',
+  'rt:activation:list',
+  'rt:activation:ls',
+  'rt:activations:list',
+  'rt:activations:ls'
+]
+
 module.exports = ActivationList

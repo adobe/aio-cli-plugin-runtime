@@ -188,4 +188,6 @@ DeploySync.flags = {
 
 DeploySync.description = 'A tool to sync deployment and undeployment of Runtime packages using a manifest and optional deployment files using YAML'
 
+DeploySync.aliases = ['rt:deploy:sync']
+
 module.exports = DeploySync

@@ -83,4 +83,6 @@ ActionInvoke.flags = {
 }
 ActionInvoke.description = 'Invokes an Action'
 
+ActionInvoke.aliases = ['rt:action:invoke']
+
 module.exports = ActionInvoke

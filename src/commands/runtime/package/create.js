@@ -111,4 +111,10 @@ PackageCreate.flags = {
 
 PackageCreate.description = 'Creates a Package'
 
+PackageCreate.aliases = [
+  'runtime:pkg:create',
+  'rt:package:create',
+  'rt:pkg:create'
+]
+
 module.exports = PackageCreate

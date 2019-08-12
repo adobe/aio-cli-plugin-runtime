@@ -101,4 +101,8 @@ TriggerCreate.flags = {
 
 TriggerCreate.description = 'Create a trigger for Adobe I/O Runtime'
 
+TriggerCreate.aliases = [
+  'rt:trigger:create'
+]
+
 module.exports = TriggerCreate
