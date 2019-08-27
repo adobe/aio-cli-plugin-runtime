@@ -36,7 +36,7 @@ $ npm install -g @adobe/aio-cli-plugin-runtime
 $ ./bin/run COMMAND
 running command...
 $ ./bin/run (-v|--version|version)
-@adobe/aio-cli-plugin-runtime/1.0.0 darwin-x64 node-v8.9.4
+@adobe/aio-cli-plugin-runtime/1.0.1 darwin-x64 node-v10.16.1
 $ ./bin/run --help [COMMAND]
 USAGE
   $ ./bin/run COMMAND
@@ -119,9 +119,12 @@ OPTIONS
   --help                   Show help
   --key=key                client key
   --version                Show version
+
+ALIASES
+  $ ./bin/run rt
 ```
 
-_See code: [src/commands/runtime/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.0/src/commands/runtime/index.js)_
+_See code: [src/commands/runtime/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.1/src/commands/runtime/index.js)_
 
 ## `./bin/run runtime:action`
 
@@ -142,9 +145,12 @@ OPTIONS
   --help                   Show help
   --key=key                client key
   --version                Show version
+
+ALIASES
+  $ ./bin/run rt:action
 ```
 
-_See code: [src/commands/runtime/action/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.0/src/commands/runtime/action/index.js)_
+_See code: [src/commands/runtime/action/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.1/src/commands/runtime/action/index.js)_
 
 ## `./bin/run runtime:action:create ACTIONNAME [ACTIONPATH]`
 
@@ -195,9 +201,12 @@ OPTIONS
   --version                              Show version
 
   --web=true|yes|false|no|raw            treat ACTION as a web action or as a raw HTTP web action
+
+ALIASES
+  $ ./bin/run rt:action:create
 ```
 
-_See code: [src/commands/runtime/action/create.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.0/src/commands/runtime/action/create.js)_
+_See code: [src/commands/runtime/action/create.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.1/src/commands/runtime/action/create.js)_
 
 ## `./bin/run runtime:action:delete ACTIONNAME`
 
@@ -209,9 +218,14 @@ USAGE
 
 OPTIONS
   --json  output raw json
+
+ALIASES
+  $ ./bin/run runtime:action:del
+  $ ./bin/run rt:action:delete
+  $ ./bin/run rt:action:del
 ```
 
-_See code: [src/commands/runtime/action/delete.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.0/src/commands/runtime/action/delete.js)_
+_See code: [src/commands/runtime/action/delete.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.1/src/commands/runtime/action/delete.js)_
 
 ## `./bin/run runtime:action:get ACTIONNAME`
 
@@ -235,9 +249,12 @@ OPTIONS
   --save                   save action code to file corresponding with action name
   --save-as=save-as        file to save action code to
   --version                Show version
+
+ALIASES
+  $ ./bin/run rt:action:get
 ```
 
-_See code: [src/commands/runtime/action/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.0/src/commands/runtime/action/get.js)_
+_See code: [src/commands/runtime/action/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.1/src/commands/runtime/action/get.js)_
 
 ## `./bin/run runtime:action:invoke ACTIONNAME`
 
@@ -262,9 +279,12 @@ OPTIONS
   --help                       Show help
   --key=key                    client key
   --version                    Show version
+
+ALIASES
+  $ ./bin/run rt:action:invoke
 ```
 
-_See code: [src/commands/runtime/action/invoke.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.0/src/commands/runtime/action/invoke.js)_
+_See code: [src/commands/runtime/action/invoke.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.1/src/commands/runtime/action/invoke.js)_
 
 ## `./bin/run runtime:action:list`
 
@@ -288,9 +308,18 @@ OPTIONS
   --json                   output raw json
   --key=key                client key
   --version                Show version
+
+ALIASES
+  $ ./bin/run runtime:action:ls
+  $ ./bin/run runtime:actions:list
+  $ ./bin/run runtime:actions:ls
+  $ ./bin/run rt:action:list
+  $ ./bin/run rt:actions:list
+  $ ./bin/run rt:action:ls
+  $ ./bin/run rt:actions:ls
 ```
 
-_See code: [src/commands/runtime/action/list.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.0/src/commands/runtime/action/list.js)_
+_See code: [src/commands/runtime/action/list.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.1/src/commands/runtime/action/list.js)_
 
 ## `./bin/run runtime:action:update ACTIONNAME [ACTIONPATH]`
 
@@ -341,9 +370,12 @@ OPTIONS
 
   --web=true|yes|false|no|raw            treat ACTION as a web action or as a raw HTTP web action. web = true/yes|raw or
                                          web = false/no
+
+ALIASES
+  $ ./bin/run rt:action:update
 ```
 
-_See code: [src/commands/runtime/action/update.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.0/src/commands/runtime/action/update.js)_
+_See code: [src/commands/runtime/action/update.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.1/src/commands/runtime/action/update.js)_
 
 ## `./bin/run runtime:activation`
 
@@ -364,9 +396,12 @@ OPTIONS
   --help                   Show help
   --key=key                client key
   --version                Show version
+
+ALIASES
+  $ ./bin/run rt:activation
 ```
 
-_See code: [src/commands/runtime/activation/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.0/src/commands/runtime/activation/index.js)_
+_See code: [src/commands/runtime/activation/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.1/src/commands/runtime/activation/index.js)_
 
 ## `./bin/run runtime:activation:get ACTIVATIONID`
 
@@ -387,9 +422,12 @@ OPTIONS
   --help                   Show help
   --key=key                client key
   --version                Show version
+
+ALIASES
+  $ ./bin/run rt:activation:get
 ```
 
-_See code: [src/commands/runtime/activation/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.0/src/commands/runtime/activation/get.js)_
+_See code: [src/commands/runtime/activation/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.1/src/commands/runtime/activation/get.js)_
 
 ## `./bin/run runtime:activation:list [ACTIVATIONID]`
 
@@ -400,6 +438,7 @@ USAGE
   $ ./bin/run runtime:activation:list [ACTIVATIONID]
 
 OPTIONS
+  -f, --full               include full activation description
   -i, --insecure           bypass certificate check
 
   -l, --limit=limit        only return LIMIT number of activations from the collection with a maximum LIMIT of 200
@@ -432,9 +471,18 @@ OPTIONS
                            Jan 1970
 
   --version                Show version
+
+ALIASES
+  $ ./bin/run runtime:activations:list
+  $ ./bin/run runtime:activation:ls
+  $ ./bin/run runtime:activations:ls
+  $ ./bin/run rt:activation:list
+  $ ./bin/run rt:activation:ls
+  $ ./bin/run rt:activations:list
+  $ ./bin/run rt:activations:ls
 ```
 
-_See code: [src/commands/runtime/activation/list.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.0/src/commands/runtime/activation/list.js)_
+_See code: [src/commands/runtime/activation/list.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.1/src/commands/runtime/activation/list.js)_
 
 ## `./bin/run runtime:activation:logs ACTIVATIONID`
 
@@ -455,9 +503,14 @@ OPTIONS
   --help                   Show help
   --key=key                client key
   --version                Show version
+
+ALIASES
+  $ ./bin/run runtime:activation:log
+  $ ./bin/run rt:activation:logs
+  $ ./bin/run rt:activation:log
 ```
 
-_See code: [src/commands/runtime/activation/logs.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.0/src/commands/runtime/activation/logs.js)_
+_See code: [src/commands/runtime/activation/logs.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.1/src/commands/runtime/activation/logs.js)_
 
 ## `./bin/run runtime:activation:result ACTIVATIONID`
 
@@ -478,9 +531,12 @@ OPTIONS
   --help                   Show help
   --key=key                client key
   --version                Show version
+
+ALIASES
+  $ ./bin/run rt:activation:result
 ```
 
-_See code: [src/commands/runtime/activation/result.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.0/src/commands/runtime/activation/result.js)_
+_See code: [src/commands/runtime/activation/result.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.1/src/commands/runtime/activation/result.js)_
 
 ## `./bin/run runtime:deploy`
 
@@ -505,9 +561,12 @@ OPTIONS
   --key=key                    client key
   --param=param                parameter values in KEY VALUE format
   --version                    Show version
+
+ALIASES
+  $ ./bin/run rt:deploy
 ```
 
-_See code: [src/commands/runtime/deploy/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.0/src/commands/runtime/deploy/index.js)_
+_See code: [src/commands/runtime/deploy/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.1/src/commands/runtime/deploy/index.js)_
 
 ## `./bin/run runtime:deploy:export`
 
@@ -530,9 +589,12 @@ OPTIONS
   --key=key                  client key
   --projectname=projectname  (required) the name of the project to be undeployed
   --version                  Show version
+
+ALIASES
+  $ ./bin/run rt:deploy:export
 ```
 
-_See code: [src/commands/runtime/deploy/export.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.0/src/commands/runtime/deploy/export.js)_
+_See code: [src/commands/runtime/deploy/export.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.1/src/commands/runtime/deploy/export.js)_
 
 ## `./bin/run runtime:deploy:report`
 
@@ -555,9 +617,12 @@ OPTIONS
   --help                       Show help
   --key=key                    client key
   --version                    Show version
+
+ALIASES
+  $ ./bin/run rt:deploy:report
 ```
 
-_See code: [src/commands/runtime/deploy/report.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.0/src/commands/runtime/deploy/report.js)_
+_See code: [src/commands/runtime/deploy/report.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.1/src/commands/runtime/deploy/report.js)_
 
 ## `./bin/run runtime:deploy:sync`
 
@@ -580,9 +645,12 @@ OPTIONS
   --help                       Show help
   --key=key                    client key
   --version                    Show version
+
+ALIASES
+  $ ./bin/run rt:deploy:sync
 ```
 
-_See code: [src/commands/runtime/deploy/sync.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.0/src/commands/runtime/deploy/sync.js)_
+_See code: [src/commands/runtime/deploy/sync.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.1/src/commands/runtime/deploy/sync.js)_
 
 ## `./bin/run runtime:deploy:undeploy`
 
@@ -605,9 +673,12 @@ OPTIONS
   --key=key                  client key
   --projectname=projectname  the name of the project to be undeployed
   --version                  Show version
+
+ALIASES
+  $ ./bin/run rt:deploy:undeploy
 ```
 
-_See code: [src/commands/runtime/deploy/undeploy.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.0/src/commands/runtime/deploy/undeploy.js)_
+_See code: [src/commands/runtime/deploy/undeploy.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.1/src/commands/runtime/deploy/undeploy.js)_
 
 ## `./bin/run runtime:deploy:version`
 
@@ -628,9 +699,12 @@ OPTIONS
   --help                   Show help
   --key=key                client key
   --version                Show version
+
+ALIASES
+  $ ./bin/run rt:deploy:version
 ```
 
-_See code: [src/commands/runtime/deploy/version.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.0/src/commands/runtime/deploy/version.js)_
+_See code: [src/commands/runtime/deploy/version.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.1/src/commands/runtime/deploy/version.js)_
 
 ## `./bin/run runtime:namespace`
 
@@ -651,9 +725,14 @@ OPTIONS
   --help                   Show help
   --key=key                client key
   --version                Show version
+
+ALIASES
+  $ ./bin/run runtime:ns
+  $ ./bin/run rt:namespace
+  $ ./bin/run rt:ns
 ```
 
-_See code: [src/commands/runtime/namespace/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.0/src/commands/runtime/namespace/index.js)_
+_See code: [src/commands/runtime/namespace/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.1/src/commands/runtime/namespace/index.js)_
 
 ## `./bin/run runtime:namespace:get`
 
@@ -677,10 +756,14 @@ OPTIONS
   --version                Show version
 
 ALIASES
+  $ ./bin/run rt:get
   $ ./bin/run runtime:list
+  $ ./bin/run rt:list
+  $ ./bin/run runtime:ls
+  $ ./bin/run rt:ls
 ```
 
-_See code: [src/commands/runtime/namespace/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.0/src/commands/runtime/namespace/get.js)_
+_See code: [src/commands/runtime/namespace/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.1/src/commands/runtime/namespace/get.js)_
 
 ## `./bin/run runtime:namespace:list`
 
@@ -702,9 +785,18 @@ OPTIONS
   --json                   output raw json
   --key=key                client key
   --version                Show version
+
+ALIASES
+  $ ./bin/run runtime:namespace:ls
+  $ ./bin/run runtime:ns:list
+  $ ./bin/run runtime:ns:ls
+  $ ./bin/run rt:namespace:list
+  $ ./bin/run rt:namespace:ls
+  $ ./bin/run rt:ns:list
+  $ ./bin/run rt:ns:ls
 ```
 
-_See code: [src/commands/runtime/namespace/list.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.0/src/commands/runtime/namespace/list.js)_
+_See code: [src/commands/runtime/namespace/list.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.1/src/commands/runtime/namespace/list.js)_
 
 ## `./bin/run runtime:package`
 
@@ -725,9 +817,14 @@ OPTIONS
   --help                   Show help
   --key=key                client key
   --version                Show version
+
+ALIASES
+  $ ./bin/run runtime:pkg
+  $ ./bin/run rt:package
+  $ ./bin/run rt:pkg
 ```
 
-_See code: [src/commands/runtime/package/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.0/src/commands/runtime/package/index.js)_
+_See code: [src/commands/runtime/package/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.1/src/commands/runtime/package/index.js)_
 
 ## `./bin/run runtime:package:bind PACKAGENAME BINDPACKAGENAME`
 
@@ -753,9 +850,14 @@ OPTIONS
   --json                                 output raw json
   --key=key                              client key
   --version                              Show version
+
+ALIASES
+  $ ./bin/run runtime:pkg:bind
+  $ ./bin/run rt:package:bind
+  $ ./bin/run rt:pkg:bind
 ```
 
-_See code: [src/commands/runtime/package/bind.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.0/src/commands/runtime/package/bind.js)_
+_See code: [src/commands/runtime/package/bind.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.1/src/commands/runtime/package/bind.js)_
 
 ## `./bin/run runtime:package:create PACKAGENAME`
 
@@ -782,9 +884,14 @@ OPTIONS
   --key=key                              client key
   --shared=true|yes|false|no             parameter to be passed to indicate whether package is shared or private
   --version                              Show version
+
+ALIASES
+  $ ./bin/run runtime:pkg:create
+  $ ./bin/run rt:package:create
+  $ ./bin/run rt:pkg:create
 ```
 
-_See code: [src/commands/runtime/package/create.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.0/src/commands/runtime/package/create.js)_
+_See code: [src/commands/runtime/package/create.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.1/src/commands/runtime/package/create.js)_
 
 ## `./bin/run runtime:package:delete PACKAGENAME`
 
@@ -796,9 +903,14 @@ USAGE
 
 OPTIONS
   --json  output raw json
+
+ALIASES
+  $ ./bin/run runtime:pkg:delete
+  $ ./bin/run rt:package:delete
+  $ ./bin/run rt:pkg:delete
 ```
 
-_See code: [src/commands/runtime/package/delete.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.0/src/commands/runtime/package/delete.js)_
+_See code: [src/commands/runtime/package/delete.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.1/src/commands/runtime/package/delete.js)_
 
 ## `./bin/run runtime:package:get PACKAGENAME`
 
@@ -819,9 +931,14 @@ OPTIONS
   --help                   Show help
   --key=key                client key
   --version                Show version
+
+ALIASES
+  $ ./bin/run runtime:pkg:get
+  $ ./bin/run rt:package:get
+  $ ./bin/run rt:pkg:get
 ```
 
-_See code: [src/commands/runtime/package/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.0/src/commands/runtime/package/get.js)_
+_See code: [src/commands/runtime/package/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.1/src/commands/runtime/package/get.js)_
 
 ## `./bin/run runtime:package:list [NAMESPACE]`
 
@@ -845,9 +962,18 @@ OPTIONS
   --json                   output raw json
   --key=key                client key
   --version                Show version
+
+ALIASES
+  $ ./bin/run runtime:package:ls
+  $ ./bin/run runtime:pkg:list
+  $ ./bin/run runtime:pkg:ls
+  $ ./bin/run rt:package:list
+  $ ./bin/run rt:package:ls
+  $ ./bin/run rt:pkg:list
+  $ ./bin/run rt:pkg:ls
 ```
 
-_See code: [src/commands/runtime/package/list.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.0/src/commands/runtime/package/list.js)_
+_See code: [src/commands/runtime/package/list.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.1/src/commands/runtime/package/list.js)_
 
 ## `./bin/run runtime:package:update PACKAGENAME`
 
@@ -874,9 +1000,14 @@ OPTIONS
   --key=key                              client key
   --shared=true|yes|false|no             parameter to be passed to indicate whether package is shared or private
   --version                              Show version
+
+ALIASES
+  $ ./bin/run runtime:pkg:update
+  $ ./bin/run rt:package:update
+  $ ./bin/run rt:pkg:update
 ```
 
-_See code: [src/commands/runtime/package/update.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.0/src/commands/runtime/package/update.js)_
+_See code: [src/commands/runtime/package/update.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.1/src/commands/runtime/package/update.js)_
 
 ## `./bin/run runtime:property`
 
@@ -897,9 +1028,13 @@ OPTIONS
   --help          Show help
   --key           client key
   --version       Show version
+
+ALIASES
+  $ ./bin/run runtime:prop
+  $ ./bin/run rt:prop
 ```
 
-_See code: [src/commands/runtime/property/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.0/src/commands/runtime/property/index.js)_
+_See code: [src/commands/runtime/property/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.1/src/commands/runtime/property/index.js)_
 
 ## `./bin/run runtime:property:get`
 
@@ -925,9 +1060,14 @@ OPTIONS
   --key           client key
   --namespace     whisk namespace
   --version       Show version
+
+ALIASES
+  $ ./bin/run runtime:prop:get
+  $ ./bin/run rt:property:get
+  $ ./bin/run rt:prop:get
 ```
 
-_See code: [src/commands/runtime/property/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.0/src/commands/runtime/property/get.js)_
+_See code: [src/commands/runtime/property/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.1/src/commands/runtime/property/get.js)_
 
 ## `./bin/run runtime:property:set`
 
@@ -949,9 +1089,14 @@ OPTIONS
   --key                  client key
   --namespace=namespace  whisk namespace
   --version              Show version
+
+ALIASES
+  $ ./bin/run runtime:prop:set
+  $ ./bin/run rt:property:set
+  $ ./bin/run rt:prop:set
 ```
 
-_See code: [src/commands/runtime/property/set.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.0/src/commands/runtime/property/set.js)_
+_See code: [src/commands/runtime/property/set.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.1/src/commands/runtime/property/set.js)_
 
 ## `./bin/run runtime:property:unset`
 
@@ -973,9 +1118,14 @@ OPTIONS
   --key           client key
   --namespace     whisk namespace
   --version       Show version
+
+ALIASES
+  $ ./bin/run runtime:prop:unset
+  $ ./bin/run rt:property:unset
+  $ ./bin/run rt:prop:unset
 ```
 
-_See code: [src/commands/runtime/property/unset.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.0/src/commands/runtime/property/unset.js)_
+_See code: [src/commands/runtime/property/unset.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.1/src/commands/runtime/property/unset.js)_
 
 ## `./bin/run runtime:route`
 
@@ -998,10 +1148,11 @@ OPTIONS
   --version       Show version
 
 ALIASES
-  $ ./bin/run api
+  $ ./bin/run runtime:api
+  $ ./bin/run rt:api
 ```
 
-_See code: [src/commands/runtime/route/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.0/src/commands/runtime/route/index.js)_
+_See code: [src/commands/runtime/route/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.1/src/commands/runtime/route/index.js)_
 
 ## `./bin/run runtime:route:create BASEPATH RELPATH APIVERB ACTION`
 
@@ -1044,10 +1195,12 @@ OPTIONS
   --version                                         Show version
 
 ALIASES
-  $ ./bin/run api:create
+  $ ./bin/run runtime:api:create
+  $ ./bin/run rt:route:create
+  $ ./bin/run rt:api:create
 ```
 
-_See code: [src/commands/runtime/route/create.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.0/src/commands/runtime/route/create.js)_
+_See code: [src/commands/runtime/route/create.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.1/src/commands/runtime/route/create.js)_
 
 ## `./bin/run runtime:route:delete BASEPATHORAPINAME [RELPATH] [APIVERB]`
 
@@ -1075,10 +1228,12 @@ OPTIONS
   --version       Show version
 
 ALIASES
-  $ ./bin/run api:delete
+  $ ./bin/run runtime:api:delete
+  $ ./bin/run rt:route:delete
+  $ ./bin/run rt:api:delete
 ```
 
-_See code: [src/commands/runtime/route/delete.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.0/src/commands/runtime/route/delete.js)_
+_See code: [src/commands/runtime/route/delete.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.1/src/commands/runtime/route/delete.js)_
 
 ## `./bin/run runtime:route:get BASEPATHORAPINAME`
 
@@ -1104,10 +1259,12 @@ OPTIONS
   --version       Show version
 
 ALIASES
-  $ ./bin/run api:get
+  $ ./bin/run runtime:api:get
+  $ ./bin/run rt:route:get
+  $ ./bin/run rt:api:get
 ```
 
-_See code: [src/commands/runtime/route/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.0/src/commands/runtime/route/get.js)_
+_See code: [src/commands/runtime/route/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.1/src/commands/runtime/route/get.js)_
 
 ## `./bin/run runtime:route:list [BASEPATH] [RELPATH] [APIVERB]`
 
@@ -1138,10 +1295,16 @@ OPTIONS
   --version          Show version
 
 ALIASES
-  $ ./bin/run api:list
+  $ ./bin/run runtime:route:ls
+  $ ./bin/run runtime:api:list
+  $ ./bin/run runtime:api:ls
+  $ ./bin/run rt:route:list
+  $ ./bin/run rt:route:ls
+  $ ./bin/run rt:api:list
+  $ ./bin/run rt:api:ls
 ```
 
-_See code: [src/commands/runtime/route/list.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.0/src/commands/runtime/route/list.js)_
+_See code: [src/commands/runtime/route/list.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.1/src/commands/runtime/route/list.js)_
 
 ## `./bin/run runtime:rule`
 
@@ -1162,9 +1325,12 @@ OPTIONS
   --help          Show help
   --key           client key
   --version       Show version
+
+ALIASES
+  $ ./bin/run rt:rule
 ```
 
-_See code: [src/commands/runtime/rule/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.0/src/commands/runtime/rule/index.js)_
+_See code: [src/commands/runtime/rule/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.1/src/commands/runtime/rule/index.js)_
 
 ## `./bin/run runtime:rule:create NAME TRIGGER ACTION`
 
@@ -1191,9 +1357,12 @@ OPTIONS
   --json          output raw json
   --key           client key
   --version       Show version
+
+ALIASES
+  $ ./bin/run rt:rule:create
 ```
 
-_See code: [src/commands/runtime/rule/create.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.0/src/commands/runtime/rule/create.js)_
+_See code: [src/commands/runtime/rule/create.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.1/src/commands/runtime/rule/create.js)_
 
 ## `./bin/run runtime:rule:delete NAME`
 
@@ -1217,9 +1386,12 @@ OPTIONS
   --help          Show help
   --key           client key
   --version       Show version
+
+ALIASES
+  $ ./bin/run rt:rule:delete
 ```
 
-_See code: [src/commands/runtime/rule/delete.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.0/src/commands/runtime/rule/delete.js)_
+_See code: [src/commands/runtime/rule/delete.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.1/src/commands/runtime/rule/delete.js)_
 
 ## `./bin/run runtime:rule:disable NAME`
 
@@ -1243,9 +1415,12 @@ OPTIONS
   --help          Show help
   --key           client key
   --version       Show version
+
+ALIASES
+  $ ./bin/run rt:rule:disable
 ```
 
-_See code: [src/commands/runtime/rule/disable.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.0/src/commands/runtime/rule/disable.js)_
+_See code: [src/commands/runtime/rule/disable.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.1/src/commands/runtime/rule/disable.js)_
 
 ## `./bin/run runtime:rule:enable NAME`
 
@@ -1269,9 +1444,12 @@ OPTIONS
   --help          Show help
   --key           client key
   --version       Show version
+
+ALIASES
+  $ ./bin/run rt:rule:enable
 ```
 
-_See code: [src/commands/runtime/rule/enable.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.0/src/commands/runtime/rule/enable.js)_
+_See code: [src/commands/runtime/rule/enable.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.1/src/commands/runtime/rule/enable.js)_
 
 ## `./bin/run runtime:rule:get NAME`
 
@@ -1295,9 +1473,12 @@ OPTIONS
   --help          Show help
   --key           client key
   --version       Show version
+
+ALIASES
+  $ ./bin/run rt:rule:get
 ```
 
-_See code: [src/commands/runtime/rule/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.0/src/commands/runtime/rule/get.js)_
+_See code: [src/commands/runtime/rule/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.1/src/commands/runtime/rule/get.js)_
 
 ## `./bin/run runtime:rule:list`
 
@@ -1321,9 +1502,14 @@ OPTIONS
   --json             output raw json
   --key              client key
   --version          Show version
+
+ALIASES
+  $ ./bin/run runtime:rule:ls
+  $ ./bin/run rt:rule:list
+  $ ./bin/run rt:rule:ls
 ```
 
-_See code: [src/commands/runtime/rule/list.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.0/src/commands/runtime/rule/list.js)_
+_See code: [src/commands/runtime/rule/list.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.1/src/commands/runtime/rule/list.js)_
 
 ## `./bin/run runtime:rule:status NAME`
 
@@ -1347,9 +1533,12 @@ OPTIONS
   --help          Show help
   --key           client key
   --version       Show version
+
+ALIASES
+  $ ./bin/run rt:rule:status
 ```
 
-_See code: [src/commands/runtime/rule/status.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.0/src/commands/runtime/rule/status.js)_
+_See code: [src/commands/runtime/rule/status.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.1/src/commands/runtime/rule/status.js)_
 
 ## `./bin/run runtime:rule:update NAME TRIGGER ACTION`
 
@@ -1376,9 +1565,12 @@ OPTIONS
   --json          output raw json
   --key           client key
   --version       Show version
+
+ALIASES
+  $ ./bin/run rt:rule:update
 ```
 
-_See code: [src/commands/runtime/rule/update.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.0/src/commands/runtime/rule/update.js)_
+_See code: [src/commands/runtime/rule/update.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.1/src/commands/runtime/rule/update.js)_
 
 ## `./bin/run runtime:trigger`
 
@@ -1399,9 +1591,12 @@ OPTIONS
   --help          Show help
   --key           client key
   --version       Show version
+
+ALIASES
+  $ ./bin/run rt:trigger
 ```
 
-_See code: [src/commands/runtime/trigger/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.0/src/commands/runtime/trigger/index.js)_
+_See code: [src/commands/runtime/trigger/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.1/src/commands/runtime/trigger/index.js)_
 
 ## `./bin/run runtime:trigger:create TRIGGERNAME`
 
@@ -1429,9 +1624,12 @@ OPTIONS
   --help                                 Show help
   --key                                  client key
   --version                              Show version
+
+ALIASES
+  $ ./bin/run rt:trigger:create
 ```
 
-_See code: [src/commands/runtime/trigger/create.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.0/src/commands/runtime/trigger/create.js)_
+_See code: [src/commands/runtime/trigger/create.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.1/src/commands/runtime/trigger/create.js)_
 
 ## `./bin/run runtime:trigger:delete TRIGGERPATH`
 
@@ -1455,9 +1653,12 @@ OPTIONS
   --help          Show help
   --key           client key
   --version       Show version
+
+ALIASES
+  $ ./bin/run rt:trigger:delete
 ```
 
-_See code: [src/commands/runtime/trigger/delete.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.0/src/commands/runtime/trigger/delete.js)_
+_See code: [src/commands/runtime/trigger/delete.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.1/src/commands/runtime/trigger/delete.js)_
 
 ## `./bin/run runtime:trigger:fire TRIGGERNAME`
 
@@ -1483,9 +1684,12 @@ OPTIONS
   --help                       Show help
   --key                        client key
   --version                    Show version
+
+ALIASES
+  $ ./bin/run rt:trigger:fire
 ```
 
-_See code: [src/commands/runtime/trigger/fire.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.0/src/commands/runtime/trigger/fire.js)_
+_See code: [src/commands/runtime/trigger/fire.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.1/src/commands/runtime/trigger/fire.js)_
 
 ## `./bin/run runtime:trigger:get TRIGGERPATH`
 
@@ -1509,9 +1713,12 @@ OPTIONS
   --help          Show help
   --key           client key
   --version       Show version
+
+ALIASES
+  $ ./bin/run rt:trigger:get
 ```
 
-_See code: [src/commands/runtime/trigger/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.0/src/commands/runtime/trigger/get.js)_
+_See code: [src/commands/runtime/trigger/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.1/src/commands/runtime/trigger/get.js)_
 
 ## `./bin/run runtime:trigger:list`
 
@@ -1535,9 +1742,14 @@ OPTIONS
   --json             output raw json
   --key              client key
   --version          Show version
+
+ALIASES
+  $ ./bin/run runtime:trigger:ls
+  $ ./bin/run rt:trigger:list
+  $ ./bin/run rt:trigger:ls
 ```
 
-_See code: [src/commands/runtime/trigger/list.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.0/src/commands/runtime/trigger/list.js)_
+_See code: [src/commands/runtime/trigger/list.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.1/src/commands/runtime/trigger/list.js)_
 
 ## `./bin/run runtime:trigger:update TRIGGERNAME`
 
@@ -1565,9 +1777,12 @@ OPTIONS
   --help                                 Show help
   --key                                  client key
   --version                              Show version
+
+ALIASES
+  $ ./bin/run rt:trigger:update
 ```
 
-_See code: [src/commands/runtime/trigger/update.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.0/src/commands/runtime/trigger/update.js)_
+_See code: [src/commands/runtime/trigger/update.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.0.1/src/commands/runtime/trigger/update.js)_
 <!-- commandsstop -->
 
 

@@ -55,4 +55,8 @@ RuleUpdate.flags = {
   })
 }
 
+RuleUpdate.aliases = [
+  'rt:rule:update'
+]
+
 module.exports = RuleUpdate

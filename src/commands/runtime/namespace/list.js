@@ -47,4 +47,14 @@ NamespaceList.flags = {
 
 NamespaceList.description = 'Lists all of your namespaces for Adobe I/O Runtime'
 
+NamespaceList.aliases = [
+  'runtime:namespace:ls',
+  'runtime:ns:list',
+  'runtime:ns:ls',
+  'rt:namespace:list',
+  'rt:namespace:ls',
+  'rt:ns:list',
+  'rt:ns:ls'
+]
+
 module.exports = NamespaceList

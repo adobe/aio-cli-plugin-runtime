@@ -39,4 +39,8 @@ RuleStatus.flags = {
   ...RuntimeBaseCommand.flags
 }
 
+RuleStatus.aliases = [
+  'rt:rule:status'
+]
+
 module.exports = RuleStatus

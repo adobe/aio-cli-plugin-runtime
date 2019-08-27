@@ -206,4 +206,6 @@ ActionUpdate.flags = {
 
 ActionUpdate.description = 'Updates an Action'
 
+ActionUpdate.aliases = ['rt:action:update']
+
 module.exports = ActionUpdate

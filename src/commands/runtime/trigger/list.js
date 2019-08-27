@@ -69,4 +69,10 @@ TriggerList.flags = {
 
 TriggerList.description = 'Lists all of your triggers for Adobe I/O Runtime'
 
+TriggerList.aliases = [
+  'runtime:trigger:ls',
+  'rt:trigger:list',
+  'rt:trigger:ls'
+]
+
 module.exports = TriggerList

@@ -83,4 +83,14 @@ PackageList.args = [
 
 PackageList.description = 'Lists all the Packages'
 
+PackageList.aliases = [
+  'runtime:package:ls',
+  'runtime:pkg:list',
+  'runtime:pkg:ls',
+  'rt:package:list',
+  'rt:package:ls',
+  'rt:pkg:list',
+  'rt:pkg:ls'
+]
+
 module.exports = PackageList

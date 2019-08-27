@@ -22,4 +22,9 @@ class IndexCommand extends RuntimeBaseCommand {
 
 IndexCommand.description = 'Execute property commands'
 
+IndexCommand.aliases = [
+  'runtime:prop',
+  'rt:prop'
+]
+
 module.exports = IndexCommand

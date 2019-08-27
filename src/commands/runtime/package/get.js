@@ -36,4 +36,10 @@ PackageGet.args = [
 
 PackageGet.description = 'Retrieves a Package'
 
+PackageGet.aliases = [
+  'runtime:pkg:get',
+  'rt:package:get',
+  'rt:pkg:get'
+]
+
 module.exports = PackageGet

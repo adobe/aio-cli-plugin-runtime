@@ -103,4 +103,6 @@ DeployReport.flags = {
 
 DeployReport.description = 'Provides a summary report of Runtime assets being deployed/undeployed based on manifest/deployment YAML'
 
+DeployReport.aliases = ['rt:deploy:report']
+
 module.exports = DeployReport

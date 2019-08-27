@@ -44,4 +44,10 @@ PackageDelete.flags = {
 
 PackageDelete.description = 'Deletes a Package'
 
+PackageDelete.aliases = [
+  'runtime:pkg:delete',
+  'rt:package:delete',
+  'rt:pkg:delete'
+]
+
 module.exports = PackageDelete

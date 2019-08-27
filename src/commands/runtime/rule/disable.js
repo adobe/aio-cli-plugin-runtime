@@ -39,4 +39,8 @@ RuleDisable.flags = {
   ...RuntimeBaseCommand.flags
 }
 
+RuleDisable.aliases = [
+  'rt:rule:disable'
+]
+
 module.exports = RuleDisable

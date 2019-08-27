@@ -44,4 +44,8 @@ TriggerGet.args = [
 
 TriggerGet.description = 'Get a trigger for Adobe I/O Runtime'
 
+TriggerGet.aliases = [
+  'rt:trigger:get'
+]
+
 module.exports = TriggerGet

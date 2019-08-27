@@ -25,10 +25,6 @@ test('description', async () => {
   expect(TheCommand.description).toBeDefined()
 })
 
-test('aliases', async () => {
-  expect(TheCommand.aliases).toEqual([])
-})
-
 test('flags', async () => {
   expect(TheCommand.flags.param.required).toBe(false)
   expect(TheCommand.flags.param.hidden).toBe(false)
@@ -88,6 +84,12 @@ test('args', async () => {
   expect(actionPath.name).toBeDefined()
   expect(actionPath.name).toEqual('actionPath')
   expect(actionPath.required).toEqual(false)
+})
+
+test('aliases', async () => {
+  expect(TheCommand.aliases).toBeDefined()
+  expect(TheCommand.aliases).toBeInstanceOf(Array)
+  expect(TheCommand.aliases.length).toBeGreaterThan(0)
 })
 
 describe('instance methods', () => {

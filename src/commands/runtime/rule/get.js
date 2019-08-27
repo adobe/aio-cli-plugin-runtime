@@ -39,4 +39,8 @@ RuleGet.flags = {
   ...RuntimeBaseCommand.flags
 }
 
+RuleGet.aliases = [
+  'rt:rule:get'
+]
+
 module.exports = RuleGet

@@ -90,8 +90,13 @@ NamespaceGet.flags = {
   })
 }
 
-NamespaceGet.aliases = [ 'runtime:list' ]
-
 NamespaceGet.description = 'Get triggers, actions, and rules in the registry for namespace'
+
+NamespaceGet.aliases = [
+  'rt:get',
+  'runtime:list',
+  'rt:list',
+  'runtime:ls',
+  'rt:ls' ]
 
 module.exports = NamespaceGet

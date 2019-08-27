@@ -26,7 +26,9 @@ test('description', async () => {
 })
 
 test('aliases', async () => {
-  expect(TheCommand.aliases).toEqual([])
+  expect(TheCommand.aliases).toBeDefined()
+  expect(TheCommand.aliases).toBeInstanceOf(Array)
+  expect(TheCommand.aliases.length).toBeGreaterThan(0)
 })
 
 test('args', async () => {
