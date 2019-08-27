@@ -76,4 +76,8 @@ TriggerFire.flags = {
 
 TriggerFire.description = 'Fire a trigger for Adobe I/O Runtime'
 
+TriggerFire.aliases = [
+  'rt:trigger:fire'
+]
+
 module.exports = TriggerFire

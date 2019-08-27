@@ -39,4 +39,8 @@ RuleEnable.flags = {
   ...RuntimeBaseCommand.flags
 }
 
+RuleEnable.aliases = [
+  'rt:rule:enable'
+]
+
 module.exports = RuleEnable

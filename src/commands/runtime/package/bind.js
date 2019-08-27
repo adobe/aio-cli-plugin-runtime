@@ -109,4 +109,10 @@ PackageBind.flags = {
 
 PackageBind.description = 'Bind parameters to a package'
 
+PackageBind.aliases = [
+  'runtime:pkg:bind',
+  'rt:package:bind',
+  'rt:pkg:bind'
+]
+
 module.exports = PackageBind

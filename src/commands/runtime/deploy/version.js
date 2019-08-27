@@ -20,4 +20,6 @@ class DeployVersion extends RuntimeBaseCommand {
 
 DeployVersion.description = 'Prints the version number of aio runtime deploy'
 
+DeployVersion.aliases = ['rt:deploy:version']
+
 module.exports = DeployVersion

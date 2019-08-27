@@ -99,4 +99,6 @@ ActionGet.flags = {
 
 ActionGet.description = 'Retrieves an Action'
 
+ActionGet.aliases = ['rt:action:get']
+
 module.exports = ActionGet

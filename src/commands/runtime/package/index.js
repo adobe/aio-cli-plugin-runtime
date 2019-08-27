@@ -22,4 +22,10 @@ class IndexCommand extends RuntimeBaseCommand {
 
 IndexCommand.description = 'Manage your packages'
 
+IndexCommand.aliases = [
+  'runtime:pkg',
+  'rt:package',
+  'rt:pkg'
+]
+
 module.exports = IndexCommand

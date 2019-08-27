@@ -22,4 +22,8 @@ class IndexCommand extends RuntimeBaseCommand {
 
 IndexCommand.description = 'Manage your rules'
 
+IndexCommand.aliases = [
+  'rt:rule'
+]
+
 module.exports = IndexCommand

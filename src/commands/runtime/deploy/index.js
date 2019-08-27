@@ -71,4 +71,6 @@ IndexCommand.flags = {
 
 IndexCommand.description = 'The Runtime Deployment Tool'
 
+IndexCommand.aliases = ['rt:deploy']
+
 module.exports = IndexCommand

@@ -35,4 +35,8 @@ ActivationResult.args = [
 
 ActivationResult.description = 'Retrieves the Results for an Activation'
 
+ActivationResult.aliases = [
+  'rt:activation:result'
+]
+
 module.exports = ActivationResult

@@ -132,4 +132,6 @@ DeployUndeploy.flags = {
 
 DeployUndeploy.description = 'Undeploy removes Runtime assets which were deployed from the manifest and deployment YAML'
 
+DeployUndeploy.aliases = ['rt:deploy:undeploy']
+
 module.exports = DeployUndeploy
