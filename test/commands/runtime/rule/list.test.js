@@ -72,7 +72,7 @@ describe('instance methods', () => {
       command.argv = ['--limit', '2', '--json']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ limit: 2, json: true })
+          expect(cmd).toHaveBeenCalledWith(expect.objectContaining({ limit: 2, json: true }))
           expect(cmd2).toHaveBeenCalled()
           expect(stdout.output).toMatchFixture('rule/list.json')
         })
@@ -94,7 +94,7 @@ describe('instance methods', () => {
       command.argv = ['--skip', '3', '--json']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ limit: 30, skip: 3, json: true })
+          expect(cmd).toHaveBeenCalledWith(expect.objectContaining({ limit: 30, skip: 3, json: true }))
           expect(stdout.output).toMatch('[]')
         })
     })
@@ -105,7 +105,7 @@ describe('instance methods', () => {
       command.argv = ['--limit', '2']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ limit: 2 })
+          expect(cmd).toHaveBeenCalledWith(expect.objectContaining({ limit: 2 }))
           expect(cmd2).toHaveBeenCalled()
           expect(stdout.output.replace(/\s/g, '')).toMatchFixture('rule/list-output.txt')
         })
@@ -117,7 +117,7 @@ describe('instance methods', () => {
       command.argv = ['--limit', '2']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ limit: 2 })
+          expect(cmd).toHaveBeenCalledWith(expect.objectContaining({ limit: 2 }))
           expect(cmd2).toHaveBeenCalled()
           expect(stdout.output.replace(/\s/g, '')).toMatchFixture('rule/list-output-public.txt')
         })
