@@ -64,7 +64,7 @@ describe('instance methods', () => {
     })
 
     test('return list of packages', () => {
-      let cmd = ow.mockResolvedFixture(owAction, 'package/list.json')
+      const cmd = ow.mockResolvedFixture(owAction, 'package/list.json')
       command.argv = []
       return command.run()
         .then(() => {
@@ -85,7 +85,7 @@ describe('instance methods', () => {
     })
 
     test('return list of packages --json', () => {
-      let cmd = ow.mockResolved(owAction, '')
+      const cmd = ow.mockResolved(owAction, '')
       command.argv = ['--json']
       return command.run()
         .then(() => {
@@ -95,17 +95,17 @@ describe('instance methods', () => {
     })
 
     test('return list of packages with limits', () => {
-      let cmd = ow.mockResolvedFixture(owAction, 'package/list.json')
+      const cmd = ow.mockResolvedFixture(owAction, 'package/list.json')
       command.argv = ['--limit', '1']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ 'limit': 1 })
+          expect(cmd).toHaveBeenCalledWith({ limit: 1 })
           expect(stdout.output).toMatch('')
         })
     })
 
     test('return list of packages with namespace', () => {
-      let cmd = ow.mockResolvedFixture(owAction, 'package/list.json')
+      const cmd = ow.mockResolvedFixture(owAction, 'package/list.json')
       command.argv = ['nameSpaceName']
       return command.run()
         .then(() => {
@@ -115,11 +115,11 @@ describe('instance methods', () => {
     })
 
     test('return list of packages with skip (no actions)', () => {
-      let cmd = ow.mockResolvedFixture(owAction, 'package/list.json')
+      const cmd = ow.mockResolvedFixture(owAction, 'package/list.json')
       command.argv = ['--skip', '3']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ 'skip': 3 })
+          expect(cmd).toHaveBeenCalledWith({ skip: 3 })
           expect(stdout.output).toMatch('')
         })
     })

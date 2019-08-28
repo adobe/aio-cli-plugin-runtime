@@ -64,7 +64,7 @@ describe('instance methods', () => {
     })
 
     test('get simple rule', () => {
-      let cmd = ow.mockResolvedFixture(owAction, 'rule/get.json')
+      const cmd = ow.mockResolvedFixture(owAction, 'rule/get.json')
       command.argv = ['nameFoo']
       return command.run()
         .then(() => {

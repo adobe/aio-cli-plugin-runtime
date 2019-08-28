@@ -43,7 +43,7 @@ describe('instance methods', () => {
 
     test('returns version', () => {
       command.config = fixtureJson('property/config.json')
-      command.argv = [ ]
+      command.argv = []
       return command.run()
         .then(() => {
           expect(stdout.output).toMatchFixture('deploy/cliversion.txt')

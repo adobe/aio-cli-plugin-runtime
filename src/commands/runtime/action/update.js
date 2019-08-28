@@ -10,7 +10,7 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-let fs = require('fs')
+const fs = require('fs')
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 const { createKeyValueObjectFromFlag, createKeyValueObjectFromFile, createComponentsfromSequence } = require('../../../runtime-helpers')
 const { flags } = require('@oclif/command')
@@ -69,10 +69,10 @@ class ActionUpdate extends RuntimeBaseCommand {
         }
       }
       const ow = await this.wsk()
-      let options = {}
+      const options = {}
       options['name'] = name
       options['action'] = action
-      let limits = {}
+      const limits = {}
       if (flags.timeout) {
         limits['timeout'] = flags.timeout
       }
@@ -84,12 +84,12 @@ class ActionUpdate extends RuntimeBaseCommand {
       }
       options['limits'] = limits
       if (flags.sequence) {
-        let sequenceAction = flags.sequence.trim().split(',')
+        const sequenceAction = flags.sequence.trim().split(',')
         if (sequenceAction[0].length === 0) {
           throw new Error('Provide a valid sequence component')
         } else {
-          let opts = await ow.actions.client.options
-          let ns = opts.namespace
+          const opts = await ow.actions.client.options
+          const ns = opts.namespace
           options['exec'] = createComponentsfromSequence(sequenceAction, ns)
         }
       }
@@ -129,14 +129,14 @@ ActionUpdate.args = [
 
 ActionUpdate.flags = {
   ...RuntimeBaseCommand.flags,
-  'param': flags.string({
+  param: flags.string({
     char: 'p',
     description: 'parameter to be passed to the action', // help description for flag
     hidden: false, // hide from help
     multiple: true, // allow setting this flag multiple times
     required: false
   }),
-  'web': flags.string({
+  web: flags.string({
     description: 'treat ACTION as a web action or as a raw HTTP web action. web = true/yes|raw or web = false/no', // help description for flag
     multiple: false, // allow setting this flag multiple times
     options: ['true', 'yes', 'false', 'no', 'raw'],
@@ -149,34 +149,34 @@ ActionUpdate.flags = {
     multiple: false, // allow setting this flag multiple times
     required: false
   }),
-  'timeout': flags.integer({
+  timeout: flags.integer({
     char: 't',
     description: 'the timeout LIMIT in milliseconds after which the action is terminated (default 60000)', // help description for flag
     hidden: false, // hide from help
     multiple: false, // allow setting this flag multiple times
     required: false
   }),
-  'memory': flags.integer({
+  memory: flags.integer({
     char: 'm',
     description: 'the maximum memory LIMIT in MB for the action (default 256)', // help description for flag
     hidden: false, // hide from help
     multiple: false, // allow setting this flag multiple times
     required: false
   }),
-  'logsize': flags.integer({
+  logsize: flags.integer({
     char: 'l',
     description: 'the maximum log size LIMIT in MB for the action (default 10)', // help description for flag
     hidden: false, // hide from help
     multiple: false, // allow setting this flag multiple times
     required: false
   }),
-  'kind': flags.string({
+  kind: flags.string({
     description: 'the KIND of the action runtime (example: swift:default, nodejs:default)', // help description for flag
     hidden: false, // hide from help
     multiple: false, // allow setting this flag multiple times
     required: false
   }),
-  'annotation': flags.string({
+  annotation: flags.string({
     char: 'a',
     description: 'annotation values in KEY VALUE format', // help description for flag
     hidden: false, // hide from help
@@ -190,16 +190,16 @@ ActionUpdate.flags = {
     multiple: false, // allow setting this flag multiple times
     required: false
   }),
-  'json': flags.boolean({
+  json: flags.boolean({
     description: 'output raw json'
   }),
-  'sequence': flags.string({
+  sequence: flags.string({
     description: 'treat ACTION as comma separated sequence of actions to invoke', // help description for flag
     hidden: false, // hide from help
     multiple: false, // allow setting this flag multiple times
     required: false
   }),
-  'main': flags.string({
+  main: flags.string({
     description: 'the name of the action entry point (function or fully-qualified method name when applicable)'
   })
 }

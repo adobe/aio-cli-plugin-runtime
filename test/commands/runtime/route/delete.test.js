@@ -46,7 +46,7 @@ test('args', async () => {
 
   expect(args[2].name).toEqual('apiVerb')
   expect(args[2].required).toBeFalsy()
-  expect(args[2].options).toMatchObject([ 'get', 'post', 'put', 'patch', 'delete', 'head', 'options' ])
+  expect(args[2].options).toMatchObject(['get', 'post', 'put', 'patch', 'delete', 'head', 'options'])
   expect(args[2].description).toBeDefined()
 })
 
@@ -70,7 +70,7 @@ describe('instance methods', () => {
 
   test('error, throws exception', (done) => {
     ow.mockRejected(owAction, new Error('an error'))
-    command.argv = [ '/myapi' ]
+    command.argv = ['/myapi']
     return command.run()
       .then(() => done.fail('should not succeed'))
       .catch(() => {
@@ -80,8 +80,8 @@ describe('instance methods', () => {
   })
 
   test('simple delete call', () => {
-    let cmd = ow.mockResolved(owAction, '')
-    command.argv = [ '/myapi', '/mypath', 'get' ]
+    const cmd = ow.mockResolved(owAction, '')
+    command.argv = ['/myapi', '/mypath', 'get']
     return command.run()
       .then(() => {
         expect(cmd).toHaveBeenCalledWith({ basepath: '/myapi', relpath: '/mypath', operation: 'get' })

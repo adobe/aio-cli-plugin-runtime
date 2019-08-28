@@ -43,8 +43,8 @@ test('aliases', async () => {
 describe('instance methods', () => {
   let command, handleError
   let cwdSpy
-  let projectHash = 'xyz'
-  let packagelist = [{
+  const projectHash = 'xyz'
+  const packagelist = [{
     annotations: [{
       key: 'whisk-managed',
       value: {
@@ -62,7 +62,7 @@ describe('instance methods', () => {
     version: '0.0.2'
   }]
 
-  let packageNoAnnotations = [{
+  const packageNoAnnotations = [{
     annotations: [],
     binding: false,
     name: 'testSeq1',
@@ -72,7 +72,7 @@ describe('instance methods', () => {
     version: '0.0.2'
   }]
 
-  let changedPackagelist = [{
+  const changedPackagelist = [{
     annotations: [{
       key: 'whisk-managed',
       value: {
@@ -90,7 +90,7 @@ describe('instance methods', () => {
     version: '0.0.2'
   }]
 
-  let packagelistNoProjectName = [{
+  const packagelistNoProjectName = [{
     annotations: [{
       key: 'whisk-managed',
       value: 'key'
@@ -103,7 +103,7 @@ describe('instance methods', () => {
     version: '0.0.2'
   }]
 
-  let triggerlist = [{
+  const triggerlist = [{
     annotations: [{
       key: 'whisk-managed',
       value: {
@@ -120,7 +120,7 @@ describe('instance methods', () => {
     version: '0.0.1'
   }]
 
-  let triggerNoProjectName = [
+  const triggerNoProjectName = [
     {
       annotations: [{
         key: 'whisk-managed',
@@ -133,7 +133,7 @@ describe('instance methods', () => {
       version: '0.0.1'
     }
   ]
-  let triggerNoAnnotation = [{
+  const triggerNoAnnotation = [{
     annotations: [],
     name: 'meetPerson2',
     namespace: 'ns',
@@ -141,7 +141,7 @@ describe('instance methods', () => {
     updated: 1555527174943,
     version: '0.0.1'
   }]
-  let ruleslist = [{
+  const ruleslist = [{
     action: { name: 'three', path: 'ns/testSeq' },
     annotations: [{
       key: 'whisk-managed',
@@ -170,7 +170,7 @@ describe('instance methods', () => {
     trigger: { name: 'meetPerson1', path: 'ns' },
     version: '0.0.2'
   }]
-  let rulesWrongHash = [{
+  const rulesWrongHash = [{
     action: { name: 'three', path: 'ns/testSeq' },
     annotations: [{
       key: 'whisk-managed',
@@ -187,7 +187,7 @@ describe('instance methods', () => {
     trigger: { name: 'meetPerson', path: 'ns' },
     version: '0.0.2'
   }]
-  let rulesNoAnnotations = [{
+  const rulesNoAnnotations = [{
     action: { name: 'three2', path: 'ns/testSeq2' },
     annotations: [],
     name: 'meetPersonRule2',
@@ -197,7 +197,7 @@ describe('instance methods', () => {
     version: '0.0.2'
   }]
 
-  let actionList = [{
+  const actionList = [{
     annotations: [
       {
         key: 'whisk-managed',
@@ -218,7 +218,7 @@ describe('instance methods', () => {
     version: '0.0.16' }
   ]
 
-  let changeActionList = [{
+  const changeActionList = [{
     annotations: [
       {
         key: 'whisk-managed',
@@ -239,7 +239,7 @@ describe('instance methods', () => {
     version: '0.0.16' }
   ]
 
-  let actionListNoPackage = [{
+  const actionListNoPackage = [{
     annotations: [
       {
         key: 'whisk-managed',
@@ -260,7 +260,7 @@ describe('instance methods', () => {
     version: '0.0.16' }
   ]
 
-  let actionWrongHash = [{
+  const actionWrongHash = [{
     annotations: [{
       key: 'whisk-managed',
       value: {
@@ -279,7 +279,7 @@ describe('instance methods', () => {
     version: '0.0.16' }
   ]
 
-  let actionNoAnnotations = [{
+  const actionNoAnnotations = [{
     annotations: [],
     exec: { binary: false },
     limits: { concurrency: 1, logs: 10, memory: 256, timeout: 60000 },
@@ -346,9 +346,9 @@ describe('instance methods', () => {
     })
 
     test('sync a package which has not been deployed on server before', () => {
-      let cmd = ow.mockResolved(owPackage, '')
+      const cmd = ow.mockResolved(owPackage, '')
       ow.mockResolved('actions.list', [])
-      command.argv = [ '-m', '/deploy/deployment_actionMissingInputs.yaml' ]
+      command.argv = ['-m', '/deploy/deployment_actionMissingInputs.yaml']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalled()
@@ -358,8 +358,8 @@ describe('instance methods', () => {
 
     test('sync a trigger which has not been deployed on server before', () => {
       ow.mockResolved('actions.list', [])
-      let cmd = ow.mockResolved(owTrigger, '')
-      command.argv = [ '-m', '/deploy/deployment_actionMissingInputs.yaml' ]
+      const cmd = ow.mockResolved(owTrigger, '')
+      command.argv = ['-m', '/deploy/deployment_actionMissingInputs.yaml']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalled()
@@ -369,8 +369,8 @@ describe('instance methods', () => {
 
     test('sync an action which has not been deployed on server before', () => {
       ow.mockResolved('actions.list', [])
-      let cmd = ow.mockResolved(owAction, '')
-      command.argv = [ '-m', '/deploy/deployment_actionMissingInputs.yaml' ]
+      const cmd = ow.mockResolved(owAction, '')
+      command.argv = ['-m', '/deploy/deployment_actionMissingInputs.yaml']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalled()
@@ -380,8 +380,8 @@ describe('instance methods', () => {
 
     test('sync a package which has been deployed before but has not changed ', () => {
       ow.mockResolved('packages.list', packagelist)
-      let cmd = ow.mockResolved(owPackage, '')
-      command.argv = [ '-m', '/deploy/deployment_actionMissingInputs.yaml' ]
+      const cmd = ow.mockResolved(owPackage, '')
+      command.argv = ['-m', '/deploy/deployment_actionMissingInputs.yaml']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalled()
@@ -391,8 +391,8 @@ describe('instance methods', () => {
 
     test('sync a trigger which has been deployed before but has not changed ', () => {
       ow.mockResolved('packages.list', packagelist)
-      let cmd = ow.mockResolved(owTrigger, '')
-      command.argv = [ '-m', '/deploy/deployment_actionMissingInputs.yaml' ]
+      const cmd = ow.mockResolved(owTrigger, '')
+      command.argv = ['-m', '/deploy/deployment_actionMissingInputs.yaml']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalled()
@@ -402,8 +402,8 @@ describe('instance methods', () => {
 
     test('sync an action which has been deployed before but has not changed ', () => {
       ow.mockResolved('packages.list', packagelist)
-      let cmd = ow.mockResolved(owAction, '')
-      command.argv = [ '-m', '/deploy/deployment_actionMissingInputs.yaml' ]
+      const cmd = ow.mockResolved(owAction, '')
+      command.argv = ['-m', '/deploy/deployment_actionMissingInputs.yaml']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalled()
@@ -414,8 +414,8 @@ describe('instance methods', () => {
     test('sync a project which has been deployed before and manifest content has changed ', () => {
       ow.mockResolved('packages.list', changedPackagelist)
       ow.mockResolved('actions.list', actionList)
-      let cmd = ow.mockResolved(owPackageDelete, '')
-      command.argv = [ '-m', '/deploy/deployment_syncMissingAction.yaml' ]
+      const cmd = ow.mockResolved(owPackageDelete, '')
+      command.argv = ['-m', '/deploy/deployment_syncMissingAction.yaml']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalledWith('testSeq')
@@ -426,8 +426,8 @@ describe('instance methods', () => {
     test('should not find projectHash from package list with no annotations and package should not be deleted ', () => {
       ow.mockResolved('packages.list', packageNoAnnotations)
       ow.mockResolved('actions.list', actionList)
-      let cmd = ow.mockResolved(owPackageDelete, '')
-      command.argv = [ '-m', '/deploy/deployment_syncMissingAction.yaml' ]
+      const cmd = ow.mockResolved(owPackageDelete, '')
+      command.argv = ['-m', '/deploy/deployment_syncMissingAction.yaml']
       return command.run()
         .then(() => {
           expect(cmd).not.toHaveBeenCalled()
@@ -438,8 +438,8 @@ describe('instance methods', () => {
     test('should not find projectHash from package list with no value for project name and package should not be deleted ', () => {
       ow.mockResolved('packages.list', packagelistNoProjectName)
       ow.mockResolved('actions.list', actionList)
-      let cmd = ow.mockResolved(owPackageDelete, '')
-      command.argv = [ '-m', '/deploy/deployment_syncMissingAction.yaml' ]
+      const cmd = ow.mockResolved(owPackageDelete, '')
+      command.argv = ['-m', '/deploy/deployment_syncMissingAction.yaml']
       return command.run()
         .then(() => {
           expect(cmd).not.toHaveBeenCalled()
@@ -451,8 +451,8 @@ describe('instance methods', () => {
       ow.mockResolved('packages.list', [])
       ow.mockResolved('actions.list', [])
       ow.mockResolved('triggers.list', triggerlist)
-      let cmd = ow.mockResolved(owTriggerDelete, '')
-      command.argv = [ '-m', '/deploy/deployment_syncMissingAction.yaml' ]
+      const cmd = ow.mockResolved(owTriggerDelete, '')
+      command.argv = ['-m', '/deploy/deployment_syncMissingAction.yaml']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalledWith('meetPerson')
@@ -464,8 +464,8 @@ describe('instance methods', () => {
       ow.mockResolved('packages.list', [])
       ow.mockResolved('actions.list', [])
       ow.mockResolved('triggers.list', triggerNoAnnotation)
-      let cmd = ow.mockResolved(owTriggerDelete, '')
-      command.argv = [ '-m', '/deploy/deployment_syncMissingAction.yaml' ]
+      const cmd = ow.mockResolved(owTriggerDelete, '')
+      command.argv = ['-m', '/deploy/deployment_syncMissingAction.yaml']
       return command.run()
         .then(() => {
           expect(cmd).not.toHaveBeenCalled()
@@ -477,8 +477,8 @@ describe('instance methods', () => {
       ow.mockResolved('packages.list', [])
       ow.mockResolved('actions.list', [])
       ow.mockResolved('triggers.list', triggerNoProjectName)
-      let cmd = ow.mockResolved(owTriggerDelete, '')
-      command.argv = [ '-m', '/deploy/deployment_syncMissingAction.yaml' ]
+      const cmd = ow.mockResolved(owTriggerDelete, '')
+      command.argv = ['-m', '/deploy/deployment_syncMissingAction.yaml']
       return command.run()
         .then(() => {
           expect(cmd).not.toHaveBeenCalled()
@@ -489,8 +489,8 @@ describe('instance methods', () => {
     test('fail to find projectHash from action list which has no projectHash and has been deployed before and manifest content has changed ', () => {
       ow.mockResolved('packages.list', [])
       ow.mockResolved('actions.list', actionWrongHash)
-      let cmd = ow.mockResolved(owActionDelete, '')
-      command.argv = [ '-m', '/deploy/deployment_syncMissingAction.yaml' ]
+      const cmd = ow.mockResolved(owActionDelete, '')
+      command.argv = ['-m', '/deploy/deployment_syncMissingAction.yaml']
       return command.run()
         .then(() => {
           expect(cmd).not.toHaveBeenCalled()
@@ -501,8 +501,8 @@ describe('instance methods', () => {
     test('fail to find projectHash from action list which has no annotations and has been deployed before and manifest content has changed ', () => {
       ow.mockResolved('packages.list', [])
       ow.mockResolved('actions.list', actionNoAnnotations)
-      let cmd = ow.mockResolved(owTriggerDelete, '')
-      command.argv = [ '-m', '/deploy/deployment_syncMissingAction.yaml' ]
+      const cmd = ow.mockResolved(owTriggerDelete, '')
+      command.argv = ['-m', '/deploy/deployment_syncMissingAction.yaml']
       return command.run()
         .then(() => {
           expect(cmd).not.toHaveBeenCalled()
@@ -513,8 +513,8 @@ describe('instance methods', () => {
     test('find project hash from action list which has been deployed before and action should be deleted because of projecthash change', () => {
       ow.mockResolved('packages.list', [])
       ow.mockResolved('actions.list', changeActionList)
-      let cmd = ow.mockResolved(owActionDelete, '')
-      command.argv = [ '-m', '/deploy/deployment_syncMissingAction.yaml' ]
+      const cmd = ow.mockResolved(owActionDelete, '')
+      command.argv = ['-m', '/deploy/deployment_syncMissingAction.yaml']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalled()
@@ -525,8 +525,8 @@ describe('instance methods', () => {
     test('find project hash from action list which has been deployed but not as part of any package before and action should be deleted because of projecthash change', () => {
       ow.mockResolved('packages.list', [])
       ow.mockResolved('actions.list', actionListNoPackage)
-      let cmd = ow.mockResolved(owActionDelete, '')
-      command.argv = [ '-m', '/deploy/deployment_syncMissingAction.yaml' ]
+      const cmd = ow.mockResolved(owActionDelete, '')
+      command.argv = ['-m', '/deploy/deployment_syncMissingAction.yaml']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalled()
@@ -539,8 +539,8 @@ describe('instance methods', () => {
       ow.mockResolved('actions.list', [])
       ow.mockResolved('triggers.list', [])
       ow.mockResolved('rules.list', ruleslist)
-      let cmd = ow.mockResolved(owRulesDelete, '')
-      command.argv = [ '-m', '/deploy/deployment_syncMissingAction.yaml' ]
+      const cmd = ow.mockResolved(owRulesDelete, '')
+      command.argv = ['-m', '/deploy/deployment_syncMissingAction.yaml']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalledWith('meetPersonRule')
@@ -553,8 +553,8 @@ describe('instance methods', () => {
       ow.mockResolved('actions.list', [])
       ow.mockResolved('triggers.list', [])
       ow.mockResolved('rules.list', rulesWrongHash)
-      let cmd = ow.mockResolved(owRulesDelete, '')
-      command.argv = [ '-m', '/deploy/deployment_syncMissingAction.yaml' ]
+      const cmd = ow.mockResolved(owRulesDelete, '')
+      command.argv = ['-m', '/deploy/deployment_syncMissingAction.yaml']
       return command.run()
         .then(() => {
           expect(cmd).not.toHaveBeenCalled()
@@ -567,8 +567,8 @@ describe('instance methods', () => {
       ow.mockResolved('actions.list', [])
       ow.mockResolved('triggers.list', [])
       ow.mockResolved('rules.list', rulesNoAnnotations)
-      let cmd = ow.mockResolved(owRulesDelete, '')
-      command.argv = [ '-m', '/deploy/deployment_syncMissingAction.yaml' ]
+      const cmd = ow.mockResolved(owRulesDelete, '')
+      command.argv = ['-m', '/deploy/deployment_syncMissingAction.yaml']
       return command.run()
         .then(() => {
           expect(cmd).not.toHaveBeenCalled()
@@ -579,8 +579,8 @@ describe('instance methods', () => {
     test('find project hash and deploy sequences', () => {
       ow.mockResolved('packages.list', packagelist)
       ow.mockResolved('actions.list', actionList)
-      let cmd = ow.mockResolved(owAction, '')
-      command.argv = [ '-m', '/deploy/deployment_syncSequences.yaml' ]
+      const cmd = ow.mockResolved(owAction, '')
+      command.argv = ['-m', '/deploy/deployment_syncSequences.yaml']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalled()
@@ -589,10 +589,10 @@ describe('instance methods', () => {
     })
 
     test('both manifest files not found', (done) => {
-      const toRemove = [ '/deploy/manifest.yaml', '/deploy/manifest.yml' ]
+      const toRemove = ['/deploy/manifest.yaml', '/deploy/manifest.yml']
       fakeFileSystem.removeKeys(toRemove)
 
-      command.argv = [ ]
+      command.argv = []
       return command.run()
         .then(() => done.fail('does not throw error'))
         .catch(() => {
@@ -602,7 +602,7 @@ describe('instance methods', () => {
     })
 
     test('project name missing from manifest file', (done) => {
-      command.argv = [ ]
+      command.argv = []
       return command.run()
         .then(() => done.fail('does not throw error'))
         .catch(() => {
@@ -612,7 +612,7 @@ describe('instance methods', () => {
     })
 
     test('project name different in manifest and deployment file', (done) => {
-      command.argv = [ '-m', '/deploy/deployment_syncMissingAction.yaml', '-d', '/deploy/deployment.yml' ]
+      command.argv = ['-m', '/deploy/deployment_syncMissingAction.yaml', '-d', '/deploy/deployment.yml']
       return command.run()
         .then(() => done.fail('does not throw error'))
         .catch(() => {

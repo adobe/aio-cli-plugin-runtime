@@ -11,7 +11,7 @@ governing permissions and limitations under the License.
 */
 
 const fs = require('fs')
-let yaml = require('js-yaml')
+const yaml = require('js-yaml')
 const debug = require('debug')('aio-cli-plugin-runtime/deploy')
 /**
  * @description returns key value array from the parameters supplied. Used to create --param and --annotation key value pairs
@@ -21,9 +21,9 @@ const debug = require('debug')('aio-cli-plugin-runtime/deploy')
 function createKeyValueArrayFromFlag (flag) {
   if (flag.length % 2 === 0) {
     let i
-    let tempArray = []
+    const tempArray = []
     for (i = 0; i < flag.length; i += 2) {
-      let obj = {}
+      const obj = {}
       obj['key'] = flag[i]
       try {
         // assume it is JSON, there is only 1 way to find out
@@ -46,12 +46,12 @@ function createKeyValueArrayFromFlag (flag) {
  * @returns An array of key value pairs in this format : [{key : 'Your key 1' , value: 'Your value 1'}, {key : 'Your key 2' , value: 'Your value 2'} ]
  */
 function createKeyValueArrayFromFile (file) {
-  let jsonData = fs.readFileSync(file)
-  let jsonParams = JSON.parse(jsonData)
-  let tempArray = []
+  const jsonData = fs.readFileSync(file)
+  const jsonParams = JSON.parse(jsonData)
+  const tempArray = []
   Object.entries(jsonParams).forEach(
     ([key, value]) => {
-      let obj = {}
+      const obj = {}
       obj['key'] = key
       obj['value'] = value
       tempArray.push(obj)
@@ -68,7 +68,7 @@ function createKeyValueArrayFromFile (file) {
 function createKeyValueObjectFromFlag (flag) {
   if (flag.length % 2 === 0) {
     let i
-    let tempObj = {}
+    const tempObj = {}
     for (i = 0; i < flag.length; i += 2) {
       try {
         // assume it is JSON, there is only 1 way to find out
@@ -89,12 +89,12 @@ function createKeyValueObjectFromFlag (flag) {
  * @returns An object of key value pairs in this format : {Your key1 : 'Your Value 1' , Your key2: 'Your value 2'}
  */
 function createKeyValueObjectFromFile (file) {
-  let jsonData = fs.readFileSync(file)
+  const jsonData = fs.readFileSync(file)
   return JSON.parse(jsonData)
 }
 
 function createComponentsfromSequence (sequenceAction, ns) {
-  let objSequence = {}
+  const objSequence = {}
   objSequence['kind'] = 'sequence'
   // The components array requires fully qualified names [/namespace/package_name/action_name] of all the actions passed as sequence
   sequenceAction = sequenceAction.map(sequence => {
@@ -110,26 +110,27 @@ function returnUnion (firstObject, secondObject) {
 
 function parsePathPattern (path) {
   const pattern = /^\/(.+)\/(.+)$/i
-  let defaultMatch = [ null, null, path ]
+  const defaultMatch = [null, null, path]
 
   return (pattern.exec(path) || defaultMatch)
 }
 
 function processInputs (input, params) {
   // check if the value of a key is an object (Advanced parameters)
-  let dictDataTypes = {
+  const dictDataTypes = {
     string: '',
     integer: 0,
     number: 0
   }
 
   // check if the value of a key is an object (Advanced parameters)
-  for (let key in input) {
-    if (params.hasOwnProperty(key)) {
+  for (const key in input) {
+    // eslint: see https://eslint.org/docs/rules/no-prototype-builtins
+    if (Object.prototype.hasOwnProperty.call(params, key)) {
       input[key] = params[key]
     } else {
       if (typeof input[key] === 'object') {
-        for (let val in input[key]) {
+        for (const val in input[key]) {
           if (val === 'value') {
             input[key] = input[key][val]
           } else if (val === 'default') {
@@ -139,7 +140,8 @@ function processInputs (input, params) {
       } else {
         // For example: name:'string' is changed to name:'' (Typed parameters)
         // For example: height:'integer' or height:'number' is changed to height:0 (Typed parameters)
-        if (dictDataTypes.hasOwnProperty(input[key])) {
+        // eslint: see https://eslint.org/docs/rules/no-prototype-builtins
+        if (Object.prototype.hasOwnProperty.call(dictDataTypes, input[key])) {
           input[key] = dictDataTypes[input[key]]
         } else if (typeof input[key] === 'string' && input[key].startsWith('$')) {
           let val = input[key]
@@ -183,7 +185,7 @@ function setManifestPath () {
 }
 
 function returnDeploymentTriggerInputs (deploymentPackages) {
-  let deploymentTriggers = {}
+  const deploymentTriggers = {}
   Object.keys(deploymentPackages).forEach((key) => {
     if (deploymentPackages[key]['triggers']) {
       Object.keys(deploymentPackages[key]['triggers']).forEach((trigger) => {
@@ -228,8 +230,8 @@ function returnAnnotations (action) {
 }
 
 function createApiObject (packages, key, api, ruleAction, arrSequence) {
-  let objectAPI = {}
-  let firstProp = (obj) => Object.keys(obj)[0]
+  const objectAPI = {}
+  const firstProp = (obj) => Object.keys(obj)[0]
   objectAPI.basepath = firstProp(packages[key]['apis'][api])
   objectAPI.relpath = firstProp(packages[key]['apis'][api][objectAPI.basepath])
   objectAPI.action = firstProp(packages[key]['apis'][api][objectAPI.basepath][objectAPI.relpath])
@@ -261,7 +263,7 @@ function createSequenceObject (thisSequence, options, key) {
     actionArray = thisSequence.split(',')
     actionArray = actionArray.map((action) => {
       // remove space between two actions after split
-      let actionItem = action.replace(/\s+/g, '')
+      const actionItem = action.replace(/\s+/g, '')
       if (actionItem.split('/').length > 1) {
         return actionItem
       } else {
@@ -271,7 +273,7 @@ function createSequenceObject (thisSequence, options, key) {
   } else {
     throw new Error('Actions for the sequence not provided.')
   }
-  let objSequence = {}
+  const objSequence = {}
   objSequence['kind'] = 'sequence'
   objSequence['components'] = actionArray
   options['exec'] = objSequence
@@ -279,7 +281,7 @@ function createSequenceObject (thisSequence, options, key) {
 }
 
 function checkWebFlags (flag) {
-  let tempObj = {}
+  const tempObj = {}
   switch (flag) {
     case true:
     case 'yes' :
@@ -317,7 +319,7 @@ function createActionObject (thisAction, objAction) {
   }
 
   if (thisAction.limits) {
-    let limits = {
+    const limits = {
       memory: thisAction.limits['memorySize'] || 256,
       logs: thisAction.limits['logSize'] || 10,
       timeout: thisAction.limits['timeout'] || 60000
@@ -329,14 +331,14 @@ function createActionObject (thisAction, objAction) {
 }
 
 function processPackage (packages, deploymentPackages, deploymentTriggers, params) {
-  let pkgtoCreate = []
-  let actions = []
-  let rules = []
-  let triggers = []
-  let ruleAction = []
-  let ruleTrigger = []
-  let apis = []
-  let arrSequence = []
+  const pkgtoCreate = []
+  const actions = []
+  const rules = []
+  const triggers = []
+  const ruleAction = []
+  const ruleTrigger = []
+  const apis = []
+  const arrSequence = []
 
   Object.keys(packages).forEach((key) => {
     pkgtoCreate.push({ name: key })
@@ -345,10 +347,10 @@ function processPackage (packages, deploymentPackages, deploymentTriggers, param
     // pkg.license = packages[key]['license']
     if (packages[key]['dependencies']) {
       Object.keys(packages[key]['dependencies']).forEach((depName) => {
-        let thisDep = packages[key]['dependencies'][depName]
+        const thisDep = packages[key]['dependencies'][depName]
         let objPackage = {}
         try { // Parse location
-          let thisLocation = thisDep['location'].split('/')
+          const thisLocation = thisDep['location'].split('/')
           objPackage = {
             binding: {
               namespace: thisLocation[1],
@@ -361,14 +363,14 @@ function processPackage (packages, deploymentPackages, deploymentTriggers, param
 
         // Parse inputs
         let deploymentInputs = {}
-        let packageInputs = thisDep['inputs'] || {}
+        const packageInputs = thisDep['inputs'] || {}
         if (deploymentPackages[key] && deploymentPackages[key]['dependencies'] && deploymentPackages[key]['dependencies'][depName]) {
           deploymentInputs = deploymentPackages[key]['dependencies'][depName]['inputs'] || {}
         }
-        let allInputs = returnUnion(packageInputs, deploymentInputs)
+        const allInputs = returnUnion(packageInputs, deploymentInputs)
         // if parameter is provided as key : 'data type' , process it to set default values before deployment
         if (Object.entries(allInputs).length !== 0) {
-          let processedInput = createKeyValueInput(processInputs(allInputs, params))
+          const processedInput = createKeyValueInput(processInputs(allInputs, params))
           objPackage['parameters'] = processedInput
         }
         pkgtoCreate.push({ name: depName, package: objPackage })
@@ -376,18 +378,18 @@ function processPackage (packages, deploymentPackages, deploymentTriggers, param
     }
     if (packages[key]['actions']) {
       Object.keys(packages[key]['actions']).forEach((actionName) => {
-        let thisAction = packages[key]['actions'][actionName]
+        const thisAction = packages[key]['actions'][actionName]
         let objAction = { name: `${key}/${actionName}` }
         objAction = createActionObject(thisAction, objAction)
         let deploymentInputs = {}
-        let packageInputs = thisAction['inputs'] || {}
+        const packageInputs = thisAction['inputs'] || {}
         if (deploymentPackages[key] && deploymentPackages[key]['actions'] && deploymentPackages[key]['actions'][actionName]) {
           deploymentInputs = deploymentPackages[key]['actions'][actionName]['inputs'] || {}
         }
-        let allInputs = returnUnion(packageInputs, deploymentInputs)
+        const allInputs = returnUnion(packageInputs, deploymentInputs)
         // if parameter is provided as key : 'data type' , process it to set default values before deployment
         if (Object.entries(allInputs).length !== 0) {
-          let processedInput = processInputs(allInputs, params)
+          const processedInput = processInputs(allInputs, params)
           objAction['params'] = processedInput
         }
         ruleAction.push(actionName)
@@ -400,7 +402,7 @@ function processPackage (packages, deploymentPackages, deploymentTriggers, param
       // Usage: aio runtime:action:create <action-name> --sequence existingAction1, existingAction2
       Object.keys(packages[key]['sequences']).forEach((sequenceName) => {
         let options = { name: `${key}/${sequenceName}`, action: '' }
-        let thisSequence = packages[key]['sequences'][sequenceName]
+        const thisSequence = packages[key]['sequences'][sequenceName]
         options = createSequenceObject(thisSequence['actions'], options, key)
         options['annotations'] = returnAnnotations(thisSequence)
         arrSequence.push(sequenceName)
@@ -409,8 +411,8 @@ function processPackage (packages, deploymentPackages, deploymentTriggers, param
     }
     if (packages[key]['triggers']) {
       Object.keys(packages[key]['triggers']).forEach((triggerName) => {
-        let objTrigger = { name: triggerName, trigger: {} }
-        let packageInputs = packages[key]['triggers'][triggerName]['inputs'] || {}
+        const objTrigger = { name: triggerName, trigger: {} }
+        const packageInputs = packages[key]['triggers'][triggerName]['inputs'] || {}
         let deploymentInputs = {}
         if (triggerName in deploymentTriggers) {
           deploymentInputs = deploymentTriggers[triggerName]
@@ -431,7 +433,7 @@ function processPackage (packages, deploymentPackages, deploymentTriggers, param
     // Rules cannot belong to any package
     if (packages[key]['rules']) {
       Object.keys(packages[key]['rules']).forEach((ruleName) => {
-        let objRule = { name: ruleName }
+        const objRule = { name: ruleName }
         if (packages[key]['rules'][ruleName]['trigger'] && packages[key]['rules'][ruleName]['action']) {
           objRule['trigger'] = packages[key]['rules'][ruleName]['trigger']
           objRule['action'] = packages[key]['rules'][ruleName]['action']
@@ -453,7 +455,7 @@ function processPackage (packages, deploymentPackages, deploymentTriggers, param
     if (packages[key]['apis']) {
       Object.keys(packages[key]['apis']).forEach((api) => {
         if (packages[key]['apis'][api]) {
-          let objectAPI = createApiObject(packages, key, api, ruleAction, arrSequence)
+          const objectAPI = createApiObject(packages, key, api, ruleAction, arrSequence)
           objectAPI.name = api
           apis.push(objectAPI)
         } else {
@@ -462,7 +464,7 @@ function processPackage (packages, deploymentPackages, deploymentTriggers, param
       })
     }
   })
-  let entities = {
+  const entities = {
     pkgtoCreate: pkgtoCreate,
     apis: apis,
     triggers: triggers,
@@ -491,13 +493,13 @@ function setPaths (flags) {
   let deploymentTriggers = {}
   let deploymentProjectName = ''
   if (deploymentPath) {
-    let deployment = yaml.safeLoad(fs.readFileSync(deploymentPath, 'utf8'))
+    const deployment = yaml.safeLoad(fs.readFileSync(deploymentPath, 'utf8'))
     deploymentProjectName = deployment.project.name || ''
     deploymentPackages = deployment.project.packages
     deploymentTriggers = returnDeploymentTriggerInputs(deploymentPackages)
   }
 
-  let manifest = yaml.safeLoad(fs.readFileSync(manifestPath, 'utf8'))
+  const manifest = yaml.safeLoad(fs.readFileSync(manifestPath, 'utf8'))
   let packages
   let projectName = ''
   if (manifest.project) {
@@ -518,7 +520,7 @@ function setPaths (flags) {
     }
   }
 
-  let filecomponents = {
+  const filecomponents = {
     packages: packages,
     deploymentTriggers: deploymentTriggers,
     deploymentPackages: deploymentPackages,
@@ -530,14 +532,14 @@ function setPaths (flags) {
 }
 
 async function deployPackage (entities, ow, logger) {
-  let opts = await ow.actions.client.options
-  let ns = opts.namespace
-  for (let pkg of entities.pkgtoCreate) {
+  const opts = await ow.actions.client.options
+  const ns = opts.namespace
+  for (const pkg of entities.pkgtoCreate) {
     logger(`Info: Deploying package [${pkg.name}]...`)
     await ow.packages.update(pkg)
     logger(`Info: package [${pkg.name}] has been successfully deployed.\n`)
   }
-  for (let action of entities.actions) {
+  for (const action of entities.actions) {
     if (action['exec'] && action['exec']['kind']) {
       action['exec']['components'] = action['exec']['components'].map(sequence => {
         /*
@@ -548,7 +550,7 @@ async function deployPackage (entities, ow, logger) {
           /snamespace/spackage/saction => /snamespace/spackage/saction
         */
         sequence = sequence.startsWith('/') ? sequence.substr(1) : sequence
-        let actionItemCount = sequence.split('/').length
+        const actionItemCount = sequence.split('/').length
         return (actionItemCount > 2)
           ? `/${sequence}`
           : `/${ns}/${sequence}`
@@ -559,17 +561,17 @@ async function deployPackage (entities, ow, logger) {
     logger(`Info: action [${action.name}] has been successfully deployed.\n`)
   }
 
-  for (let api of entities.apis) {
+  for (const api of entities.apis) {
     logger(`Info: Deploying api [${api.name}]...`)
     await ow.routes.create(api)
     logger(`Info: api [${api.name}] has been successfully deployed.\n`)
   }
-  for (let trigger of entities.triggers) {
+  for (const trigger of entities.triggers) {
     logger(`Info: Deploying trigger [${trigger.name}]...`)
     await ow.triggers.update(trigger)
     logger(`Info: trigger [${trigger.name}] has been successfully deployed.\n`)
   }
-  for (let rule of entities.rules) {
+  for (const rule of entities.rules) {
     logger(`Info: Deploying rule [${rule.name}]...`)
     rule.action = `/${ns}/${rule.action}`
     await ow.rules.update(rule)
@@ -589,13 +591,13 @@ async function deleteEntities (projectHash, ow, projectName) {
     paramtobeChecked = 'projectName'
   }
 
-  let resultActionList = await ow.actions.list()
-  for (let action of resultActionList) {
+  const resultActionList = await ow.actions.list()
+  for (const action of resultActionList) {
     if (action.annotations.length > 0) {
-      let whiskManaged = action.annotations.find(elem => elem.key === 'whisk-managed')
+      const whiskManaged = action.annotations.find(elem => elem.key === 'whisk-managed')
       if (whiskManaged !== undefined && whiskManaged.value[paramtobeChecked] === valuetobeChecked) {
         let actionName = action.name
-        let ns = action.namespace.split('/')
+        const ns = action.namespace.split('/')
         if (ns.length > 1) {
           actionName = `${ns[1]}/${actionName}`
         }
@@ -604,31 +606,31 @@ async function deleteEntities (projectHash, ow, projectName) {
     }
   }
 
-  let options = {}
-  let resultSync = await ow.packages.list(options)
-  for (let pkg of resultSync) {
+  const options = {}
+  const resultSync = await ow.packages.list(options)
+  for (const pkg of resultSync) {
     if (pkg.annotations.length > 0) {
-      let whiskManaged = pkg.annotations.find(elem => elem.key === 'whisk-managed')
+      const whiskManaged = pkg.annotations.find(elem => elem.key === 'whisk-managed')
       if (whiskManaged !== undefined && whiskManaged.value[paramtobeChecked] === valuetobeChecked) {
         await ow.packages.delete(pkg.name)
       }
     }
   }
 
-  let resultTriggerList = await ow.triggers.list()
-  for (let trigger of resultTriggerList) {
+  const resultTriggerList = await ow.triggers.list()
+  for (const trigger of resultTriggerList) {
     if (trigger.annotations.length > 0) {
-      let whiskManaged = trigger.annotations.find(elem => elem.key === 'whisk-managed')
+      const whiskManaged = trigger.annotations.find(elem => elem.key === 'whisk-managed')
       if (whiskManaged !== undefined && whiskManaged.value[paramtobeChecked] === valuetobeChecked) {
         await ow.triggers.delete(trigger.name)
       }
     }
   }
 
-  let resultRules = await ow.rules.list()
-  for (let rule of resultRules) {
+  const resultRules = await ow.rules.list()
+  for (const rule of resultRules) {
     if (rule.annotations.length > 0) {
-      let whiskManaged = rule.annotations.find(elem => elem.key === 'whisk-managed')
+      const whiskManaged = rule.annotations.find(elem => elem.key === 'whisk-managed')
       if (whiskManaged !== undefined && whiskManaged.value[paramtobeChecked] === valuetobeChecked) {
         await ow.rules.delete(rule.name)
       }

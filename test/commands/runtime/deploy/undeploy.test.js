@@ -46,7 +46,7 @@ test('flags', async () => {
 describe('instance methods', () => {
   let command, handleError
   let cwdSpy
-  let packagelist = [{
+  const packagelist = [{
     annotations: [{
       key: 'whisk-managed',
       value: {
@@ -64,7 +64,7 @@ describe('instance methods', () => {
     version: '0.0.2'
   }]
 
-  let packagelistNoAnnotation = [{
+  const packagelistNoAnnotation = [{
     annotations: [],
     binding: false,
     name: 'testSeq',
@@ -74,7 +74,7 @@ describe('instance methods', () => {
     version: '0.0.2'
   }]
 
-  let packagelistNoProjectName = [{
+  const packagelistNoProjectName = [{
     annotations: [{
       key: 'whisk-managed',
       value: 'key'
@@ -129,8 +129,8 @@ describe('instance methods', () => {
     })
 
     test('undeploy a package without specifying manifest file', () => {
-      let cmd = ow.mockResolved(owPackage, '')
-      command.argv = [ ]
+      const cmd = ow.mockResolved(owPackage, '')
+      command.argv = []
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalledWith({ name: 'demo_package' })
@@ -139,10 +139,10 @@ describe('instance methods', () => {
     })
 
     test('manifest.yaml missing', () => {
-      const toRemove = [ '/deploy/manifest.yaml' ]
+      const toRemove = ['/deploy/manifest.yaml']
       fakeFileSystem.removeKeys(toRemove)
-      let cmd = ow.mockResolved(owPackage, '')
-      command.argv = [ ]
+      const cmd = ow.mockResolved(owPackage, '')
+      command.argv = []
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalledWith({ name: 'demo_package' })
@@ -151,10 +151,10 @@ describe('instance methods', () => {
     })
 
     test('manifest.yml missing', () => {
-      const toRemove = [ '/deploy/manifest.yml' ]
+      const toRemove = ['/deploy/manifest.yml']
       fakeFileSystem.removeKeys(toRemove)
-      let cmd = ow.mockResolved(owPackage, '')
-      command.argv = [ ]
+      const cmd = ow.mockResolved(owPackage, '')
+      command.argv = []
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalledWith({ name: 'demo_package' })
@@ -163,8 +163,8 @@ describe('instance methods', () => {
     })
 
     test('undeploy a package with manifest file', () => {
-      let cmd = ow.mockResolved(owPackage, '')
-      command.argv = [ '-m', '/deploy/manifest_triggersRules.yaml' ]
+      const cmd = ow.mockResolved(owPackage, '')
+      command.argv = ['-m', '/deploy/manifest_triggersRules.yaml']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalledWith({ name: 'testSeq' })
@@ -173,8 +173,8 @@ describe('instance methods', () => {
     })
 
     test('undeploy a package dependency with manifest file', () => {
-      let cmd = ow.mockResolved(owPackage, '')
-      command.argv = [ '-m', '/deploy/manifest_dependencies.yaml' ]
+      const cmd = ow.mockResolved(owPackage, '')
+      command.argv = ['-m', '/deploy/manifest_dependencies.yaml']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalledWith({ name: 'mypackage' })
@@ -183,7 +183,7 @@ describe('instance methods', () => {
     })
 
     test('package should be created if project is the root', () => {
-      let cmd = ow.mockResolved(owPackage, '')
+      const cmd = ow.mockResolved(owPackage, '')
       command.argv = ['-m', '/deploy/manifest_report.yaml']
       return command.run()
         .then(() => {
@@ -193,8 +193,8 @@ describe('instance methods', () => {
     })
 
     test('undeploy a trigger with manifest file', () => {
-      let cmd = ow.mockResolved(owTrigger, '')
-      command.argv = [ '-m', '/deploy/manifest_triggersRules.yaml' ]
+      const cmd = ow.mockResolved(owTrigger, '')
+      command.argv = ['-m', '/deploy/manifest_triggersRules.yaml']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalled()
@@ -203,8 +203,8 @@ describe('instance methods', () => {
     })
 
     test('undeploy a rule with manifest file', () => {
-      let cmd = ow.mockResolved(owRules, '')
-      command.argv = [ '-m', '/deploy/manifest_triggersRules.yaml' ]
+      const cmd = ow.mockResolved(owRules, '')
+      command.argv = ['-m', '/deploy/manifest_triggersRules.yaml']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalled()
@@ -213,8 +213,8 @@ describe('instance methods', () => {
     })
 
     test('undeploy an action with manifest file', () => {
-      let cmd = ow.mockResolved(owAction, '')
-      command.argv = [ '-m', '/deploy/manifest_triggersRules.yaml' ]
+      const cmd = ow.mockResolved(owAction, '')
+      command.argv = ['-m', '/deploy/manifest_triggersRules.yaml']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalled()
@@ -227,8 +227,8 @@ describe('instance methods', () => {
       ow.mockResolved('actions.list', '')
       ow.mockResolved('triggers.list', '')
       ow.mockResolved('rules.list', '')
-      let cmd = ow.mockResolved(owPackage, '')
-      command.argv = [ '--projectname', 'proj' ]
+      const cmd = ow.mockResolved(owPackage, '')
+      command.argv = ['--projectname', 'proj']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalled()
@@ -240,8 +240,8 @@ describe('instance methods', () => {
       ow.mockResolved('actions.list', '')
       ow.mockResolved('triggers.list', '')
       ow.mockResolved('rules.list', '')
-      let cmd = ow.mockResolved(owPackage, '')
-      command.argv = [ '--projectname', 'proj' ]
+      const cmd = ow.mockResolved(owPackage, '')
+      command.argv = ['--projectname', 'proj']
       return command.run()
         .then(() => {
           expect(cmd).not.toHaveBeenCalled()
@@ -253,8 +253,8 @@ describe('instance methods', () => {
       ow.mockResolved('actions.list', '')
       ow.mockResolved('triggers.list', '')
       ow.mockResolved('rules.list', '')
-      let cmd = ow.mockResolved(owPackage, '')
-      command.argv = [ '--projectname', 'proj' ]
+      const cmd = ow.mockResolved(owPackage, '')
+      command.argv = ['--projectname', 'proj']
       return command.run()
         .then(() => {
           expect(cmd).not.toHaveBeenCalled()
@@ -262,8 +262,8 @@ describe('instance methods', () => {
     })
 
     test('undeploy an api with manifest file', () => {
-      let cmd = ow.mockResolved(owApi, '')
-      command.argv = [ '-m', '/deploy/api_manifest.yaml' ]
+      const cmd = ow.mockResolved(owApi, '')
+      command.argv = ['-m', '/deploy/api_manifest.yaml']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalled()
@@ -272,11 +272,11 @@ describe('instance methods', () => {
     })
 
     test('both manifest files not found', (done) => {
-      const toRemove = [ '/deploy/manifest.yaml', '/deploy/manifest.yml' ]
+      const toRemove = ['/deploy/manifest.yaml', '/deploy/manifest.yml']
       fakeFileSystem.removeKeys(toRemove)
 
       ow.mockRejected(owAction, new Error('an error'))
-      command.argv = [ ]
+      command.argv = []
       return command.run()
         .then(() => done.fail('does not throw error'))
         .catch(() => {

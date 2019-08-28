@@ -32,7 +32,7 @@ class ActionGet extends RuntimeBaseCommand {
         */
         let web = 'namespaces'
         let actionValue = '/actions'
-        let webFlag = result.annotations.find(elem => elem.key === 'web-export')
+        const webFlag = result.annotations.find(elem => elem.key === 'web-export')
         let actionPartOfPackage = false
         // check if action belongs to a package
         if (name.split('/').length > 1) {
@@ -46,25 +46,25 @@ class ActionGet extends RuntimeBaseCommand {
             actionValue = '/default'
           }
         }
-        let opts = ow.actions.client.options
+        const opts = ow.actions.client.options
         this.log(`${opts.api}${web}/${opts.namespace}${actionValue}/${name}`)
       } else {
-        let bSaveFile = flags['save-as'] && flags['save-as'].length > 0
+        const bSaveFile = flags['save-as'] && flags['save-as'].length > 0
 
         if (flags.save || bSaveFile) {
           if (result.exec.binary) {
-            let saveFileName = bSaveFile ? flags['save-as'] : `${name}.zip`
+            const saveFileName = bSaveFile ? flags['save-as'] : `${name}.zip`
             const data = Buffer.from(result.exec.code, 'base64')
             fs.writeFileSync(saveFileName, data, 'buffer')
           } else {
-            let saveFileName = bSaveFile ? flags['save-as'] : `${name}.js`
+            const saveFileName = bSaveFile ? flags['save-as'] : `${name}.js`
             fs.writeFileSync(saveFileName, result.exec.code)
           }
         } else {
           // destructure getAction to remove the exec.code
           this.logJSON(`${result.name}\n`, { ...result,
-            'exec': { ...result.exec,
-              'code': undefined
+            exec: { ...result.exec,
+              code: undefined
             }
           })
         }
@@ -84,12 +84,12 @@ ActionGet.args = [
 
 ActionGet.flags = {
   ...RuntimeBaseCommand.flags,
-  'url': flags.boolean({
+  url: flags.boolean({
     char: 'r',
     description: 'get action url',
     required: false
   }),
-  'save': flags.boolean({
+  save: flags.boolean({
     description: 'save action code to file corresponding with action name'
   }),
   'save-as': flags.string({

@@ -52,7 +52,7 @@ describe('instance methods', () => {
     })
 
     test('retrieve a package', () => {
-      let cmd = ow.mockResolved(owAction, '')
+      const cmd = ow.mockResolved(owAction, '')
       command.argv = ['packageName']
       return command.run()
         .then(() => {

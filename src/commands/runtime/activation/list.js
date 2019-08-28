@@ -19,7 +19,7 @@ class ActivationList extends RuntimeBaseCommand {
     const { args, flags } = this.parse(ActivationList)
     const id = args.activationID
     try {
-      let options = {}
+      const options = {}
       if (id) {
         options['name'] = id
       }
@@ -80,7 +80,7 @@ class ActivationList extends RuntimeBaseCommand {
           },
           Status: {
             get: (row) => {
-              let statusStrings = ['success', 'application error', 'developer error', 'internal error']
+              const statusStrings = ['success', 'application error', 'developer error', 'internal error']
               return statusStrings[row.statusCode]
             }
           },
@@ -115,36 +115,36 @@ ActivationList.args = [
 ActivationList.flags = {
   ...RuntimeBaseCommand.flags,
   // example usage:  aio runtime:activation:list --limit 10 --skip 2
-  'limit': flags.integer({
+  limit: flags.integer({
     char: 'l',
     description: 'only return LIMIT number of activations from the collection with a maximum LIMIT of 200 activations (default 30)',
     hidden: false, // hide from help
     multiple: false, // allow setting this flag multiple times
     required: false // not mandatory
   }),
-  'skip': flags.integer({
+  skip: flags.integer({
     char: 's',
     description: 'exclude the first SKIP number of activations from the result',
     hidden: false, // hide from help
     multiple: false, // allow setting this flag multiple times
     required: false // not mandatory
   }),
-  'since': flags.integer({
+  since: flags.integer({
     description: 'return activations with timestamps later than SINCE; measured in milliseconds since Th, 01, Jan 1970',
     hidden: false, // hide from help
     multiple: false, // allow setting this flag multiple times
     required: false // not mandatory
   }),
-  'upto': flags.integer({
+  upto: flags.integer({
     description: 'return activations with timestamps earlier than UPTO; measured in milliseconds since Th, 01, Jan 1970',
     multiple: false, // allow setting this flag multiple times
     hidden: false, // hide from help
     required: false // not mandatory
   }),
-  'json': flags.boolean({
+  json: flags.boolean({
     description: 'output raw json'
   }),
-  'full': flags.boolean({
+  full: flags.boolean({
     char: 'f',
     description: 'include full activation description'
   })

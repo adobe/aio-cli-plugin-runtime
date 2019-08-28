@@ -111,7 +111,7 @@ describe('instance methods', () => {
       // cli version
       command.config = fixtureJson('property/config.json')
       // set flag
-      command.argv = [ '--all' ]
+      command.argv = ['--all']
       return command.run()
         .then(() => {
           expect(stdout.output).toMatchFixture('property/all.txt')
@@ -122,7 +122,7 @@ describe('instance methods', () => {
       // cli version
       command.config = fixtureJson('property/config.json')
       // set flag
-      command.argv = [ '--namespace' ]
+      command.argv = ['--namespace']
       return command.run()
         .then(() => {
           expect(stdout.output).toMatchFixture('property/namespace.txt')
@@ -133,7 +133,7 @@ describe('instance methods', () => {
       // cli version
       command.config = fixtureJson('property/config.json')
       // set flag
-      command.argv = [ '--auth' ]
+      command.argv = ['--auth']
       return command.run()
         .then(() => {
           expect(stdout.output).toMatchFixture('property/auth.txt')
@@ -144,7 +144,7 @@ describe('instance methods', () => {
       // cli version
       command.config = fixtureJson('property/config.json')
       // set flag
-      command.argv = [ '--apihost' ]
+      command.argv = ['--apihost']
       return command.run()
         .then(() => {
           expect(stdout.output).toMatchFixture('property/apihost.txt')
@@ -155,7 +155,7 @@ describe('instance methods', () => {
       // cli version
       command.config = fixtureJson('property/config.json')
       // set flag
-      command.argv = [ '--apiversion' ]
+      command.argv = ['--apiversion']
       return command.run()
         .then(() => {
           expect(stdout.output).toMatchFixture('property/apiversion.txt')
@@ -166,7 +166,7 @@ describe('instance methods', () => {
       // cli version
       command.config = fixtureJson('property/config.json')
       // set flag
-      command.argv = [ '--cliversion' ]
+      command.argv = ['--cliversion']
       return command.run()
         .then(() => {
           expect(stdout.output).toMatchFixture('property/cliversion.txt')
@@ -177,7 +177,7 @@ describe('instance methods', () => {
       // cli version
       command.config = fixtureJson('property/config.json')
       // set flag
-      command.argv = [ '--apibuild' ]
+      command.argv = ['--apibuild']
       return command.run()
         .then(() => {
           expect(stdout.output).toMatchFixture('property/apibuild.txt')
@@ -188,7 +188,7 @@ describe('instance methods', () => {
       // cli version
       command.config = fixtureJson('property/config.json')
       // set flag
-      command.argv = [ '--apibuildno' ]
+      command.argv = ['--apibuildno']
       return command.run()
         .then(() => {
           expect(stdout.output).toMatchFixture('property/apibuildno.txt')
@@ -201,7 +201,7 @@ describe('instance methods', () => {
       // cli version
       command.config = fixtureJson('property/config.json')
       // set flag
-      command.argv = [ '--all' ]
+      command.argv = ['--all']
       return command.run()
         .then(() => {
           expect(stdout.output).toMatchFixture('property/all-empty-wskprops.txt')
@@ -218,7 +218,7 @@ describe('instance methods', () => {
 
       command.config = fixtureJson('property/config.json')
       // set flag
-      command.argv = [ ]
+      command.argv = []
       return command.run()
         .then(() => {
           expect(stdout.output).toMatchFixture('property/cli-override-wskprops.txt')

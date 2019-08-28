@@ -69,7 +69,7 @@ describe('instance methods', () => {
     })
 
     test('--limit flag (no triggers)', () => {
-      let cmd = ow.mockResolved('triggers.list', [])
+      const cmd = ow.mockResolved('triggers.list', [])
       command.argv = ['--limit', '10']
       return command.run()
         .then(() => {
@@ -81,7 +81,7 @@ describe('instance methods', () => {
     })
 
     test('--skip flag (no triggers)', () => {
-      let cmd = ow.mockResolved(owAction, [])
+      const cmd = ow.mockResolved(owAction, [])
       command.argv = ['--skip', '5']
       return command.run()
         .then(() => {
@@ -91,7 +91,7 @@ describe('instance methods', () => {
     })
 
     test('simple trigger list', () => {
-      let cmd = ow.mockResolved(owAction, [
+      const cmd = ow.mockResolved(owAction, [
         { name: 'trigger1', namespace: 'namespace1', publish: false },
         { name: 'trigger2', namespace: 'namespace1', publish: true }
       ])
@@ -110,8 +110,8 @@ describe('instance methods', () => {
         { name: 'trigger2', namespace: 'namespace1', publish: true }
       ]
 
-      let cmd = ow.mockResolved(owAction, json)
-      command.argv = [ '--json' ]
+      const cmd = ow.mockResolved(owAction, json)
+      command.argv = ['--json']
       return command.run()
         .then(() => {
           const cmdArg0 = cmd.mock.calls[0][0]

@@ -53,7 +53,7 @@ describe('instance methods', () => {
     })
 
     test('simple namespace list', (done) => {
-      let cmd = ow.mockResolved(owAction, fixtureFile('namespace/list.json'))
+      const cmd = ow.mockResolved(owAction, fixtureFile('namespace/list.json'))
 
       return command.run()
         .then(() => {
@@ -64,9 +64,9 @@ describe('instance methods', () => {
     })
 
     test('simple namespace list, --json flag', (done) => {
-      let cmd = ow.mockResolved(owAction, fixtureFile('namespace/list.json'))
+      const cmd = ow.mockResolved(owAction, fixtureFile('namespace/list.json'))
 
-      command.argv = [ '--json' ]
+      command.argv = ['--json']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalled()

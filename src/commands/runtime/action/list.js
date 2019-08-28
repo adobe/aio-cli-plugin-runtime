@@ -50,20 +50,20 @@ class ActionList extends RuntimeBaseCommand {
 ActionList.flags = {
   ...RuntimeBaseCommand.flags,
   // example usage:  aio runtime:action:list --limit 10 --skip 2
-  'limit': flags.integer({
+  limit: flags.integer({
     char: 'l',
     description: 'only return LIMIT number of actions from the collection (default 30)',
     hidden: false, // hide from help
     multiple: false, // allow setting this flag multiple times
     required: false // not mandatory
   }),
-  'skip': flags.integer({
+  skip: flags.integer({
     char: 's',
     description: 'exclude the first SKIP number of actions from the result',
     multiple: false, // allow setting this flag multiple times
     required: false // not mandatory
   }),
-  'json': flags.boolean({
+  json: flags.boolean({
     description: 'output raw json'
   })
 }

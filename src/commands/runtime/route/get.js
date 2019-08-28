@@ -19,7 +19,7 @@ class RouteGet extends RuntimeBaseCommand {
 
     try {
       const ow = await this.wsk()
-      let options = {
+      const options = {
         basepath: args.basePathOrApiName
       }
 

@@ -46,7 +46,7 @@ test('args', async () => {
 
   expect(args[2].name).toEqual('apiVerb')
   expect(args[2].required).toBeFalsy()
-  expect(args[2].options).toMatchObject([ 'get', 'post', 'put', 'patch', 'delete', 'head', 'options' ])
+  expect(args[2].options).toMatchObject(['get', 'post', 'put', 'patch', 'delete', 'head', 'options'])
   expect(args[2].description).toBeDefined()
 })
 
@@ -93,7 +93,7 @@ describe('instance methods', () => {
 
     test('no required args (all are optional) - should not throw exception, --json flag', () => {
       ow.mockResolvedFixture(owAction, 'route/list.json')
-      command.argv = [ '--json' ]
+      command.argv = ['--json']
       return command.run()
         .then(() => {
           const expectedJson = fixtureJson('route/list.json')

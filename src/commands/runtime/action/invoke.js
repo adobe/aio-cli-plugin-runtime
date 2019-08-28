@@ -50,7 +50,7 @@ ActionInvoke.args = [
 
 ActionInvoke.flags = {
   ...RuntimeBaseCommand.flags,
-  'param': flags.string({
+  param: flags.string({
     char: 'p',
     description: 'parameter values in KEY VALUE format', // help description for flag
     hidden: false, // hide from help
@@ -64,7 +64,7 @@ ActionInvoke.flags = {
     multiple: false, // allow setting this flag multiple times
     required: false
   }),
-  'blocking': flags.boolean({
+  blocking: flags.boolean({
     char: 'b',
     description: 'blocking invoke', // help description for flag
     hidden: false, // hide from help
@@ -72,7 +72,7 @@ ActionInvoke.flags = {
     required: false,
     default: false
   }),
-  'result': flags.boolean({
+  result: flags.boolean({
     char: 'r',
     description: 'blocking invoke; show only activation result (unless there is a failure)', // help description for flag
     hidden: false, // hide from help

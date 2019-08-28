@@ -19,7 +19,7 @@ class PackageList extends RuntimeBaseCommand {
     const { args, flags } = this.parse(PackageList)
     try {
       const ow = await this.wsk()
-      let options = {}
+      const options = {}
       if (args.namespace) {
         options['namespace'] = args.namespace
       }
@@ -56,20 +56,20 @@ PackageList.flags = {
   ...RuntimeBaseCommand.flags,
   // example usage:  aio runtime:package:list --limit 10 --skip 2
   // aio runtime:package:list --count true OR  aio runtime:package:list --count yes
-  'limit': flags.integer({
+  limit: flags.integer({
     char: 'l',
     description: 'only return LIMIT number of packages from the collection (default 30)',
     hidden: false, // hide from help
     multiple: false, // allow setting this flag multiple times
     required: false // not mandatory
   }),
-  'skip': flags.integer({
+  skip: flags.integer({
     char: 's',
     description: 'exclude the first SKIP number of packages from the result',
     multiple: false, // allow setting this flag multiple times
     required: false // not mandatory
   }),
-  'json': flags.boolean({
+  json: flags.boolean({
     description: 'output raw json'
   })
 }

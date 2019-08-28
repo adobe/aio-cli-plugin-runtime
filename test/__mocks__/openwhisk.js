@@ -8,10 +8,10 @@ const mockOpenWhisk = {
   feeds: {},
   routes: {},
   mockFn: function (methodName) {
-    let cmd = methodName.split('.')
+    const cmd = methodName.split('.')
     let method = this
     while (cmd.length > 1) {
-      let word = cmd.shift()
+      const word = cmd.shift()
       method = method[word] = method[word] || {}
     }
     method = method[cmd.shift()] = jest.fn()

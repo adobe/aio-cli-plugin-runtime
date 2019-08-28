@@ -30,12 +30,12 @@ class TriggerFire extends RuntimeBaseCommand {
 
       // triggerParams.parameters is expected to be passed as an array of key value pairs
       // For example : [{key : 'Your key 1' , value: 'Your value 1'}, {key : 'Your key 2' , value: 'Your value 2'} ]
-      let triggerParams = {}
+      const triggerParams = {}
       if (triggerPackage.length) {
         triggerParams.parameters = triggerPackage
       }
 
-      let options = {
+      const options = {
         name: args.triggerName,
         trigger: triggerParams
       }
@@ -58,7 +58,7 @@ TriggerFire.args = [
 
 TriggerFire.flags = {
   ...RuntimeBaseCommand.flags,
-  'param': flags.string({
+  param: flags.string({
     char: 'p',
     description: 'parameter values in KEY VALUE format', // help description for flag
     hidden: false, // hide from help

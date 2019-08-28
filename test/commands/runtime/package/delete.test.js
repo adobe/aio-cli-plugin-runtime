@@ -52,7 +52,7 @@ describe('instance methods', () => {
     })
 
     test('delete a package', () => {
-      let cmd = ow.mockResolved(owAction, '')
+      const cmd = ow.mockResolved(owAction, '')
       command.argv = ['packageName']
       return command.run()
         .then(() => {
@@ -62,7 +62,7 @@ describe('instance methods', () => {
     })
 
     test('delete a package --json', () => {
-      let cmd = ow.mockResolved(owAction, '')
+      const cmd = ow.mockResolved(owAction, '')
       command.argv = ['packageName', '--json']
       return command.run()
         .then(() => {

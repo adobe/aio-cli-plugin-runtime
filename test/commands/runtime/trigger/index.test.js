@@ -50,7 +50,7 @@ describe('instance methods', () => {
     })
 
     test('returns help file for runtime:trigger command', () => {
-      let spy = jest.spyOn(HHelp.prototype, 'showHelp').mockReturnValue(true)
+      const spy = jest.spyOn(HHelp.prototype, 'showHelp').mockReturnValue(true)
       return command.run().then(() => {
         expect(spy).toHaveBeenCalledWith(['runtime:trigger', '--help'])
       })

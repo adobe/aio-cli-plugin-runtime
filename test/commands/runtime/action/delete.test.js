@@ -52,7 +52,7 @@ describe('instance methods', () => {
     })
 
     test('delete an action', () => {
-      let cmd = ow.mockResolvedFixture(owAction, 'action/list.json')
+      const cmd = ow.mockResolvedFixture(owAction, 'action/list.json')
       command.argv = ['hello']
       return command.run()
         .then(() => {
@@ -62,7 +62,7 @@ describe('instance methods', () => {
     })
 
     test('delete an action --json', () => {
-      let cmd = ow.mockResolvedFixture(owAction, 'action/list.json')
+      const cmd = ow.mockResolvedFixture(owAction, 'action/list.json')
       command.argv = ['hello', '--json']
       return command.run()
         .then(() => {

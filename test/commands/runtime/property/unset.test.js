@@ -68,7 +68,7 @@ describe('instance methods', () => {
 
     test('--auth', (done) => {
       // unset flag
-      command.argv = [ '--auth' ]
+      command.argv = ['--auth']
       return command.run()
         .then(() => {
           done()
@@ -77,7 +77,7 @@ describe('instance methods', () => {
 
     test('--apihost', (done) => {
       // unset flag
-      command.argv = [ '--apihost' ]
+      command.argv = ['--apihost']
       return command.run()
         .then(() => {
           done()
@@ -86,7 +86,7 @@ describe('instance methods', () => {
 
     test('--apiversion', (done) => {
       // unset flag
-      command.argv = [ '--apiversion' ]
+      command.argv = ['--apiversion']
       return command.run()
         .then(() => {
           done()
@@ -95,7 +95,7 @@ describe('instance methods', () => {
 
     test('--cert', (done) => {
       // unset flag
-      command.argv = [ '--cert' ]
+      command.argv = ['--cert']
       return command.run()
         .then(() => {
           done()
@@ -104,7 +104,7 @@ describe('instance methods', () => {
 
     test('--key', (done) => {
       // unset flag
-      command.argv = [ '--key' ]
+      command.argv = ['--key']
       return command.run()
         .then(() => {
           done()
@@ -113,7 +113,7 @@ describe('instance methods', () => {
 
     test('--namespace', (done) => {
       // unset flag
-      command.argv = [ '--namespace' ]
+      command.argv = ['--namespace']
       return command.run()
         .then(() => {
           done()
@@ -121,7 +121,7 @@ describe('instance methods', () => {
     })
 
     test('unknown flag', (done) => {
-      command.argv = [ '--unknown-flag' ]
+      command.argv = ['--unknown-flag']
       return command.run()
         .then(() => done.fail('this should not succeed'))
         .catch(() => {

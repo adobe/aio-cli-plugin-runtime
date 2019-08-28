@@ -58,30 +58,30 @@ describe('instance methods', () => {
     })
 
     test('simple trigger delete', (done) => {
-      let cmd = ow.mockResolved(owAction, '')
+      const cmd = ow.mockResolved(owAction, '')
 
       command.argv = ['trigger1']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ 'name': 'trigger1', 'namespace': null })
+          expect(cmd).toHaveBeenCalledWith({ name: 'trigger1', namespace: null })
           expect(stdout.output).toMatch('')
           done()
         })
     })
 
     test('simple trigger delete with namespace in trigger name', (done) => {
-      let cmd = ow.mockResolved(owAction, '')
+      const cmd = ow.mockResolved(owAction, '')
       command.argv = ['/MySpecifiedNamespace/trigger1']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ 'name': 'trigger1', 'namespace': 'MySpecifiedNamespace' })
+          expect(cmd).toHaveBeenCalledWith({ name: 'trigger1', namespace: 'MySpecifiedNamespace' })
           expect(stdout.output).toMatch('')
           done()
         })
     })
 
     test('trigger delete, error', (done) => {
-      let err = new Error('an error')
+      const err = new Error('an error')
       ow.mockRejected(owAction, err)
 
       command.argv = ['trigger1']

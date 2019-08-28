@@ -58,42 +58,42 @@ describe('instance methods', () => {
     })
 
     test('simple trigger get', (done) => {
-      let obj = {
-        'annotations': [],
-        'limits': {},
-        'name': 'trigger1',
-        'namespace': 'namespace1',
-        'parameters': [],
-        'publish': false,
-        'version': '0.0.1'
+      const obj = {
+        annotations: [],
+        limits: {},
+        name: 'trigger1',
+        namespace: 'namespace1',
+        parameters: [],
+        publish: false,
+        version: '0.0.1'
       }
-      let cmd = ow.mockResolved(owAction, obj)
+      const cmd = ow.mockResolved(owAction, obj)
 
       command.argv = ['trigger1']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ 'name': 'trigger1', 'namespace': null })
+          expect(cmd).toHaveBeenCalledWith({ name: 'trigger1', namespace: null })
           expect(JSON.parse(stdout.output)).toMatchObject(obj)
           done()
         })
     })
 
     test('simple trigger get with namespace in trigger name', (done) => {
-      let obj = {
-        'annotations': [],
-        'limits': {},
-        'name': 'trigger1',
-        'namespace': 'MySpecifiedNamespace',
-        'parameters': [],
-        'publish': false,
-        'version': '0.0.1'
+      const obj = {
+        annotations: [],
+        limits: {},
+        name: 'trigger1',
+        namespace: 'MySpecifiedNamespace',
+        parameters: [],
+        publish: false,
+        version: '0.0.1'
       }
-      let cmd = ow.mockResolved(owAction, obj)
+      const cmd = ow.mockResolved(owAction, obj)
 
       command.argv = ['/MySpecifiedNamespace/trigger1']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ 'name': 'trigger1', 'namespace': 'MySpecifiedNamespace' })
+          expect(cmd).toHaveBeenCalledWith({ name: 'trigger1', namespace: 'MySpecifiedNamespace' })
           expect(JSON.parse(stdout.output)).toMatchObject(obj)
           done()
         })

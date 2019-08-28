@@ -84,7 +84,7 @@ describe('instance methods', () => {
     })
 
     test('print entities listed in a manifest.yaml file', () => {
-      command.argv = [ '-m', '/deploy/manifest_report.yaml' ]
+      command.argv = ['-m', '/deploy/manifest_report.yaml']
       return command.run()
         .then(() => {
           expect(stdout.output).toMatchFixture('deploy/reportPackage.txt')
@@ -92,7 +92,7 @@ describe('instance methods', () => {
     })
 
     test('print entities listed in a manifest file and a wrong deployment file', () => {
-      command.argv = [ '-m', '/deploy/manifest_report.yaml', '--deployment', '/deploy/deployment_wrongpackage.yaml' ]
+      command.argv = ['-m', '/deploy/manifest_report.yaml', '--deployment', '/deploy/deployment_wrongpackage.yaml']
       return command.run()
         .then(() => {
           expect(stdout.output).toMatchFixture('deploy/reportPackage_defaultDeployment.txt')
@@ -100,7 +100,7 @@ describe('instance methods', () => {
     })
 
     test('print entities listed in a manifest file with wrong action inputs in deployment file', () => {
-      command.argv = [ '-m', '/deploy/manifest_report.yaml', '-d', '/deploy/deployment_actionMissingInputs.yaml' ]
+      command.argv = ['-m', '/deploy/manifest_report.yaml', '-d', '/deploy/deployment_actionMissingInputs.yaml']
       return command.run()
         .then(() => {
           expect(stdout.output).toMatchFixture('deploy/reportPackage_defaultDeployment.txt')
@@ -108,7 +108,7 @@ describe('instance methods', () => {
     })
 
     test('print packages in default manifest file', () => {
-      command.argv = [ ]
+      command.argv = []
       return command.run()
         .then(() => {
           expect(stdout.output).toMatchFixture('deploy/report_twoPackages.txt')
@@ -116,7 +116,7 @@ describe('instance methods', () => {
     })
 
     test('print action wihtout inputs manifest file', () => {
-      command.argv = [ '-m', '/deploy/manifest_actionMissingInputs.yaml' ]
+      command.argv = ['-m', '/deploy/manifest_actionMissingInputs.yaml']
       return command.run()
         .then(() => {
           expect(stdout.output).toMatchFixture('deploy/report_triggersMissingInputs.txt')
@@ -124,7 +124,7 @@ describe('instance methods', () => {
     })
 
     test('print triggers from manifest file when deployment file has trigger with no inputs', () => {
-      command.argv = [ '-m', '/deploy/manifest_actionMissingInputs.yaml', '--deployment', '/deploy/deployment_triggersMissingInputs.yaml' ]
+      command.argv = ['-m', '/deploy/manifest_actionMissingInputs.yaml', '--deployment', '/deploy/deployment_triggersMissingInputs.yaml']
       return command.run()
         .then(() => {
           expect(stdout.output).toMatchFixture('deploy/report_triggersMissingInputs.txt')
@@ -132,7 +132,7 @@ describe('instance methods', () => {
     })
 
     test('project name different in manifest and deployment file', (done) => {
-      command.argv = [ '-m', '/deploy/deployment_syncMissingAction.yaml', '-d', '/deploy/deployment-triggerError.yaml' ]
+      command.argv = ['-m', '/deploy/deployment_syncMissingAction.yaml', '-d', '/deploy/deployment-triggerError.yaml']
       return command.run()
         .then(() => done.fail('does not throw error'))
         .catch(() => {
@@ -142,10 +142,10 @@ describe('instance methods', () => {
     })
 
     test('both manifest files not found', (done) => {
-      const toRemove = [ '/deploy/manifest.yaml', '/deploy/manifest.yml' ]
+      const toRemove = ['/deploy/manifest.yaml', '/deploy/manifest.yml']
       fakeFileSystem.removeKeys(toRemove)
 
-      command.argv = [ ]
+      command.argv = []
       return command.run()
         .then(() => done.fail('does not throw error'))
         .catch(() => {

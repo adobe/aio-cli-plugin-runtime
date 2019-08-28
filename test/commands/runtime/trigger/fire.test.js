@@ -86,11 +86,11 @@ describe('instance methods', () => {
     })
 
     test('fire a simple trigger', () => {
-      let cmd = ow.mockResolved(owAction, '')
+      const cmd = ow.mockResolved(owAction, '')
       command.argv = ['trigger1']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ 'name': 'trigger1', 'trigger': {} })
+          expect(cmd).toHaveBeenCalledWith({ name: 'trigger1', trigger: {} })
           expect(stdout.output).toMatch('')
         })
     })
@@ -107,20 +107,20 @@ describe('instance methods', () => {
     })
 
     test('fire a simple trigger, use param flag', () => {
-      let cmd = ow.mockResolved(owAction, '')
+      const cmd = ow.mockResolved(owAction, '')
       command.argv = ['trigger1', '--param', 'a', 'b', '--param', 'c', 'd']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ 'name': 'trigger1',
-            'trigger': {
-              'parameters': [
+          expect(cmd).toHaveBeenCalledWith({ name: 'trigger1',
+            trigger: {
+              parameters: [
                 {
-                  'key': 'a',
-                  'value': 'b'
+                  key: 'a',
+                  value: 'b'
                 },
                 {
-                  'key': 'c',
-                  'value': 'd'
+                  key: 'c',
+                  value: 'd'
                 }
 
               ]
@@ -130,21 +130,21 @@ describe('instance methods', () => {
     })
 
     test('fire a simple trigger, use param-file flag', () => {
-      let cmd = ow.mockResolved(owAction, '')
+      const cmd = ow.mockResolved(owAction, '')
 
       command.argv = ['trigger1', '--param-file', '/trigger/parameters.json']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ 'name': 'trigger1',
-            'trigger': {
-              'parameters': [
+          expect(cmd).toHaveBeenCalledWith({ name: 'trigger1',
+            trigger: {
+              parameters: [
                 {
-                  'key': 'param1',
-                  'value': 'param1value'
+                  key: 'param1',
+                  value: 'param1value'
                 },
                 {
-                  'key': 'param2',
-                  'value': 'param2value'
+                  key: 'param2',
+                  value: 'param2value'
                 }
 
               ]

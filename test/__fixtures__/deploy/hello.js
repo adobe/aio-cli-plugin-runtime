@@ -1,6 +1,6 @@
 
 function main (params) {
-  let msg = 'Hello ' + params.name + ', ' + params.message + '.'
+  const msg = 'Hello ' + params.name + ', ' + params.message + '.'
   return { msg }
 }
 

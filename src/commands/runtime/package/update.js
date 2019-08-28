@@ -36,7 +36,7 @@ class PackageUpdate extends RuntimeBaseCommand {
       }
       // The keys 'parameters' and 'annotations' are expected to be passed as an array of key value pairs
       // For example : [{key : 'Your key 1' , value: 'Your value 1'}, {key : 'Your key 2' , value: 'Your value 2'} ]
-      let packageParams = {
+      const packageParams = {
         parameters: paramsPackage,
         annotations: annotationParams
       }
@@ -49,7 +49,7 @@ class PackageUpdate extends RuntimeBaseCommand {
         case 'no' :
           packageParams['publish'] = false
       }
-      let options = {}
+      const options = {}
       options['name'] = args.packageName
       options['package'] = packageParams
       const ow = await this.wsk()
@@ -72,7 +72,7 @@ PackageUpdate.args = [
 
 PackageUpdate.flags = {
   ...RuntimeBaseCommand.flags,
-  'param': flags.string({
+  param: flags.string({
     char: 'p',
     description: 'parameter values in KEY VALUE format', // help description for flag
     hidden: false, // hide from help
@@ -86,14 +86,14 @@ PackageUpdate.flags = {
     multiple: false, // allow setting this flag multiple times
     required: false
   }),
-  'shared': flags.string({
+  shared: flags.string({
     description: 'parameter to be passed to indicate whether package is shared or private', // help description for flag
     hidden: false, // hide from help
     options: ['true', 'yes', 'false', 'no'],
     multiple: false, // allow setting this flag multiple times
     required: false
   }),
-  'annotation': flags.string({
+  annotation: flags.string({
     char: 'a',
     description: 'annotation values in KEY VALUE format', // help description for flag
     hidden: false, // hide from help
@@ -107,7 +107,7 @@ PackageUpdate.flags = {
     multiple: false, // allow setting this flag multiple times
     required: false
   }),
-  'json': flags.boolean({
+  json: flags.boolean({
     description: 'output raw json'
   })
 }

@@ -37,7 +37,7 @@ PackageDelete.args = [
 ]
 
 PackageDelete.flags = {
-  'json': flags.boolean({
+  json: flags.boolean({
     description: 'output raw json'
   })
 }

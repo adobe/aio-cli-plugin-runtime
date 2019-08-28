@@ -50,7 +50,7 @@ RuleUpdate.args = [
 
 RuleUpdate.flags = {
   ...RuntimeBaseCommand.flags,
-  'json': flags.boolean({
+  json: flags.boolean({
     description: 'output raw json'
   })
 }

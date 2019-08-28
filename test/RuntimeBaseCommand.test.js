@@ -54,13 +54,13 @@ describe('instance methods', () => {
     })
 
     test('apihost default', async () => {
-      let files = {}
+      const files = {}
       files[require('path').join(require('os').homedir(), '.wskprops')] = 'AUTH=1234'
       fakeFileSystem.addJson(files)
 
       return command.wsk().then(() => {
         expect(ow).toHaveBeenLastCalledWith(
-          { 'apihost': 'https://adobeioruntime.net', 'api_key': 1234, 'apiversion': 'v1' }
+          { apihost: 'https://adobeioruntime.net', api_key: 1234, apiversion: 'v1' }
         )
       })
     })
@@ -79,7 +79,7 @@ describe('instance methods', () => {
     test('null AUTH should throw', async (done) => {
       delete process.env[PropertyEnv.APIHOST]
       delete process.env[PropertyEnv.AUTH]
-      let files = {}
+      const files = {}
       files[require('path').join(require('os').homedir(), '.wskprops')] = ''
       fakeFileSystem.addJson(files)
 
@@ -104,13 +104,13 @@ describe('instance methods', () => {
     })
 
     test('not string AUTH should not throw', async () => {
-      let files = {}
+      const files = {}
       files[require('path').join(require('os').homedir(), '.wskprops')] = 'AUTH=1234'
       fakeFileSystem.addJson(files)
 
       return command.wsk().then(() => {
         expect(ow).toHaveBeenLastCalledWith(
-          { 'api_key': 1234, 'apihost': 'https://adobeioruntime.net', 'apiversion': 'v1' }
+          { api_key: 1234, apihost: 'https://adobeioruntime.net', apiversion: 'v1' }
         )
         delete process.env[PropertyEnv.APIHOST]
       })
@@ -172,7 +172,7 @@ describe('instance methods', () => {
 
     test('verbose flag', async () => {
       const debug = require('debug')
-      let spy = jest.spyOn(debug, 'enable').mockReturnValue()
+      const spy = jest.spyOn(debug, 'enable').mockReturnValue()
 
       command.argv = ['--verbose']
       return command.init().then(() => {
@@ -183,7 +183,7 @@ describe('instance methods', () => {
 
     test('debug flag', async () => {
       const debug = require('debug')
-      let spy = jest.spyOn(debug, 'enable').mockReturnValue()
+      const spy = jest.spyOn(debug, 'enable').mockReturnValue()
 
       command.argv = ['--debug', 'foo,bar']
       return command.init().then(() => {
@@ -194,7 +194,7 @@ describe('instance methods', () => {
 
     test('init no flag', async () => {
       const debug = require('debug')
-      let spy = jest.spyOn(debug, 'enable').mockReturnValue()
+      const spy = jest.spyOn(debug, 'enable').mockReturnValue()
 
       command.argv = []
       return command.init().then(() => {
@@ -237,7 +237,7 @@ describe('instance methods', () => {
   })
 
   describe('handleError', () => {
-    let suffix = '\n specify --verbose flag for more information'
+    const suffix = '\n specify --verbose flag for more information'
     test('is a function', async () => {
       expect(command.handleError).toBeInstanceOf(Function)
     })
