@@ -46,7 +46,9 @@ RouteGet.flags = {
 RouteGet.description = 'get API details'
 
 RouteGet.aliases = [
-  'api:get'
+  'runtime:api:get',
+  'rt:route:get',
+  'rt:api:get'
 ]
 
 module.exports = RouteGet

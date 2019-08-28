@@ -30,7 +30,9 @@ test('description', async () => {
 })
 
 test('aliases', async () => {
-  expect(TheCommand.aliases).toEqual([])
+  expect(TheCommand.aliases).toBeDefined()
+  expect(TheCommand.aliases).toBeInstanceOf(Array)
+  expect(TheCommand.aliases.length).toBeGreaterThan(0)
 })
 
 test('flags', async () => {
@@ -101,6 +103,7 @@ describe('instance methods', () => {
     const json = {
       'deploy/manifest_triggersRules.yaml': fixtureFile('deploy/manifest_triggersRules.yaml'),
       'deploy/manifest.yaml': fixtureFile('deploy/manifest.yaml'),
+      'deploy/manifest_dependencies.yaml': fixtureFile('deploy/manifest_dependencies.yaml'),
       'deploy/manifest_report.yaml': fixtureFile('deploy/manifest_report.yaml'),
       'deploy/api_manifest.yaml': fixtureFile('deploy/api_manifest.yaml'),
       'deploy/manifest.yml': fixtureFile('deploy/manifest.yml'),
@@ -165,6 +168,16 @@ describe('instance methods', () => {
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalledWith({ name: 'testSeq' })
+          expect(stdout.output).toMatch('')
+        })
+    })
+
+    test('undeploy a package dependency with manifest file', () => {
+      let cmd = ow.mockResolved(owPackage, '')
+      command.argv = [ '-m', '/deploy/manifest_dependencies.yaml' ]
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith({ name: 'mypackage' })
           expect(stdout.output).toMatch('')
         })
     })

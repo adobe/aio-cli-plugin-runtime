@@ -24,7 +24,9 @@ test('description', async () => {
 })
 
 test('aliases', async () => {
-  expect(TheCommand.aliases).toEqual([])
+  expect(TheCommand.aliases).toBeDefined()
+  expect(TheCommand.aliases).toBeInstanceOf(Array)
+  expect(TheCommand.aliases.length).toBeGreaterThan(0)
 })
 
 test('args', async () => {
@@ -47,7 +49,7 @@ describe('instance methods', () => {
       let spy = jest.spyOn(HHelp.prototype, 'showHelp').mockReturnValue(true)
       command.id = 'pgb'
       return command.run().then(() => {
-        expect(spy).toHaveBeenCalledWith(['runtime:action', '--help'])
+        expect(spy).toHaveBeenCalledWith(['runtime:activation', '--help'])
       })
     })
   })

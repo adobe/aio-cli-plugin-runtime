@@ -60,4 +60,10 @@ PropertySet.flags = {
 
 PropertySet.description = 'set property'
 
+PropertySet.aliases = [
+  'runtime:prop:set',
+  'rt:property:set',
+  'rt:prop:set'
+]
+
 module.exports = PropertySet

@@ -30,7 +30,9 @@ test('description', async () => {
 })
 
 test('aliases', async () => {
-  expect(TheCommand.aliases).toEqual([])
+  expect(TheCommand.aliases).toBeDefined()
+  expect(TheCommand.aliases).toBeInstanceOf(Array)
+  expect(TheCommand.aliases.length).toBeGreaterThan(0)
 })
 
 test('flags', async () => {
@@ -81,7 +83,11 @@ describe('instance methods', () => {
       'deploy/manifest_webSequence.yaml': fixtureFile('deploy/manifest_webSequence.yaml'),
       'deploy/deployment_triggersMissingInputs.yaml': fixtureFile('deploy/deployment_triggersMissingInputs.yaml'),
       'deploy/deployment_triggersMissing.yaml': fixtureFile('deploy/deployment_triggersMissing.yaml'),
+      'deploy/manifest_dependencies.yaml': fixtureFile('deploy/manifest_dependencies.yaml'),
+      'deploy/manifest_dependencies_error.yaml': fixtureFile('deploy/manifest_dependencies_error.yaml'),
       'deploy/manifest_dep.yaml': fixtureFile('deploy/manifest_dep.yaml'),
+      'deploy/manifest_dep_dependencies.yaml': fixtureFile('deploy/manifest_dep_dependencies.yaml'),
+      'deploy/deployment_dependencies.yaml': fixtureFile('deploy/deployment_dependencies.yaml'),
       'deploy/deployment_wrongPackageName.yaml': fixtureFile('deploy/deployment_wrongPackageName.yaml'),
       'deploy/deployment-triggerError.yaml': fixtureFile('deploy/deployment-triggerError.yaml'),
       'deploy/deployment_wrongTrigger.yaml': fixtureFile('deploy/deployment_wrongTrigger.yaml'),
@@ -411,6 +417,60 @@ describe('instance methods', () => {
         })
     })
 
+    test('deploys dependencies', () => {
+      let cmd = ow.mockResolved(owPackage, '')
+      command.argv = ['-m', '/deploy/manifest_dependencies.yaml']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith({
+            name: 'mypackage',
+            package: {
+              binding: {
+                namespace: 'adobeio',
+                name: 'oauth'
+              },
+              parameters: [{
+                'key': 'client_id',
+                'value': 'myclientID123'
+              }]
+            }
+          })
+          expect(stdout.output).toMatch('')
+        })
+    })
+
+    test('deploys dependencies with deployment flag', () => {
+      let cmd = ow.mockResolved(owPackage, '')
+      command.argv = ['-m', '/deploy/manifest_dep_dependencies.yaml', '--deployment', '/deploy/deployment_dependencies.yaml']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith({
+            name: 'mypackage',
+            package: {
+              binding: {
+                namespace: 'adobeio',
+                name: 'oauth'
+              },
+              parameters: [{
+                'key': 'client_id',
+                'value': 'myclientID123'
+              }]
+            }
+          })
+          expect(stdout.output).toMatch('')
+        })
+    })
+
+    test('errors out on deploying dependencies without location flag', (done) => {
+      command.argv = ['-m', '/deploy/manifest_dependencies_error.yaml']
+      return command.run()
+        .then(() => done.fail('does not throw error'))
+        .catch(() => {
+          expect(handleError).toHaveBeenLastCalledWith('Failed to deploy', new Error('Invalid or missing location in the manifest for this action: mypackage'))
+          done()
+        })
+    })
+
     test('package should be created if project is the root', () => {
       let cmd = ow.mockResolved(owPackage, '')
       command.argv = ['-m', '/deploy/manifest_report.yaml', '--deployment', '/deploy/deployment.yaml']
@@ -625,6 +685,23 @@ describe('instance methods', () => {
       command.argv = [ '-m', '/deploy/manifest_webSequence.yaml' ]
       return command.run()
         .then(() => {
+          expect(cmd).toHaveBeenCalledWith({
+            name: 'hello_world_package/hello_world',
+            action: '',
+            annotations: { 'web-export': true },
+            exec: {
+              components: [
+                '/ns/hello_world_package/hello_validate',
+                '/ns/hello_world_package/hello',
+                '/ns/hello_world_package/hello_wrap',
+                '/ns/spackage/saction',
+                '/ns/spackage/saction',
+                '/snamespace/spackage/saction',
+                '/snamespace/spackage/saction'
+              ],
+              kind: 'sequence'
+            }
+          })
           expect(cmd).toHaveBeenCalledTimes(4)
           expect(stdout.output).toMatch('')
         })

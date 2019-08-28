@@ -81,4 +81,10 @@ RuleList.flags = {
   })
 }
 
+RuleList.aliases = [
+  'runtime:rule:ls',
+  'rt:rule:list',
+  'rt:rule:ls'
+]
+
 module.exports = RuleList

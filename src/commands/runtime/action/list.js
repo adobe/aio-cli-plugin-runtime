@@ -70,4 +70,13 @@ ActionList.flags = {
 
 ActionList.description = 'Lists all the Actions'
 
+ActionList.aliases = [
+  'runtime:action:ls',
+  'runtime:actions:list',
+  'runtime:actions:ls',
+  'rt:action:list',
+  'rt:actions:list',
+  'rt:action:ls',
+  'rt:actions:ls']
+
 module.exports = ActionList

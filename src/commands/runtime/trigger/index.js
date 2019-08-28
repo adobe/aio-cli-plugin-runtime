@@ -22,4 +22,8 @@ class IndexCommand extends RuntimeBaseCommand {
 
 IndexCommand.description = 'Manage your triggers'
 
+IndexCommand.aliases = [
+  'rt:trigger'
+]
+
 module.exports = IndexCommand

@@ -343,6 +343,37 @@ function processPackage (packages, deploymentPackages, deploymentTriggers, param
     // From wskdeploy repo : currently, the 'version' and 'license' values are not stored in Apache OpenWhisk, but there are plans to support it in the future
     // pkg.version = packages[key]['version']
     // pkg.license = packages[key]['license']
+    if (packages[key]['dependencies']) {
+      Object.keys(packages[key]['dependencies']).forEach((depName) => {
+        let thisDep = packages[key]['dependencies'][depName]
+        let objPackage = {}
+        try { // Parse location
+          let thisLocation = thisDep['location'].split('/')
+          objPackage = {
+            binding: {
+              namespace: thisLocation[1],
+              name: thisLocation[2]
+            }
+          }
+        } catch (ex) {
+          throw (new Error(`Invalid or missing location in the manifest for this action: ${depName}`))
+        }
+
+        // Parse inputs
+        let deploymentInputs = {}
+        let packageInputs = thisDep['inputs'] || {}
+        if (deploymentPackages[key] && deploymentPackages[key]['dependencies'] && deploymentPackages[key]['dependencies'][depName]) {
+          deploymentInputs = deploymentPackages[key]['dependencies'][depName]['inputs'] || {}
+        }
+        let allInputs = returnUnion(packageInputs, deploymentInputs)
+        // if parameter is provided as key : 'data type' , process it to set default values before deployment
+        if (Object.entries(allInputs).length !== 0) {
+          let processedInput = createKeyValueInput(processInputs(allInputs, params))
+          objPackage['parameters'] = processedInput
+        }
+        pkgtoCreate.push({ name: depName, package: objPackage })
+      })
+    }
     if (packages[key]['actions']) {
       Object.keys(packages[key]['actions']).forEach((actionName) => {
         let thisAction = packages[key]['actions'][actionName]
@@ -502,16 +533,25 @@ async function deployPackage (entities, ow, logger) {
   let opts = await ow.actions.client.options
   let ns = opts.namespace
   for (let pkg of entities.pkgtoCreate) {
-    let options = {}
-    options['name'] = pkg.name
     logger(`Info: Deploying package [${pkg.name}]...`)
-    await ow.packages.update(options)
+    await ow.packages.update(pkg)
     logger(`Info: package [${pkg.name}] has been successfully deployed.\n`)
   }
   for (let action of entities.actions) {
     if (action['exec'] && action['exec']['kind']) {
       action['exec']['components'] = action['exec']['components'].map(sequence => {
-        return `/${ns}/${sequence}`
+        /*
+          Input => Output
+          spackage/saction => /ns/spackage/saction
+          /spackage/saction => /ns/spackage/saction
+          snamespace/spackage/saction => /snamespace/spackage/saction
+          /snamespace/spackage/saction => /snamespace/spackage/saction
+        */
+        sequence = sequence.startsWith('/') ? sequence.substr(1) : sequence
+        let actionItemCount = sequence.split('/').length
+        return (actionItemCount > 2)
+          ? `/${sequence}`
+          : `/${ns}/${sequence}`
       })
     }
     logger(`Info: Deploying action [${action.name}]...`)

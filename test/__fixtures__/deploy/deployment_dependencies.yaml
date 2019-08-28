@@ -1,0 +1,10 @@
+project:
+  packages:
+    testSeq:
+      dependencies:
+        mypackage:
+          location: /adobeio/oauth
+          inputs:
+            client_id: "myclientID123"
+        mypackage2:
+          location: /adobeio/oauth

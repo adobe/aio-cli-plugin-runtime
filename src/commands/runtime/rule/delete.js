@@ -39,4 +39,8 @@ RuleDelete.flags = {
   ...RuntimeBaseCommand.flags
 }
 
+RuleDelete.aliases = [
+  'rt:rule:delete'
+]
+
 module.exports = RuleDelete

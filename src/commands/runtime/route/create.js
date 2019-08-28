@@ -76,7 +76,9 @@ RouteCreate.flags = {
 RouteCreate.description = 'create a new api route'
 
 RouteCreate.aliases = [
-  'api:create'
+  'runtime:api:create',
+  'rt:route:create',
+  'rt:api:create'
 ]
 
 module.exports = RouteCreate
