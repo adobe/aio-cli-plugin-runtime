@@ -29,7 +29,7 @@ class PropertyGet extends RuntimeBaseCommand {
       flags.all = true
     }
 
-    let data = []
+    const data = []
     const properties = propertiesFile()
 
     // get property data
@@ -75,7 +75,7 @@ class PropertyGet extends RuntimeBaseCommand {
 
       try {
         debug(`Getting data from url ${uri} ...\n`)
-        let response = await fetch(uri)
+        const response = await fetch(uri)
         result = await response.json()
         debug(JSON.stringify(result, null, 2))
       } catch (err) {

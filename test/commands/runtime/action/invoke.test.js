@@ -82,17 +82,17 @@ describe('instance methods', () => {
     })
 
     test('invokes an action only with action name', () => {
-      let cmd = ow.mockResolved(owAction, '')
+      const cmd = ow.mockResolved(owAction, '')
       command.argv = ['hello']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ 'name': 'hello', 'blocking': false, 'params': {}, 'result': false })
+          expect(cmd).toHaveBeenCalledWith({ name: 'hello', blocking: false, params: {}, result: false })
           expect(stdout.output).toMatch('')
         })
     })
 
     test('invokes an action with action name and params', () => {
-      let cmd = ow.mockResolved(owAction, '')
+      const cmd = ow.mockResolved(owAction, '')
       command.argv = ['hello', '--param', 'a', 'b', 'c', 'd']
       return command.run()
         .then(() => {
@@ -107,7 +107,7 @@ describe('instance methods', () => {
     })
 
     test('invokes an action with action name, params and blocking', () => {
-      let cmd = ow.mockResolved(owAction, '')
+      const cmd = ow.mockResolved(owAction, '')
       command.argv = ['hello', '--param', 'a', 'b', '--param', 'c', 'd', '--blocking']
       return command.run()
         .then(() => {
@@ -122,7 +122,7 @@ describe('instance methods', () => {
     })
 
     test('invokes an action with action name, params and result. Should still block', () => {
-      let cmd = ow.mockResolved(owAction, '')
+      const cmd = ow.mockResolved(owAction, '')
       command.argv = ['hello', '--result']
       return command.run()
         .then(() => {
@@ -137,7 +137,7 @@ describe('instance methods', () => {
     })
 
     test('invokes an action with all flags', () => {
-      let cmd = ow.mockResolved(owAction, '')
+      const cmd = ow.mockResolved(owAction, '')
       command.argv = ['hello', '--param', 'a', 'b', '--param', 'c', 'd', '--blocking', '--result']
       return command.run()
         .then(() => {
@@ -152,7 +152,7 @@ describe('instance methods', () => {
     })
 
     test('invokes an action with all flags and --param-file', () => {
-      let cmd = ow.mockResolved(owAction, '')
+      const cmd = ow.mockResolved(owAction, '')
       const json = {
         'parameters.json': fixtureFile('trigger/parameters.json')
       }
@@ -164,7 +164,7 @@ describe('instance methods', () => {
         .then(() => {
           expect(cmd).toHaveBeenCalledWith({
             name: 'hello',
-            params: { param1: 'param1value', 'param2': 'param2value' },
+            params: { param1: 'param1value', param2: 'param2value' },
             blocking: true,
             result: true
           })

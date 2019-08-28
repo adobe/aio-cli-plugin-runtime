@@ -84,7 +84,7 @@ describe('instance methods', () => {
     })
 
     test('creates a package with package name param flag', () => {
-      let cmd = ow.mockResolved(owAction, '')
+      const cmd = ow.mockResolved(owAction, '')
       command.argv = ['packageName', '--param', 'a', 'b', '--param', 'c', 'd']
       return command.run()
         .then(() => {
@@ -109,7 +109,7 @@ describe('instance methods', () => {
     })
 
     test('creates a package with package name param flag --json', () => {
-      let cmd = ow.mockResolved(owAction, '')
+      const cmd = ow.mockResolved(owAction, '')
       command.argv = ['packageName', '--param', 'a', 'b', '--param', 'c', 'd', '--json']
       return command.run()
         .then(() => {
@@ -134,7 +134,7 @@ describe('instance methods', () => {
     })
 
     test('creates a package with only package name', () => {
-      let cmd = ow.mockResolved(owAction, '')
+      const cmd = ow.mockResolved(owAction, '')
       command.argv = ['packageName']
       return command.run()
         .then(() => {
@@ -156,7 +156,7 @@ describe('instance methods', () => {
       fakeFileSystem.addJson({
         '/action': json
       })
-      let cmd = ow.mockResolved(owAction, '')
+      const cmd = ow.mockResolved(owAction, '')
       command.argv = ['packageName', '--param-file', '/action/parameters.json']
       return command.run()
         .then(() => {
@@ -187,7 +187,7 @@ describe('instance methods', () => {
       fakeFileSystem.addJson({
         '/action': json
       })
-      let cmd = ow.mockResolved(owAction, '')
+      const cmd = ow.mockResolved(owAction, '')
       command.argv = ['packageName', '--annotation-file', '/action/parameters.json']
       return command.run()
         .then(() => {
@@ -212,7 +212,7 @@ describe('instance methods', () => {
     })
 
     test('creates a package with package name and annotation and param flags', () => {
-      let cmd = ow.mockResolved(owAction, '')
+      const cmd = ow.mockResolved(owAction, '')
       command.argv = ['packageName', '--annotation', 'a', 'b', '--annotation', 'c', 'd', '--param', 'p1', 'p2']
       return command.run()
         .then(() => {
@@ -242,7 +242,7 @@ describe('instance methods', () => {
     })
 
     test('creates a package with package name and annotation and param flags with shorter flag version', () => {
-      let cmd = ow.mockResolved(owAction, '')
+      const cmd = ow.mockResolved(owAction, '')
       command.argv = ['packageName', '-a', 'a', 'b', '-a', 'c', 'd', '-p', 'p1', 'p2']
       return command.run()
         .then(() => {
@@ -272,7 +272,7 @@ describe('instance methods', () => {
     })
 
     test('creates a package with package name and shared flag', () => {
-      let cmd = ow.mockResolved(owAction, '')
+      const cmd = ow.mockResolved(owAction, '')
       command.argv = ['packageName', '--shared', 'true']
       return command.run()
         .then(() => {
@@ -289,7 +289,7 @@ describe('instance methods', () => {
     })
 
     test('creates a package with package name and shared flag as false', () => {
-      let cmd = ow.mockResolved(owAction, '')
+      const cmd = ow.mockResolved(owAction, '')
       command.argv = ['packageName', '--shared', 'false']
       return command.run()
         .then(() => {

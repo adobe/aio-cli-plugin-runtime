@@ -18,29 +18,29 @@ class DeployReport extends RuntimeBaseCommand {
   async run () {
     const { flags } = this.parse(DeployReport)
     try {
-      let components = setPaths(flags)
-      let packages = components.packages
-      let deploymentTriggers = components.deploymentTriggers
-      let deploymentPackages = components.deploymentPackages
+      const components = setPaths(flags)
+      const packages = components.packages
+      const deploymentTriggers = components.deploymentTriggers
+      const deploymentPackages = components.deploymentPackages
 
-      let proj = {
+      const proj = {
         name: components.projectName,
         Inputs: {}
       }
-      let pkg = []
-      let actions = []
-      let triggers = []
+      const pkg = []
+      const actions = []
+      const triggers = []
       Object.keys(packages).forEach((key) => {
         pkg.push({ name: key, Inputs: {} })
         if (packages[key]['actions']) {
           Object.keys(packages[key]['actions']).forEach((action) => {
-            let objAction = { name: action, Inputs: {} }
-            let packageInputs = packages[key]['actions'][action]['inputs'] || {}
+            const objAction = { name: action, Inputs: {} }
+            const packageInputs = packages[key]['actions'][action]['inputs'] || {}
             let deploymentInputs = {}
             if (deploymentPackages[key] && deploymentPackages[key]['actions'] && deploymentPackages[key]['actions'][action]) {
               deploymentInputs = deploymentPackages[key]['actions'][action]['inputs'] || {}
             }
-            let allInputs = returnUnion(packageInputs, deploymentInputs)
+            const allInputs = returnUnion(packageInputs, deploymentInputs)
             objAction.Inputs = processInputs(allInputs, {})
             actions.push(objAction)
           })
@@ -48,15 +48,15 @@ class DeployReport extends RuntimeBaseCommand {
 
         if (packages[key]['sequences']) {
           Object.keys(packages[key]['sequences']).forEach((sequence) => {
-            let objSequence = { name: sequence, Inputs: {} }
+            const objSequence = { name: sequence, Inputs: {} }
             actions.push(objSequence)
           })
         }
 
         if (packages[key]['triggers']) {
           Object.keys(packages[key]['triggers']).forEach((trigger) => {
-            let objTrigger = { name: trigger }
-            let packageInputs = packages[key]['triggers'][trigger]['inputs'] || {}
+            const objTrigger = { name: trigger }
+            const packageInputs = packages[key]['triggers'][trigger]['inputs'] || {}
             let deploymentInputs = {}
             if (trigger in deploymentTriggers) {
               deploymentInputs = deploymentTriggers[trigger]
@@ -71,14 +71,14 @@ class DeployReport extends RuntimeBaseCommand {
 
       this.logJSON('', proj)
 
-      for (let packg of pkg) {
+      for (const packg of pkg) {
         this.logJSON('', packg)
       }
-      for (let action of actions) {
+      for (const action of actions) {
         // TODO : Need to improve the fetching of namespace and addition to actions
         this.logJSON('', action)
       }
-      for (let trigger of triggers) {
+      for (const trigger of triggers) {
         this.logJSON('', trigger)
       }
     } catch (err) {
@@ -89,12 +89,12 @@ class DeployReport extends RuntimeBaseCommand {
 
 DeployReport.flags = {
   ...RuntimeBaseCommand.flags,
-  'manifest': flags.string({
+  manifest: flags.string({
     char: 'm',
     description: 'the manifest file location', // help description for flag
     required: false
   }),
-  'deployment': flags.string({
+  deployment: flags.string({
     char: 'd',
     description: 'the deployment file location', // help description for flag
     required: false

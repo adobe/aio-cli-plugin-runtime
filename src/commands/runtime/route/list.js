@@ -25,7 +25,7 @@ function processApi (api) {
     const path = paths[key]
     Object.keys(path).forEach(verb => {
       const operation = path[verb]
-      let item = {}
+      const item = {}
 
       item.Action = `/${operation.operationId}`
       item.Verb = verb
@@ -44,7 +44,7 @@ class RouteList extends RuntimeBaseCommand {
 
     try {
       const ow = await this.wsk()
-      let options = {
+      const options = {
         basepath: args.basePath,
         relpath: args.relPath,
         operation: args.apiVerb,
@@ -98,7 +98,7 @@ RouteList.args = [
     name: 'apiVerb',
     required: false,
     description: 'The http verb',
-    options: [ 'get', 'post', 'put', 'patch', 'delete', 'head', 'options' ]
+    options: ['get', 'post', 'put', 'patch', 'delete', 'head', 'options']
   }
 ]
 

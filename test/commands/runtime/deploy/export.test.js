@@ -36,7 +36,7 @@ test('aliases', async () => {
 
 describe('instance methods', () => {
   let command, handleError
-  let packagelist = [{
+  const packagelist = [{
     annotations: [{
       key: 'whisk-managed',
       value: {
@@ -54,7 +54,7 @@ describe('instance methods', () => {
     version: '0.0.2'
   }]
 
-  let packageNoAnnotations = [{
+  const packageNoAnnotations = [{
     annotations: [],
     binding: false,
     name: 'testSeq1',
@@ -64,7 +64,7 @@ describe('instance methods', () => {
     version: '0.0.2'
   }]
 
-  let packagelistNoProjectName = [{
+  const packagelistNoProjectName = [{
     annotations: [{
       key: 'whisk-managed',
       value: 'key'
@@ -77,7 +77,7 @@ describe('instance methods', () => {
     version: '0.0.2'
   }]
 
-  let packageget = {
+  const packageget = {
     actions: [{
       annotations: [],
       name: 'helloAction',
@@ -106,7 +106,7 @@ describe('instance methods', () => {
     version: '0.0.2'
   }
 
-  let sequenceGet = {
+  const sequenceGet = {
     annotations: [
       {
         key: 'whisk-managed',
@@ -132,15 +132,15 @@ describe('instance methods', () => {
     },
     name: 'four',
     namespace: '53444_51981/testSeq',
-    parameters: [ {
+    parameters: [{
       key: '_actions',
-      value: [ '/53444_51981/testSeq/zero', '/53444_51981/testSeq/one', '/53444_51981/testSeq/two' ]
+      value: ['/53444_51981/testSeq/zero', '/53444_51981/testSeq/one', '/53444_51981/testSeq/two']
     }],
     publish: false,
     version: '0.0.9'
   }
 
-  let actionGet = {
+  const actionGet = {
     annotations: [
       {
         key: 'whisk-managed',
@@ -163,7 +163,7 @@ describe('instance methods', () => {
     limits: { concurrency: 1, logs: 10, memory: 256, timeout: 60000 },
     name: 'helloAction1',
     namespace: '53444_51981/testSeq',
-    parameters: [ {
+    parameters: [{
       key: 'key1',
       value: 'val1'
     },
@@ -176,7 +176,7 @@ describe('instance methods', () => {
     version: '0.0.9'
   }
 
-  let actionBinaryGet = {
+  const actionBinaryGet = {
     annotations: [
       {
         key: 'whisk-managed',
@@ -199,7 +199,7 @@ describe('instance methods', () => {
     limits: { concurrency: 1, logs: 10, memory: 256, timeout: 60000 },
     name: 'helloAction',
     namespace: '53444_51981/testSeq',
-    parameters: [ {
+    parameters: [{
       key: 'key1',
       value: 'val1'
     },
@@ -212,7 +212,7 @@ describe('instance methods', () => {
     version: '0.0.9'
   }
 
-  let triggerlist = [{
+  const triggerlist = [{
     annotations: [{
       key: 'whisk-managed',
       value: {
@@ -229,7 +229,7 @@ describe('instance methods', () => {
     version: '0.0.1'
   }]
 
-  let rulesNoAnnotations = [{
+  const rulesNoAnnotations = [{
     action: { name: 'three2', path: 'ns/testSeq2' },
     annotations: [],
     name: 'meetPersonRule2',
@@ -239,7 +239,7 @@ describe('instance methods', () => {
     version: '0.0.2'
   }]
 
-  let triggerNoProjectName = [
+  const triggerNoProjectName = [
     {
       annotations: [{
         key: 'whisk-managed',
@@ -252,7 +252,7 @@ describe('instance methods', () => {
       version: '0.0.1'
     }
   ]
-  let triggerNoAnnotation = [{
+  const triggerNoAnnotation = [{
     annotations: [],
     name: 'meetPerson2',
     namespace: 'ns',
@@ -261,7 +261,7 @@ describe('instance methods', () => {
     version: '0.0.1'
   }]
 
-  let triggerGet = {
+  const triggerGet = {
     annotations: [{
       key: 'whisk-managed',
       value: {
@@ -282,7 +282,7 @@ describe('instance methods', () => {
     },
     { key: 'children',
       value: 0
-    } ],
+    }],
     publish: false,
     rules: {
       '53444_51981/meetPersonRule': {
@@ -296,7 +296,7 @@ describe('instance methods', () => {
     version: '0.0.5'
   }
 
-  let ruleslist = [{
+  const ruleslist = [{
     action: { name: 'three', path: 'ns/testSeq' },
     annotations: [{
       key: 'whisk-managed',
@@ -359,8 +359,8 @@ describe('instance methods', () => {
     })
 
     test('fetch list of packages to be exported from project name', () => {
-      let cmd = ow.mockResolved(owPackageList, '')
-      command.argv = [ '--projectname', 'proj', '-m', '/deploy/manifest.yaml' ]
+      const cmd = ow.mockResolved(owPackageList, '')
+      command.argv = ['--projectname', 'proj', '-m', '/deploy/manifest.yaml']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalled()
@@ -369,8 +369,8 @@ describe('instance methods', () => {
     })
 
     test('fetch list of actions to be exported from project name', () => {
-      let cmd = ow.mockResolved('packages.get', packageget)
-      command.argv = [ '--projectname', 'proj', '-m', '/deploy/manifest.yaml' ]
+      const cmd = ow.mockResolved('packages.get', packageget)
+      command.argv = ['--projectname', 'proj', '-m', '/deploy/manifest.yaml']
       ow.mockResolved(owPackageList, packagelist)
       ow.mockResolved('actions.get', actionGet)
       return command.run()
@@ -381,8 +381,8 @@ describe('instance methods', () => {
     })
 
     test('fetch list of triggers to be exported from project name', () => {
-      let cmd = ow.mockResolved(owTriggerList, '')
-      command.argv = [ '--projectname', 'proj', '-m', '/deploy/manifest.yaml' ]
+      const cmd = ow.mockResolved(owTriggerList, '')
+      command.argv = ['--projectname', 'proj', '-m', '/deploy/manifest.yaml']
       ow.mockResolved(owPackageList, packagelist)
       ow.mockResolved('packages.get', packageget)
       ow.mockResolved('actions.get', actionGet)
@@ -394,8 +394,8 @@ describe('instance methods', () => {
     })
 
     test('fetch list of rules to be exported from project name', () => {
-      let cmd = ow.mockResolved(owRulesList, '')
-      command.argv = [ '--projectname', 'proj', '-m', '/deploy/manifest.yaml' ]
+      const cmd = ow.mockResolved(owRulesList, '')
+      command.argv = ['--projectname', 'proj', '-m', '/deploy/manifest.yaml']
       ow.mockResolved(owPackageList, packagelist)
       ow.mockResolved('packages.get', packageget)
       ow.mockResolved('actions.get', actionGet)
@@ -412,8 +412,8 @@ describe('instance methods', () => {
       ow.mockResolved('triggers.get', triggerGet)
       ow.mockResolved(owRulesList, ruleslist)
       fs.writeFileSync = jest.fn()
-      command.argv = [ '--projectname', 'proj', '-m', '/deploy/manifest.yaml' ]
-      let yaml = fixtureFile('deploy/export_yaml.yaml')
+      command.argv = ['--projectname', 'proj', '-m', '/deploy/manifest.yaml']
+      const yaml = fixtureFile('deploy/export_yaml.yaml')
       return command.run()
         .then(() => {
           expect(fs.writeFileSync).toHaveBeenCalledWith('/deploy/manifest.yaml', yaml)
@@ -428,8 +428,8 @@ describe('instance methods', () => {
       ow.mockResolved('triggers.get', triggerGet)
       ow.mockResolved(owRulesList, ruleslist)
       fs.writeFileSync = jest.fn()
-      command.argv = [ '--projectname', 'proj', '-m', '/deploy/manifest.yaml' ]
-      let yaml = fixtureFile('deploy/export_yaml_Sequence.yaml')
+      command.argv = ['--projectname', 'proj', '-m', '/deploy/manifest.yaml']
+      const yaml = fixtureFile('deploy/export_yaml_Sequence.yaml')
       return command.run()
         .then(() => {
           expect(fs.writeFileSync).toHaveBeenCalledWith('/deploy/manifest.yaml', yaml)
@@ -437,13 +437,13 @@ describe('instance methods', () => {
     })
 
     test('write binary of action to js file', () => {
-      let bufferData = Buffer.from('code', 'base64')
+      const bufferData = Buffer.from('code', 'base64')
       ow.mockResolved('actions.get', actionBinaryGet)
       ow.mockResolved(owTriggerList, triggerlist)
       ow.mockResolved('triggers.get', triggerGet)
       ow.mockResolved(owRulesList, ruleslist)
       fs.writeFileSync = jest.fn()
-      command.argv = [ '--projectname', 'proj', '-m', '/deploy/manifest.yaml' ]
+      command.argv = ['--projectname', 'proj', '-m', '/deploy/manifest.yaml']
       return command.run()
         .then(() => {
           expect(fs.writeFileSync).toHaveBeenCalledWith('/deploy/testSeq/helloAction.zip', bufferData, 'buffer')
@@ -455,8 +455,8 @@ describe('instance methods', () => {
       ow.mockResolved(owTriggerList, '')
       ow.mockResolved(owRulesList, '')
       fs.writeFileSync = jest.fn()
-      command.argv = [ '--projectname', 'proj', '-m', '/deploy/manifest.yaml' ]
-      let yaml = fixtureFile('deploy/export_yaml_noAnnotations.yaml')
+      command.argv = ['--projectname', 'proj', '-m', '/deploy/manifest.yaml']
+      const yaml = fixtureFile('deploy/export_yaml_noAnnotations.yaml')
       return command.run()
         .then(() => {
           expect(fs.writeFileSync).toHaveBeenCalledWith('/deploy/manifest.yaml', yaml)
@@ -468,8 +468,8 @@ describe('instance methods', () => {
       fs.writeFileSync = jest.fn()
       ow.mockResolved(owTriggerList, '')
       ow.mockResolved(owRulesList, '')
-      command.argv = [ '--projectname', 'proj', '-m', '/deploy/manifest.yaml' ]
-      let yaml = fixtureFile('deploy/export_yaml_noAnnotations.yaml')
+      command.argv = ['--projectname', 'proj', '-m', '/deploy/manifest.yaml']
+      const yaml = fixtureFile('deploy/export_yaml_noAnnotations.yaml')
       return command.run()
         .then(() => {
           expect(fs.writeFileSync).toHaveBeenCalledWith('/deploy/manifest.yaml', yaml)
@@ -480,8 +480,8 @@ describe('instance methods', () => {
       ow.mockResolved(owPackageList, '')
       ow.mockResolved(owTriggerList, triggerNoProjectName)
       ow.mockResolved(owRulesList, '')
-      let cmd = ow.mockResolved('triggers.get', '')
-      command.argv = [ '--projectname', 'proj', '-m', '/deploy/manifest.yaml' ]
+      const cmd = ow.mockResolved('triggers.get', '')
+      command.argv = ['--projectname', 'proj', '-m', '/deploy/manifest.yaml']
       return command.run()
         .then(() => {
           expect(cmd).not.toHaveBeenCalled()
@@ -492,8 +492,8 @@ describe('instance methods', () => {
       ow.mockResolved(owPackageList, '')
       ow.mockResolved(owTriggerList, triggerNoAnnotation)
       ow.mockResolved(owRulesList, '')
-      let cmd = ow.mockResolved('triggers.get', '')
-      command.argv = [ '--projectname', 'proj', '-m', '/deploy/manifest.yaml' ]
+      const cmd = ow.mockResolved('triggers.get', '')
+      command.argv = ['--projectname', 'proj', '-m', '/deploy/manifest.yaml']
       return command.run()
         .then(() => {
           expect(cmd).not.toHaveBeenCalled()
@@ -505,8 +505,8 @@ describe('instance methods', () => {
       fs.writeFileSync = jest.fn()
       ow.mockResolved(owTriggerList, '')
       ow.mockResolved(owRulesList, rulesNoAnnotations)
-      command.argv = [ '--projectname', 'proj', '-m', '/deploy/manifest.yaml' ]
-      let yaml = fixtureFile('deploy/export_yaml_noAnnotations.yaml')
+      command.argv = ['--projectname', 'proj', '-m', '/deploy/manifest.yaml']
+      const yaml = fixtureFile('deploy/export_yaml_noAnnotations.yaml')
       return command.run()
         .then(() => {
           expect(fs.writeFileSync).toHaveBeenCalledWith('/deploy/manifest.yaml', yaml)
@@ -515,7 +515,7 @@ describe('instance methods', () => {
 
     test('errors out on api error', (done) => {
       ow.mockRejected(owPackageList, new Error('an error'))
-      command.argv = [ '--projectname', 'proj', '-m', '/deploy/manifest.yaml' ]
+      command.argv = ['--projectname', 'proj', '-m', '/deploy/manifest.yaml']
       return command.run()
         .then(() => done.fail('does not throw error'))
         .catch(() => {

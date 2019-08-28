@@ -54,7 +54,7 @@ describe('instance methods', () => {
     })
 
     test('retrieve an action', () => {
-      let cmd = ow.mockResolvedFixture(owAction, 'action/get.json')
+      const cmd = ow.mockResolvedFixture(owAction, 'action/get.json')
       command.argv = ['hello']
       return command.run()
         .then(() => {
@@ -64,7 +64,7 @@ describe('instance methods', () => {
     })
 
     test('retrieve an action --url with web flags', () => {
-      let cmd = ow.mockResolvedFixture(owAction, 'action/get.json')
+      const cmd = ow.mockResolvedFixture(owAction, 'action/get.json')
       ow.mockResolved('actions.client.options', '')
       ow.actions.client.options = { api: 'api/', namespace: 'namespace' }
       command.argv = ['hello', '--url']
@@ -76,7 +76,7 @@ describe('instance methods', () => {
     })
 
     test('retrieve an action --url with web flags from package', () => {
-      let cmd = ow.mockResolvedFixture(owAction, 'action/get.json')
+      const cmd = ow.mockResolvedFixture(owAction, 'action/get.json')
       ow.mockResolved('actions.client.options', '')
       ow.actions.client.options = { api: 'api/', namespace: 'namespace' }
       command.argv = ['test/hello', '--url']
@@ -88,7 +88,7 @@ describe('instance methods', () => {
     })
 
     test('retrieve an action --url without web flags', () => {
-      let cmd = ow.mockResolvedFixture(owAction, 'action/getWebFalse.json')
+      const cmd = ow.mockResolvedFixture(owAction, 'action/getWebFalse.json')
       ow.mockResolved('actions.client.options', '')
       ow.actions.client.options = { api: 'api/', namespace: 'namespace' }
       command.argv = ['hello', '--url']
@@ -100,7 +100,7 @@ describe('instance methods', () => {
     })
 
     test('retrieve an action --url when annotation array is absent', () => {
-      let cmd = ow.mockResolvedFixture(owAction, 'action/get_NoWebFlag.json')
+      const cmd = ow.mockResolvedFixture(owAction, 'action/get_NoWebFlag.json')
       ow.mockResolved('actions.client.options', '')
       ow.actions.client.options = { api: 'api/', namespace: 'namespace' }
       command.argv = ['hello', '--url']
@@ -112,7 +112,7 @@ describe('instance methods', () => {
     })
 
     test('retrieve an action --json', () => {
-      let cmd = ow.mockResolvedFixture(owAction, 'action/get.json')
+      const cmd = ow.mockResolvedFixture(owAction, 'action/get.json')
       command.argv = ['hello']
       return command.run()
         .then(() => {
@@ -134,11 +134,11 @@ describe('instance methods', () => {
   })
 
   describe('save and save-as flags', () => {
-    let bufferData = Buffer.from('this is the code', 'base64')
+    const bufferData = Buffer.from('this is the code', 'base64')
 
     test('retrieve an action --save', () => {
       fs.writeFileSync = jest.fn()
-      let cmd = ow.mockResolvedFixture(owAction, 'action/get.json')
+      const cmd = ow.mockResolvedFixture(owAction, 'action/get.json')
       command.argv = ['hello', '--save']
       return command.run()
         .then(() => {
@@ -148,7 +148,7 @@ describe('instance methods', () => {
     })
 
     test('retrieve an action --save-as', () => {
-      let cmd = ow.mockResolvedFixture(owAction, 'action/get.json')
+      const cmd = ow.mockResolvedFixture(owAction, 'action/get.json')
       fs.writeFileSync = jest.fn()
       command.argv = ['hello', '--save-as', 'filename.js']
       return command.run()
@@ -159,7 +159,7 @@ describe('instance methods', () => {
     })
 
     test('retrieve an action --save (binary)', () => {
-      let cmd = ow.mockResolvedFixture(owAction, 'action/get.binary.json')
+      const cmd = ow.mockResolvedFixture(owAction, 'action/get.binary.json')
       fs.writeFileSync = jest.fn()
       command.argv = ['hello', '--save']
       return command.run()
@@ -171,7 +171,7 @@ describe('instance methods', () => {
     })
 
     test('retrieve an action --save-as (binary)', () => {
-      let cmd = ow.mockResolvedFixture(owAction, 'action/get.binary.json')
+      const cmd = ow.mockResolvedFixture(owAction, 'action/get.binary.json')
       fs.writeFileSync = jest.fn()
       command.argv = ['hello', '--save-as', 'filename.zip']
       return command.run()

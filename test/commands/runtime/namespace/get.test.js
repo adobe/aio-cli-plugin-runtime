@@ -55,7 +55,7 @@ describe('instance methods', () => {
     test('simple namespace get', (done) => {
       const expectedJson = fixtureJson('namespace/get.json')
       expectedJson.actions[0].publish = true // coverage
-      let cmd = ow.mockResolved(owAction, expectedJson)
+      const cmd = ow.mockResolved(owAction, expectedJson)
 
       ow.mockFn('rules.get')
         .mockImplementationOnce(() => {
@@ -77,7 +77,7 @@ describe('instance methods', () => {
 
     test('simple namespace get, --json flag', (done) => {
       const expectedJson = fixtureJson('namespace/get.json')
-      let cmd = ow.mockResolved(owAction, expectedJson)
+      const cmd = ow.mockResolved(owAction, expectedJson)
 
       ow.mockFn('rules.get')
         .mockImplementationOnce(() => {
@@ -87,7 +87,7 @@ describe('instance methods', () => {
           return fixtureJson('namespace/rule2.json')
         })
 
-      command.argv = [ '--json' ]
+      command.argv = ['--json']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalled()

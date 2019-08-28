@@ -18,7 +18,7 @@ class RouteCreate extends RuntimeBaseCommand {
 
     try {
       const ow = await this.wsk()
-      let options = {
+      const options = {
         basepath: args.basePath,
         relpath: args.relPath,
         operation: args.apiVerb,
@@ -50,7 +50,7 @@ RouteCreate.args = [
     name: 'apiVerb',
     required: true,
     description: 'The http verb',
-    options: [ 'get', 'post', 'put', 'patch', 'delete', 'head', 'options' ]
+    options: ['get', 'post', 'put', 'patch', 'delete', 'head', 'options']
   },
   {
     name: 'action',
@@ -61,7 +61,7 @@ RouteCreate.args = [
 
 RouteCreate.flags = {
   ...RuntimeBaseCommand.flags,
-  'apiname': flags.string({
+  apiname: flags.string({
     char: 'n',
     description: 'Friendly name of the API; ignored when CFG_FILE is specified (default BASE_PATH)'
   }),

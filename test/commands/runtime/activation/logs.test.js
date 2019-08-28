@@ -52,7 +52,7 @@ describe('instance methods', () => {
     })
 
     test('retrieve logs of an activation', () => {
-      let cmd = ow.mockResolved(owAction, '')
+      const cmd = ow.mockResolved(owAction, '')
       command.argv = ['12345']
       return command.run()
         .then(() => {

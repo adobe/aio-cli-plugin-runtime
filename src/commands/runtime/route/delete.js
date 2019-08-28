@@ -19,7 +19,7 @@ class RouteDelete extends RuntimeBaseCommand {
 
     try {
       const ow = await this.wsk()
-      let options = {
+      const options = {
         basepath: args.basePathOrApiName,
         relpath: args.relPath,
         operation: args.apiVerb
@@ -47,7 +47,7 @@ RouteDelete.args = [
     name: 'apiVerb',
     required: false,
     description: 'The http verb',
-    options: [ 'get', 'post', 'put', 'patch', 'delete', 'head', 'options' ]
+    options: ['get', 'post', 'put', 'patch', 'delete', 'head', 'options']
   }
 ]
 

@@ -72,7 +72,7 @@ describe('instance methods', () => {
     })
 
     test('create simple rule', () => {
-      let cmd = ow.mockResolved(owAction, '')
+      const cmd = ow.mockResolved(owAction, '')
       command.argv = ['nameFoo', 'triggerFoo', 'actionFoo']
       return command.run()
         .then(() => {
@@ -86,7 +86,7 @@ describe('instance methods', () => {
     })
 
     test('create simple rule --json', () => {
-      let cmd = ow.mockResolved(owAction, '')
+      const cmd = ow.mockResolved(owAction, '')
       command.argv = ['nameFoo', 'triggerFoo', 'actionFoo', '--json']
       return command.run()
         .then(() => {

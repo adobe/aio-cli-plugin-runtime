@@ -21,6 +21,6 @@ test('exports', async () => {
 })
 
 test('propertiesFile', () => {
-  let properties = TheHelper.propertiesFile()
+  const properties = TheHelper.propertiesFile()
   expect(typeof properties.save).toEqual('function')
 })

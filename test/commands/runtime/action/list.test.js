@@ -32,7 +32,7 @@ test('aliases', async () => {
 })
 
 test('flags', async () => {
-  expect(TheCommand.flags).toMatchObject({ 'limit': { 'char': 'l', 'description': 'only return LIMIT number of actions from the collection (default 30)', 'hidden': false, 'multiple': false, 'required': false }, 'skip': { 'char': 's', 'description': 'exclude the first SKIP number of actions from the result', 'multiple': false, 'required': false } })
+  expect(TheCommand.flags).toMatchObject({ limit: { char: 'l', description: 'only return LIMIT number of actions from the collection (default 30)', hidden: false, multiple: false, required: false }, skip: { char: 's', description: 'exclude the first SKIP number of actions from the result', multiple: false, required: false } })
 })
 
 test('args', async () => {
@@ -53,17 +53,17 @@ describe('instance methods', () => {
     })
 
     test('return list of actions with limits', () => {
-      let cmd = ow.mockResolvedFixture(owAction, 'action/list.json')
+      const cmd = ow.mockResolvedFixture(owAction, 'action/list.json')
       command.argv = ['--limit', '1']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ 'limit': 1 })
+          expect(cmd).toHaveBeenCalledWith({ limit: 1 })
           expect(stdout.output).toMatchFixture('action/list-output.txt')
         })
     })
 
     test('return list of actions', () => {
-      let cmd = ow.mockResolvedFixture(owAction, 'action/list.json')
+      const cmd = ow.mockResolvedFixture(owAction, 'action/list.json')
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalled()
@@ -75,7 +75,7 @@ describe('instance methods', () => {
       const json = fixtureJson('action/list.json')
       json[0].publish = true
 
-      let cmd = ow.mockResolved(owAction, json)
+      const cmd = ow.mockResolved(owAction, json)
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalled()
@@ -84,8 +84,8 @@ describe('instance methods', () => {
     })
 
     test('return list of actions, --json flag', () => {
-      let cmd = ow.mockResolvedFixture(owAction, 'action/list.json')
-      command.argv = [ '--json' ]
+      const cmd = ow.mockResolvedFixture(owAction, 'action/list.json')
+      command.argv = ['--json']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalled()
@@ -94,11 +94,11 @@ describe('instance methods', () => {
     })
 
     test('return list of actions with skip (no actions)', () => {
-      let cmd = ow.mockResolved(owAction, [])
+      const cmd = ow.mockResolved(owAction, [])
       command.argv = ['--skip', '3']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ 'skip': 3 })
+          expect(cmd).toHaveBeenCalledWith({ skip: 3 })
           expect(stdout.output).toMatch('actions                                           ')
         })
     })

@@ -67,19 +67,19 @@ describe('instance methods', () => {
     })
 
     test('return list of rules with limits --json', () => {
-      let cmd = ow.mockResolvedFixture(owAction, 'rule/list.json')
-      let cmd2 = ow.mockResolvedFixture('rules.get', 'rule/get.json')
+      const cmd = ow.mockResolvedFixture(owAction, 'rule/list.json')
+      const cmd2 = ow.mockResolvedFixture('rules.get', 'rule/get.json')
       command.argv = ['--limit', '2', '--json']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ 'limit': 2, 'json': true })
+          expect(cmd).toHaveBeenCalledWith({ limit: 2, json: true })
           expect(cmd2).toHaveBeenCalled()
           expect(stdout.output).toMatchFixture('rule/list.json')
         })
     })
 
     test('return list of rules with no limits --json', () => {
-      let cmd = ow.mockResolvedFixture(owAction, 'rule/list.json')
+      const cmd = ow.mockResolvedFixture(owAction, 'rule/list.json')
       ow.mockResolvedFixture('rules.get', 'rule/get.json')
       command.argv = ['--json']
       return command.run()
@@ -90,41 +90,41 @@ describe('instance methods', () => {
     })
 
     test('return list of rules with skip (no rules) --json', () => {
-      let cmd = ow.mockResolved(owAction, [])
+      const cmd = ow.mockResolved(owAction, [])
       command.argv = ['--skip', '3', '--json']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ 'limit': 30, 'skip': 3, 'json': true })
+          expect(cmd).toHaveBeenCalledWith({ limit: 30, skip: 3, json: true })
           expect(stdout.output).toMatch('[]')
         })
     })
 
     test('return list of rules with limits - tabular', () => {
-      let cmd = ow.mockResolvedFixture(owAction, 'rule/list.json')
-      let cmd2 = ow.mockResolvedFixture('rules.get', 'rule/get.json')
+      const cmd = ow.mockResolvedFixture(owAction, 'rule/list.json')
+      const cmd2 = ow.mockResolvedFixture('rules.get', 'rule/get.json')
       command.argv = ['--limit', '2']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ 'limit': 2 })
+          expect(cmd).toHaveBeenCalledWith({ limit: 2 })
           expect(cmd2).toHaveBeenCalled()
           expect(stdout.output.replace(/\s/g, '')).toMatchFixture('rule/list-output.txt')
         })
     })
 
     test('return list of rules with limits - tabular not-active', () => {
-      let cmd = ow.mockResolvedFixture(owAction, 'rule/list.json')
-      let cmd2 = ow.mockResolvedFixture('rules.get', 'rule/get-public.json')
+      const cmd = ow.mockResolvedFixture(owAction, 'rule/list.json')
+      const cmd2 = ow.mockResolvedFixture('rules.get', 'rule/get-public.json')
       command.argv = ['--limit', '2']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ 'limit': 2 })
+          expect(cmd).toHaveBeenCalledWith({ limit: 2 })
           expect(cmd2).toHaveBeenCalled()
           expect(stdout.output.replace(/\s/g, '')).toMatchFixture('rule/list-output-public.txt')
         })
     })
 
     test('return list of rules with no limits --json - tabular not-active', () => {
-      let cmd = ow.mockResolvedFixture(owAction, 'rule/list.json')
+      const cmd = ow.mockResolvedFixture(owAction, 'rule/list.json')
       ow.mockResolvedFixture('rules.get', 'rule/get-public.json')
       command.argv = ['--json']
       return command.run()

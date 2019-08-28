@@ -60,7 +60,7 @@ describe('instance methods', () => {
 
     test('error, throws exception', (done) => {
       ow.mockRejected(owAction, new Error('an error'))
-      command.argv = [ '/myapi' ]
+      command.argv = ['/myapi']
       return command.run()
         .then(() => done.fail('should not succeed'))
         .catch(() => {
@@ -70,8 +70,8 @@ describe('instance methods', () => {
     })
 
     test('simple get call', () => {
-      let cmd = ow.mockResolvedFixture(owAction, 'route/get.json')
-      command.argv = [ '/myapi' ]
+      const cmd = ow.mockResolvedFixture(owAction, 'route/get.json')
+      command.argv = ['/myapi']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalledWith({ basepath: '/myapi' })

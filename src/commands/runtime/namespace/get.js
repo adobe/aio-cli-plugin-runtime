@@ -85,7 +85,7 @@ class NamespaceGet extends RuntimeBaseCommand {
 
 NamespaceGet.flags = {
   ...RuntimeBaseCommand.flags,
-  'json': flags.boolean({
+  json: flags.boolean({
     description: 'output raw json'
   })
 }
@@ -97,6 +97,6 @@ NamespaceGet.aliases = [
   'runtime:list',
   'rt:list',
   'runtime:ls',
-  'rt:ls' ]
+  'rt:ls']
 
 module.exports = NamespaceGet

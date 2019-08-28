@@ -17,11 +17,11 @@ class TriggerGet extends RuntimeBaseCommand {
   async run () {
     const { args } = this.parse(TriggerGet)
     const triggerPath = args.triggerPath
-    let [ , namespace, name ] = parsePathPattern(triggerPath)
+    const [, namespace, name] = parsePathPattern(triggerPath)
 
     try {
       const ow = await this.wsk()
-      let obj = { namespace, name }
+      const obj = { namespace, name }
       const result = await ow.triggers.get(obj)
       this.logJSON('', result)
     } catch (err) {

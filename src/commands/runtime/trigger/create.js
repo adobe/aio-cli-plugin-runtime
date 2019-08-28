@@ -38,7 +38,7 @@ class TriggerCreate extends RuntimeBaseCommand {
 
       // triggerParams.parameters is expected to be passed as an array of key value pairs
       // For example : [{key : 'Your key 1' , value: 'Your value 1'}, {key : 'Your key 2' , value: 'Your value 2'} ]
-      let triggerParams = {}
+      const triggerParams = {}
       if (triggerPackage.length) {
         triggerParams.parameters = triggerPackage
       }
@@ -46,7 +46,7 @@ class TriggerCreate extends RuntimeBaseCommand {
         triggerParams.annotations = annotationParams
       }
 
-      let options = {
+      const options = {
         name: args.triggerName,
         trigger: triggerParams
       }
@@ -69,7 +69,7 @@ TriggerCreate.args = [
 
 TriggerCreate.flags = {
   ...RuntimeBaseCommand.flags,
-  'param': flags.string({
+  param: flags.string({
     char: 'p',
     description: 'parameter values in KEY VALUE format', // help description for flag
     hidden: false, // hide from help
@@ -83,7 +83,7 @@ TriggerCreate.flags = {
     multiple: false, // allow setting this flag multiple times
     required: false
   }),
-  'annotation': flags.string({
+  annotation: flags.string({
     char: 'a',
     description: 'annotation values in KEY VALUE format', // help description for flag
     hidden: false, // hide from help

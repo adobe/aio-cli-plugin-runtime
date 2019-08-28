@@ -68,7 +68,7 @@ global.fakeFileSystem = {
   removeKeys: (arr) => {
     // remove from existing
     const files = ffs.files()
-    for (let prop in files) {
+    for (const prop in files) {
       if (arr.includes(prop)) {
         delete files[prop]
       }
@@ -99,7 +99,8 @@ global.createTestBaseFlagsFunction = (TheCommand, BaseCommand) => {
 global.createTestFlagsFunction = (TheCommand, Flags) => {
   return () => {
     // every command needs to override .flags (for global flags)
-    expect(TheCommand.hasOwnProperty('flags')).toBeTruthy()
+    // eslint: see https://eslint.org/docs/rules/no-prototype-builtins
+    expect(Object.prototype.hasOwnProperty.call(TheCommand, 'flags')).toBeTruthy()
 
     const flagsKeys = Object.keys(Flags)
     const theCommandFlagKeys = Object.keys(TheCommand.flags)
@@ -112,7 +113,7 @@ global.createTestFlagsFunction = (TheCommand, Flags) => {
 // fixture matcher
 expect.extend({
   toMatchFixture (received, argument) {
-    let val = fixtureFile(argument)
+    const val = fixtureFile(argument)
     expect(eol.auto(received)).toEqual(eol.auto(val))
     return { pass: true }
   }
@@ -120,7 +121,7 @@ expect.extend({
 
 expect.extend({
   toMatchFixtureJson (received, argument) {
-    let val = fixtureJson(argument)
+    const val = fixtureJson(argument)
     expect(received).toEqual(val)
     return { pass: true }
   }

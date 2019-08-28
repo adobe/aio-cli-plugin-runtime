@@ -20,9 +20,9 @@ class RuleList extends RuntimeBaseCommand {
       const ow = await this.wsk()
       const RuleListObject = { ...flags }
       const result = await ow.rules.list(RuleListObject)
-      let p = Promise.all(
+      const p = Promise.all(
         result.map(item => {
-          let res = ow.rules.get(item.name)
+          const res = ow.rules.get(item.name)
           res.then((result) => {
             item.status = result.status
           })
@@ -76,7 +76,7 @@ RuleList.flags = {
     hidden: false,
     required: false
   }),
-  'json': flags.boolean({
+  json: flags.boolean({
     description: 'output raw json'
   })
 }

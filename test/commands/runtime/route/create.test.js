@@ -46,7 +46,7 @@ test('args', async () => {
 
   expect(args[2].name).toEqual('apiVerb')
   expect(args[2].required).toBeTruthy()
-  expect(args[2].options).toMatchObject([ 'get', 'post', 'put', 'patch', 'delete', 'head', 'options' ])
+  expect(args[2].options).toMatchObject(['get', 'post', 'put', 'patch', 'delete', 'head', 'options'])
   expect(args[2].description).toBeDefined()
 
   expect(args[3].name).toEqual('action')
@@ -89,7 +89,7 @@ describe('instance methods', () => {
     test('create a simple api, no flags', () => {
       const basepath = '/mybase'
       const relpath = '/myapi'
-      let cmd = ow.mockResolved(owAction, { gwApiUrl: `http://myserver${basepath}` })
+      const cmd = ow.mockResolved(owAction, { gwApiUrl: `http://myserver${basepath}` })
       command.argv = ['/mybase', '/myapi', 'get', 'myaction']
       return command.run()
         .then(() => {
@@ -107,7 +107,7 @@ describe('instance methods', () => {
     test('create a simple api with --response-type and --apiname flags', () => {
       const basepath = '/mybase'
       const relpath = '/myapi'
-      let cmd = ow.mockResolved(owAction, { gwApiUrl: `http://myserver${basepath}` })
+      const cmd = ow.mockResolved(owAction, { gwApiUrl: `http://myserver${basepath}` })
       command.argv = ['/mybase', '/myapi', 'get', 'myaction', '--response-type', 'text', '--apiname', 'MyApiName']
       return command.run()
         .then(() => {

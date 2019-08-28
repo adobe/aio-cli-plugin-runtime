@@ -11,8 +11,8 @@ governing permissions and limitations under the License.
 */
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
-let fs = require('fs')
-let yaml = require('js-yaml')
+const fs = require('fs')
+const yaml = require('js-yaml')
 const { setManifestPath, deleteEntities } = require('../../../runtime-helpers')
 const { flags } = require('@oclif/command')
 
@@ -31,18 +31,18 @@ class DeployUndeploy extends RuntimeBaseCommand {
       } else {
         manifestPath = flags.manifest
       }
-      let manifest = yaml.safeLoad(fs.readFileSync(manifestPath, 'utf8'))
+      const manifest = yaml.safeLoad(fs.readFileSync(manifestPath, 'utf8'))
       let packages
       if (manifest.project) {
         packages = manifest.project.packages
       } else {
         packages = manifest.packages
       }
-      let pkg = []
-      let actions = []
-      let triggers = []
-      let rules = []
-      let apis = []
+      const pkg = []
+      const actions = []
+      const triggers = []
+      const rules = []
+      const apis = []
       Object.keys(packages).forEach((key) => {
         pkg.push(key)
         if (packages[key]['dependencies']) {
@@ -74,7 +74,7 @@ class DeployUndeploy extends RuntimeBaseCommand {
         }
         if (packages[key]['apis']) {
           Object.keys(packages[key]['apis']).forEach((api) => {
-            let firstProp = (obj) => Object.keys(obj)[0]
+            const firstProp = (obj) => Object.keys(obj)[0]
             let basepath = firstProp(packages[key]['apis'][api])
             basepath = '/' + basepath
             apis.push(basepath)
@@ -83,28 +83,28 @@ class DeployUndeploy extends RuntimeBaseCommand {
       })
 
       const ow = await this.wsk()
-      for (let action of actions) {
+      for (const action of actions) {
         this.log(`Info: Undeploying action [${action}]...`)
         await ow.actions.delete(action)
         this.log(`Info: action [${action}] has been successfully undeployed.\n`)
       }
-      for (let trigger of triggers) {
+      for (const trigger of triggers) {
         this.log(`Info: Undeploying trigger [${trigger}]...`)
         await ow.triggers.delete(trigger)
         this.log(`Info: trigger [${trigger}] has been successfully undeployed.\n`)
       }
-      for (let rule of rules) {
+      for (const rule of rules) {
         this.log(`Info: Undeploying rule [${rule}]...`)
         await ow.rules.delete(rule)
         this.log(`Info: rule [${rule}] has been successfully undeployed.\n`)
       }
-      for (let api of apis) {
+      for (const api of apis) {
         this.log(`Info: Undeploying api [${api.name}]...`)
         await ow.routes.delete(api)
         this.log(`Info: api [${api.name}] has been successfully undeployed.\n`)
       }
-      for (let packg of pkg) {
-        let options = {}
+      for (const packg of pkg) {
+        const options = {}
         options.name = packg
         this.log(`Info: Undeploying package [${packg}]...`)
         await ow.packages.delete(options)
@@ -119,12 +119,12 @@ class DeployUndeploy extends RuntimeBaseCommand {
 
 DeployUndeploy.flags = {
   ...RuntimeBaseCommand.flags,
-  'manifest': flags.string({
+  manifest: flags.string({
     char: 'm',
     description: 'the manifest file location', // help description for flag
     required: false
   }),
-  'projectname': flags.string({
+  projectname: flags.string({
     description: 'the name of the project to be undeployed', // help description for flag
     required: false
   })

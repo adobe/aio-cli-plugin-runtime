@@ -17,11 +17,11 @@ class TriggerDelete extends RuntimeBaseCommand {
   async run () {
     const { args } = this.parse(TriggerDelete)
     const triggerPath = args.triggerPath
-    let [ , namespace, name ] = parsePathPattern(triggerPath)
+    const [, namespace, name] = parsePathPattern(triggerPath)
 
     try {
       const ow = await this.wsk()
-      let obj = { namespace, name }
+      const obj = { namespace, name }
       await ow.triggers.delete(obj)
     } catch (err) {
       this.handleError(`Unable to delete trigger '${triggerPath}'`, err)

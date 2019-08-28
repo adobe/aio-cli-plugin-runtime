@@ -20,10 +20,10 @@ class IndexCommand extends RuntimeBaseCommand {
 
     try {
       // in case of 'aio runtime:deploy' (without the path to the manifest file) the program looks for the manifest file in the current directory.
-      let components = setPaths(flags)
-      let packages = components.packages
-      let deploymentTriggers = components.deploymentTriggers
-      let deploymentPackages = components.deploymentPackages
+      const components = setPaths(flags)
+      const packages = components.packages
+      const deploymentTriggers = components.deploymentTriggers
+      const deploymentPackages = components.deploymentPackages
       let params = {}
       if (flags.param) {
         params = createKeyValueObjectFromFlag(flags.param)
@@ -31,9 +31,9 @@ class IndexCommand extends RuntimeBaseCommand {
         params = createKeyValueObjectFromFile(flags['param-file'])
       }
 
-      let entities = processPackage(packages, deploymentPackages, deploymentTriggers, params)
+      const entities = processPackage(packages, deploymentPackages, deploymentTriggers, params)
       const ow = await this.wsk()
-      let logger = this.log
+      const logger = this.log
       await deployPackage(entities, ow, logger)
     } catch (err) {
       this.handleError('Failed to deploy', err)
@@ -43,18 +43,18 @@ class IndexCommand extends RuntimeBaseCommand {
 
 IndexCommand.flags = {
   ...RuntimeBaseCommand.flags,
-  'manifest': flags.string({
+  manifest: flags.string({
     char: 'm',
     description: 'the manifest file location', // help description for flag
     hidden: false, // hide from help
     multiple: false, // allow setting this flag multiple times
     required: false
   }),
-  'deployment': flags.string({
+  deployment: flags.string({
     char: 'd',
     description: 'the path to the deployment file'
   }),
-  'param': flags.string({
+  param: flags.string({
     description: 'parameter values in KEY VALUE format', // help description for flag
     hidden: false, // hide from help
     multiple: true, // allow setting this flag multiple times

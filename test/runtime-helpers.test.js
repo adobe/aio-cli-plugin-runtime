@@ -46,11 +46,11 @@ describe('createKeyValueArrayFromFlag', () => {
     }
   })
   test('array of key:value (string) pairs', () => {
-    let res = TheHelper.createKeyValueArrayFromFlag(['name1', 'val1', 'name2', 'val2'])
+    const res = TheHelper.createKeyValueArrayFromFlag(['name1', 'val1', 'name2', 'val2'])
     expect(res).toMatchObject([{ key: 'name1', value: 'val1' }, { key: 'name2', value: 'val2' }])
   })
   test('array of key:value (object) pairs', () => {
-    let res = TheHelper.createKeyValueArrayFromFlag(['name1', '["val0","val1"]', 'name2', 'val2'])
+    const res = TheHelper.createKeyValueArrayFromFlag(['name1', '["val0","val1"]', 'name2', 'val2'])
     expect(typeof res[0].value).toEqual('object')
     expect(res).toMatchObject([{ key: 'name1', value: ['val0', 'val1'] }, { key: 'name2', value: 'val2' }])
   })
@@ -67,19 +67,19 @@ describe('createKeyValueObjectFromFlag', () => {
     }
   })
   test('array of key:value (string) pairs', () => {
-    let res = TheHelper.createKeyValueObjectFromFlag(['name1', 'val1', 'name2', 'val2'])
-    expect(res).toMatchObject({ 'name1': 'val1', 'name2': 'val2' })
+    const res = TheHelper.createKeyValueObjectFromFlag(['name1', 'val1', 'name2', 'val2'])
+    expect(res).toMatchObject({ name1: 'val1', name2: 'val2' })
   })
   test('array of key:value (object) pairs', () => {
-    let res = TheHelper.createKeyValueObjectFromFlag(['name1', '["val0","val1"]', 'name2', 'val2'])
+    const res = TheHelper.createKeyValueObjectFromFlag(['name1', '["val0","val1"]', 'name2', 'val2'])
     expect(typeof res).toEqual('object')
-    expect(res).toMatchObject({ 'name1': ['val0', 'val1'], 'name2': 'val2' })
+    expect(res).toMatchObject({ name1: ['val0', 'val1'], name2: 'val2' })
   })
 })
 
 describe('createKeyValueArrayFromFile', () => {
   test('array of key:value pairs', () => {
-    let res = TheHelper.createKeyValueArrayFromFile('/file.json')
+    const res = TheHelper.createKeyValueArrayFromFile('/file.json')
     expect(typeof res).toEqual('object')
     expect(res).toMatchObject([{ key: 'param1', value: 'param1value' }, { key: 'param2', value: 'param2value' }])
   })
@@ -87,7 +87,7 @@ describe('createKeyValueArrayFromFile', () => {
 
 describe('createKeyValueObjectFromFile', () => {
   test('object with key:value pairs', () => {
-    let res = TheHelper.createKeyValueObjectFromFile('/file.json')
+    const res = TheHelper.createKeyValueObjectFromFile('/file.json')
     expect(typeof res).toEqual('object')
     expect(res).toMatchObject({ param1: 'param1value', param2: 'param2value' })
   })
@@ -96,14 +96,14 @@ describe('createKeyValueObjectFromFile', () => {
 describe('parsePathPattern', () => {
   // expect(Vishal)toWriteThis()
   test('test with namespace and name in path', () => {
-    let [ , namespace, name ] = TheHelper.parsePathPattern('/53444_28782/name1')
+    const [, namespace, name] = TheHelper.parsePathPattern('/53444_28782/name1')
     expect(typeof namespace).toEqual('string')
     expect(namespace).toEqual('53444_28782')
     expect(typeof name).toEqual('string')
     expect(name).toEqual('name1')
   })
   test('test with only name in path', () => {
-    let [ , namespace, name ] = TheHelper.parsePathPattern('name1')
+    const [, namespace, name] = TheHelper.parsePathPattern('name1')
     expect(namespace).toEqual(null)
     expect(typeof name).toEqual('string')
     expect(name).toEqual('name1')

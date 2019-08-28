@@ -17,7 +17,7 @@ class PackageGet extends RuntimeBaseCommand {
     const { args } = this.parse(PackageGet)
     try {
       const ow = await this.wsk()
-      let options = {}
+      const options = {}
       options['name'] = args.packageName
       const result = await ow.packages.get(options)
       this.logJSON('', result)

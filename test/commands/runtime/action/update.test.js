@@ -115,45 +115,45 @@ describe('instance methods', () => {
   })
 
   describe('run', () => {
-    let jsFile = fixtureFile('action/actionFile.js')
+    const jsFile = fixtureFile('action/actionFile.js')
     ow.mockResolved('actions.client.options', '')
     test('exists', async () => {
       expect(command.run).toBeInstanceOf(Function)
     })
 
     test('updates an action with action name and action path', () => {
-      let cmd = ow.mockResolved(owAction, '')
+      const cmd = ow.mockResolved(owAction, '')
       command.argv = ['hello', '/action/actionFile.js']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ 'name': 'hello', 'action': jsFile, 'annotations': {}, 'limits': {}, 'params': {} })
+          expect(cmd).toHaveBeenCalledWith({ name: 'hello', action: jsFile, annotations: {}, limits: {}, params: {} })
           expect(stdout.output).toMatch('')
         })
     })
 
     test('updates an action with action name and action path --json', () => {
-      let cmd = ow.mockResolved(owAction, '')
+      const cmd = ow.mockResolved(owAction, '')
       command.argv = ['hello', '/action/actionFile.js', '--json']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ 'name': 'hello', 'action': jsFile, 'annotations': {}, 'limits': {}, 'params': {} })
+          expect(cmd).toHaveBeenCalledWith({ name: 'hello', action: jsFile, annotations: {}, limits: {}, params: {} })
           expect(stdout.output).toMatch('')
         })
     })
 
     test('updates an action with action name and action path to zip file', () => {
-      let zipFile = Buffer.from('fakezipfile')
-      let cmd = ow.mockResolved(owAction, '')
+      const zipFile = Buffer.from('fakezipfile')
+      const cmd = ow.mockResolved(owAction, '')
       command.argv = ['hello', '/action/zipAction.zip', '--kind', 'nodejs:10']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ 'name': 'hello', 'action': zipFile, 'annotations': {}, kind: 'nodejs:10', 'limits': {}, 'params': {} })
+          expect(cmd).toHaveBeenCalledWith({ name: 'hello', action: zipFile, annotations: {}, kind: 'nodejs:10', limits: {}, params: {} })
           expect(stdout.output).toMatch('')
         })
     })
 
     test('updates an action with action name, action path and --param flag', () => {
-      let cmd = ow.mockResolved(owAction, '')
+      const cmd = ow.mockResolved(owAction, '')
       command.argv = ['hello', '/action/actionFile.js', '--param', 'a', 'b', '--param', 'c', 'd']
       return command.run()
         .then(() => {
@@ -169,20 +169,20 @@ describe('instance methods', () => {
     })
 
     test('updates an action with action name and --sequence flag', () => {
-      let cmd = ow.mockResolved(owAction, '')
+      const cmd = ow.mockResolved(owAction, '')
       ow.actions.client.options = { namespace: 'ns' }
       command.argv = ['hello', '--sequence', 'a,b,c']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalledWith({
-            'name': 'hello',
-            'action': '',
-            'annotations': {},
-            'limits': {},
-            'params': {},
+            name: 'hello',
+            action: '',
+            annotations: {},
+            limits: {},
+            params: {},
             exec: {
               kind: 'sequence',
-              components: [ '/ns/a', '/ns/b', '/ns/c' ]
+              components: ['/ns/a', '/ns/b', '/ns/c']
             }
           })
           expect(stdout.output).toMatch('')
@@ -190,13 +190,13 @@ describe('instance methods', () => {
     })
 
     test('updates an action with --main flag', () => {
-      let cmd = ow.mockResolved(owAction, '')
+      const cmd = ow.mockResolved(owAction, '')
       command.argv = ['hello', '/action/actionFile.js', '--main', 'maynard']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalledWith({
             name: 'hello',
-            exec: { 'main': 'maynard' },
+            exec: { main: 'maynard' },
             params: {},
             action: jsFile,
             annotations: {},
@@ -207,7 +207,7 @@ describe('instance methods', () => {
     })
 
     test('update an action with --main flag and --sequence', () => {
-      let cmd = ow.mockResolved(owAction, '')
+      const cmd = ow.mockResolved(owAction, '')
       command.argv = ['hello', '/action/actionFile.js', '--main', 'maynard', '--sequence', 'a,b,c']
       return command.run()
         .then(() => {
@@ -216,7 +216,7 @@ describe('instance methods', () => {
             exec: {
               main: 'maynard',
               kind: 'sequence',
-              components: [ '/ns/a', '/ns/b', '/ns/c' ]
+              components: ['/ns/a', '/ns/b', '/ns/c']
             },
             params: {},
             action: jsFile,
@@ -228,7 +228,7 @@ describe('instance methods', () => {
     })
 
     test('updates an action with action name, action path and --param-file flag', () => {
-      let cmd = ow.mockResolved(owAction, '')
+      const cmd = ow.mockResolved(owAction, '')
       command.argv = ['hello', '/action/actionFile.js', '--param-file', '/action/parameters.json']
       return command.run()
         .then(() => {
@@ -244,7 +244,7 @@ describe('instance methods', () => {
     })
 
     test('updates an action with action name, action path, --params flag and limits', () => {
-      let cmd = ow.mockResolved(owAction, '')
+      const cmd = ow.mockResolved(owAction, '')
       command.argv = ['hello', '/action/actionFile.js', '--param', 'a', 'b', '--param', 'c', 'd', '--logsize', '8', '--memory', '128', '--timeout', '20000']
       return command.run()
         .then(() => {
@@ -254,9 +254,9 @@ describe('instance methods', () => {
             action: jsFile,
             annotations: {},
             limits: {
-              'logs': 8,
-              'memory': 128,
-              'timeout': 20000
+              logs: 8,
+              memory: 128,
+              timeout: 20000
             }
           })
           expect(stdout.output).toMatch('')
@@ -264,7 +264,7 @@ describe('instance methods', () => {
     })
 
     test('updates an action with action name, action path, --params flag and limits with shorter flag version', () => {
-      let cmd = ow.mockResolved(owAction, '')
+      const cmd = ow.mockResolved(owAction, '')
       command.argv = ['hello', '/action/actionFile.js', '-p', 'a', 'b', '-p', 'c', 'd', '-l', '8', '-m', '128', '-t', '20000']
       return command.run()
         .then(() => {
@@ -274,9 +274,9 @@ describe('instance methods', () => {
             action: jsFile,
             annotations: {},
             limits: {
-              'logs': 8,
-              'memory': 128,
-              'timeout': 20000
+              logs: 8,
+              memory: 128,
+              timeout: 20000
             }
           })
           expect(stdout.output).toMatch('')
@@ -284,7 +284,7 @@ describe('instance methods', () => {
     })
 
     test('updates an action with action name, action path, --params flag ,limits and kind ', () => {
-      let cmd = ow.mockResolved(owAction, '')
+      const cmd = ow.mockResolved(owAction, '')
       command.argv = ['hello', '/action/actionFile.js', '--param', 'a', 'b', '--param', 'c', 'd', '--logsize', '8', '--memory', '128', '--kind', 'nodejs:default']
       return command.run()
         .then(() => {
@@ -295,8 +295,8 @@ describe('instance methods', () => {
             annotations: {},
             kind: 'nodejs:default',
             limits: {
-              'logs': 8,
-              'memory': 128
+              logs: 8,
+              memory: 128
             }
           })
           expect(stdout.output).toMatch('')
@@ -304,7 +304,7 @@ describe('instance methods', () => {
     })
 
     test('updates an action with action name, action path, --params flag and annotation flag ', () => {
-      let cmd = ow.mockResolved(owAction, '')
+      const cmd = ow.mockResolved(owAction, '')
       command.argv = ['hello', '/action/actionFile.js', '--param', 'a', 'b', '--param', 'c', 'd', '--annotation', 'desc', 'Description']
       return command.run()
         .then(() => {
@@ -322,7 +322,7 @@ describe('instance methods', () => {
     })
 
     test('updates an action with action name, action path, --params flag and annotation-file flag ', () => {
-      let cmd = ow.mockResolved(owAction, '')
+      const cmd = ow.mockResolved(owAction, '')
       command.argv = ['hello', '/action/actionFile.js', '-p', 'a', 'b', '-p', 'c', 'd', '-A', '/action/parameters.json']
       return command.run()
         .then(() => {
@@ -341,7 +341,7 @@ describe('instance methods', () => {
     })
 
     test('updates an action with action name, action path, --params flag and web flag as raw ', () => {
-      let cmd = ow.mockResolved(owAction, '')
+      const cmd = ow.mockResolved(owAction, '')
       command.argv = ['hello', '/action/actionFile.js', '-p', 'a', 'b', '-p', 'c', 'd', '--web', 'raw']
       return command.run()
         .then(() => {
@@ -360,7 +360,7 @@ describe('instance methods', () => {
     })
 
     test('updates an action with action name, action path, --params flag and web flag as false ', () => {
-      let cmd = ow.mockResolved(owAction, '')
+      const cmd = ow.mockResolved(owAction, '')
       command.argv = ['hello', '/action/actionFile.js', '-p', 'a', 'b', '-p', 'c', 'd', '--web', 'false']
       return command.run()
         .then(() => {
@@ -378,7 +378,7 @@ describe('instance methods', () => {
     })
 
     test('updates an action with action name, action path, --params flag, annotations and web flag as true ', () => {
-      let cmd = ow.mockResolved(owAction, '')
+      const cmd = ow.mockResolved(owAction, '')
       command.argv = ['hello', '/action/actionFile.js', '-p', 'a', 'b', '-p', 'c', 'd', '-a', 'desc', 'Description', '--web', 'true']
       return command.run()
         .then(() => {

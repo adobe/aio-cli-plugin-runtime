@@ -73,47 +73,47 @@ describe('instance methods', () => {
     })
 
     test('return list of activations with limits', () => {
-      let cmd = ow.mockResolved(owAction, '')
+      const cmd = ow.mockResolved(owAction, '')
       command.argv = ['--limit', '3']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ 'limit': 3 })
+          expect(cmd).toHaveBeenCalledWith({ limit: 3 })
           expect(stdout.output).toMatch('')
         })
     })
 
     test('return list of activations with skip', () => {
-      let cmd = ow.mockResolved(owAction, '')
+      const cmd = ow.mockResolved(owAction, '')
       command.argv = ['--skip', '3']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ 'skip': 3 })
+          expect(cmd).toHaveBeenCalledWith({ skip: 3 })
           expect(stdout.output).toMatch('')
         })
     })
 
     test('return list of activations with --since', () => {
-      let cmd = ow.mockResolved(owAction, '')
+      const cmd = ow.mockResolved(owAction, '')
       command.argv = ['--since', '3']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ 'since': 3 })
+          expect(cmd).toHaveBeenCalledWith({ since: 3 })
           expect(stdout.output).toMatch('')
         })
     })
 
     test('return list of activations with --upto', () => {
-      let cmd = ow.mockResolved(owAction, '')
+      const cmd = ow.mockResolved(owAction, '')
       command.argv = ['--upto', '3']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ 'upto': 3 })
+          expect(cmd).toHaveBeenCalledWith({ upto: 3 })
           expect(stdout.output).toMatch('')
         })
     })
 
     test('return list of actions with activation id', () => {
-      let cmd = ow.mockResolved(owAction, '')
+      const cmd = ow.mockResolved(owAction, '')
       command.argv = ['12345']
       return command.run()
         .then(() => {
@@ -123,7 +123,7 @@ describe('instance methods', () => {
     })
 
     test('return list of actions with activation id, --full flag', () => {
-      let cmd = ow.mockResolved(owAction, '')
+      const cmd = ow.mockResolved(owAction, '')
       command.argv = ['12345', '--full']
       return command.run()
         .then(() => {
@@ -133,7 +133,7 @@ describe('instance methods', () => {
     })
 
     test('return list of actions with activation id --json', () => {
-      let cmd = ow.mockResolved(owAction, '')
+      const cmd = ow.mockResolved(owAction, '')
       command.argv = ['12345', '--json']
       return command.run()
         .then(() => {
@@ -145,20 +145,20 @@ describe('instance methods', () => {
     test('return list of actions with activation id + data (cold)', () => {
       const data = [
         {
-          'activationId': '12345',
-          'annotations': [
-            { 'key': 'path', 'value': '8888_9999/foo' },
-            { 'key': 'kind', 'value': 'nodejs:10' },
-            { 'key': 'initTime', 'value': 20 }
+          activationId: '12345',
+          annotations: [
+            { key: 'path', value: '8888_9999/foo' },
+            { key: 'kind', value: 'nodejs:10' },
+            { key: 'initTime', value: 20 }
           ],
-          'duration': 23,
-          'name': 'foo',
-          'namespace': '8888_9999',
-          'start': 1558507178861,
-          'statusCode': 0,
-          'version': '0.0.1'
+          duration: 23,
+          name: 'foo',
+          namespace: '8888_9999',
+          start: 1558507178861,
+          statusCode: 0,
+          version: '0.0.1'
         }]
-      let cmd = ow.mockResolved(owAction, data)
+      const cmd = ow.mockResolved(owAction, data)
       command.argv = ['12345']
       return command.run()
         .then(() => {
@@ -170,20 +170,20 @@ describe('instance methods', () => {
     test('return list of actions with activation id + data (warm)', () => {
       const data = [
         {
-          'activationId': '12345',
-          'annotations': [
-            { 'key': 'path', 'value': '8888_9999/foo' },
-            { 'key': 'kind', 'value': 'nodejs:10' }
+          activationId: '12345',
+          annotations: [
+            { key: 'path', value: '8888_9999/foo' },
+            { key: 'kind', value: 'nodejs:10' }
           // no initTime key
           ],
-          'duration': 23,
-          'name': 'foo',
-          'namespace': '8888_9999',
-          'start': 1558507178861,
-          'statusCode': 0,
-          'version': '0.0.1'
+          duration: 23,
+          name: 'foo',
+          namespace: '8888_9999',
+          start: 1558507178861,
+          statusCode: 0,
+          version: '0.0.1'
         }]
-      let cmd = ow.mockResolved(owAction, data)
+      const cmd = ow.mockResolved(owAction, data)
       command.argv = ['12345']
       return command.run()
         .then(() => {

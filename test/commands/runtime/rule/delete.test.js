@@ -64,7 +64,7 @@ describe('instance methods', () => {
     })
 
     test('delete simple rule', () => {
-      let cmd = ow.mockResolved(owAction, '')
+      const cmd = ow.mockResolved(owAction, '')
       command.argv = ['nameFoo']
       return command.run()
         .then(() => {

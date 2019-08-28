@@ -13,7 +13,7 @@ governing permissions and limitations under the License.
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 const { flags } = require('@oclif/command')
 const fs = require('fs')
-let yaml = require('js-yaml')
+const yaml = require('js-yaml')
 const path = require('path')
 
 class DeployExport extends RuntimeBaseCommand {
@@ -21,11 +21,11 @@ class DeployExport extends RuntimeBaseCommand {
     const { flags } = this.parse(DeployExport)
     try {
       const ow = await this.wsk()
-      let projectEntities = await findProjectEntities(ow, flags.projectname)
-      let manifest = flags.manifest
-      let fileDirectory = path.dirname(manifest)
-      let projectJSON = await createProjectJSON(projectEntities, flags.projectname, ow, fileDirectory)
-      let yamlObject = { project: projectJSON }
+      const projectEntities = await findProjectEntities(ow, flags.projectname)
+      const manifest = flags.manifest
+      const fileDirectory = path.dirname(manifest)
+      const projectJSON = await createProjectJSON(projectEntities, flags.projectname, ow, fileDirectory)
+      const yamlObject = { project: projectJSON }
       fs.writeFileSync(manifest, yaml.safeDump(yamlObject))
     } catch (err) {
       this.handleError('Failed to export', err)
@@ -34,34 +34,34 @@ class DeployExport extends RuntimeBaseCommand {
 }
 
 async function findProjectEntities (ow, projectName) {
-  let packages = []
-  let actions = []
-  let triggers = []
-  let rules = []
+  const packages = []
+  const actions = []
+  const triggers = []
+  const rules = []
 
-  let options = {}
-  let resultSync = await ow.packages.list(options)
-  for (let pkg of resultSync) {
+  const options = {}
+  const resultSync = await ow.packages.list(options)
+  for (const pkg of resultSync) {
     if (pkg.annotations.length > 0) {
-      let whiskManaged = pkg.annotations.find(elem => elem.key === 'whisk-managed')
+      const whiskManaged = pkg.annotations.find(elem => elem.key === 'whisk-managed')
       if (whiskManaged !== undefined && whiskManaged.value.projectName === projectName) {
         packages.push(pkg)
       }
     }
   }
 
-  for (let pkg of packages) {
-    let getPackage = await ow.packages.get(pkg)
-    for (let action of getPackage.actions) {
-      let actionName = `${getPackage.name}/${action.name}`
+  for (const pkg of packages) {
+    const getPackage = await ow.packages.get(pkg)
+    for (const action of getPackage.actions) {
+      const actionName = `${getPackage.name}/${action.name}`
       actions.push(actionName)
     }
   }
 
-  let resultTriggerList = await ow.triggers.list()
-  for (let trigger of resultTriggerList) {
+  const resultTriggerList = await ow.triggers.list()
+  for (const trigger of resultTriggerList) {
     if (trigger.annotations.length > 0) {
-      let whiskManaged = trigger.annotations.find(elem => elem.key === 'whisk-managed')
+      const whiskManaged = trigger.annotations.find(elem => elem.key === 'whisk-managed')
       if (whiskManaged !== undefined && whiskManaged.value.projectName === projectName) {
         triggers.push(trigger.name)
       }
@@ -69,17 +69,17 @@ async function findProjectEntities (ow, projectName) {
   }
 
   // if no trigger exists with the projectName -> look in rules
-  let resultRules = await ow.rules.list()
-  for (let rule of resultRules) {
+  const resultRules = await ow.rules.list()
+  for (const rule of resultRules) {
     if (rule.annotations.length > 0) {
-      let whiskManaged = rule.annotations.find(elem => elem.key === 'whisk-managed')
+      const whiskManaged = rule.annotations.find(elem => elem.key === 'whisk-managed')
       if (whiskManaged !== undefined && whiskManaged.value.projectName === projectName) {
         rules.push(rule)
       }
     }
   }
 
-  let entities = {
+  const entities = {
     packages: packages,
     actions: actions,
     triggers: triggers,
@@ -88,9 +88,9 @@ async function findProjectEntities (ow, projectName) {
   return entities
 }
 async function createProjectJSON (entities, projectname, ow, fileDirectory) {
-  let project = { name: projectname, packages: {} }
-  for (let pkg of entities.packages) {
-    let annotations = returninputsfromKeyValue(pkg.annotations)
+  const project = { name: projectname, packages: {} }
+  for (const pkg of entities.packages) {
+    const annotations = returninputsfromKeyValue(pkg.annotations)
     project['packages'][pkg.name] = {
       version: pkg.version,
       namespace: pkg.namespace,
@@ -102,19 +102,19 @@ async function createProjectJSON (entities, projectname, ow, fileDirectory) {
     }
   }
 
-  let filesObject = []
+  const filesObject = []
   let packageName
-  for (let action of entities.actions) {
-    let getAction = await ow.actions.get(action)
+  for (const action of entities.actions) {
+    const getAction = await ow.actions.get(action)
     packageName = getAction.namespace.split('/').pop()
-    let actionName = getAction.name
+    const actionName = getAction.name
     if (getAction.exec.kind !== 'sequence') {
-      let binaryFlag = getAction.exec.binary || false
+      const binaryFlag = getAction.exec.binary || false
       let functionValue = `${action}.js`
       if (binaryFlag) {
         functionValue = `${action}.zip`
       }
-      let limits = {
+      const limits = {
         timeout: getAction.limits.timeout,
         memorySize: getAction.limits.memory,
         logSize: getAction.limits.logs
@@ -129,7 +129,7 @@ async function createProjectJSON (entities, projectname, ow, fileDirectory) {
         main: getAction.exec.main || '',
         limits: limits
       }
-      let obj = { name: functionValue, code: getAction.exec.code }
+      const obj = { name: functionValue, code: getAction.exec.code }
       filesObject.push(obj)
     } else {
       let sequenceString = ''
@@ -143,8 +143,8 @@ async function createProjectJSON (entities, projectname, ow, fileDirectory) {
     }
   }
 
-  for (let trigger of entities.triggers) {
-    let getTrigger = await ow.triggers.get(trigger)
+  for (const trigger of entities.triggers) {
+    const getTrigger = await ow.triggers.get(trigger)
     project['packages'][packageName]['triggers'][trigger] = {
       namespace: getTrigger.namespace,
       inputs: returninputsfromKeyValue(getTrigger.parameters),
@@ -152,7 +152,7 @@ async function createProjectJSON (entities, projectname, ow, fileDirectory) {
     }
   }
 
-  for (let rule of entities.rules) {
+  for (const rule of entities.rules) {
     project['packages'][packageName]['rules'][rule.name] = {
       action: rule.action.name,
       annotations: returninputsfromKeyValue(rule.annotations),
@@ -164,9 +164,9 @@ async function createProjectJSON (entities, projectname, ow, fileDirectory) {
 }
 
 function writeFiles (fileObj, fileDirectory) {
-  for (let file of fileObj) {
-    let packageName = path.dirname(file.name)
-    let fileDirectorywithPackage = `${fileDirectory}/${packageName}`
+  for (const file of fileObj) {
+    const packageName = path.dirname(file.name)
+    const fileDirectorywithPackage = `${fileDirectory}/${packageName}`
     if (!fs.existsSync(fileDirectorywithPackage)) {
       fs.mkdirSync(fileDirectorywithPackage, { recursive: true })
     }
@@ -181,8 +181,8 @@ function writeFiles (fileObj, fileDirectory) {
 }
 
 function returninputsfromKeyValue (inputs) {
-  let inputObj = {}
-  for (let input of inputs) {
+  const inputObj = {}
+  for (const input of inputs) {
     // whisk managed annotation not exported to yaml file
     if (input.key !== 'whisk-managed') {
       inputObj[input.key] = input.value
@@ -193,13 +193,13 @@ function returninputsfromKeyValue (inputs) {
 
 DeployExport.flags = {
   ...RuntimeBaseCommand.flags,
-  'manifest': flags.string({
+  manifest: flags.string({
     char: 'm',
     description: 'the manifest file location', // help description for flag
     required: true
   }),
 
-  'projectname': flags.string({
+  projectname: flags.string({
     description: 'the name of the project to be undeployed', // help description for flag
     required: true
   })

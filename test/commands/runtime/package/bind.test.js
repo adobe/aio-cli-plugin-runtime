@@ -85,7 +85,7 @@ describe('instance methods', () => {
 
     test('binds a package with package name param flag', () => {
       ow.mockResolved('packages.get', { namespace: 'ns' })
-      let cmd = ow.mockResolved(owAction, '')
+      const cmd = ow.mockResolved(owAction, '')
       command.argv = ['packageName', 'bindPackageName', '--param', 'a', 'b', '--param', 'c', 'd']
       return command.run()
         .then(() => {
@@ -115,7 +115,7 @@ describe('instance methods', () => {
 
     test('binds a package with package name param flag --json', () => {
       ow.mockResolved('packages.get', { namespace: 'ns' })
-      let cmd = ow.mockResolved(owAction, '')
+      const cmd = ow.mockResolved(owAction, '')
       command.argv = ['packageName', 'bindPackageName', '--param', 'a', 'b', '--param', 'c', 'd', '--json']
       return command.run()
         .then(() => {
@@ -145,7 +145,7 @@ describe('instance methods', () => {
 
     test('binds a package with only packageName and bindPackageName', () => {
       ow.mockResolved('packages.get', { namespace: 'ns' })
-      let cmd = ow.mockResolved(owAction, '')
+      const cmd = ow.mockResolved(owAction, '')
       command.argv = ['packageName', 'bindpackageName']
       return command.run()
         .then(() => {
@@ -172,7 +172,7 @@ describe('instance methods', () => {
         '/action': json
       })
       ow.mockResolved('packages.get', { namespace: 'ns' })
-      let cmd = ow.mockResolved(owAction, '')
+      const cmd = ow.mockResolved(owAction, '')
       command.argv = ['packageName', 'bindPackageName', '--param-file', '/action/parameters.json']
       return command.run()
         .then(() => {
@@ -207,7 +207,7 @@ describe('instance methods', () => {
       fakeFileSystem.addJson({
         '/action': json
       })
-      let cmd = ow.mockResolved(owAction, '')
+      const cmd = ow.mockResolved(owAction, '')
       command.argv = ['packageName', 'bindPackageName', '--annotation-file', '/action/parameters.json']
       return command.run()
         .then(() => {
@@ -236,7 +236,7 @@ describe('instance methods', () => {
     })
 
     test('binds a package with packageName, bindPackageName and annotation and param flags', () => {
-      let cmd = ow.mockResolved(owAction, '')
+      const cmd = ow.mockResolved(owAction, '')
       command.argv = ['packageName', 'bindPackageName', '--annotation', 'a', 'b', '--annotation', 'c', 'd', '--param', 'p1', 'p2']
       return command.run()
         .then(() => {
@@ -270,7 +270,7 @@ describe('instance methods', () => {
     })
 
     test('binds a package with packageName, bindPackageName and annotation and param flags with shorter flag version', () => {
-      let cmd = ow.mockResolved(owAction, '')
+      const cmd = ow.mockResolved(owAction, '')
       command.argv = ['packageName', 'bindPackageName', '-a', 'a', 'b', '-a', 'c', 'd', '-p', 'p1', 'p2']
       return command.run()
         .then(() => {

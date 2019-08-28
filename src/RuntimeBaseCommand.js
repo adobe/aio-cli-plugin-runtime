@@ -114,7 +114,7 @@ RuntimeBaseCommand.propertyFlags = ({ asBoolean = false } = {}) => {
     apihost: { description: 'whisk API host', env: PropertyEnv.APIHOST },
     auth: { char: 'u', description: 'whisk auth', env: PropertyEnv.AUTH }
   }
-  let newData = {}
+  const newData = {}
 
   Object
     .keys(propData)
