@@ -53,6 +53,12 @@ class RuntimeBaseCommand extends Command {
       throw new Error('An AUTH key must be specified')
     }
 
+    // .env var is given priority, then the flag, which has a default value
+    // of aio-cli-plugin-runtime@VERSION
+    if (!process.env['__OW_USER_AGENT']) {
+      process.env['__OW_USER_AGENT'] = flags.useragent
+    }
+
     return OpenWhisk(options)
   }
 
@@ -130,7 +136,12 @@ RuntimeBaseCommand.flags = {
   debug: flags.string({ description: 'Debug level output' }),
   verbose: flags.boolean({ char: 'v', description: 'Verbose output' }),
   version: flags.boolean({ description: 'Show version' }),
-  help: flags.boolean({ description: 'Show help' })
+  help: flags.boolean({ description: 'Show help' }),
+  useragent: flags.string({
+    hidden: true,
+    description: 'Use custom user-agent string',
+    default: 'aio-cli-plugin-runtime@' + require('../package.json').version
+  })
 }
 
 module.exports = RuntimeBaseCommand
