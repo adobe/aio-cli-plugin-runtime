@@ -14,7 +14,7 @@
     "js-yaml": "^3.13.1",
     "node-fetch": "^2.3.0",
     "openwhisk": "^3.19.0",
-    "properties-reader": "0.2.0",
+    "properties-reader": "0.3.0",
     "sha1": "^1.1.1"
   },
   "devDependencies": {
