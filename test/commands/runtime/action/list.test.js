@@ -16,27 +16,43 @@ const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
 const ow = require('openwhisk')()
 const owAction = 'actions.list'
 
-test('exports', async () => {
-  expect(typeof TheCommand).toEqual('function')
-  expect(TheCommand.prototype instanceof RuntimeBaseCommand).toBeTruthy()
-})
+describe('List command meta', () => {
+  test('exports', async () => {
+    expect(typeof TheCommand).toEqual('function')
+    expect(TheCommand.prototype instanceof RuntimeBaseCommand).toBeTruthy()
+  })
 
-test('description', async () => {
-  expect(TheCommand.description).toBeDefined()
-})
+  test('description', async () => {
+    expect(TheCommand.description).toBeDefined()
+  })
 
-test('aliases', async () => {
-  expect(TheCommand.aliases).toBeDefined()
-  expect(TheCommand.aliases).toBeInstanceOf(Array)
-  expect(TheCommand.aliases.length).toBeGreaterThan(0)
-})
+  test('aliases', async () => {
+    expect(TheCommand.aliases).toBeDefined()
+    expect(TheCommand.aliases).toBeInstanceOf(Array)
+    expect(TheCommand.aliases.length).toBeGreaterThan(0)
+  })
 
-test('flags', async () => {
-  expect(TheCommand.flags).toMatchObject({ limit: { char: 'l', description: 'only return LIMIT number of actions from the collection (default 30)', hidden: false, multiple: false, required: false }, skip: { char: 's', description: 'exclude the first SKIP number of actions from the result', multiple: false, required: false } })
-})
+  test('flags', async () => {
+    expect(TheCommand.flags).toMatchObject({
+      limit: {
+        char: 'l',
+        description: expect.any(String),
+        hidden: false,
+        multiple: false,
+        required: false
+      },
+      skip: {
+        char: 's',
+        description: expect.any(String),
+        multiple: false,
+        required: false
+      }
+    })
+  })
 
-test('args', async () => {
-  expect(TheCommand.args).toBeUndefined()
+  test('args', async () => {
+    expect(TheCommand.args).toBeUndefined()
+  })
 })
 
 describe('instance methods', () => {
@@ -57,7 +73,7 @@ describe('instance methods', () => {
       command.argv = ['--limit', '1']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ limit: 1 })
+          expect(cmd).toHaveBeenCalledWith(expect.objectContaining({ limit: 1 }))
           expect(stdout.output).toMatchFixture('action/list-output.txt')
         })
     })
@@ -98,8 +114,8 @@ describe('instance methods', () => {
       command.argv = ['--skip', '3']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ skip: 3 })
-          expect(stdout.output).toMatch('actions                                           ')
+          expect(cmd).toHaveBeenCalledWith(expect.objectContaining({ skip: 3 }))
+          expect(stdout.output).toMatch('actions')
         })
     })
 

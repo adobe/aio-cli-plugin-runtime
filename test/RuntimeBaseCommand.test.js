@@ -34,7 +34,8 @@ test('aliases', async () => {
 })
 
 test('flags', async () => {
-  expect(Object.keys(TheCommand.flags)).toEqual(['cert', 'key', 'apiversion', 'apihost', 'auth', 'insecure', 'debug', 'verbose', 'version', 'help'])
+  expect(Object.keys(TheCommand.flags)).toEqual(expect.arrayContaining(
+    ['cert', 'key', 'apiversion', 'apihost', 'auth', 'insecure', 'debug', 'verbose', 'version', 'help', 'useragent']))
 })
 
 test('args', async () => {
