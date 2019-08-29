@@ -114,7 +114,7 @@ describe('instance methods', () => {
       command.argv = ['--skip', '3']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ skip: 3, useragent: expect.any(String) })
+          expect(cmd).toHaveBeenCalledWith(expect.objectContaining({ skip: 3 }))
           expect(stdout.output).toMatch('actions')
         })
     })
