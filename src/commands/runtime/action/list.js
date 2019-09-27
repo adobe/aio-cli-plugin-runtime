@@ -20,10 +20,10 @@ class ActionList extends RuntimeBaseCommand {
     try {
       const ow = await this.wsk()
       const result = await ow.actions.list(flags)
-      if (flags.namesort) {
-        result.sort(function(a, b){
-          if (a.namespace == b.namespace) {
-            return (a.name == b.name) ? 0 : ((a.name > b.name) ? 1 : -1)
+      if (flags['name-sort'] || flags.name) {
+        result.sort(function (a, b) {
+          if (a.namespace === b.namespace) {
+            return (a.name === b.name) ? 0 : ((a.name > b.name) ? 1 : -1)
           } else {
             return (a.namespace > b.namespace) ? 1 : -1
           }
@@ -75,8 +75,16 @@ ActionList.flags = {
   json: flags.boolean({
     description: 'output raw json'
   }),
-  namesort: flags.boolean({
-    description: 'name sort'
+  'name-sort': flags.boolean({
+    description: 'sort results by namespace & name',
+    multiple: false, // allow setting this flag multiple times
+    required: false // not mandatory
+  }),
+  name: flags.boolean({
+    char: 'n',
+    description: 'sort results by namespace & name',
+    multiple: false, // allow setting this flag multiple times
+    required: false // not mandatory
   })
 }
 
