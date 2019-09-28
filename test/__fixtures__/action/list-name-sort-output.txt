@@ -1,7 +1,5 @@
 actions                                                             
-/53444_70360/b-hello                              private nodejs:10 
 /53444_70361/a-hello                              private nodejs:10 
 /53444_70361/b-hello                              private nodejs:10 
 /53444_70361/b-hello                              private nodejs:10 
 /53444_70361/c-hello                              private nodejs:10 
-/53444_70362/a-hello                              private nodejs:10 
