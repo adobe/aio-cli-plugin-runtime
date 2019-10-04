@@ -23,14 +23,15 @@ class ActivationLogs extends RuntimeBaseCommand {
       const ax = await ow.activations.list({ limit: 1, skip: 0 })
       id = ax[0].activationId
     }
-
     if (!id) {
-      this.error('Missing 1 required arg: `activationID`')
+      this.error('Missing required arg: `activationID`')
     }
 
     try {
       const result = await ow.activations.logs(id)
-      result.logs.forEach(elem => { this.log(elem) })
+      if (result.logs) {
+        result.logs.forEach(elem => { this.log(elem) })
+      }
     } catch (err) {
       this.handleError('failed to retrieve the logs', err)
     }
