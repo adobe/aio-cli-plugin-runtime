@@ -20,6 +20,9 @@ class ActionList extends RuntimeBaseCommand {
     try {
       const ow = await this.wsk()
       const result = await ow.actions.list(flags)
+      if (flags['name-sort'] || flags.name) {
+        result.sort((a, b) => a.name.localeCompare(b.name))
+      }
       if (flags.json) {
         this.logJSON('', result)
       } else {
@@ -65,6 +68,17 @@ ActionList.flags = {
   }),
   json: flags.boolean({
     description: 'output raw json'
+  }),
+  'name-sort': flags.boolean({
+    description: 'sort results by name',
+    multiple: false, // allow setting this flag multiple times
+    required: false // not mandatory
+  }),
+  name: flags.boolean({
+    char: 'n',
+    description: 'sort results by name',
+    multiple: false, // allow setting this flag multiple times
+    required: false // not mandatory
   })
 }
 
