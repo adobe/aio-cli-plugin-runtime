@@ -10,16 +10,28 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
+const { flags } = require('@oclif/command')
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 
 class ActivationLogs extends RuntimeBaseCommand {
   async run () {
-    const { args } = this.parse(ActivationLogs)
-    const id = args.activationID
+    const { args, flags } = this.parse(ActivationLogs)
+    let id = args.activationID // note: could be null, but we wait to check
+    const ow = await this.wsk()
+
+    if (flags.last) {
+      const ax = await ow.activations.list({ limit: 1, skip: 0 })
+      id = ax[0].activationId
+    }
+    if (!id) {
+      this.error('Missing required arg: `activationID`')
+    }
+
     try {
-      const ow = await this.wsk()
       const result = await ow.activations.logs(id)
-      this.logJSON('', result)
+      if (result.logs) {
+        result.logs.forEach(elem => { this.log(elem) })
+      }
     } catch (err) {
       this.handleError('failed to retrieve the logs', err)
     }
@@ -29,16 +41,28 @@ class ActivationLogs extends RuntimeBaseCommand {
 ActivationLogs.args = [
   {
     name: 'activationID',
-    required: true
+    required: false
   }
 ]
+
+ActivationLogs.flags = {
+  ...RuntimeBaseCommand.flags,
+  last: flags.boolean({
+    char: 'l',
+    description: 'retrieves the most recent activation log'
+  })
+}
 
 ActivationLogs.description = 'Retrieves the Logs for an Activation'
 
 ActivationLogs.aliases = [
   'runtime:activation:log',
+  'runtime:log',
+  'runtime:logs',
   'rt:activation:logs',
-  'rt:activation:log'
+  'rt:activation:log',
+  'rt:log',
+  'rt:logs'
 ]
 
 module.exports = ActivationLogs

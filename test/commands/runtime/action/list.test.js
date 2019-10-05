@@ -128,5 +128,15 @@ describe('instance methods', () => {
           done()
         })
     })
+
+    test('return list of actions, --name-sort flag', () => {
+      const cmd = ow.mockResolvedFixture(owAction, 'action/list-name-sort.json')
+      command.argv = ['--name']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalled()
+          expect(stdout.output).toMatchFixture('action/list-name-sort-output.txt')
+        })
+    })
   })
 })
