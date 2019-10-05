@@ -1,0 +1,5 @@
+triggers                                                  
+/53444_70361/a-hello                              private 
+/53444_70361/b-hello                              private 
+/53444_70361/b-hello                              private 
+/53444_70361/c-hello                              private 

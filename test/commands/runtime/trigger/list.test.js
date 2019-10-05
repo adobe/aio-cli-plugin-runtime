@@ -130,5 +130,14 @@ describe('instance methods', () => {
           done()
         })
     })
+    test('return list of triggers, --name-sort flag', () => {
+      const cmd = ow.mockResolvedFixture(owAction, 'trigger/list-name-sort.json')
+      command.argv = ['--name']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalled()
+          expect(stdout.output).toMatchFixture('trigger/list-name-sort-output.txt')
+        })
+    })
   })
 })
