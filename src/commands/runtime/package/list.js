@@ -30,6 +30,9 @@ class PackageList extends RuntimeBaseCommand {
         options['limit'] = flags.limit
       }
       const result = await ow.packages.list(options)
+      if (flags['name-sort'] || flags.name) {
+        result.sort((a, b) => a.name.localeCompare(b.name))
+      }
       if (flags.json) {
         this.logJSON('', result)
       } else {
@@ -71,6 +74,17 @@ PackageList.flags = {
   }),
   json: flags.boolean({
     description: 'output raw json'
+  }),
+  'name-sort': flags.boolean({
+    description: 'sort results by name',
+    multiple: false, // allow setting this flag multiple times
+    required: false // not mandatory
+  }),
+  name: flags.boolean({
+    char: 'n',
+    description: 'sort results by name',
+    multiple: false, // allow setting this flag multiple times
+    required: false // not mandatory
   })
 }
 
