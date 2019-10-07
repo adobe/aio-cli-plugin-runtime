@@ -17,7 +17,7 @@ const createDebug = require('debug')
 const debug = createDebug('aio-cli-plugin-runtime')
 const http = require('http')
 const OpenWhisk = require('openwhisk')
-const config = require('@adobe/aio-cna-core-config')
+const config = require('@adobe/aio-lib-core-config')
 
 class RuntimeBaseCommand extends Command {
   async wsk () {
