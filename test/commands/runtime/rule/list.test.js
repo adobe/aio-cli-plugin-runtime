@@ -133,6 +133,16 @@ describe('instance methods', () => {
           expect(stdout.output).toMatchFixture('rule/list-public.json')
         })
     })
+    test('return list of rules, --name-sort flag', () => {
+      const cmd = ow.mockResolvedFixture(owAction, 'rule/list-name-sort.json')
+      ow.mockResolvedFixtureMulitValue('rules.get', 'rule/get-name-sort.json')
+      command.argv = ['--name']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalled()
+          expect(stdout.output).toMatchFixture('rule/list-name-sort-output.txt')
+        })
+    })
 
     // test('return the number of rules with count flag', () => {
     //   let cmd = ow.mockResolved(owAction, '2')
