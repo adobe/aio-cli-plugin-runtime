@@ -20,6 +20,9 @@ class RuleList extends RuntimeBaseCommand {
       const ow = await this.wsk()
       const RuleListObject = { ...flags }
       const result = await ow.rules.list(RuleListObject)
+      if (flags['name-sort'] || flags.name) {
+        result.sort((a, b) => a.name.localeCompare(b.name))
+      }
       const p = Promise.all(
         result.map(item => {
           const res = ow.rules.get(item.name)
@@ -78,6 +81,17 @@ RuleList.flags = {
   }),
   json: flags.boolean({
     description: 'output raw json'
+  }),
+  'name-sort': flags.boolean({
+    description: 'sort results by name',
+    multiple: false, // allow setting this flag multiple times
+    required: false // not mandatory
+  }),
+  name: flags.boolean({
+    char: 'n',
+    description: 'sort results by name',
+    multiple: false, // allow setting this flag multiple times
+    required: false // not mandatory
   })
 }
 

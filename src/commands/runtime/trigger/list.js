@@ -28,6 +28,9 @@ class TriggerList extends RuntimeBaseCommand {
       }
 
       const result = await ow.triggers.list(options)
+      if (flags['name-sort'] || flags.name) {
+        result.sort((a, b) => a.name.localeCompare(b.name))
+      }
 
       if (flags.json) {
         this.logJSON('', result)
@@ -64,6 +67,17 @@ TriggerList.flags = {
   }),
   json: flags.boolean({
     description: 'output raw json'
+  }),
+  'name-sort': flags.boolean({
+    description: 'sort results by name',
+    multiple: false, // allow setting this flag multiple times
+    required: false // not mandatory
+  }),
+  name: flags.boolean({
+    char: 'n',
+    description: 'sort results by name',
+    multiple: false, // allow setting this flag multiple times
+    required: false // not mandatory
   })
 }
 

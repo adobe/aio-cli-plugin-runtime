@@ -133,5 +133,14 @@ describe('instance methods', () => {
           done()
         })
     })
+    test('return list of packages, --name-sort flag', () => {
+      const cmd = ow.mockResolvedFixture(owAction, 'package/list-name-sort.json')
+      command.argv = ['--name-sort']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalled()
+          expect(stdout.output).toMatchFixture('package/list-name-sort-output.txt')
+        })
+    })
   })
 })
