@@ -79,8 +79,8 @@ class DeployUndeploy extends RuntimeBaseCommand {
             objectAPI.name = api
             objectAPI.basepath = firstProp(packages[key]['apis'][api])
             objectAPI.relpath = firstProp(packages[key]['apis'][api][objectAPI.basepath])
-            objectAPI['relpath'] = '/' + objectAPI['relpath']
-            objectAPI['basepath'] = '/' + objectAPI['basepath']
+            objectAPI.relpath = '/' + objectAPI.relpath
+            objectAPI.basepath = '/' + objectAPI.basepath
             apis.push(objectAPI)
           })
         }
