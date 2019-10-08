@@ -266,7 +266,8 @@ describe('instance methods', () => {
       command.argv = ['-m', '/deploy/api_manifest.yaml']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalled()
+          expect(cmd).toHaveBeenCalledWith(expect.objectContaining({ name: 'hello-world', basepath: '/hello', relpath: '/world' }))
+          expect(cmd).toHaveBeenCalledWith(expect.objectContaining({ name: 'goodbye-world', basepath: '/hello', relpath: '/world' }))
           expect(stdout.output).toMatch('')
         })
     })
