@@ -104,7 +104,7 @@ class DeployUndeploy extends RuntimeBaseCommand {
       }
       for (const api of apis) {
         this.log(`Info: Undeploying api [${api.name}]...`)
-        await ow.routes.delete(api)
+        await ow.routes.delete({ basepath: api.basepath, relpath: api.relpath }) // cannot use name + basepath
         this.log(`Info: api [${api.name}] has been successfully undeployed.\n`)
       }
       for (const packg of pkg) {
