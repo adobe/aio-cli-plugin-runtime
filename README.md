@@ -36,7 +36,7 @@ $ npm install -g @adobe/aio-cli-plugin-runtime
 $ ./bin/run COMMAND
 running command...
 $ ./bin/run (-v|--version|version)
-@adobe/aio-cli-plugin-runtime/1.1.0 darwin-x64 node-v10.16.1
+@adobe/aio-cli-plugin-runtime/1.1.0 darwin-x64 node-v8.11.3
 $ ./bin/run --help [COMMAND]
 USAGE
   $ ./bin/run COMMAND
@@ -751,6 +751,7 @@ USAGE
 
 OPTIONS
   -i, --insecure           bypass certificate check
+  -n, --name               sort results by name
   -u, --auth=auth          whisk auth
   -v, --verbose            Verbose output
   --apihost=apihost        whisk API host
@@ -760,6 +761,7 @@ OPTIONS
   --help                   Show help
   --json                   output raw json
   --key=key                client key
+  --name-sort              sort results by name
   --version                Show version
 
 ALIASES
@@ -958,6 +960,7 @@ USAGE
 OPTIONS
   -i, --insecure           bypass certificate check
   -l, --limit=limit        only return LIMIT number of packages from the collection (default 30)
+  -n, --name               sort results by name
   -s, --skip=skip          exclude the first SKIP number of packages from the result
   -u, --auth=auth          whisk auth
   -v, --verbose            Verbose output
@@ -968,6 +971,7 @@ OPTIONS
   --help                   Show help
   --json                   output raw json
   --key=key                client key
+  --name-sort              sort results by name
   --version                Show version
 
 ALIASES
@@ -1498,6 +1502,7 @@ USAGE
 OPTIONS
   -i, --insecure     bypass certificate check
   -l, --limit=limit  [default: 30] Limit number of rules returned. Default 30
+  -n, --name         sort results by name
   -s, --skip=skip    Skip number of rules returned
   -u, --auth         whisk auth
   -v, --verbose      Verbose output
@@ -1508,6 +1513,7 @@ OPTIONS
   --help             Show help
   --json             output raw json
   --key              client key
+  --name-sort        sort results by name
   --version          Show version
 
 ALIASES
@@ -1738,6 +1744,7 @@ USAGE
 OPTIONS
   -i, --insecure     bypass certificate check
   -l, --limit=limit  [default: 30] only return LIMIT number of triggers from the collection (default 30)
+  -n, --name         sort results by name
   -s, --skip=skip    exclude the first SKIP number of triggers from the result
   -u, --auth         whisk auth
   -v, --verbose      Verbose output
@@ -1748,6 +1755,7 @@ OPTIONS
   --help             Show help
   --json             output raw json
   --key              client key
+  --name-sort        sort results by name
   --version          Show version
 
 ALIASES
