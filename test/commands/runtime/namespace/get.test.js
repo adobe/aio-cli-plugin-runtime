@@ -14,6 +14,7 @@ const TheCommand = require('../../../../src/commands/runtime/namespace/get.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
 const ow = require('openwhisk')()
 const { stdout } = require('stdout-stderr')
+
 const owAction = 'namespaces.get'
 
 test('exports', async () => {
@@ -68,8 +69,7 @@ describe('instance methods', () => {
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalled()
-          // todo: rewrite the following so it does not fail when different consoles
-          // truncate text in different spots.
+          // todo: now skip testing formatted output which can vary
           // expect(stdout.output).toMatchFixture('namespace/get.txt')
           done()
         })
@@ -124,7 +124,8 @@ describe('instance methods', () => {
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalled()
-          // todo: rewrite as above reason
+          // todo: skip testing formatted output which can vary
+          // todo: expect(eol.auto(received).replace(/\s/g, '')).toEqual(eol.auto(val).replace(/\s/g, ''))
           // expect(stdout.output).toMatchFixture('namespace/get-name-sort.txt')
           done()
         })

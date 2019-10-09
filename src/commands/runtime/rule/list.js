@@ -83,15 +83,11 @@ RuleList.flags = {
     description: 'output raw json'
   }),
   'name-sort': flags.boolean({
-    description: 'sort results by name',
-    multiple: false, // allow setting this flag multiple times
-    required: false // not mandatory
+    description: 'sort results by name'
   }),
   name: flags.boolean({
     char: 'n',
-    description: 'sort results by name',
-    multiple: false, // allow setting this flag multiple times
-    required: false // not mandatory
+    description: 'sort results by name'
   })
 }
 
