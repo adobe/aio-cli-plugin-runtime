@@ -14,6 +14,7 @@ const TheCommand = require('../../../../src/commands/runtime/namespace/get.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
 const ow = require('openwhisk')()
 const { stdout } = require('stdout-stderr')
+
 const owAction = 'namespaces.get'
 
 test('exports', async () => {
@@ -68,8 +69,7 @@ describe('instance methods', () => {
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalled()
-          // todo: rewrite the following so it does not fail when different consoles
-          // truncate text in different spots.
+          // todo: now skip testing formatted output which can vary
           // expect(stdout.output).toMatchFixture('namespace/get.txt')
           done()
         })
@@ -106,6 +106,27 @@ describe('instance methods', () => {
         .then(() => done.fail('does not throw error'))
         .catch(() => {
           expect(handleError).toHaveBeenLastCalledWith('failed to get the data for a namespace', new Error('an error'))
+          done()
+        })
+    })
+
+    test('return list of actions, --name-sort flag', (done) => {
+      const expectedJson = fixtureJson('namespace/get-name-sort.json')
+      const cmd = ow.mockResolved(owAction, expectedJson)
+      ow.mockFn('rules.get')
+        .mockImplementationOnce(() => {
+          return fixtureJson('namespace/rule1.json')
+        })
+        .mockImplementationOnce(() => {
+          return fixtureJson('namespace/rule2.json')
+        })
+      command.argv = ['--name']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalled()
+          // todo: skip testing formatted output which can vary
+          // todo: expect(eol.auto(received).replace(/\s/g, '')).toEqual(eol.auto(val).replace(/\s/g, ''))
+          // expect(stdout.output).toMatchFixture('namespace/get-name-sort.txt')
           done()
         })
     })
