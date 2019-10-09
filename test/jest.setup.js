@@ -119,6 +119,20 @@ expect.extend({
   }
 })
 
+// clean trailing whitespace which will vary with different terminal settings
+function cleanWhite (input) {
+  return eol.split(input).map(line => { return line.trim() }).join(eol.auto)
+}
+
+expect.extend({
+  toMatchFixtureIgnoreWhite (received, argument) {
+    const val = cleanWhite(fixtureFile(argument))
+    // eat white
+    expect(cleanWhite(received)).toEqual(val)
+    return { pass: true }
+  }
+})
+
 expect.extend({
   toMatchFixtureJson (received, argument) {
     const val = fixtureJson(argument)

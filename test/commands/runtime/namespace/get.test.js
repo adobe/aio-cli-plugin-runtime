@@ -69,8 +69,7 @@ describe('instance methods', () => {
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalled()
-          // todo: now skip testing formatted output which can vary
-          // expect(stdout.output).toMatchFixture('namespace/get.txt')
+          expect(stdout.output).toMatchFixtureIgnoreWhite('namespace/get.txt')
           done()
         })
     })
@@ -124,9 +123,7 @@ describe('instance methods', () => {
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalled()
-          // todo: skip testing formatted output which can vary
-          // todo: expect(eol.auto(received).replace(/\s/g, '')).toEqual(eol.auto(val).replace(/\s/g, ''))
-          // expect(stdout.output).toMatchFixture('namespace/get-name-sort.txt')
+          expect(stdout.output).toMatchFixtureIgnoreWhite('namespace/get-name-sort.txt')
           done()
         })
     })
