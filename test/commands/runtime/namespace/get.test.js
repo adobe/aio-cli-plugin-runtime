@@ -109,5 +109,24 @@ describe('instance methods', () => {
           done()
         })
     })
+
+    test('return list of actions, --name-sort flag', (done) => {
+      const expectedJson = fixtureJson('namespace/get-name-sort.json')
+      const cmd = ow.mockResolved(owAction, expectedJson)
+      ow.mockFn('rules.get')
+        .mockImplementationOnce(() => {
+          return fixtureJson('namespace/rule1.json')
+        })
+        .mockImplementationOnce(() => {
+          return fixtureJson('namespace/rule2.json')
+        })
+      command.argv = ['--name']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalled()
+          expect(stdout.output).toMatchFixture('namespace/get-name-sort.txt')
+          done()
+        })
+    })
   })
 })
