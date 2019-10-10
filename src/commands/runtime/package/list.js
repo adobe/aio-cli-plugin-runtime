@@ -44,6 +44,7 @@ class PackageList extends RuntimeBaseCommand {
           },
           published: {
             header: '',
+            minWidth: 7,
             get: row => `${row.publish === false ? 'private' : 'public'}`
           }
         }

@@ -25,6 +25,7 @@ function createColumns (columnName) {
     published: {
       header: '',
       'no-truncate': true,
+      minWidth: 7,
       get: row => `${row.publish === false ? 'private' : 'public'}`
     },
     exec: {
