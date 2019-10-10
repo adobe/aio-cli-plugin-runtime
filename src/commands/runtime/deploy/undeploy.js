@@ -75,13 +75,12 @@ class DeployUndeploy extends RuntimeBaseCommand {
         if (packages[key]['apis']) {
           Object.keys(packages[key]['apis']).forEach((api) => {
             const firstProp = (obj) => Object.keys(obj)[0]
-            const objectAPI = {}
-            objectAPI.name = api
-            objectAPI.basepath = firstProp(packages[key]['apis'][api])
-            objectAPI.relpath = firstProp(packages[key]['apis'][api][objectAPI.basepath])
-            objectAPI.relpath = '/' + objectAPI.relpath
-            objectAPI.basepath = '/' + objectAPI.basepath
-            apis.push(objectAPI)
+            const basepathProp = firstProp(packages[key]['apis'][api])
+            apis.push({
+              name: api,
+              basepath: '/' + basepathProp,
+              relpath: '/' + firstProp(packages[key]['apis'][api][basepathProp])
+            })
           })
         }
       })
