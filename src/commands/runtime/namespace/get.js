@@ -25,6 +25,7 @@ function createColumns (columnName) {
     published: {
       header: '',
       'no-truncate': true,
+      minWidth: 8,
       get: row => `${row.publish === false ? 'private' : 'public'}`
     },
     exec: {
@@ -66,7 +67,12 @@ class NamespaceGet extends RuntimeBaseCommand {
       const ow = await this.wsk()
       const data = await ow.namespaces.get()
       data.rules = await getRulesWithStatus(ow, data.rules)
-
+      if (flags['name-sort'] || flags.name) {
+        data.rules.sort((a, b) => a.name.localeCompare(b.name))
+        data.actions.sort((a, b) => a.name.localeCompare(b.name))
+        data.packages.sort((a, b) => a.name.localeCompare(b.name))
+        data.triggers.sort((a, b) => a.name.localeCompare(b.name))
+      }
       if (flags.json) {
         this.logJSON('', data)
       } else {
@@ -87,6 +93,13 @@ NamespaceGet.flags = {
   ...RuntimeBaseCommand.flags,
   json: flags.boolean({
     description: 'output raw json'
+  }),
+  'name-sort': flags.boolean({
+    description: 'sort results by name'
+  }),
+  name: flags.boolean({
+    char: 'n',
+    description: 'sort results by name'
   })
 }
 
