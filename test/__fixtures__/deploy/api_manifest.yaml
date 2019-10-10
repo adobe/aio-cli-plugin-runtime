@@ -20,4 +20,8 @@ packages:
           world:
             hello_world:
               method: GET
-
+      goodbye-world:
+        hello:
+          world:
+            hello_world:
+              method: DELETE
