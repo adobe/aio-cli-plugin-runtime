@@ -31,14 +31,23 @@ test('aliases', async () => {
   expect(TheCommand.aliases.length).toBeGreaterThan(0)
 })
 
-test('args and flags', async () => {
+test('args', async () => {
   const logName = TheCommand.args[0]
   expect(logName.name).toBeDefined()
   expect(logName.name).toEqual('activationID')
   expect(logName.required).toEqual(false)
+})
 
-  expect(TheCommand.flags).toBeDefined()
-  expect(TheCommand.flags.last).toBeDefined()
+test('flags', async () => {
+  const lFlag = TheCommand.flags.last
+  expect(lFlag).toBeDefined()
+  expect(lFlag.description).toBeDefined()
+  expect(lFlag.char).toBe('l')
+
+  const sFlag = TheCommand.flags.strip
+  expect(sFlag).toBeDefined()
+  expect(sFlag.description).toBeDefined()
+  expect(sFlag.char).toBe('r')
 })
 
 describe('instance methods', () => {

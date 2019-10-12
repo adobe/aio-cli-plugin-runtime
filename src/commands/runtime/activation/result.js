@@ -10,14 +10,23 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
+const { flags } = require('@oclif/command')
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 
 class ActivationResult extends RuntimeBaseCommand {
   async run () {
-    const { args } = this.parse(ActivationResult)
-    const id = args.activationID
+    const { args, flags } = this.parse(ActivationResult)
+    let id = args.activationID
     try {
       const ow = await this.wsk()
+      if (flags.last) {
+        const ax = await ow.activations.list({ limit: 1, skip: 0 })
+        id = ax[0].activationId
+      }
+      if (!id) {
+        this.error('missing required argument activationID')
+      }
+
       const result = await ow.activations.result(id)
       this.logJSON('', result)
     } catch (err) {
@@ -29,9 +38,17 @@ class ActivationResult extends RuntimeBaseCommand {
 ActivationResult.args = [
   {
     name: 'activationID',
-    required: true
+    required: false
   }
 ]
+
+ActivationResult.flags = {
+  ...RuntimeBaseCommand.flags,
+  last: flags.boolean({
+    char: 'l',
+    description: 'retrieves the most recent activation result'
+  })
+}
 
 ActivationResult.description = 'Retrieves the Results for an Activation'
 
