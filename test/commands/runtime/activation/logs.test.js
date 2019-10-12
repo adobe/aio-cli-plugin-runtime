@@ -54,13 +54,33 @@ describe('instance methods', () => {
       expect(command.run).toBeInstanceOf(Function)
     })
 
-    test('retrieve logs of an activation', () => {
+    test('retrieve logs of an activation - no-results', () => {
       const cmd = ow.mockResolved(owAction, '')
       command.argv = ['12345']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalledWith('12345')
           expect(stdout.output).toMatch('')
+        })
+    })
+
+    test('retrieve logs of an activation - with-results', () => {
+      const cmd = ow.mockResolved(owAction, { logs: ['this is a log', 'so is this'] })
+      command.argv = ['12345']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith('12345')
+          expect(stdout.output).toMatch('this is a log')
+        })
+    })
+
+    test('retrieve logs of an activation --strip', () => {
+      const cmd = ow.mockResolved(owAction, { logs: ['line1', 'line2', '2019-10-11T19:08:57.298Z       stdout: login-success'] })
+      command.argv = ['12345', '-r']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith('12345')
+          expect(stdout.output).toMatch('line1\nline2\nstdout: login-success')
         })
     })
 
@@ -95,7 +115,7 @@ describe('instance methods', () => {
         .then(() => {
           expect(listCmd).toHaveBeenCalledWith(expect.objectContaining({ limit: 1 }))
           expect(logCmd).toHaveBeenCalledWith('12345')
-          // expect(stdout.output).toMatch('line3')
+          expect(stdout.output).toMatch('line3')
         })
     })
 
