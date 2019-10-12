@@ -36,7 +36,7 @@ $ npm install -g @adobe/aio-cli-plugin-runtime
 $ ./bin/run COMMAND
 running command...
 $ ./bin/run (-v|--version|version)
-@adobe/aio-cli-plugin-runtime/1.1.0 darwin-x64 node-v8.11.3
+@adobe/aio-cli-plugin-runtime/1.1.0 darwin-x64 node-v10.16.1
 $ ./bin/run --help [COMMAND]
 USAGE
   $ ./bin/run COMMAND
@@ -497,6 +497,7 @@ USAGE
 OPTIONS
   -i, --insecure           bypass certificate check
   -l, --last               retrieves the most recent activation log
+  -r, --strip              strip timestamp information and output first line only
   -u, --auth=auth          whisk auth
   -v, --verbose            Verbose output
   --apihost=apihost        whisk API host
