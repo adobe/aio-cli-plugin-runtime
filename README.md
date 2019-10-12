@@ -54,10 +54,10 @@ USAGE
 * [`./bin/run runtime:action:list`](#binrun-runtimeactionlist)
 * [`./bin/run runtime:action:update ACTIONNAME [ACTIONPATH]`](#binrun-runtimeactionupdate-actionname-actionpath)
 * [`./bin/run runtime:activation`](#binrun-runtimeactivation)
-* [`./bin/run runtime:activation:get ACTIVATIONID`](#binrun-runtimeactivationget-activationid)
+* [`./bin/run runtime:activation:get [ACTIVATIONID]`](#binrun-runtimeactivationget-activationid)
 * [`./bin/run runtime:activation:list [ACTIVATIONID]`](#binrun-runtimeactivationlist-activationid)
 * [`./bin/run runtime:activation:logs [ACTIVATIONID]`](#binrun-runtimeactivationlogs-activationid)
-* [`./bin/run runtime:activation:result ACTIVATIONID`](#binrun-runtimeactivationresult-activationid)
+* [`./bin/run runtime:activation:result [ACTIVATIONID]`](#binrun-runtimeactivationresult-activationid)
 * [`./bin/run runtime:deploy`](#binrun-runtimedeploy)
 * [`./bin/run runtime:deploy:export`](#binrun-runtimedeployexport)
 * [`./bin/run runtime:deploy:report`](#binrun-runtimedeployreport)
@@ -405,16 +405,17 @@ ALIASES
 
 _See code: [src/commands/runtime/activation/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.1.0/src/commands/runtime/activation/index.js)_
 
-## `./bin/run runtime:activation:get ACTIVATIONID`
+## `./bin/run runtime:activation:get [ACTIVATIONID]`
 
 Retrieves an Activation
 
 ```
 USAGE
-  $ ./bin/run runtime:activation:get ACTIVATIONID
+  $ ./bin/run runtime:activation:get [ACTIVATIONID]
 
 OPTIONS
   -i, --insecure           bypass certificate check
+  -l, --last               retrieves the most recent activation
   -u, --auth=auth          whisk auth
   -v, --verbose            Verbose output
   --apihost=apihost        whisk API host
@@ -520,16 +521,17 @@ ALIASES
 
 _See code: [src/commands/runtime/activation/logs.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/v1.1.0/src/commands/runtime/activation/logs.js)_
 
-## `./bin/run runtime:activation:result ACTIVATIONID`
+## `./bin/run runtime:activation:result [ACTIVATIONID]`
 
 Retrieves the Results for an Activation
 
 ```
 USAGE
-  $ ./bin/run runtime:activation:result ACTIVATIONID
+  $ ./bin/run runtime:activation:result [ACTIVATIONID]
 
 OPTIONS
   -i, --insecure           bypass certificate check
+  -l, --last               retrieves the most recent activation result
   -u, --auth=auth          whisk auth
   -v, --verbose            Verbose output
   --apihost=apihost        whisk API host
