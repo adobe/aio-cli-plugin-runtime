@@ -36,16 +36,11 @@ describe('List command meta', () => {
     expect(TheCommand.flags).toMatchObject({
       limit: {
         char: 'l',
-        description: expect.any(String),
-        hidden: false,
-        multiple: false,
-        required: false
+        description: expect.any(String)
       },
       skip: {
         char: 's',
-        description: expect.any(String),
-        multiple: false,
-        required: false
+        description: expect.any(String)
       }
     })
   })

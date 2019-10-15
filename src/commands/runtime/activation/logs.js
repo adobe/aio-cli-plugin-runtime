@@ -61,8 +61,7 @@ class ActivationLogs extends RuntimeBaseCommand {
 
 ActivationLogs.args = [
   {
-    name: 'activationID',
-    required: false
+    name: 'activationID'
   }
 ]
 

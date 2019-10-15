@@ -32,23 +32,11 @@ test('aliases', async () => {
 })
 
 test('flags', async () => {
-  expect(TheCommand.flags.limit.required).toBe(false)
-  expect(TheCommand.flags.limit.hidden).toBe(false)
-  expect(TheCommand.flags.limit.multiple).toBe(false)
   expect(TheCommand.flags.limit.char).toBe('l')
   expect(typeof TheCommand.flags.limit).toBe('object')
-  expect(TheCommand.flags.skip.required).toBe(false)
-  expect(TheCommand.flags.skip.hidden).toBe(false)
-  expect(TheCommand.flags.skip.multiple).toBe(false)
   expect(TheCommand.flags.skip.char).toBe('s')
   expect(typeof TheCommand.flags.skip).toBe('object')
-  expect(TheCommand.flags.since.required).toBe(false)
-  expect(TheCommand.flags.since.hidden).toBe(false)
-  expect(TheCommand.flags.since.multiple).toBe(false)
   expect(typeof TheCommand.flags.since).toBe('object')
-  expect(TheCommand.flags.upto.required).toBe(false)
-  expect(TheCommand.flags.upto.hidden).toBe(false)
-  expect(TheCommand.flags.upto.multiple).toBe(false)
   expect(typeof TheCommand.flags.upto).toBe('object')
 })
 
@@ -56,7 +44,6 @@ test('args', async () => {
   const logName = TheCommand.args[0]
   expect(logName.name).toBeDefined()
   expect(logName.name).toEqual('activationID')
-  expect(logName.required).toEqual(false)
 })
 
 describe('instance methods', () => {

@@ -32,13 +32,8 @@ test('aliases', async () => {
 })
 
 test('flags', async () => {
-  expect(TheCommand.flags.limit.required).toBe(false)
-  expect(TheCommand.flags.limit.hidden).toBe(false)
-  expect(TheCommand.flags.limit.multiple).toBe(false)
   expect(TheCommand.flags.limit.char).toBe('l')
   expect(typeof TheCommand.flags.limit).toBe('object')
-  expect(TheCommand.flags.skip.required).toBe(false)
-  expect(TheCommand.flags.skip.multiple).toBe(false)
   expect(TheCommand.flags.skip.char).toBe('s')
   expect(typeof TheCommand.flags.skip).toBe('object')
 })
@@ -47,7 +42,6 @@ test('args', async () => {
   const listName = TheCommand.args[0]
   expect(listName.name).toBeDefined()
   expect(listName.name).toEqual('namespace')
-  expect(listName.required).toEqual(false)
 })
 
 describe('instance methods', () => {

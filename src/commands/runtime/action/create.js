@@ -114,8 +114,7 @@ ActionCreate.args = [
     required: true
   },
   {
-    name: 'actionPath',
-    required: false
+    name: 'actionPath'
   }
 ]
 
@@ -124,70 +123,43 @@ ActionCreate.flags = {
   param: flags.string({
     char: 'p',
     description: 'parameter values in KEY VALUE format', // help description for flag
-    hidden: false, // hide from help
-    multiple: true, // allow setting this flag multiple times
-    required: false
+    multiple: true // allow setting this flag multiple times
   }),
   web: flags.string({
     description: 'treat ACTION as a web action or as a raw HTTP web action', // help description for flag
-    multiple: false, // allow setting this flag multiple times
-    options: ['true', 'yes', 'false', 'no', 'raw'],
-    required: false
+    options: ['true', 'yes', 'false', 'no', 'raw']
   }),
   'param-file': flags.string({
     char: 'P',
-    description: 'FILE containing parameter values in JSON format', // help description for flag
-    hidden: false, // hide from help
-    multiple: false, // allow setting this flag multiple times
-    required: false
+    description: 'FILE containing parameter values in JSON format' // help description for flag
   }),
   timeout: flags.integer({
     char: 't',
-    description: 'the timeout LIMIT in milliseconds after which the action is terminated (default 60000)', // help description for flag
-    hidden: false, // hide from help
-    multiple: false, // allow setting this flag multiple times
-    required: false
+    description: 'the timeout LIMIT in milliseconds after which the action is terminated (default 60000)' // help description for flag
   }),
   memory: flags.integer({
     char: 'm',
-    description: 'the maximum memory LIMIT in MB for the action (default 256)', // help description for flag
-    hidden: false, // hide from help
-    multiple: false, // allow setting this flag multiple times
-    required: false
+    description: 'the maximum memory LIMIT in MB for the action (default 256)' // help description for flag
   }),
   logsize: flags.integer({
     char: 'l',
-    description: 'the maximum log size LIMIT in MB for the action (default 10)', // help description for flag
-    hidden: false, // hide from help
-    multiple: false, // allow setting this flag multiple times
-    required: false
+    description: 'the maximum log size LIMIT in MB for the action (default 10)' // help description for flag
   }),
   kind: flags.string({
     description: 'the KIND of the action runtime (example: swift:default, nodejs:default)', // help description for flag
-    hidden: false, // hide from help
-    multiple: false, // allow setting this flag multiple times
-    required: false,
     default: 'nodejs:10'
   }),
   annotation: flags.string({
     char: 'a',
     description: 'annotation values in KEY VALUE format', // help description for flag
-    hidden: false, // hide from help
-    multiple: true, // allow setting this flag multiple times
-    required: false
+    multiple: true // allow setting this flag multiple times
   }),
   'annotation-file': flags.string({
     char: 'A',
-    description: 'FILE containing annotation values in JSON format', // help description for flag
-    hidden: false, // hide from help
-    multiple: false, // allow setting this flag multiple times
-    required: false
+    description: 'FILE containing annotation values in JSON format' // help description for flag
   }),
   sequence: flags.string({
-    description: 'treat ACTION as comma separated sequence of actions to invoke', // help description for flag
-    hidden: false, // hide from help
-    multiple: false, // allow setting this flag multiple times
-    required: false
+    description: 'treat ACTION as comma separated sequence of actions to invoke' // help description for flag
   }),
   main: flags.string({
     description: 'the name of the action entry point (function or fully-qualified method name when applicable)'

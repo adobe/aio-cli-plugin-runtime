@@ -37,8 +37,7 @@ class ActivationResult extends RuntimeBaseCommand {
 
 ActivationResult.args = [
   {
-    name: 'activationID',
-    required: false
+    name: 'activationID'
   }
 ]
 

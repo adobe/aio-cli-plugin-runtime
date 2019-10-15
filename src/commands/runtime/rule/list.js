@@ -67,17 +67,11 @@ RuleList.flags = {
   limit: flags.integer({
     char: 'l',
     description: 'Limit number of rules returned. Default 30',
-    multiple: false,
-    hidden: false,
-    required: false,
     default: 30
   }),
   skip: flags.integer({
     char: 's',
-    description: 'Skip number of rules returned',
-    multiple: false,
-    hidden: false,
-    required: false
+    description: 'Skip number of rules returned'
   }),
   json: flags.boolean({
     description: 'output raw json'

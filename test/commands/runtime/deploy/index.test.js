@@ -36,18 +36,10 @@ test('aliases', async () => {
 })
 
 test('flags', async () => {
-  expect(TheCommand.flags.manifest.required).toBe(false)
-  expect(TheCommand.flags.manifest.hidden).toBe(false)
-  expect(TheCommand.flags.manifest.multiple).toBe(false)
   expect(TheCommand.flags.manifest.char).toBe('m')
   expect(typeof TheCommand.flags.manifest).toBe('object')
-  expect(TheCommand.flags.param.required).toBe(false)
-  expect(TheCommand.flags.param.hidden).toBe(false)
   expect(TheCommand.flags.param.multiple).toBe(true)
   expect(typeof TheCommand.flags.param).toBe('object')
-  expect(TheCommand.flags['param-file'].required).toBe(false)
-  expect(TheCommand.flags['param-file'].hidden).toBe(false)
-  expect(TheCommand.flags['param-file'].multiple).toBe(false)
   expect(TheCommand.flags['param-file'].char).toBe('P')
   expect(typeof TheCommand.flags['param-file']).toBe('object')
 })

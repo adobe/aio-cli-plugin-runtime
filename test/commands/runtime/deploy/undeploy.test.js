@@ -36,10 +36,8 @@ test('aliases', async () => {
 })
 
 test('flags', async () => {
-  expect(TheCommand.flags.manifest.required).toBe(false)
   expect(TheCommand.flags.manifest.char).toBe('m')
   expect(typeof TheCommand.flags.manifest).toBe('object')
-  expect(TheCommand.flags.projectname.required).toBe(false)
   expect(typeof TheCommand.flags.projectname).toBe('object')
 })
 

@@ -124,12 +124,10 @@ DeployUndeploy.flags = {
   ...RuntimeBaseCommand.flags,
   manifest: flags.string({
     char: 'm',
-    description: 'the manifest file location', // help description for flag
-    required: false
+    description: 'the manifest file location' // help description for flag
   }),
   projectname: flags.string({
-    description: 'the name of the project to be undeployed', // help description for flag
-    required: false
+    description: 'the name of the project to be undeployed' // help description for flag
   })
 }
 

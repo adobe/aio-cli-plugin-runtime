@@ -61,16 +61,11 @@ TriggerFire.flags = {
   param: flags.string({
     char: 'p',
     description: 'parameter values in KEY VALUE format', // help description for flag
-    hidden: false, // hide from help
-    multiple: true, // allow setting this flag multiple times
-    required: false
+    multiple: true // allow setting this flag multiple times
   }),
   'param-file': flags.string({
     char: 'P',
-    description: 'FILE containing parameter values in JSON format', // help description for flag
-    hidden: false, // hide from help
-    multiple: false, // allow setting this flag multiple times
-    required: false
+    description: 'FILE containing parameter values in JSON format' // help description for flag
   })
 }
 
