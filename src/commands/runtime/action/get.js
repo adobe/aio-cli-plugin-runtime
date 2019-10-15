@@ -86,8 +86,7 @@ ActionGet.flags = {
   ...RuntimeBaseCommand.flags,
   url: flags.boolean({
     char: 'r',
-    description: 'get action url',
-    required: false
+    description: 'get action url'
   }),
   save: flags.boolean({
     description: 'save action code to file corresponding with action name'

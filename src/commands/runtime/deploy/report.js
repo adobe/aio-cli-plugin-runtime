@@ -91,13 +91,11 @@ DeployReport.flags = {
   ...RuntimeBaseCommand.flags,
   manifest: flags.string({
     char: 'm',
-    description: 'the manifest file location', // help description for flag
-    required: false
+    description: 'the manifest file location' // help description for flag
   }),
   deployment: flags.string({
     char: 'd',
-    description: 'the deployment file location', // help description for flag
-    required: false
+    description: 'the deployment file location' // help description for flag
   })
 }
 

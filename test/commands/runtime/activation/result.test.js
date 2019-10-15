@@ -35,7 +35,6 @@ test('args', async () => {
   const logName = TheCommand.args[0]
   expect(logName.name).toBeDefined()
   expect(logName.name).toEqual('activationID')
-  expect(logName.required).toEqual(false)
 })
 
 test('flags', async () => {

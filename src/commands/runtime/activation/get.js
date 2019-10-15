@@ -35,8 +35,7 @@ class ActivationGet extends RuntimeBaseCommand {
 
 ActivationGet.args = [
   {
-    name: 'activationID',
-    required: false
+    name: 'activationID'
   }
 ]
 

@@ -86,17 +86,14 @@ class RouteList extends RuntimeBaseCommand {
 RouteList.args = [
   {
     name: 'basePath',
-    required: false,
     description: 'The base path of the api'
   },
   {
     name: 'relPath',
-    required: false,
     description: 'The path of the api relative to the base path'
   },
   {
     name: 'apiVerb',
-    required: false,
     description: 'The http verb',
     options: ['get', 'post', 'put', 'patch', 'delete', 'head', 'options']
   }

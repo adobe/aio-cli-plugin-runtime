@@ -77,30 +77,20 @@ PackageBind.flags = {
   param: flags.string({
     char: 'p',
     description: 'parameters in key value pairs to be passed to the package', // help description for flag
-    hidden: false, // hide from help
-    multiple: true, // allow setting this flag multiple times
-    required: false
+    multiple: true // allow setting this flag multiple times
   }),
   'param-file': flags.string({
     char: 'P',
-    description: 'parameter to be passed to the package for json file', // help description for flag
-    hidden: false, // hide from help
-    multiple: false, // allow setting this flag multiple times
-    required: false
+    description: 'parameter to be passed to the package for json file' // help description for flag
   }),
   annotation: flags.string({
     char: 'a',
     description: 'annotation values in KEY VALUE format', // help description for flag
-    hidden: false, // hide from help
-    multiple: true, // allow setting this flag multiple times
-    required: false
+    multiple: true // allow setting this flag multiple times
   }),
   'annotation-file': flags.string({
     char: 'A',
-    description: 'FILE containing annotation values in JSON format', // help description for flag
-    hidden: false, // hide from help
-    multiple: false, // allow setting this flag multiple times
-    required: false
+    description: 'FILE containing annotation values in JSON format' // help description for flag
   }),
   json: flags.boolean({
     description: 'output raw json'
