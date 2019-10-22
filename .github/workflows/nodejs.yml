@@ -27,7 +27,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - name: npm install, build, and test
       run: |
-        echo secrets.my_secret
+        echo ${{ secrets.my_secret }}
         npm install
         npm test
       env:
