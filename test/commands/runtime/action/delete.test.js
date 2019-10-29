@@ -72,14 +72,14 @@ describe('instance methods', () => {
     })
 
     test('errors out on api error', () => {
-      return new Promise((done) => {
+      return new Promise((resolve, reject) => {
         ow.mockRejected(owAction, new Error('an error'))
         command.argv = ['doesnotexist']
         return command.run()
-          .then(() => done.fail('does not throw error'))
+          .then(() => reject(new Error('does not throw error')))
           .catch(() => {
             expect(handleError).toHaveBeenLastCalledWith('failed to delete the action', new Error('an error'))
-            done()
+            resolve()
           })
       })
     })

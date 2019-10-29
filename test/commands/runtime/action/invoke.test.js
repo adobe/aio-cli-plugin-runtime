@@ -162,27 +162,27 @@ describe('instance methods', () => {
     })
 
     test('tests for incorrect parameters', () => {
-      return new Promise((done) => {
+      return new Promise((resolve, reject) => {
         ow.mockRejected(owAction, '')
         command.argv = ['hello', '--param', 'a', 'b', 'c', '--blocking']
         return command.run()
-          .then(() => done.fail('does not throw error'))
+          .then(() => reject(new Error('does not throw error')))
           .catch(() => {
             expect(handleError).toHaveBeenLastCalledWith('failed to invoke the action', new Error('Please provide correct values for flags'))
-            done()
+            resolve()
           })
       })
     })
 
     test('errors out on api error', () => {
-      return new Promise((done) => {
+      return new Promise((resolve, reject) => {
         ow.mockRejected(owAction, new Error('an error'))
         command.argv = ['hello']
         return command.run()
-          .then(() => done.fail('does not throw error'))
+          .then(() => reject(new Error('does not throw error')))
           .catch(() => {
             expect(handleError).toHaveBeenLastCalledWith('failed to invoke the action', new Error('an error'))
-            done()
+            resolve()
           })
       })
     })

@@ -37,15 +37,8 @@ afterAll(() => {
 
 describe('createKeyValueArrayFromFlag', () => {
   test('fail when flag length is odd', () => {
-    return new Promise((resolve, reject) => {
-      try {
-        TheHelper.createKeyValueArrayFromFlag(['key1'])
-        reject(new Error('should throw an error'))
-      } catch (err) {
-        expect(err).toMatchObject(new Error('Please provide correct values for flags'))
-        resolve()
-      }
-    })
+    const func = () => TheHelper.createKeyValueArrayFromFlag(['key1'])
+    expect(func).toThrow(new Error('Please provide correct values for flags'))
   })
   test('array of key:value (string) pairs', () => {
     const res = TheHelper.createKeyValueArrayFromFlag(['name1', 'val1', 'name2', 'val2'])
@@ -60,15 +53,8 @@ describe('createKeyValueArrayFromFlag', () => {
 
 describe('createKeyValueObjectFromFlag', () => {
   test('fail when flag length is odd', () => {
-    return new Promise((resolve, reject) => {
-      try {
-        TheHelper.createKeyValueObjectFromFlag(['key1'])
-        reject(new Error('should throw an error'))
-      } catch (err) {
-        expect(err).toMatchObject(new Error('Please provide correct values for flags'))
-        resolve()
-      }
-    })
+    const func = () => TheHelper.createKeyValueObjectFromFlag(['key1'])
+    expect(func).toThrow(new Error('Please provide correct values for flags'))
   })
   test('array of key:value (string) pairs', () => {
     const res = TheHelper.createKeyValueObjectFromFlag(['name1', 'val1', 'name2', 'val2'])

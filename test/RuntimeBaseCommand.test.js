@@ -222,6 +222,7 @@ describe('instance methods', () => {
       })
     })
 
+    // eslint-disable-next-line jest/expect-expect
     test('no config file, no problem', () => {
       fakeFileSystem.clear()
       process.env[PropertyEnv.AUTH] = '1234'
@@ -231,6 +232,7 @@ describe('instance methods', () => {
       })
     })
 
+    // eslint-disable-next-line jest/expect-expect
     test('should not throw if config file specified but doesnt exist', () => {
       fakeFileSystem.clear()
       process.env[PropertyEnv.CONFIG_FILE] = '/foo'

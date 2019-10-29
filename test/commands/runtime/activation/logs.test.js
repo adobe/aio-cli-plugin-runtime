@@ -93,14 +93,14 @@ describe('instance methods', () => {
     })
 
     test('errors out on api error', () => {
-      return new Promise((done) => {
+      return new Promise((resolve, reject) => {
         ow.mockRejected(owAction, new Error('an error'))
         command.argv = ['12345']
         return command.run()
-          .then(() => done.fail('does not throw error'))
+          .then(() => reject(new Error('does not throw error')))
           .catch(() => {
             expect(handleError).toHaveBeenLastCalledWith('failed to retrieve the logs', new Error('an error'))
-            done()
+            resolve()
           })
       })
     })
@@ -130,14 +130,14 @@ describe('instance methods', () => {
     })
 
     test('errors if np axId or --last flag', () => {
-      return new Promise((done) => {
+      return new Promise((resolve, reject) => {
         command.argv = []
         const error = jest.spyOn(command, 'error')
         return command.run()
-          .then(() => done.fail('does not throw error'))
+          .then(() => reject(new Error('does not throw error')))
           .catch(() => {
             expect(error).toHaveBeenLastCalledWith('Missing required arg: `activationID`')
-            done()
+            resolve()
           })
       })
     })
