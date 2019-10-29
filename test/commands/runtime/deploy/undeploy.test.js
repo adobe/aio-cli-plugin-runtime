@@ -270,18 +270,20 @@ describe('instance methods', () => {
         })
     })
 
-    test('both manifest files not found', (done) => {
-      const toRemove = ['/deploy/manifest.yaml', '/deploy/manifest.yml']
-      fakeFileSystem.removeKeys(toRemove)
+    test('both manifest files not found', () => {
+      return new Promise((resolve, reject) => {
+        const toRemove = ['/deploy/manifest.yaml', '/deploy/manifest.yml']
+        fakeFileSystem.removeKeys(toRemove)
 
-      ow.mockRejected(owAction, new Error('an error'))
-      command.argv = []
-      return command.run()
-        .then(() => done.fail('does not throw error'))
-        .catch(() => {
-          expect(handleError).toHaveBeenLastCalledWith('Failed to undeploy', new Error('Manifest file not found'))
-          done()
-        })
+        ow.mockRejected(owAction, new Error('an error'))
+        command.argv = []
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('Failed to undeploy', new Error('Manifest file not found'))
+            resolve()
+          })
+      })
     })
   })
 })

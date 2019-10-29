@@ -67,15 +67,17 @@ describe('instance methods', () => {
         })
     })
 
-    test('return list of packages - no data exception', (done) => {
-      ow.mockResolved(owAction, '')
-      command.argv = []
-      return command.run()
-        .then(() => done.fail('does not throw error'))
-        .catch((err) => {
-          expect(err).toBeDefined()
-          done()
-        })
+    test('return list of packages - no data exception', () => {
+      return new Promise((resolve, reject) => {
+        ow.mockResolved(owAction, '')
+        command.argv = []
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch((err) => {
+            expect(err).toBeDefined()
+            resolve()
+          })
+      })
     })
 
     test('return list of packages --json', () => {
@@ -118,14 +120,16 @@ describe('instance methods', () => {
         })
     })
 
-    test('errors out on api error', (done) => {
-      ow.mockRejected(owAction, new Error('an error'))
-      return command.run()
-        .then(() => done.fail('does not throw error'))
-        .catch(() => {
-          expect(handleError).toHaveBeenLastCalledWith('failed to list the packages', new Error('an error'))
-          done()
-        })
+    test('errors out on api error', () => {
+      return new Promise((resolve, reject) => {
+        ow.mockRejected(owAction, new Error('an error'))
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('failed to list the packages', new Error('an error'))
+            resolve()
+          })
+      })
     })
     test('return list of packages, --name-sort flag', () => {
       const cmd = ow.mockResolvedFixture(owAction, 'package/list-name-sort.json')

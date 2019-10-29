@@ -31,6 +31,7 @@ test('aliases', async () => {
   expect(TheCommand.aliases.length).toBeGreaterThan(0)
 })
 
+// eslint-disable-next-line jest/expect-expect
 test('base flags included in command flags',
   createTestBaseFlagsFunction(TheCommand, RuntimeBaseCommand)
 )
@@ -106,15 +107,17 @@ describe('instance methods', () => {
         })
     })
 
-    test('create a simple trigger, error', (done) => {
-      ow.mockRejected(owAction, new Error('an error'))
-      command.argv = ['trigger1']
-      return command.run()
-        .then(() => done.fail('does not throw error'))
-        .catch(() => {
-          expect(handleError).toHaveBeenLastCalledWith('failed to create the trigger', new Error('an error'))
-          done()
-        })
+    test('create a simple trigger, error', () => {
+      return new Promise((resolve, reject) => {
+        ow.mockRejected(owAction, new Error('an error'))
+        command.argv = ['trigger1']
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('failed to create the trigger', new Error('an error'))
+            resolve()
+          })
+      })
     })
 
     test('create a simple trigger, use param flag', () => {

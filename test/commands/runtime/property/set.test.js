@@ -33,6 +33,7 @@ test('args', async () => {
   expect(TheCommand.args).not.toBeDefined()
 })
 
+// eslint-disable-next-line jest/expect-expect
 test('base flags included in command flags',
   createTestFlagsFunction(TheCommand, {
     ...RuntimeBaseCommand.flags
@@ -68,58 +69,76 @@ describe('instance methods', () => {
     })
   })
 
-  test('--auth', (done) => {
+  // eslint-disable-next-line jest/expect-expect
+  test('--auth', () => {
+    return new Promise((resolve) => {
     // set flag
-    command.argv = ['--auth', 'some-auth-key']
-    return command.run()
-      .then(() => {
-        done()
-      })
+      command.argv = ['--auth', 'some-auth-key']
+      return command.run()
+        .then(() => {
+          resolve()
+        })
+    })
   })
 
-  test('--apihost', (done) => {
+  // eslint-disable-next-line jest/expect-expect
+  test('--apihost', () => {
+    return new Promise((resolve) => {
     // set flag
-    command.argv = ['--apihost', 'http://myserver']
-    return command.run()
-      .then(() => {
-        done()
-      })
+      command.argv = ['--apihost', 'http://myserver']
+      return command.run()
+        .then(() => {
+          resolve()
+        })
+    })
   })
 
-  test('--apiversion', (done) => {
+  // eslint-disable-next-line jest/expect-expect
+  test('--apiversion', () => {
+    return new Promise((resolve) => {
     // set flag
-    command.argv = ['--apiversion', 'v2']
-    return command.run()
-      .then(() => {
-        done()
-      })
+      command.argv = ['--apiversion', 'v2']
+      return command.run()
+        .then(() => {
+          resolve()
+        })
+    })
   })
 
-  test('--cert', (done) => {
+  // eslint-disable-next-line jest/expect-expect
+  test('--cert', () => {
+    return new Promise((resolve) => {
     // set flag
-    command.argv = ['--cert', 'mycert=12512tsagZFSG']
-    return command.run()
-      .then(() => {
-        done()
-      })
+      command.argv = ['--cert', 'mycert=12512tsagZFSG']
+      return command.run()
+        .then(() => {
+          resolve()
+        })
+    })
   })
 
-  test('--key', (done) => {
+  // eslint-disable-next-line jest/expect-expect
+  test('--key', () => {
+    return new Promise((resolve) => {
     // set flag
-    command.argv = ['--key', '7129asgas97195t9asgha']
-    return command.run()
-      .then(() => {
-        done()
-      })
+      command.argv = ['--key', '7129asgas97195t9asgha']
+      return command.run()
+        .then(() => {
+          resolve()
+        })
+    })
   })
 
-  test('--namespace', (done) => {
+  // eslint-disable-next-line jest/expect-expect
+  test('--namespace', () => {
+    return new Promise((resolve) => {
     // set flag
-    command.argv = ['--namespace', 'my-namespace']
-    return command.run()
-      .then(() => {
-        done()
-      })
+      command.argv = ['--namespace', 'my-namespace']
+      return command.run()
+        .then(() => {
+          resolve()
+        })
+    })
   })
 
   test('namespace flag with env', async () => {
@@ -132,13 +151,15 @@ describe('instance methods', () => {
     })
   })
 
-  test('unknown flag', (done) => {
-    command.argv = ['--unknown-flag', 'some-value']
-    return command.run()
-      .then(() => done.fail('this should not succeed'))
-      .catch(() => {
-        expect(handleError).toHaveBeenLastCalledWith('failed to set the property', new Error('Unexpected arguments: --unknown-flag, some-value\nSee more help with --help'))
-        done()
-      })
+  test('unknown flag', () => {
+    return new Promise((resolve, reject) => {
+      command.argv = ['--unknown-flag', 'some-value']
+      return command.run()
+        .then(() => reject(new Error('this should not succeed')))
+        .catch(() => {
+          expect(handleError).toHaveBeenLastCalledWith('failed to set the property', new Error('Unexpected arguments: --unknown-flag, some-value\nSee more help with --help'))
+          resolve()
+        })
+    })
   })
 })
