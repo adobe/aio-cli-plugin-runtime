@@ -32,25 +32,14 @@ test('aliases', async () => {
 })
 
 test('flags', async () => {
-  expect(TheCommand.flags.param.required).toBe(false)
-  expect(TheCommand.flags.param.hidden).toBe(false)
   expect(TheCommand.flags.param.multiple).toBe(true)
   expect(TheCommand.flags.param.char).toBe('p')
   expect(typeof TheCommand.flags.param).toBe('object')
-  expect(TheCommand.flags['param-file'].required).toBe(false)
-  expect(TheCommand.flags['param-file'].hidden).toBe(false)
-  expect(TheCommand.flags['param-file'].multiple).toBe(false)
   expect(TheCommand.flags['param-file'].char).toBe('P')
   expect(typeof TheCommand.flags['param-file']).toBe('object')
-  expect(TheCommand.flags.blocking.required).toBe(false)
-  expect(TheCommand.flags.blocking.hidden).toBe(false)
-  expect(TheCommand.flags.blocking.multiple).toBe(false)
   expect(TheCommand.flags.blocking.char).toBe('b')
   expect(TheCommand.flags.blocking.default).toBe(false)
   expect(typeof TheCommand.flags.blocking).toBe('object')
-  expect(TheCommand.flags.result.required).toBe(false)
-  expect(TheCommand.flags.result.hidden).toBe(false)
-  expect(TheCommand.flags.result.multiple).toBe(false)
   expect(TheCommand.flags.result.char).toBe('r')
   expect(TheCommand.flags.result.default).toBe(false)
   expect(typeof TheCommand.flags.result).toBe('object')
@@ -172,26 +161,30 @@ describe('instance methods', () => {
         })
     })
 
-    test('tests for incorrect parameters', (done) => {
-      ow.mockRejected(owAction, '')
-      command.argv = ['hello', '--param', 'a', 'b', 'c', '--blocking']
-      return command.run()
-        .then(() => done.fail('does not throw error'))
-        .catch(() => {
-          expect(handleError).toHaveBeenLastCalledWith('failed to invoke the action', new Error('Please provide correct values for flags'))
-          done()
-        })
+    test('tests for incorrect parameters', () => {
+      return new Promise((resolve, reject) => {
+        ow.mockRejected(owAction, '')
+        command.argv = ['hello', '--param', 'a', 'b', 'c', '--blocking']
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('failed to invoke the action', new Error('Please provide correct values for flags'))
+            resolve()
+          })
+      })
     })
 
-    test('errors out on api error', (done) => {
-      ow.mockRejected(owAction, new Error('an error'))
-      command.argv = ['hello']
-      return command.run()
-        .then(() => done.fail('does not throw error'))
-        .catch(() => {
-          expect(handleError).toHaveBeenLastCalledWith('failed to invoke the action', new Error('an error'))
-          done()
-        })
+    test('errors out on api error', () => {
+      return new Promise((resolve, reject) => {
+        ow.mockRejected(owAction, new Error('an error'))
+        command.argv = ['hello']
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('failed to invoke the action', new Error('an error'))
+            resolve()
+          })
+      })
     })
   })
 })

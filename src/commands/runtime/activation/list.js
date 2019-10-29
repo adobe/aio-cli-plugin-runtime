@@ -107,8 +107,7 @@ class ActivationList extends RuntimeBaseCommand {
 
 ActivationList.args = [
   {
-    name: 'activationID',
-    required: false
+    name: 'activationID'
   }
 ]
 
@@ -117,29 +116,17 @@ ActivationList.flags = {
   // example usage:  aio runtime:activation:list --limit 10 --skip 2
   limit: flags.integer({
     char: 'l',
-    description: 'only return LIMIT number of activations from the collection with a maximum LIMIT of 200 activations (default 30)',
-    hidden: false, // hide from help
-    multiple: false, // allow setting this flag multiple times
-    required: false // not mandatory
+    description: 'only return LIMIT number of activations from the collection with a maximum LIMIT of 200 activations (default 30)'
   }),
   skip: flags.integer({
     char: 's',
-    description: 'exclude the first SKIP number of activations from the result',
-    hidden: false, // hide from help
-    multiple: false, // allow setting this flag multiple times
-    required: false // not mandatory
+    description: 'exclude the first SKIP number of activations from the result'
   }),
   since: flags.integer({
-    description: 'return activations with timestamps later than SINCE; measured in milliseconds since Th, 01, Jan 1970',
-    hidden: false, // hide from help
-    multiple: false, // allow setting this flag multiple times
-    required: false // not mandatory
+    description: 'return activations with timestamps later than SINCE; measured in milliseconds since Th, 01, Jan 1970'
   }),
   upto: flags.integer({
-    description: 'return activations with timestamps earlier than UPTO; measured in milliseconds since Th, 01, Jan 1970',
-    multiple: false, // allow setting this flag multiple times
-    hidden: false, // hide from help
-    required: false // not mandatory
+    description: 'return activations with timestamps earlier than UPTO; measured in milliseconds since Th, 01, Jan 1970'
   }),
   json: flags.boolean({
     description: 'output raw json'

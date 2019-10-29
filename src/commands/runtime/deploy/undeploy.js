@@ -75,9 +75,12 @@ class DeployUndeploy extends RuntimeBaseCommand {
         if (packages[key]['apis']) {
           Object.keys(packages[key]['apis']).forEach((api) => {
             const firstProp = (obj) => Object.keys(obj)[0]
-            let basepath = firstProp(packages[key]['apis'][api])
-            basepath = '/' + basepath
-            apis.push(basepath)
+            const basepathProp = firstProp(packages[key]['apis'][api])
+            apis.push({
+              name: api,
+              basepath: '/' + basepathProp,
+              relpath: '/' + firstProp(packages[key]['apis'][api][basepathProp])
+            })
           })
         }
       })
@@ -100,7 +103,7 @@ class DeployUndeploy extends RuntimeBaseCommand {
       }
       for (const api of apis) {
         this.log(`Info: Undeploying api [${api.name}]...`)
-        await ow.routes.delete(api)
+        await ow.routes.delete({ basepath: api.basepath, relpath: api.relpath }) // cannot use name + basepath
         this.log(`Info: api [${api.name}] has been successfully undeployed.\n`)
       }
       for (const packg of pkg) {
@@ -121,12 +124,10 @@ DeployUndeploy.flags = {
   ...RuntimeBaseCommand.flags,
   manifest: flags.string({
     char: 'm',
-    description: 'the manifest file location', // help description for flag
-    required: false
+    description: 'the manifest file location' // help description for flag
   }),
   projectname: flags.string({
-    description: 'the name of the project to be undeployed', // help description for flag
-    required: false
+    description: 'the name of the project to be undeployed' // help description for flag
   })
 }
 

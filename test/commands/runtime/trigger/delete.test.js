@@ -40,6 +40,7 @@ test('args', async () => {
   expect(triggerPath.description).toBeDefined()
 })
 
+// eslint-disable-next-line jest/expect-expect
 test('base flags included in command flags',
   createTestBaseFlagsFunction(TheCommand, RuntimeBaseCommand)
 )
@@ -57,40 +58,46 @@ describe('instance methods', () => {
       expect(command.run).toBeInstanceOf(Function)
     })
 
-    test('simple trigger delete', (done) => {
-      const cmd = ow.mockResolved(owAction, '')
+    test('simple trigger delete', () => {
+      return new Promise((resolve) => {
+        const cmd = ow.mockResolved(owAction, '')
 
-      command.argv = ['trigger1']
-      return command.run()
-        .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ name: 'trigger1', namespace: null })
-          expect(stdout.output).toMatch('')
-          done()
-        })
+        command.argv = ['trigger1']
+        return command.run()
+          .then(() => {
+            expect(cmd).toHaveBeenCalledWith({ name: 'trigger1', namespace: null })
+            expect(stdout.output).toMatch('')
+            resolve()
+          })
+      })
     })
 
-    test('simple trigger delete with namespace in trigger name', (done) => {
-      const cmd = ow.mockResolved(owAction, '')
-      command.argv = ['/MySpecifiedNamespace/trigger1']
-      return command.run()
-        .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ name: 'trigger1', namespace: 'MySpecifiedNamespace' })
-          expect(stdout.output).toMatch('')
-          done()
-        })
+    test('simple trigger delete with namespace in trigger name', () => {
+      return new Promise((resolve) => {
+        const cmd = ow.mockResolved(owAction, '')
+        command.argv = ['/MySpecifiedNamespace/trigger1']
+        return command.run()
+          .then(() => {
+            expect(cmd).toHaveBeenCalledWith({ name: 'trigger1', namespace: 'MySpecifiedNamespace' })
+            expect(stdout.output).toMatch('')
+            resolve()
+          })
+      })
     })
 
-    test('trigger delete, error', (done) => {
-      const err = new Error('an error')
-      ow.mockRejected(owAction, err)
+    test('trigger delete, error', () => {
+      return new Promise((resolve, reject) => {
+        const err = new Error('an error')
+        ow.mockRejected(owAction, err)
 
-      command.argv = ['trigger1']
-      return command.run()
-        .then(() => done.fail('does not throw error'))
-        .catch(() => {
-          expect(handleError).toHaveBeenLastCalledWith("Unable to delete trigger 'trigger1'", new Error('an error'))
-          done()
-        })
+        command.argv = ['trigger1']
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith("Unable to delete trigger 'trigger1'", new Error('an error'))
+            resolve()
+          })
+      })
     })
   })
 })

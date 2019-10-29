@@ -20,6 +20,9 @@ class RuleList extends RuntimeBaseCommand {
       const ow = await this.wsk()
       const RuleListObject = { ...flags }
       const result = await ow.rules.list(RuleListObject)
+      if (flags['name-sort'] || flags.name) {
+        result.sort((a, b) => a.name.localeCompare(b.name))
+      }
       const p = Promise.all(
         result.map(item => {
           const res = ow.rules.get(item.name)
@@ -64,20 +67,21 @@ RuleList.flags = {
   limit: flags.integer({
     char: 'l',
     description: 'Limit number of rules returned. Default 30',
-    multiple: false,
-    hidden: false,
-    required: false,
     default: 30
   }),
   skip: flags.integer({
     char: 's',
-    description: 'Skip number of rules returned',
-    multiple: false,
-    hidden: false,
-    required: false
+    description: 'Skip number of rules returned'
   }),
   json: flags.boolean({
     description: 'output raw json'
+  }),
+  'name-sort': flags.boolean({
+    description: 'sort results by name'
+  }),
+  name: flags.boolean({
+    char: 'n',
+    description: 'sort results by name'
   })
 }
 

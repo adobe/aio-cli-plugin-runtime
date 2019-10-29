@@ -36,16 +36,11 @@ describe('List command meta', () => {
     expect(TheCommand.flags).toMatchObject({
       limit: {
         char: 'l',
-        description: expect.any(String),
-        hidden: false,
-        multiple: false,
-        required: false
+        description: expect.any(String)
       },
       skip: {
         char: 's',
-        description: expect.any(String),
-        multiple: false,
-        required: false
+        description: expect.any(String)
       }
     })
   })
@@ -119,14 +114,16 @@ describe('instance methods', () => {
         })
     })
 
-    test('errors out on api error', (done) => {
-      ow.mockRejected(owAction, new Error('an error'))
-      return command.run()
-        .then(() => done.fail('does not throw error'))
-        .catch(() => {
-          expect(handleError).toHaveBeenLastCalledWith('failed to list the actions', new Error('an error'))
-          done()
-        })
+    test('errors out on api error', () => {
+      return new Promise((resolve, reject) => {
+        ow.mockRejected(owAction, new Error('an error'))
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('failed to list the actions', new Error('an error'))
+            resolve()
+          })
+      })
     })
 
     test('return list of actions, --name-sort flag', () => {

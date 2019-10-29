@@ -36,18 +36,10 @@ test('aliases', async () => {
 })
 
 test('flags', async () => {
-  expect(TheCommand.flags.manifest.required).toBe(false)
-  expect(TheCommand.flags.manifest.hidden).toBe(false)
-  expect(TheCommand.flags.manifest.multiple).toBe(false)
   expect(TheCommand.flags.manifest.char).toBe('m')
   expect(typeof TheCommand.flags.manifest).toBe('object')
-  expect(TheCommand.flags.param.required).toBe(false)
-  expect(TheCommand.flags.param.hidden).toBe(false)
   expect(TheCommand.flags.param.multiple).toBe(true)
   expect(typeof TheCommand.flags.param).toBe('object')
-  expect(TheCommand.flags['param-file'].required).toBe(false)
-  expect(TheCommand.flags['param-file'].hidden).toBe(false)
-  expect(TheCommand.flags['param-file'].multiple).toBe(false)
   expect(TheCommand.flags['param-file'].char).toBe('P')
   expect(typeof TheCommand.flags['param-file']).toBe('object')
 })
@@ -461,14 +453,16 @@ describe('instance methods', () => {
         })
     })
 
-    test('errors out on deploying dependencies without location flag', (done) => {
-      command.argv = ['-m', '/deploy/manifest_dependencies_error.yaml']
-      return command.run()
-        .then(() => done.fail('does not throw error'))
-        .catch(() => {
-          expect(handleError).toHaveBeenLastCalledWith('Failed to deploy', new Error('Invalid or missing location in the manifest for this action: mypackage'))
-          done()
-        })
+    test('errors out on deploying dependencies without location flag', () => {
+      return new Promise((resolve, reject) => {
+        command.argv = ['-m', '/deploy/manifest_dependencies_error.yaml']
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('Failed to deploy', new Error('Invalid or missing location in the manifest for this action: mypackage'))
+            resolve()
+          })
+      })
     })
 
     test('package should be created if project is the root', () => {
@@ -611,26 +605,30 @@ describe('instance methods', () => {
         })
     })
 
-    test('errors out on rules not having trigger component', (done) => {
-      ow.mockRejected(owRules, '')
-      command.argv = ['-m', '/deploy/manifest_triggersRules_NoTrigger.yaml']
-      return command.run()
-        .then(() => done.fail('does not throw error'))
-        .catch(() => {
-          expect(handleError).toHaveBeenLastCalledWith('Failed to deploy', new Error('Trigger and Action are both required for rule creation'))
-          done()
-        })
+    test('errors out on rules not having trigger component', () => {
+      return new Promise((resolve, reject) => {
+        ow.mockRejected(owRules, '')
+        command.argv = ['-m', '/deploy/manifest_triggersRules_NoTrigger.yaml']
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('Failed to deploy', new Error('Trigger and Action are both required for rule creation'))
+            resolve()
+          })
+      })
     })
 
-    test('errors out on rules having incorrect action name', (done) => {
-      ow.mockRejected(owRules, '')
-      command.argv = ['-m', '/deploy/manifest_triggersRules_IncorrectAction.yaml']
-      return command.run()
-        .then(() => done.fail('does not throw error'))
-        .catch(() => {
-          expect(handleError).toHaveBeenLastCalledWith('Failed to deploy', new Error('Action/Trigger provided in the rule not found in manifest file'))
-          done()
-        })
+    test('errors out on rules having incorrect action name', () => {
+      return new Promise((resolve, reject) => {
+        ow.mockRejected(owRules, '')
+        command.argv = ['-m', '/deploy/manifest_triggersRules_IncorrectAction.yaml']
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('Failed to deploy', new Error('Action/Trigger provided in the rule not found in manifest file'))
+            resolve()
+          })
+      })
     })
 
     test('deploys a package with path to manifest.yaml', () => {
@@ -741,40 +739,46 @@ describe('instance methods', () => {
         })
     })
 
-    test('errors out on deploying zip without runtime flag error', (done) => {
-      ow.mockRejected(owAction, new Error('an error'))
-      command.argv = ['-m', '/deploy/manifest_zip.yaml']
-      return command.run()
-        .then(() => done.fail('does not throw error'))
-        .catch(() => {
-          expect(handleError).toHaveBeenLastCalledWith('Failed to deploy', new Error('Invalid or missing runtime in the manifest for this action: demo_package/sampleAction'))
-          done()
-        })
+    test('errors out on deploying zip without runtime flag error', () => {
+      return new Promise((resolve, reject) => {
+        ow.mockRejected(owAction, new Error('an error'))
+        command.argv = ['-m', '/deploy/manifest_zip.yaml']
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('Failed to deploy', new Error('Invalid or missing runtime in the manifest for this action: demo_package/sampleAction'))
+            resolve()
+          })
+      })
     })
 
-    test('errors out on deploying API without arguments', (done) => {
-      ow.mockRejected(owAPI, '')
-      command.argv = ['-m', '/deploy/manifest_api_incorrect.yaml']
-      return command.run()
-        .then(() => done.fail('does not throw error'))
-        .catch(() => {
-          expect(handleError).toHaveBeenLastCalledWith('Failed to deploy', new Error('Arguments to create API not provided'))
-          done()
-        })
+    test('errors out on deploying API without arguments', () => {
+      return new Promise((resolve, reject) => {
+        ow.mockRejected(owAPI, '')
+        command.argv = ['-m', '/deploy/manifest_api_incorrect.yaml']
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('Failed to deploy', new Error('Arguments to create API not provided'))
+            resolve()
+          })
+      })
     })
 
-    test('both manifest files not found', (done) => {
-      const toRemove = ['/deploy/manifest.yaml', '/deploy/manifest.yml']
-      fakeFileSystem.removeKeys(toRemove)
+    test('both manifest files not found', () => {
+      return new Promise((resolve, reject) => {
+        const toRemove = ['/deploy/manifest.yaml', '/deploy/manifest.yml']
+        fakeFileSystem.removeKeys(toRemove)
 
-      ow.mockRejected(owAction, new Error('an error'))
-      command.argv = []
-      return command.run()
-        .then(() => done.fail('does not throw error'))
-        .catch(() => {
-          expect(handleError).toHaveBeenLastCalledWith('Failed to deploy', new Error('Manifest file not found'))
-          done()
-        })
+        ow.mockRejected(owAction, new Error('an error'))
+        command.argv = []
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('Failed to deploy', new Error('Manifest file not found'))
+            resolve()
+          })
+      })
     })
 
     test('sequences in yml file should create a sequence action', () => {
@@ -787,58 +791,68 @@ describe('instance methods', () => {
         })
     })
 
-    test('sequences should throw an error when no actions are provided', (done) => {
-      ow.mockRejected(owAction, new Error('an error'))
-      command.argv = ['-m', '/deploy/sequences_missing_actions.yml']
-      return command.run()
-        .then(() => done.fail('does not throw error'))
-        .catch(() => {
-          expect(handleError).toHaveBeenLastCalledWith('Failed to deploy', new Error('Actions for the sequence not provided.'))
-          done()
-        })
+    test('sequences should throw an error when no actions are provided', () => {
+      return new Promise((resolve, reject) => {
+        ow.mockRejected(owAction, new Error('an error'))
+        command.argv = ['-m', '/deploy/sequences_missing_actions.yml']
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('Failed to deploy', new Error('Actions for the sequence not provided.'))
+            resolve()
+          })
+      })
     })
 
-    test('error should be thrown when sequence action mentioned in api is not a web action ', (done) => {
-      ow.mockRejected(owAction, new Error('an error'))
-      command.argv = ['-m', '/deploy/manifest_not_webAction.yaml']
-      return command.run()
-        .then(() => done.fail('does not throw error'))
-        .catch(() => {
-          expect(handleError).toHaveBeenLastCalledWith('Failed to deploy', new Error('Action provided in api is not a web action'))
-          done()
-        })
+    test('error should be thrown when sequence action mentioned in api is not a web action ', () => {
+      return new Promise((resolve, reject) => {
+        ow.mockRejected(owAction, new Error('an error'))
+        command.argv = ['-m', '/deploy/manifest_not_webAction.yaml']
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('Failed to deploy', new Error('Action provided in api is not a web action'))
+            resolve()
+          })
+      })
     })
 
-    test('error should be thrown when sequence in api is not a web sequence action', (done) => {
-      ow.mockRejected(owAction, new Error('an error'))
-      command.argv = ['-m', '/deploy/manifest_not_webSequence.yaml']
-      return command.run()
-        .then(() => done.fail('does not throw error'))
-        .catch(() => {
-          expect(handleError).toHaveBeenLastCalledWith('Failed to deploy', new Error('Sequence provided in api is not a web action'))
-          done()
-        })
+    test('error should be thrown when sequence in api is not a web sequence action', () => {
+      return new Promise((resolve, reject) => {
+        ow.mockRejected(owAction, new Error('an error'))
+        command.argv = ['-m', '/deploy/manifest_not_webSequence.yaml']
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('Failed to deploy', new Error('Sequence provided in api is not a web action'))
+            resolve()
+          })
+      })
     })
 
-    test('project name different in manifest and deployment file', (done) => {
-      command.argv = ['-m', '/deploy/deployment_syncMissingAction.yaml', '-d', '/deploy/deployment.yml']
-      return command.run()
-        .then(() => done.fail('does not throw error'))
-        .catch(() => {
-          expect(handleError).toHaveBeenLastCalledWith('Failed to deploy', new Error('The project name in the deployment file does not match the project name in the manifest file'))
-          done()
-        })
+    test('project name different in manifest and deployment file', () => {
+      return new Promise((resolve, reject) => {
+        command.argv = ['-m', '/deploy/deployment_syncMissingAction.yaml', '-d', '/deploy/deployment.yml']
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('Failed to deploy', new Error('The project name in the deployment file does not match the project name in the manifest file'))
+            resolve()
+          })
+      })
     })
 
-    test('error should be thrown when action in api is not present in the package', (done) => {
-      ow.mockRejected(owAction, new Error('an error'))
-      command.argv = ['-m', '/deploy/manifest_not_present_action.yaml']
-      return command.run()
-        .then(() => done.fail('does not throw error'))
-        .catch(() => {
-          expect(handleError).toHaveBeenLastCalledWith('Failed to deploy', new Error('Action provided in the api not present in the package'))
-          done()
-        })
+    test('error should be thrown when action in api is not present in the package', () => {
+      return new Promise((resolve, reject) => {
+        ow.mockRejected(owAction, new Error('an error'))
+        command.argv = ['-m', '/deploy/manifest_not_present_action.yaml']
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('Failed to deploy', new Error('Action provided in the api not present in the package'))
+            resolve()
+          })
+      })
     })
   })
 })

@@ -50,6 +50,7 @@ test('args', async () => {
   expect(args[2].description).toBeDefined()
 })
 
+// eslint-disable-next-line jest/expect-expect
 test('base flags included in command flags',
   createTestBaseFlagsFunction(TheCommand, RuntimeBaseCommand)
 )
@@ -68,15 +69,17 @@ describe('instance methods', () => {
     })
   })
 
-  test('error, throws exception', (done) => {
-    ow.mockRejected(owAction, new Error('an error'))
-    command.argv = ['/myapi']
-    return command.run()
-      .then(() => done.fail('should not succeed'))
-      .catch(() => {
-        expect(handleError).toHaveBeenLastCalledWith('failed to delete the api', new Error('an error'))
-        done()
-      })
+  test('error, throws exception', () => {
+    return new Promise((resolve, reject) => {
+      ow.mockRejected(owAction, new Error('an error'))
+      command.argv = ['/myapi']
+      return command.run()
+        .then(() => reject(new Error('should not succeed')))
+        .catch(() => {
+          expect(handleError).toHaveBeenLastCalledWith('failed to delete the api', new Error('an error'))
+          resolve()
+        })
+    })
   })
 
   test('simple delete call', () => {

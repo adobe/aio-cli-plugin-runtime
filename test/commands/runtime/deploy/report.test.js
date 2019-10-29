@@ -30,10 +30,8 @@ test('aliases', async () => {
 })
 
 test('flags', async () => {
-  expect(TheCommand.flags.manifest.required).toBe(false)
   expect(TheCommand.flags.manifest.char).toBe('m')
   expect(typeof TheCommand.flags.manifest).toBe('object')
-  expect(TheCommand.flags.deployment.required).toBe(false)
   expect(TheCommand.flags.deployment.char).toBe('d')
   expect(typeof TheCommand.flags.deployment).toBe('object')
 })
@@ -131,27 +129,31 @@ describe('instance methods', () => {
         })
     })
 
-    test('project name different in manifest and deployment file', (done) => {
-      command.argv = ['-m', '/deploy/deployment_syncMissingAction.yaml', '-d', '/deploy/deployment-triggerError.yaml']
-      return command.run()
-        .then(() => done.fail('does not throw error'))
-        .catch(() => {
-          expect(handleError).toHaveBeenLastCalledWith('Failed to report', new Error('The project name in the deployment file does not match the project name in the manifest file'))
-          done()
-        })
+    test('project name different in manifest and deployment file', () => {
+      return new Promise((resolve, reject) => {
+        command.argv = ['-m', '/deploy/deployment_syncMissingAction.yaml', '-d', '/deploy/deployment-triggerError.yaml']
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('Failed to report', new Error('The project name in the deployment file does not match the project name in the manifest file'))
+            resolve()
+          })
+      })
     })
 
-    test('both manifest files not found', (done) => {
-      const toRemove = ['/deploy/manifest.yaml', '/deploy/manifest.yml']
-      fakeFileSystem.removeKeys(toRemove)
+    test('both manifest files not found', () => {
+      return new Promise((resolve, reject) => {
+        const toRemove = ['/deploy/manifest.yaml', '/deploy/manifest.yml']
+        fakeFileSystem.removeKeys(toRemove)
 
-      command.argv = []
-      return command.run()
-        .then(() => done.fail('does not throw error'))
-        .catch(() => {
-          expect(handleError).toHaveBeenLastCalledWith('Failed to report', new Error('Manifest file not found'))
-          done()
-        })
+        command.argv = []
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('Failed to report', new Error('Manifest file not found'))
+            resolve()
+          })
+      })
     })
   })
 })

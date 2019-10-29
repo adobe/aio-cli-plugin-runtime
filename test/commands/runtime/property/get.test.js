@@ -36,6 +36,7 @@ test('args', async () => {
   expect(TheCommand.args).not.toBeDefined()
 })
 
+// eslint-disable-next-line jest/expect-expect
 test('base flags included in command flags',
   createTestFlagsFunction(TheCommand, {
     ...RuntimeBaseCommand.flags

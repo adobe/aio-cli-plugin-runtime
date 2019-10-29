@@ -32,52 +32,25 @@ test('aliases', async () => {
 })
 
 test('flags', async () => {
-  expect(TheCommand.flags.param.required).toBe(false)
-  expect(TheCommand.flags.param.hidden).toBe(false)
   expect(TheCommand.flags.param.multiple).toBe(true)
   expect(TheCommand.flags.param.char).toBe('p')
   expect(typeof TheCommand.flags.param).toBe('object')
-  expect(TheCommand.flags['param-file'].required).toBe(false)
-  expect(TheCommand.flags['param-file'].hidden).toBe(false)
-  expect(TheCommand.flags['param-file'].multiple).toBe(false)
   expect(TheCommand.flags['param-file'].char).toBe('P')
   expect(typeof TheCommand.flags['param-file']).toBe('object')
-  expect(TheCommand.flags.web.required).toBe(false)
-  expect(TheCommand.flags.web.multiple).toBe(false)
   expect(TheCommand.flags.web.options).toBeDefined()
   expect(typeof TheCommand.flags.web).toBe('object')
-  expect(TheCommand.flags.timeout.required).toBe(false)
-  expect(TheCommand.flags.timeout.hidden).toBe(false)
-  expect(TheCommand.flags.timeout.multiple).toBe(false)
   expect(TheCommand.flags.timeout.char).toBe('t')
   expect(typeof TheCommand.flags.timeout).toBe('object')
-  expect(TheCommand.flags.memory.required).toBe(false)
-  expect(TheCommand.flags.memory.hidden).toBe(false)
-  expect(TheCommand.flags.memory.multiple).toBe(false)
   expect(TheCommand.flags.memory.char).toBe('m')
   expect(typeof TheCommand.flags.memory).toBe('object')
-  expect(TheCommand.flags.logsize.required).toBe(false)
-  expect(TheCommand.flags.logsize.hidden).toBe(false)
-  expect(TheCommand.flags.logsize.multiple).toBe(false)
   expect(TheCommand.flags.logsize.char).toBe('l')
   expect(typeof TheCommand.flags.logsize).toBe('object')
-  expect(TheCommand.flags.kind.required).toBe(false)
-  expect(TheCommand.flags.kind.hidden).toBe(false)
-  expect(TheCommand.flags.kind.multiple).toBe(false)
   expect(typeof TheCommand.flags.kind).toBe('object')
-  expect(TheCommand.flags.annotation.required).toBe(false)
-  expect(TheCommand.flags.annotation.hidden).toBe(false)
   expect(TheCommand.flags.annotation.multiple).toBe(true)
   expect(TheCommand.flags.annotation.char).toBe('a')
   expect(typeof TheCommand.flags.annotation).toBe('object')
-  expect(TheCommand.flags['annotation-file'].required).toBe(false)
-  expect(TheCommand.flags['annotation-file'].hidden).toBe(false)
-  expect(TheCommand.flags['annotation-file'].multiple).toBe(false)
   expect(TheCommand.flags['annotation-file'].char).toBe('A')
   expect(typeof TheCommand.flags['annotation-file']).toBe('object')
-  expect(TheCommand.flags.sequence.required).toBe(false)
-  expect(TheCommand.flags.sequence.hidden).toBe(false)
-  expect(TheCommand.flags.sequence.multiple).toBe(false)
   expect(typeof TheCommand.flags.sequence).toBe('object')
 })
 
@@ -89,7 +62,6 @@ test('args', async () => {
   const actionPath = TheCommand.args[1]
   expect(actionPath.name).toBeDefined()
   expect(actionPath.name).toEqual('actionPath')
-  expect(actionPath.required).toEqual(false)
 })
 
 describe('instance methods', () => {
@@ -396,81 +368,95 @@ describe('instance methods', () => {
         })
     })
 
-    test('tests for incorrect --param flags', (done) => {
-      ow.mockRejected(owAction, '')
-      command.argv = ['hello', '/action/actionFile.js', '--param', 'a', 'b', 'c']
-      return command.run()
-        .then(() => done.fail('does not throw error'))
-        .catch(() => {
-          expect(handleError).toHaveBeenLastCalledWith('failed to update the action', new Error('Please provide correct values for flags'))
-          done()
-        })
+    test('tests for incorrect --param flags', () => {
+      return new Promise((resolve, reject) => {
+        ow.mockRejected(owAction, '')
+        command.argv = ['hello', '/action/actionFile.js', '--param', 'a', 'b', 'c']
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('failed to update the action', new Error('Please provide correct values for flags'))
+            resolve()
+          })
+      })
     })
 
-    test('tests for incorrect --annotation flags', (done) => {
-      ow.mockRejected(owAction, '')
-      command.argv = ['hello', '/action/actionFile.js', '--annotation', 'a', 'b', 'c']
-      return command.run()
-        .then(() => done.fail('does not throw error'))
-        .catch(() => {
-          expect(handleError).toHaveBeenLastCalledWith('failed to update the action', new Error('Please provide correct values for flags'))
-          done()
-        })
+    test('tests for incorrect --annotation flags', () => {
+      return new Promise((resolve, reject) => {
+        ow.mockRejected(owAction, '')
+        command.argv = ['hello', '/action/actionFile.js', '--annotation', 'a', 'b', 'c']
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('failed to update the action', new Error('Please provide correct values for flags'))
+            resolve()
+          })
+      })
     })
 
-    test('tests for incorrect --sequence flags', (done) => {
-      ow.mockRejected(owAction, '')
-      command.argv = ['hello', '--sequence', ' ,a,b,c']
-      return command.run()
-        .then(() => done.fail('does not throw error'))
-        .catch(() => {
-          expect(handleError).toHaveBeenLastCalledWith('failed to update the action', new Error('Provide a valid sequence component'))
-          done()
-        })
+    test('tests for incorrect --sequence flags', () => {
+      return new Promise((resolve, reject) => {
+        ow.mockRejected(owAction, '')
+        command.argv = ['hello', '--sequence', ' ,a,b,c']
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('failed to update the action', new Error('Provide a valid sequence component'))
+            resolve()
+          })
+      })
     })
 
-    test('tests for incorrect action path', (done) => {
-      ow.mockRejected(owAction, '')
-      command.argv = ['hello', '/action/file.js', '--kind', 'nodejs:10']
-      return command.run()
-        .then(() => done.fail('does not throw error'))
-        .catch(() => {
-          expect(handleError).toHaveBeenLastCalledWith('failed to update the action', new Error('Provide a valid path for ACTION'))
-          done()
-        })
+    test('tests for incorrect action path', () => {
+      return new Promise((resolve, reject) => {
+        ow.mockRejected(owAction, '')
+        command.argv = ['hello', '/action/file.js', '--kind', 'nodejs:10']
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('failed to update the action', new Error('Provide a valid path for ACTION'))
+            resolve()
+          })
+      })
     })
 
-    test('tests for incorrect action zip path', (done) => {
-      ow.mockRejected(owAction, '')
-      command.argv = ['hello', '/action/file.zip', '--kind', 'nodejs:10']
-      return command.run()
-        .then(() => done.fail('does not throw error'))
-        .catch(() => {
-          expect(handleError).toHaveBeenLastCalledWith('failed to update the action', new Error('Provide a valid path for ACTION'))
-          done()
-        })
+    test('tests for incorrect action zip path', () => {
+      return new Promise((resolve, reject) => {
+        ow.mockRejected(owAction, '')
+        command.argv = ['hello', '/action/file.zip', '--kind', 'nodejs:10']
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('failed to update the action', new Error('Provide a valid path for ACTION'))
+            resolve()
+          })
+      })
     })
 
-    test('error out if a zip file is deployed without the --kind flag', (done) => {
-      ow.mockRejected(owAction, '')
-      command.argv = ['hello', '/action/zipAction.zip']
-      return command.run()
-        .then(() => done.fail('does not throw error'))
-        .catch(() => {
-          expect(handleError).toHaveBeenLastCalledWith('failed to update the action', new Error('Invalid argument(s). creating an action from a .zip artifact requires specifying the action kind explicitly'))
-          done()
-        })
+    test('error out if a zip file is deployed without the --kind flag', () => {
+      return new Promise((resolve, reject) => {
+        ow.mockRejected(owAction, '')
+        command.argv = ['hello', '/action/zipAction.zip']
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('failed to update the action', new Error('Invalid argument(s). creating an action from a .zip artifact requires specifying the action kind explicitly'))
+            resolve()
+          })
+      })
     })
 
-    test('errors out on api error', (done) => {
-      ow.mockRejected(owAction, new Error('an error'))
-      command.argv = ['hello', '/action/actionFile.js']
-      return command.run()
-        .then(() => done.fail('does not throw error'))
-        .catch(() => {
-          expect(handleError).toHaveBeenLastCalledWith('failed to update the action', new Error('an error'))
-          done()
-        })
+    test('errors out on api error', () => {
+      return new Promise((resolve, reject) => {
+        ow.mockRejected(owAction, new Error('an error'))
+        command.argv = ['hello', '/action/actionFile.js']
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('failed to update the action', new Error('an error'))
+            resolve()
+          })
+      })
     })
   })
 })

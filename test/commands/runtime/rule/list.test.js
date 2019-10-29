@@ -31,6 +31,7 @@ test('aliases', async () => {
   expect(TheCommand.aliases.length).toBeGreaterThan(0)
 })
 
+// eslint-disable-next-line jest/expect-expect
 test('base flags included in command flags',
   createTestBaseFlagsFunction(TheCommand, RuntimeBaseCommand)
 )
@@ -133,7 +134,18 @@ describe('instance methods', () => {
           expect(stdout.output).toMatchFixture('rule/list-public.json')
         })
     })
+    test('return list of rules, --name-sort flag', () => {
+      const cmd = ow.mockResolvedFixture(owAction, 'rule/list-name-sort.json')
+      ow.mockResolvedFixtureMulitValue('rules.get', 'rule/get-name-sort.json')
+      command.argv = ['--name']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalled()
+          expect(stdout.output).toMatchFixture('rule/list-name-sort-output.txt')
+        })
+    })
 
+    // eslint-disable-next-line jest/no-commented-out-tests
     // test('return the number of rules with count flag', () => {
     //   let cmd = ow.mockResolved(owAction, '2')
     //   command.argv = ['--count']
@@ -144,14 +156,16 @@ describe('instance methods', () => {
     //     })
     // })
 
-    test('errors out on api error', (done) => {
-      ow.mockRejected('rules.list', new Error('an error'))
-      return command.run()
-        .then(() => done.fail('does not throw error'))
-        .catch(() => {
-          expect(handleError).toHaveBeenLastCalledWith('failed to list the rules', new Error('an error'))
-          done()
-        })
+    test('errors out on api error', () => {
+      return new Promise((resolve, reject) => {
+        ow.mockRejected('rules.list', new Error('an error'))
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('failed to list the rules', new Error('an error'))
+            resolve()
+          })
+      })
     })
   })
 })

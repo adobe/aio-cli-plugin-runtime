@@ -40,6 +40,7 @@ test('args', async () => {
   expect(triggerPath.description).toBeDefined()
 })
 
+// eslint-disable-next-line jest/expect-expect
 test('base flags included in command flags',
   createTestBaseFlagsFunction(TheCommand, RuntimeBaseCommand)
 )
@@ -57,58 +58,64 @@ describe('instance methods', () => {
       expect(command.run).toBeInstanceOf(Function)
     })
 
-    test('simple trigger get', (done) => {
-      const obj = {
-        annotations: [],
-        limits: {},
-        name: 'trigger1',
-        namespace: 'namespace1',
-        parameters: [],
-        publish: false,
-        version: '0.0.1'
-      }
-      const cmd = ow.mockResolved(owAction, obj)
+    test('simple trigger get', () => {
+      return new Promise((resolve) => {
+        const obj = {
+          annotations: [],
+          limits: {},
+          name: 'trigger1',
+          namespace: 'namespace1',
+          parameters: [],
+          publish: false,
+          version: '0.0.1'
+        }
+        const cmd = ow.mockResolved(owAction, obj)
 
-      command.argv = ['trigger1']
-      return command.run()
-        .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ name: 'trigger1', namespace: null })
-          expect(JSON.parse(stdout.output)).toMatchObject(obj)
-          done()
-        })
+        command.argv = ['trigger1']
+        return command.run()
+          .then(() => {
+            expect(cmd).toHaveBeenCalledWith({ name: 'trigger1', namespace: null })
+            expect(JSON.parse(stdout.output)).toMatchObject(obj)
+            resolve()
+          })
+      })
     })
 
-    test('simple trigger get with namespace in trigger name', (done) => {
-      const obj = {
-        annotations: [],
-        limits: {},
-        name: 'trigger1',
-        namespace: 'MySpecifiedNamespace',
-        parameters: [],
-        publish: false,
-        version: '0.0.1'
-      }
-      const cmd = ow.mockResolved(owAction, obj)
+    test('simple trigger get with namespace in trigger name', () => {
+      return new Promise((resolve) => {
+        const obj = {
+          annotations: [],
+          limits: {},
+          name: 'trigger1',
+          namespace: 'MySpecifiedNamespace',
+          parameters: [],
+          publish: false,
+          version: '0.0.1'
+        }
+        const cmd = ow.mockResolved(owAction, obj)
 
-      command.argv = ['/MySpecifiedNamespace/trigger1']
-      return command.run()
-        .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ name: 'trigger1', namespace: 'MySpecifiedNamespace' })
-          expect(JSON.parse(stdout.output)).toMatchObject(obj)
-          done()
-        })
+        command.argv = ['/MySpecifiedNamespace/trigger1']
+        return command.run()
+          .then(() => {
+            expect(cmd).toHaveBeenCalledWith({ name: 'trigger1', namespace: 'MySpecifiedNamespace' })
+            expect(JSON.parse(stdout.output)).toMatchObject(obj)
+            resolve()
+          })
+      })
     })
 
-    test('trigger get, error', (done) => {
-      ow.mockRejected(owAction, new Error('an error'))
+    test('trigger get, error', () => {
+      return new Promise((resolve, reject) => {
+        ow.mockRejected(owAction, new Error('an error'))
 
-      command.argv = ['trigger1']
-      return command.run()
-        .then(() => done.fail('does not throw error'))
-        .catch(() => {
-          expect(handleError).toHaveBeenLastCalledWith('Unable to get trigger \'trigger1\'', new Error('an error'))
-          done()
-        })
+        command.argv = ['trigger1']
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('Unable to get trigger \'trigger1\'', new Error('an error'))
+            resolve()
+          })
+      })
     })
   })
 })

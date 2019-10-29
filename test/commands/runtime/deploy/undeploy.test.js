@@ -36,10 +36,8 @@ test('aliases', async () => {
 })
 
 test('flags', async () => {
-  expect(TheCommand.flags.manifest.required).toBe(false)
   expect(TheCommand.flags.manifest.char).toBe('m')
   expect(typeof TheCommand.flags.manifest).toBe('object')
-  expect(TheCommand.flags.projectname.required).toBe(false)
   expect(typeof TheCommand.flags.projectname).toBe('object')
 })
 
@@ -266,23 +264,26 @@ describe('instance methods', () => {
       command.argv = ['-m', '/deploy/api_manifest.yaml']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalled()
+          expect(cmd).toHaveBeenCalledWith(expect.objectContaining({ basepath: '/hello', relpath: '/world' }))
+          expect(cmd).toHaveBeenCalledTimes(2)
           expect(stdout.output).toMatch('')
         })
     })
 
-    test('both manifest files not found', (done) => {
-      const toRemove = ['/deploy/manifest.yaml', '/deploy/manifest.yml']
-      fakeFileSystem.removeKeys(toRemove)
+    test('both manifest files not found', () => {
+      return new Promise((resolve, reject) => {
+        const toRemove = ['/deploy/manifest.yaml', '/deploy/manifest.yml']
+        fakeFileSystem.removeKeys(toRemove)
 
-      ow.mockRejected(owAction, new Error('an error'))
-      command.argv = []
-      return command.run()
-        .then(() => done.fail('does not throw error'))
-        .catch(() => {
-          expect(handleError).toHaveBeenLastCalledWith('Failed to undeploy', new Error('Manifest file not found'))
-          done()
-        })
+        ow.mockRejected(owAction, new Error('an error'))
+        command.argv = []
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('Failed to undeploy', new Error('Manifest file not found'))
+            resolve()
+          })
+      })
     })
   })
 })

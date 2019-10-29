@@ -17,11 +17,26 @@ const mockOpenWhisk = {
     method = method[cmd.shift()] = jest.fn()
     return method
   },
+  mockResolvedFixtureMulitValue: function (methodName, returnValues) {
+    return this.mockResolvedMulitValue(methodName, returnValues, true)
+  },
   mockResolvedFixture: function (methodName, returnValue) {
     return this.mockResolved(methodName, returnValue, true)
   },
   mockRejectedFixture: function (methodName, returnValue) {
     return this.mockRejected(methodName, returnValue, true)
+  },
+  mockResolvedMulitValue: function (methodName, returnValues, isFile) {
+    let vals = (isFile) ? fixtureFile(returnValues) : returnValues
+    try {
+      vals = JSON.parse(vals)
+    } catch (e) { }
+    const mockFn = this.mockFn(methodName)
+    for (const i in vals) {
+      mockFn.mockResolvedValueOnce(vals[i], isFile)
+    }
+    mockFn.mockResolvedValue(vals[vals.length - 1], isFile)
+    return mockFn
   },
   mockResolved: function (methodName, returnValue, isFile) {
     let val = (isFile) ? fixtureFile(returnValue) : returnValue

@@ -34,6 +34,7 @@ class ActionList extends RuntimeBaseCommand {
           },
           published: {
             header: '',
+            minWidth: 7,
             get: row => `${row.publish === false ? 'private' : 'public'}`
           },
           details: {
@@ -55,30 +56,21 @@ ActionList.flags = {
   // example usage:  aio runtime:action:list --limit 10 --skip 2
   limit: flags.integer({
     char: 'l',
-    description: 'only return LIMIT number of actions from the collection (default 30)',
-    hidden: false, // hide from help
-    multiple: false, // allow setting this flag multiple times
-    required: false // not mandatory
+    description: 'only return LIMIT number of actions from the collection (default 30)'
   }),
   skip: flags.integer({
     char: 's',
-    description: 'exclude the first SKIP number of actions from the result',
-    multiple: false, // allow setting this flag multiple times
-    required: false // not mandatory
+    description: 'exclude the first SKIP number of actions from the result'
   }),
   json: flags.boolean({
     description: 'output raw json'
   }),
   'name-sort': flags.boolean({
-    description: 'sort results by name',
-    multiple: false, // allow setting this flag multiple times
-    required: false // not mandatory
+    description: 'sort results by name'
   }),
   name: flags.boolean({
     char: 'n',
-    description: 'sort results by name',
-    multiple: false, // allow setting this flag multiple times
-    required: false // not mandatory
+    description: 'sort results by name'
   })
 }
 

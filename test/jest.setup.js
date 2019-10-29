@@ -114,7 +114,23 @@ global.createTestFlagsFunction = (TheCommand, Flags) => {
 expect.extend({
   toMatchFixture (received, argument) {
     const val = fixtureFile(argument)
+    // eslint-disable-next-line jest/no-standalone-expect
     expect(eol.auto(received)).toEqual(eol.auto(val))
+    return { pass: true }
+  }
+})
+
+// clean trailing whitespace which will vary with different terminal settings
+function cleanWhite (input) {
+  return eol.split(input).map(line => { return line.trim() }).join(eol.auto)
+}
+
+expect.extend({
+  toMatchFixtureIgnoreWhite (received, argument) {
+    const val = cleanWhite(fixtureFile(argument))
+    // eat white
+    // eslint-disable-next-line jest/no-standalone-expect
+    expect(cleanWhite(received)).toEqual(val)
     return { pass: true }
   }
 })
@@ -122,6 +138,7 @@ expect.extend({
 expect.extend({
   toMatchFixtureJson (received, argument) {
     const val = fixtureJson(argument)
+    // eslint-disable-next-line jest/no-standalone-expect
     expect(received).toEqual(val)
     return { pass: true }
   }

@@ -35,7 +35,13 @@ test('args', async () => {
   const getName = TheCommand.args[0]
   expect(getName.name).toBeDefined()
   expect(getName.name).toEqual('activationID')
-  expect(getName.required).toEqual(true)
+})
+
+test('flags', async () => {
+  const flag = TheCommand.flags.last
+  expect(flag).toBeDefined()
+  expect(flag.description).toBeDefined()
+  expect(flag.char).toBe('l')
 })
 
 describe('instance methods', () => {
@@ -51,7 +57,7 @@ describe('instance methods', () => {
       expect(command.run).toBeInstanceOf(Function)
     })
 
-    test('retrieve an action', () => {
+    test('retrieve an activation', () => {
       const cmd = ow.mockResolved(owAction, '')
       command.argv = ['12345']
       return command.run()
@@ -61,15 +67,35 @@ describe('instance methods', () => {
         })
     })
 
-    test('errors out on api error', (done) => {
-      ow.mockRejected(owAction, new Error('an error'))
-      command.argv = ['12345']
+    test('retrieve last activation --last', () => {
+      const axList = ow.mockResolved('activations.list', [{ activationId: '12345' }])
+      const axGet = ow.mockResolved(owAction, '')
+      command.argv = ['--last']
       return command.run()
-        .then(() => done.fail('does not throw error'))
-        .catch(() => {
-          expect(handleError).toHaveBeenLastCalledWith('failed to retrieve the activation', new Error('an error'))
-          done()
+        .then(() => {
+          expect(axList).toHaveBeenCalled()
+          expect(axGet).toHaveBeenCalledWith('12345')
+          expect(stdout.output).toMatch('')
         })
+    })
+
+    test('should fail on get activation w/ noflag, no activationId', async () => {
+      const runResult = command.run()
+      await expect(runResult instanceof Promise).toBeTruthy()
+      await expect(runResult).rejects.toThrow('failed to retrieve the activation')
+    })
+
+    test('errors out on api error', () => {
+      return new Promise((resolve, reject) => {
+        ow.mockRejected(owAction, new Error('an error'))
+        command.argv = ['12345']
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('failed to retrieve the activation', new Error('an error'))
+            resolve()
+          })
+      })
     })
   })
 })

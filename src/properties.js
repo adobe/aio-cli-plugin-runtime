@@ -13,7 +13,7 @@ governing permissions and limitations under the License.
 const fs = require('fs')
 const path = require('path')
 const PropertiesReader = require('properties-reader')
-const config = require('@adobe/aio-cna-core-config')
+const config = require('@adobe/aio-lib-core-config')
 
 const PropertyKey = {
   AUTH: 'AUTH',

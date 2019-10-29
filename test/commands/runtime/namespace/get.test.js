@@ -14,6 +14,7 @@ const TheCommand = require('../../../../src/commands/runtime/namespace/get.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
 const ow = require('openwhisk')()
 const { stdout } = require('stdout-stderr')
+
 const owAction = 'namespaces.get'
 
 test('exports', async () => {
@@ -35,6 +36,7 @@ test('args', async () => {
   expect(TheCommand.args).not.toBeDefined()
 })
 
+// eslint-disable-next-line jest/expect-expect
 test('base flags included in command flags',
   createTestBaseFlagsFunction(TheCommand, RuntimeBaseCommand)
 )
@@ -52,62 +54,87 @@ describe('instance methods', () => {
       expect(command.run).toBeInstanceOf(Function)
     })
 
-    test('simple namespace get', (done) => {
-      const expectedJson = fixtureJson('namespace/get.json')
-      expectedJson.actions[0].publish = true // coverage
-      const cmd = ow.mockResolved(owAction, expectedJson)
+    test('simple namespace get', () => {
+      return new Promise((resolve) => {
+        const expectedJson = fixtureJson('namespace/get.json')
+        expectedJson.actions[0].publish = true // coverage
+        const cmd = ow.mockResolved(owAction, expectedJson)
 
-      ow.mockFn('rules.get')
-        .mockImplementationOnce(() => {
-          return fixtureJson('namespace/rule1.json')
-        })
-        .mockImplementationOnce(() => {
-          return fixtureJson('namespace/rule2.json')
-        })
+        ow.mockFn('rules.get')
+          .mockImplementationOnce(() => {
+            return fixtureJson('namespace/rule1.json')
+          })
+          .mockImplementationOnce(() => {
+            return fixtureJson('namespace/rule2.json')
+          })
 
-      return command.run()
-        .then(() => {
-          expect(cmd).toHaveBeenCalled()
-          // todo: rewrite the following so it does not fail when different consoles
-          // truncate text in different spots.
-          // expect(stdout.output).toMatchFixture('namespace/get.txt')
-          done()
-        })
+        return command.run()
+          .then(() => {
+            expect(cmd).toHaveBeenCalled()
+            expect(stdout.output).toMatchFixtureIgnoreWhite('namespace/get.txt')
+            resolve()
+          })
+      })
     })
 
-    test('simple namespace get, --json flag', (done) => {
-      const expectedJson = fixtureJson('namespace/get.json')
-      const cmd = ow.mockResolved(owAction, expectedJson)
+    test('simple namespace get, --json flag', () => {
+      return new Promise((resolve) => {
+        const expectedJson = fixtureJson('namespace/get.json')
+        const cmd = ow.mockResolved(owAction, expectedJson)
 
-      ow.mockFn('rules.get')
-        .mockImplementationOnce(() => {
-          return fixtureJson('namespace/rule1.json')
-        })
-        .mockImplementationOnce(() => {
-          return fixtureJson('namespace/rule2.json')
-        })
+        ow.mockFn('rules.get')
+          .mockImplementationOnce(() => {
+            return fixtureJson('namespace/rule1.json')
+          })
+          .mockImplementationOnce(() => {
+            return fixtureJson('namespace/rule2.json')
+          })
 
-      command.argv = ['--json']
-      return command.run()
-        .then(() => {
-          expect(cmd).toHaveBeenCalled()
-          const actualJson = JSON.parse(stdout.output)
-          expectedJson.rules[0] = fixtureJson('namespace/rule1.json')
-          expectedJson.rules[1] = fixtureJson('namespace/rule2.json')
-          expect(actualJson).toMatchObject(expectedJson)
-          done()
-        })
+        command.argv = ['--json']
+        return command.run()
+          .then(() => {
+            expect(cmd).toHaveBeenCalled()
+            const actualJson = JSON.parse(stdout.output)
+            expectedJson.rules[0] = fixtureJson('namespace/rule1.json')
+            expectedJson.rules[1] = fixtureJson('namespace/rule2.json')
+            expect(actualJson).toMatchObject(expectedJson)
+            resolve()
+          })
+      })
     })
 
-    test('namespace list, error', (done) => {
-      const namespaceError = new Error('an error')
-      ow.mockRejected(owAction, namespaceError)
-      return command.run()
-        .then(() => done.fail('does not throw error'))
-        .catch(() => {
-          expect(handleError).toHaveBeenLastCalledWith('failed to get the data for a namespace', new Error('an error'))
-          done()
-        })
+    test('namespace list, error', () => {
+      return new Promise((resolve, reject) => {
+        const namespaceError = new Error('an error')
+        ow.mockRejected(owAction, namespaceError)
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('failed to get the data for a namespace', new Error('an error'))
+            resolve()
+          })
+      })
+    })
+
+    test('return list of actions, --name-sort flag', () => {
+      return new Promise((resolve) => {
+        const expectedJson = fixtureJson('namespace/get-name-sort.json')
+        const cmd = ow.mockResolved(owAction, expectedJson)
+        ow.mockFn('rules.get')
+          .mockImplementationOnce(() => {
+            return fixtureJson('namespace/rule1.json')
+          })
+          .mockImplementationOnce(() => {
+            return fixtureJson('namespace/rule2.json')
+          })
+        command.argv = ['--name']
+        return command.run()
+          .then(() => {
+            expect(cmd).toHaveBeenCalled()
+            expect(stdout.output).toMatchFixtureIgnoreWhite('namespace/get-name-sort.txt')
+            resolve()
+          })
+      })
     })
   })
 })

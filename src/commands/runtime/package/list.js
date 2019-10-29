@@ -30,6 +30,9 @@ class PackageList extends RuntimeBaseCommand {
         options['limit'] = flags.limit
       }
       const result = await ow.packages.list(options)
+      if (flags['name-sort'] || flags.name) {
+        result.sort((a, b) => a.name.localeCompare(b.name))
+      }
       if (flags.json) {
         this.logJSON('', result)
       } else {
@@ -41,6 +44,7 @@ class PackageList extends RuntimeBaseCommand {
           },
           published: {
             header: '',
+            minWidth: 7,
             get: row => `${row.publish === false ? 'private' : 'public'}`
           }
         }
@@ -58,26 +62,27 @@ PackageList.flags = {
   // aio runtime:package:list --count true OR  aio runtime:package:list --count yes
   limit: flags.integer({
     char: 'l',
-    description: 'only return LIMIT number of packages from the collection (default 30)',
-    hidden: false, // hide from help
-    multiple: false, // allow setting this flag multiple times
-    required: false // not mandatory
+    description: 'only return LIMIT number of packages from the collection (default 30)'
   }),
   skip: flags.integer({
     char: 's',
-    description: 'exclude the first SKIP number of packages from the result',
-    multiple: false, // allow setting this flag multiple times
-    required: false // not mandatory
+    description: 'exclude the first SKIP number of packages from the result'
   }),
   json: flags.boolean({
     description: 'output raw json'
+  }),
+  'name-sort': flags.boolean({
+    description: 'sort results by name'
+  }),
+  name: flags.boolean({
+    char: 'n',
+    description: 'sort results by name'
   })
 }
 
 PackageList.args = [
   {
-    name: 'namespace',
-    required: false
+    name: 'namespace'
   }
 ]
 
