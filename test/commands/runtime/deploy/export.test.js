@@ -513,15 +513,17 @@ describe('instance methods', () => {
         })
     })
 
-    test('errors out on api error', (done) => {
-      ow.mockRejected(owPackageList, new Error('an error'))
-      command.argv = ['--projectname', 'proj', '-m', '/deploy/manifest.yaml']
-      return command.run()
-        .then(() => done.fail('does not throw error'))
-        .catch(() => {
-          expect(handleError).toHaveBeenLastCalledWith('Failed to export', new Error('an error'))
-          done()
-        })
+    test('errors out on api error', () => {
+      return new Promise((resolve, reject) => {
+        ow.mockRejected(owPackageList, new Error('an error'))
+        command.argv = ['--projectname', 'proj', '-m', '/deploy/manifest.yaml']
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('Failed to export', new Error('an error'))
+            resolve()
+          })
+      })
     })
   })
 })

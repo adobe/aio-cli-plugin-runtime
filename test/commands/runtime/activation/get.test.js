@@ -85,15 +85,17 @@ describe('instance methods', () => {
       await expect(runResult).rejects.toThrow('failed to retrieve the activation')
     })
 
-    test('errors out on api error', (done) => {
-      ow.mockRejected(owAction, new Error('an error'))
-      command.argv = ['12345']
-      return command.run()
-        .then(() => done.fail('does not throw error'))
-        .catch(() => {
-          expect(handleError).toHaveBeenLastCalledWith('failed to retrieve the activation', new Error('an error'))
-          done()
-        })
+    test('errors out on api error', () => {
+      return new Promise((done) => {
+        ow.mockRejected(owAction, new Error('an error'))
+        command.argv = ['12345']
+        return command.run()
+          .then(() => done.fail('does not throw error'))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('failed to retrieve the activation', new Error('an error'))
+            done()
+          })
+      })
     })
   })
 })

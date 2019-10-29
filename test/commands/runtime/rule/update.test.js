@@ -49,6 +49,7 @@ test('args', async () => {
   expect(args[2].description).toBeDefined()
 })
 
+// eslint-disable-next-line jest/expect-expect
 test('base flags included in command flags',
   createTestBaseFlagsFunction(TheCommand, RuntimeBaseCommand)
 )
@@ -99,15 +100,17 @@ describe('instance methods', () => {
         })
     })
 
-    test('errors out on api error', (done) => {
-      ow.mockRejected('rules.update', new Error('an error'))
-      command.argv = ['nameFoo', 'triggerFoo', 'actionFoo']
-      return command.run()
-        .then(() => done.fail('does not throw error'))
-        .catch(() => {
-          expect(handleError).toHaveBeenLastCalledWith('failed to update rule', new Error('an error'))
-          done()
-        })
+    test('errors out on api error', () => {
+      return new Promise((resolve, reject) => {
+        ow.mockRejected('rules.update', new Error('an error'))
+        command.argv = ['nameFoo', 'triggerFoo', 'actionFoo']
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('failed to update rule', new Error('an error'))
+            resolve()
+          })
+      })
     })
   })
 })

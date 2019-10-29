@@ -114,14 +114,16 @@ describe('instance methods', () => {
         })
     })
 
-    test('errors out on api error', (done) => {
-      ow.mockRejected(owAction, new Error('an error'))
-      return command.run()
-        .then(() => done.fail('does not throw error'))
-        .catch(() => {
-          expect(handleError).toHaveBeenLastCalledWith('failed to list the actions', new Error('an error'))
-          done()
-        })
+    test('errors out on api error', () => {
+      return new Promise((done) => {
+        ow.mockRejected(owAction, new Error('an error'))
+        return command.run()
+          .then(() => done.fail('does not throw error'))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('failed to list the actions', new Error('an error'))
+            done()
+          })
+      })
     })
 
     test('return list of actions, --name-sort flag', () => {

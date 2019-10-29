@@ -293,37 +293,43 @@ describe('instance methods', () => {
         })
     })
 
-    test('tests for incorrect --param flags', (done) => {
-      ow.mockRejected(owAction, '')
-      command.argv = ['packageName', 'bindPackageName', '--param', 'a', 'b', 'c']
-      return command.run()
-        .then(() => done.fail('does not throw error'))
-        .catch(() => {
-          expect(handleError).toHaveBeenLastCalledWith('failed to bind the package', new Error('Please provide correct values for flags'))
-          done()
-        })
+    test('tests for incorrect --param flags', () => {
+      return new Promise((resolve, reject) => {
+        ow.mockRejected(owAction, '')
+        command.argv = ['packageName', 'bindPackageName', '--param', 'a', 'b', 'c']
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('failed to bind the package', new Error('Please provide correct values for flags'))
+            resolve()
+          })
+      })
     })
 
-    test('tests for incorrect --annotation flags', (done) => {
-      ow.mockRejected(owAction, '')
-      command.argv = ['packageName', 'bindPackageName', '--annotation', 'a', 'b', 'c']
-      return command.run()
-        .then(() => done.fail('does not throw error'))
-        .catch(() => {
-          expect(handleError).toHaveBeenLastCalledWith('failed to bind the package', new Error('Please provide correct values for flags'))
-          done()
-        })
+    test('tests for incorrect --annotation flags', () => {
+      return new Promise((resolve, reject) => {
+        ow.mockRejected(owAction, '')
+        command.argv = ['packageName', 'bindPackageName', '--annotation', 'a', 'b', 'c']
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('failed to bind the package', new Error('Please provide correct values for flags'))
+            resolve()
+          })
+      })
     })
 
-    test('errors out on api error', (done) => {
-      ow.mockRejected(owAction, new Error('an error'))
-      command.argv = ['packageName', 'bindPackageName']
-      return command.run()
-        .then(() => done.fail('does not throw error'))
-        .catch(() => {
-          expect(handleError).toHaveBeenLastCalledWith('failed to bind the package', new Error('an error'))
-          done()
-        })
+    test('errors out on api error', () => {
+      return new Promise((resolve, reject) => {
+        ow.mockRejected(owAction, new Error('an error'))
+        command.argv = ['packageName', 'bindPackageName']
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('failed to bind the package', new Error('an error'))
+            resolve()
+          })
+      })
     })
   })
 })

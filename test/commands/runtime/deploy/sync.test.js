@@ -588,37 +588,43 @@ describe('instance methods', () => {
         })
     })
 
-    test('both manifest files not found', (done) => {
-      const toRemove = ['/deploy/manifest.yaml', '/deploy/manifest.yml']
-      fakeFileSystem.removeKeys(toRemove)
+    test('both manifest files not found', () => {
+      return new Promise((done) => {
+        const toRemove = ['/deploy/manifest.yaml', '/deploy/manifest.yml']
+        fakeFileSystem.removeKeys(toRemove)
 
-      command.argv = []
-      return command.run()
-        .then(() => done.fail('does not throw error'))
-        .catch(() => {
-          expect(handleError).toHaveBeenLastCalledWith('Failed to sync', new Error('Manifest file not found'))
-          done()
-        })
+        command.argv = []
+        return command.run()
+          .then(() => done.fail('does not throw error'))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('Failed to sync', new Error('Manifest file not found'))
+            done()
+          })
+      })
     })
 
-    test('project name missing from manifest file', (done) => {
-      command.argv = []
-      return command.run()
-        .then(() => done.fail('does not throw error'))
-        .catch(() => {
-          expect(handleError).toHaveBeenLastCalledWith('Failed to sync', new Error('The mandatory key [project name] is missing'))
-          done()
-        })
+    test('project name missing from manifest file', () => {
+      return new Promise((done) => {
+        command.argv = []
+        return command.run()
+          .then(() => done.fail('does not throw error'))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('Failed to sync', new Error('The mandatory key [project name] is missing'))
+            done()
+          })
+      })
     })
 
-    test('project name different in manifest and deployment file', (done) => {
-      command.argv = ['-m', '/deploy/deployment_syncMissingAction.yaml', '-d', '/deploy/deployment.yml']
-      return command.run()
-        .then(() => done.fail('does not throw error'))
-        .catch(() => {
-          expect(handleError).toHaveBeenLastCalledWith('Failed to sync', new Error('The project name in the deployment file does not match the project name in the manifest file'))
-          done()
-        })
+    test('project name different in manifest and deployment file', () => {
+      return new Promise((done) => {
+        command.argv = ['-m', '/deploy/deployment_syncMissingAction.yaml', '-d', '/deploy/deployment.yml']
+        return command.run()
+          .then(() => done.fail('does not throw error'))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('Failed to sync', new Error('The project name in the deployment file does not match the project name in the manifest file'))
+            done()
+          })
+      })
     })
   })
 })

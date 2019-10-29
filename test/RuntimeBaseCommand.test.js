@@ -66,42 +66,48 @@ describe('instance methods', () => {
       })
     })
 
-    test('empty APIHOST should throw', async (done) => {
-      process.env[PropertyEnv.APIHOST] = '    '
+    test('empty APIHOST should throw', async () => {
+      await new Promise((resolve, reject) => {
+        process.env[PropertyEnv.APIHOST] = '    '
 
-      return command.wsk()
-        .then(() => done.fail('should have thrown'))
-        .catch((e) => {
-          expect(e).toEqual(new Error('An API host must be specified'))
-          done()
-        })
+        return command.wsk()
+          .then(() => reject(new Error('should have thrown')))
+          .catch((e) => {
+            expect(e).toEqual(new Error('An API host must be specified'))
+            resolve()
+          })
+      })
     })
 
-    test('null AUTH should throw', async (done) => {
-      delete process.env[PropertyEnv.APIHOST]
-      delete process.env[PropertyEnv.AUTH]
-      const files = {}
-      files[require('path').join(require('os').homedir(), '.wskprops')] = ''
-      fakeFileSystem.addJson(files)
+    test('null AUTH should throw', async () => {
+      await new Promise((resolve, reject) => {
+        delete process.env[PropertyEnv.APIHOST]
+        delete process.env[PropertyEnv.AUTH]
+        const files = {}
+        files[require('path').join(require('os').homedir(), '.wskprops')] = ''
+        fakeFileSystem.addJson(files)
 
-      return command.wsk()
-        .then(() => done.fail('should have thrown'))
-        .catch((e) => {
-          expect(e).toEqual(new Error('An AUTH key must be specified'))
-          done()
-        })
+        return command.wsk()
+          .then(() => reject(new Error('should have thrown')))
+          .catch((e) => {
+            expect(e).toEqual(new Error('An AUTH key must be specified'))
+            resolve()
+          })
+      })
     })
 
-    test('empty AUTH should throw', async (done) => {
-      process.env[PropertyEnv.AUTH] = '    '
+    test('empty AUTH should throw', async () => {
+      await new Promise((resolve, reject) => {
+        process.env[PropertyEnv.AUTH] = '    '
 
-      return command.wsk()
-        .then(() => done.fail('should have thrown'))
-        .catch((e) => {
-          expect(e).toEqual(new Error('An AUTH key must be specified'))
-          delete process.env[PropertyEnv.AUTH]
-          done()
-        })
+        return command.wsk()
+          .then(() => reject(new Error('should have thrown')))
+          .catch((e) => {
+            expect(e).toEqual(new Error('An AUTH key must be specified'))
+            delete process.env[PropertyEnv.AUTH]
+            resolve()
+          })
+      })
     })
 
     test('not string AUTH should not throw', async () => {
