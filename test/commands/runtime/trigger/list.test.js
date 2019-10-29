@@ -35,6 +35,7 @@ test('args', async () => {
   expect(TheCommand.args).not.toBeDefined()
 })
 
+// eslint-disable-next-line jest/expect-expect
 test('base flags included in command flags',
   createTestBaseFlagsFunction(TheCommand, RuntimeBaseCommand)
 )
@@ -121,14 +122,16 @@ describe('instance methods', () => {
         })
     })
 
-    test('trigger list, error', (done) => {
-      ow.mockRejected('triggers.list', new Error('an error'))
-      return command.run()
-        .then(() => done.fail('does not throw error'))
-        .catch(() => {
-          expect(handleError).toHaveBeenLastCalledWith('failed to list triggers', new Error('an error'))
-          done()
-        })
+    test('trigger list, error', () => {
+      return new Promise((resolve, reject) => {
+        ow.mockRejected('triggers.list', new Error('an error'))
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('failed to list triggers', new Error('an error'))
+            resolve()
+          })
+      })
     })
     test('return list of triggers, --name-sort flag', () => {
       const cmd = ow.mockResolvedFixture(owAction, 'trigger/list-name-sort.json')

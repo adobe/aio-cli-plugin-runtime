@@ -35,6 +35,7 @@ test('args', async () => {
   expect(TheCommand.args).not.toBeDefined()
 })
 
+// eslint-disable-next-line jest/expect-expect
 test('base flags included in command flags',
   createTestBaseFlagsFunction(TheCommand, RuntimeBaseCommand)
 )
@@ -52,39 +53,45 @@ describe('instance methods', () => {
       expect(command.run).toBeInstanceOf(Function)
     })
 
-    test('simple namespace list', (done) => {
-      const cmd = ow.mockResolved(owAction, fixtureFile('namespace/list.json'))
+    test('simple namespace list', () => {
+      return new Promise((resolve) => {
+        const cmd = ow.mockResolved(owAction, fixtureFile('namespace/list.json'))
 
-      return command.run()
-        .then(() => {
-          expect(cmd).toHaveBeenCalled()
-          expect(stdout.output).toMatchFixture('namespace/list.txt')
-          done()
-        })
+        return command.run()
+          .then(() => {
+            expect(cmd).toHaveBeenCalled()
+            expect(stdout.output).toMatchFixture('namespace/list.txt')
+            resolve()
+          })
+      })
     })
 
-    test('simple namespace list, --json flag', (done) => {
-      const cmd = ow.mockResolved(owAction, fixtureFile('namespace/list.json'))
+    test('simple namespace list, --json flag', () => {
+      return new Promise((resolve) => {
+        const cmd = ow.mockResolved(owAction, fixtureFile('namespace/list.json'))
 
-      command.argv = ['--json']
-      return command.run()
-        .then(() => {
-          expect(cmd).toHaveBeenCalled()
-          expect(JSON.parse(stdout.output)).toMatchFixtureJson('namespace/list.json')
-          done()
-        })
+        command.argv = ['--json']
+        return command.run()
+          .then(() => {
+            expect(cmd).toHaveBeenCalled()
+            expect(JSON.parse(stdout.output)).toMatchFixtureJson('namespace/list.json')
+            resolve()
+          })
+      })
     })
 
-    test('namespace list, error', (done) => {
-      const namespaceError = new Error('an error')
+    test('namespace list, error', () => {
+      return new Promise((resolve, reject) => {
+        const namespaceError = new Error('an error')
 
-      ow.mockRejected(owAction, namespaceError)
-      return command.run()
-        .then(() => done.fail('does not throw error'))
-        .catch(() => {
-          expect(handleError).toHaveBeenLastCalledWith('failed to list namespaces', new Error('an error'))
-          done()
-        })
+        ow.mockRejected(owAction, namespaceError)
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('failed to list namespaces', new Error('an error'))
+            resolve()
+          })
+      })
     })
   })
 })

@@ -368,70 +368,82 @@ describe('instance methods', () => {
         })
     })
 
-    test('tests for incorrect --param flags', (done) => {
-      ow.mockRejected(owAction, '')
-      command.argv = ['hello', '/action/actionFile.js', '--param', 'a', 'b', 'c']
-      return command.run()
-        .then(() => done.fail('does not throw error'))
-        .catch(() => {
-          expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error('Please provide correct values for flags'))
-          done()
-        })
+    test('tests for incorrect --param flags', () => {
+      return new Promise((resolve, reject) => {
+        ow.mockRejected(owAction, '')
+        command.argv = ['hello', '/action/actionFile.js', '--param', 'a', 'b', 'c']
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error('Please provide correct values for flags'))
+            resolve()
+          })
+      })
     })
 
-    test('tests for incorrect --sequence flags', (done) => {
-      ow.mockRejected(owAction, '')
-      command.argv = ['hello', '--sequence', ' ,a,b,c']
-      return command.run()
-        .then(() => done.fail('does not throw error'))
-        .catch(() => {
-          expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error('Provide a valid sequence component'))
-          done()
-        })
+    test('tests for incorrect --sequence flags', () => {
+      return new Promise((resolve, reject) => {
+        ow.mockRejected(owAction, '')
+        command.argv = ['hello', '--sequence', ' ,a,b,c']
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error('Provide a valid sequence component'))
+            resolve()
+          })
+      })
     })
 
-    test('tests for incorrect action path', (done) => {
-      ow.mockRejected(owAction, '')
-      command.argv = ['hello', '/action/file.js', '--kind', 'nodejs:10']
-      return command.run()
-        .then(() => done.fail('does not throw error'))
-        .catch(() => {
-          expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error('Provide a valid path for ACTION'))
-          done()
-        })
+    test('tests for incorrect action path', () => {
+      return new Promise((resolve, reject) => {
+        ow.mockRejected(owAction, '')
+        command.argv = ['hello', '/action/file.js', '--kind', 'nodejs:10']
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error('Provide a valid path for ACTION'))
+            resolve()
+          })
+      })
     })
 
-    test('tests for incorrect action zip path', (done) => {
-      ow.mockRejected(owAction, '')
-      command.argv = ['hello', '/action/file.zip', '--kind', 'nodejs:10']
-      return command.run()
-        .then(() => done.fail('does not throw error'))
-        .catch(() => {
-          expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error('Provide a valid path for ACTION'))
-          done()
-        })
+    test('tests for incorrect action zip path', () => {
+      return new Promise((resolve, reject) => {
+        ow.mockRejected(owAction, '')
+        command.argv = ['hello', '/action/file.zip', '--kind', 'nodejs:10']
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error('Provide a valid path for ACTION'))
+            resolve()
+          })
+      })
     })
 
-    test('tests for incorrect --annotation flags', (done) => {
-      ow.mockRejected(owAction, '')
-      command.argv = ['hello', '/action/actionFile.js', '--annotation', 'a', 'b', 'c']
-      return command.run()
-        .then(() => done.fail('does not throw error'))
-        .catch(() => {
-          expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error('Please provide correct values for flags'))
-          done()
-        })
+    test('tests for incorrect --annotation flags', () => {
+      return new Promise((resolve, reject) => {
+        ow.mockRejected(owAction, '')
+        command.argv = ['hello', '/action/actionFile.js', '--annotation', 'a', 'b', 'c']
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error('Please provide correct values for flags'))
+            resolve()
+          })
+      })
     })
 
-    test('errors out on api error', (done) => {
-      ow.mockRejected(owAction, new Error('an error'))
-      command.argv = ['hello', '/action/actionFile.js']
-      return command.run()
-        .then(() => done.fail('does not throw error'))
-        .catch(() => {
-          expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error('an error'))
-          done()
-        })
+    test('errors out on api error', () => {
+      return new Promise((resolve, reject) => {
+        ow.mockRejected(owAction, new Error('an error'))
+        command.argv = ['hello', '/action/actionFile.js']
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error('an error'))
+            resolve()
+          })
+      })
     })
   })
 })
