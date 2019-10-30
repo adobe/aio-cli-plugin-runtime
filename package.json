@@ -60,7 +60,7 @@
       "@oclif/plugin-help"
     ]
   },
-  "main": "src/index.js",
+  "main": "src/runtime-helpers.js",
   "repository": "adobe/aio-cli-plugin-runtime",
   "scripts": {
     "eslint-fix": "eslint src test --fix",
