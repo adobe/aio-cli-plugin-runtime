@@ -229,31 +229,34 @@ function returnAnnotations (action) {
   return annotationParams
 }
 
-function createApiObject (packages, key, api, ruleAction, arrSequence) {
+function createApiObject (packages, key, api, ruleAction, arrSequence, pathOnly) {
   const objectAPI = {}
   const firstProp = (obj) => Object.keys(obj)[0]
   objectAPI.basepath = firstProp(packages[key]['apis'][api])
   objectAPI.relpath = firstProp(packages[key]['apis'][api][objectAPI.basepath])
-  objectAPI.action = firstProp(packages[key]['apis'][api][objectAPI.basepath][objectAPI.relpath])
-  objectAPI.operation = packages[key]['apis'][api][objectAPI.basepath][objectAPI.relpath][objectAPI.action].method
-  objectAPI.responsetype = packages[key]['apis'][api][objectAPI.basepath][objectAPI.relpath][objectAPI.action].response || 'json' // binding the default parameter
-  if (ruleAction.includes(objectAPI.action)) {
-    if (packages[key]['actions'][objectAPI.action]['web'] || packages[key]['actions'][objectAPI.action]['web-export']) {
-      objectAPI.action = `${key}/${objectAPI.action}`
+  if (!pathOnly) {
+    objectAPI.action = firstProp(packages[key]['apis'][api][objectAPI.basepath][objectAPI.relpath])
+    objectAPI.operation = packages[key]['apis'][api][objectAPI.basepath][objectAPI.relpath][objectAPI.action].method
+    objectAPI.responsetype = packages[key]['apis'][api][objectAPI.basepath][objectAPI.relpath][objectAPI.action].response || 'json' // binding the default parameter
+    if (ruleAction.includes(objectAPI.action)) {
+      if (packages[key]['actions'][objectAPI.action]['web'] || packages[key]['actions'][objectAPI.action]['web-export']) {
+        objectAPI.action = `${key}/${objectAPI.action}`
+      } else {
+        throw new Error('Action provided in api is not a web action')
+      }
+    } else if (arrSequence.includes(objectAPI.action)) {
+      if (packages[key]['sequences'][objectAPI.action]['web'] || packages[key]['sequences'][objectAPI.action]['web-export']) {
+        objectAPI.action = `${key}/${objectAPI.action}`
+      } else {
+        throw new Error('Sequence provided in api is not a web action')
+      }
     } else {
-      throw new Error('Action provided in api is not a web action')
+      throw new Error('Action provided in the api not present in the package')
     }
-  } else if (arrSequence.includes(objectAPI.action)) {
-    if (packages[key]['sequences'][objectAPI.action]['web'] || packages[key]['sequences'][objectAPI.action]['web-export']) {
-      objectAPI.action = `${key}/${objectAPI.action}`
-    } else {
-      throw new Error('Sequence provided in api is not a web action')
-    }
-  } else {
-    throw new Error('Action provided in the api not present in the package')
   }
-  objectAPI['relpath'] = '/' + objectAPI['relpath']
-  objectAPI['basepath'] = '/' + objectAPI['basepath']
+
+  objectAPI.relpath = '/' + objectAPI.relpath
+  objectAPI.basepath = '/' + objectAPI.basepath
   return objectAPI
 }
 
@@ -330,7 +333,7 @@ function createActionObject (thisAction, objAction) {
   return objAction
 }
 
-function processPackage (packages, deploymentPackages, deploymentTriggers, params) {
+function processPackage (packages, deploymentPackages, deploymentTriggers, params, namesOnly = false) {
   const pkgtoCreate = []
   const actions = []
   const rules = []
@@ -348,51 +351,56 @@ function processPackage (packages, deploymentPackages, deploymentTriggers, param
     if (packages[key]['dependencies']) {
       Object.keys(packages[key]['dependencies']).forEach((depName) => {
         const thisDep = packages[key]['dependencies'][depName]
-        let objPackage = {}
-        try { // Parse location
-          const thisLocation = thisDep['location'].split('/')
-          objPackage = {
-            binding: {
-              namespace: thisLocation[1],
-              name: thisLocation[2]
+        const objDep = { name: depName }
+        if (!namesOnly) {
+          let objDepPackage = {}
+          try { // Parse location
+            const thisLocation = thisDep['location'].split('/')
+            objDepPackage = {
+              binding: {
+                namespace: thisLocation[1],
+                name: thisLocation[2]
+              }
             }
+          } catch (ex) {
+            throw (new Error(`Invalid or missing location in the manifest for this action: ${depName}`))
           }
-        } catch (ex) {
-          throw (new Error(`Invalid or missing location in the manifest for this action: ${depName}`))
+          // Parse inputs
+          let deploymentInputs = {}
+          const packageInputs = thisDep['inputs'] || {}
+          if (deploymentPackages[key] && deploymentPackages[key]['dependencies'] && deploymentPackages[key]['dependencies'][depName]) {
+            deploymentInputs = deploymentPackages[key]['dependencies'][depName]['inputs'] || {}
+          }
+          const allInputs = returnUnion(packageInputs, deploymentInputs)
+          // if parameter is provided as key : 'data type' , process it to set default values before deployment
+          if (Object.entries(allInputs).length !== 0) {
+            const processedInput = createKeyValueInput(processInputs(allInputs, params))
+            objDepPackage['parameters'] = processedInput
+          }
+          objDep.package = objDepPackage
         }
-
-        // Parse inputs
-        let deploymentInputs = {}
-        const packageInputs = thisDep['inputs'] || {}
-        if (deploymentPackages[key] && deploymentPackages[key]['dependencies'] && deploymentPackages[key]['dependencies'][depName]) {
-          deploymentInputs = deploymentPackages[key]['dependencies'][depName]['inputs'] || {}
-        }
-        const allInputs = returnUnion(packageInputs, deploymentInputs)
-        // if parameter is provided as key : 'data type' , process it to set default values before deployment
-        if (Object.entries(allInputs).length !== 0) {
-          const processedInput = createKeyValueInput(processInputs(allInputs, params))
-          objPackage['parameters'] = processedInput
-        }
-        pkgtoCreate.push({ name: depName, package: objPackage })
+        pkgtoCreate.push(objDep)
       })
     }
     if (packages[key]['actions']) {
       Object.keys(packages[key]['actions']).forEach((actionName) => {
         const thisAction = packages[key]['actions'][actionName]
         let objAction = { name: `${key}/${actionName}` }
-        objAction = createActionObject(thisAction, objAction)
-        let deploymentInputs = {}
-        const packageInputs = thisAction['inputs'] || {}
-        if (deploymentPackages[key] && deploymentPackages[key]['actions'] && deploymentPackages[key]['actions'][actionName]) {
-          deploymentInputs = deploymentPackages[key]['actions'][actionName]['inputs'] || {}
+        if (!namesOnly) {
+          objAction = createActionObject(thisAction, objAction)
+          let deploymentInputs = {}
+          const packageInputs = thisAction['inputs'] || {}
+          if (deploymentPackages[key] && deploymentPackages[key]['actions'] && deploymentPackages[key]['actions'][actionName]) {
+            deploymentInputs = deploymentPackages[key]['actions'][actionName]['inputs'] || {}
+          }
+          const allInputs = returnUnion(packageInputs, deploymentInputs)
+          // if parameter is provided as key : 'data type' , process it to set default values before deployment
+          if (Object.entries(allInputs).length !== 0) {
+            const processedInput = processInputs(allInputs, params)
+            objAction['params'] = processedInput
+          }
+          ruleAction.push(actionName)
         }
-        const allInputs = returnUnion(packageInputs, deploymentInputs)
-        // if parameter is provided as key : 'data type' , process it to set default values before deployment
-        if (Object.entries(allInputs).length !== 0) {
-          const processedInput = processInputs(allInputs, params)
-          objAction['params'] = processedInput
-        }
-        ruleAction.push(actionName)
         actions.push(objAction)
       })
     }
@@ -401,61 +409,69 @@ function processPackage (packages, deploymentPackages, deploymentTriggers, param
       // Sequences can have only one field : actions
       // Usage: aio runtime:action:create <action-name> --sequence existingAction1, existingAction2
       Object.keys(packages[key]['sequences']).forEach((sequenceName) => {
-        let options = { name: `${key}/${sequenceName}`, action: '' }
-        const thisSequence = packages[key]['sequences'][sequenceName]
-        options = createSequenceObject(thisSequence['actions'], options, key)
-        options['annotations'] = returnAnnotations(thisSequence)
-        arrSequence.push(sequenceName)
-        actions.push(options)
+        let objSequence = { name: `${key}/${sequenceName}` }
+        if (!namesOnly) {
+          objSequence.action = ''
+          const thisSequence = packages[key]['sequences'][sequenceName]
+          objSequence = createSequenceObject(thisSequence['actions'], objSequence, key)
+          objSequence['annotations'] = returnAnnotations(thisSequence)
+          arrSequence.push(sequenceName)
+        }
+        actions.push(objSequence)
       })
     }
     if (packages[key]['triggers']) {
       Object.keys(packages[key]['triggers']).forEach((triggerName) => {
-        const objTrigger = { name: triggerName, trigger: {} }
-        const packageInputs = packages[key]['triggers'][triggerName]['inputs'] || {}
-        let deploymentInputs = {}
-        if (triggerName in deploymentTriggers) {
-          deploymentInputs = deploymentTriggers[triggerName]
-        }
-        let allInputs = returnUnion(packageInputs, deploymentInputs)
-        allInputs = createKeyValueInput(processInputs(allInputs, {}))
-        if (Object.entries(allInputs).length !== 0) {
-          objTrigger.trigger.parameters = allInputs
-        }
-        if (packages[key]['triggers'][triggerName]['annotations']) {
-          objTrigger.trigger.annotations = createKeyValueInput(packages[key]['triggers'][triggerName]['annotations'])
+        const objTrigger = { name: triggerName }
+        if (!namesOnly) {
+          objTrigger.trigger = {}
+          const packageInputs = packages[key]['triggers'][triggerName]['inputs'] || {}
+          let deploymentInputs = {}
+          if (triggerName in deploymentTriggers) {
+            deploymentInputs = deploymentTriggers[triggerName]
+          }
+          let allInputs = returnUnion(packageInputs, deploymentInputs)
+          allInputs = createKeyValueInput(processInputs(allInputs, {}))
+          if (Object.entries(allInputs).length !== 0) {
+            objTrigger.trigger.parameters = allInputs
+          }
+          if (packages[key]['triggers'][triggerName]['annotations']) {
+            objTrigger.trigger.annotations = createKeyValueInput(packages[key]['triggers'][triggerName]['annotations'])
+          }
+          ruleTrigger.push(triggerName)
         }
         // trigger creation requires only name parameter and hence will be created in all cases
         triggers.push(objTrigger)
-        ruleTrigger.push(triggerName)
       })
     }
     // Rules cannot belong to any package
     if (packages[key]['rules']) {
       Object.keys(packages[key]['rules']).forEach((ruleName) => {
         const objRule = { name: ruleName }
-        if (packages[key]['rules'][ruleName]['trigger'] && packages[key]['rules'][ruleName]['action']) {
-          objRule['trigger'] = packages[key]['rules'][ruleName]['trigger']
-          objRule['action'] = packages[key]['rules'][ruleName]['action']
-          if (objRule['action'].split('/').length > 1) {
-            objRule['action'] = objRule['action'].split('/').pop()
+        if (!namesOnly) {
+          if (packages[key]['rules'][ruleName]['trigger'] && packages[key]['rules'][ruleName]['action']) {
+            objRule['trigger'] = packages[key]['rules'][ruleName]['trigger']
+            objRule['action'] = packages[key]['rules'][ruleName]['action']
+            if (objRule['action'].split('/').length > 1) {
+              objRule['action'] = objRule['action'].split('/').pop()
+            }
+          } else {
+            throw new Error('Trigger and Action are both required for rule creation')
           }
-        } else {
-          throw new Error('Trigger and Action are both required for rule creation')
+          if ((ruleAction.includes(objRule['action']) || arrSequence.includes(objRule['action'])) && ruleTrigger.includes(objRule['trigger'])) {
+            objRule['action'] = `${key}/${objRule['action']}`
+          } else {
+            throw new Error('Action/Trigger provided in the rule not found in manifest file')
+          }
         }
-        if ((ruleAction.includes(objRule['action']) || arrSequence.includes(objRule['action'])) && ruleTrigger.includes(objRule['trigger'])) {
-          objRule['action'] = `${key}/${objRule['action']}`
-          rules.push(objRule)
-        } else {
-          throw new Error('Action/Trigger provided in the rule not found in manifest file')
-        }
+        rules.push(objRule)
       })
     }
 
     if (packages[key]['apis']) {
       Object.keys(packages[key]['apis']).forEach((api) => {
         if (packages[key]['apis'][api]) {
-          const objectAPI = createApiObject(packages, key, api, ruleAction, arrSequence)
+          const objectAPI = createApiObject(packages, key, api, ruleAction, arrSequence, namesOnly)
           objectAPI.name = api
           apis.push(objectAPI)
         } else {
@@ -580,6 +596,37 @@ async function deployPackage (entities, ow, logger) {
   logger('Success: Deployment completed successfully.')
 }
 
+async function undeployPackage (entities, ow, logger) {
+  for (const action of entities.actions) {
+    logger(`Info: Undeploying action [${action.name}]...`)
+    await ow.actions.delete(action)
+    logger(`Info: action [${action.name}] has been successfully undeployed.\n`)
+  }
+  for (const trigger of entities.triggers) {
+    logger(`Info: Undeploying trigger [${trigger}]...`)
+    await ow.triggers.delete(trigger)
+    logger(`Info: trigger [${trigger.name}] has been successfully undeployed.\n`)
+  }
+  for (const rule of entities.rules) {
+    logger(`Info: Undeploying rule [${rule.name}]...`)
+    await ow.rules.delete(rule)
+    logger(`Info: rule [${rule.name}] has been successfully undeployed.\n`)
+  }
+  for (const api of entities.apis) {
+    logger(`Info: Undeploying api [${api.name}]...`)
+    await ow.routes.delete({ basepath: api.basepath, relpath: api.relpath }) // cannot use name + basepath
+    logger(`Info: api [${api.name}] has been successfully undeployed.\n`)
+  }
+  for (const packg of entities.pkgtoCreate) {
+    const options = {}
+    options.name = packg.name
+    logger(`Info: Undeploying package [${packg.name}]...`)
+    await ow.packages.delete(options)
+    logger(`Info: package [${packg.name}] has been successfully undeployed.\n`)
+  }
+  logger('Success: Undeployment completed successfully.')
+}
+
 async function deleteEntities (projectHash, ow, projectName) {
   let valuetobeChecked
   let paramtobeChecked
@@ -657,6 +704,7 @@ module.exports = {
   createApiObject,
   returnAnnotations,
   deployPackage,
+  undeployPackage,
   processPackage,
   setPaths,
   deleteEntities
