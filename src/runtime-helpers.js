@@ -13,6 +13,8 @@ governing permissions and limitations under the License.
 const fs = require('fs')
 const yaml = require('js-yaml')
 const debug = require('debug')('aio-cli-plugin-runtime/deploy')
+const sha1 = require('sha1')
+
 /**
  * @description returns key value array from the parameters supplied. Used to create --param and --annotation key value pairs
  * @param flag : flags.param or flags.annotation
@@ -627,6 +629,19 @@ async function undeployPackage (entities, ow, logger) {
   logger('Success: Undeployment completed successfully.')
 }
 
+async function syncPackage (entities, ow, logger, projectName, manifestPath, manifestContent) {
+  // find project hash from server based on entities in the manifest file
+  const hashProjectSynced = await findProjectHashonServer(ow, projectName)
+
+  // compute the project hash from the manifest file
+  const projectHash = getProjectHash(manifestContent, manifestPath)
+  await addManagedProjectAnnotations(entities, manifestPath, projectName, projectHash)
+  await deployPackage(entities, ow, logger)
+  if (projectHash !== hashProjectSynced) {
+    // delete old files with same project name that do not exist in the manifest file anymore
+    await deleteEntities(hashProjectSynced, ow, '')
+  }
+}
 async function deleteEntities (projectHash, ow, projectName) {
   let valuetobeChecked
   let paramtobeChecked
@@ -685,6 +700,112 @@ async function deleteEntities (projectHash, ow, projectName) {
   }
 }
 
+async function addManagedProjectAnnotations (entities, manifestPath, projectName, projectHash) {
+  // add whisk managed annotations
+  for (const pkg of entities.pkgtoCreate) {
+    const options = {}
+    options['name'] = pkg.name
+    options['package'] = {
+      annotations: [
+        {
+          key: 'whisk-managed',
+          value: {
+            file: manifestPath,
+            projectDeps: [],
+            projectHash: projectHash,
+            projectName: projectName
+          }
+        }
+      ]
+    }
+  }
+  for (const action of entities.actions) {
+    action['annotations']['whisk-managed'] = {
+      file: manifestPath,
+      projectDeps: [],
+      projectHash: projectHash,
+      projectName: projectName
+    }
+  }
+
+  for (const trigger of entities.triggers) {
+    const managedAnnotation = {
+      key: 'whisk-managed',
+      value: {
+        file: manifestPath,
+        projectDeps: [],
+        projectHash: projectHash,
+        projectName: projectName
+      }
+    }
+    if (trigger['trigger'] && trigger['trigger']['annotations']) {
+      trigger['trigger']['annotations'].push(managedAnnotation)
+    } else {
+      trigger['trigger']['annotations'] = [managedAnnotation]
+    }
+  }
+}
+
+function getProjectHash (manifestContent, manifestPath) {
+  const stats = fs.statSync(manifestPath)
+  const fileSize = stats.size.toString()
+  const hashString = `Runtime ${fileSize}\0${manifestContent}`
+  const projectHash = sha1(hashString)
+  return projectHash
+}
+
+async function findProjectHashonServer (ow, projectName) {
+  let projectHash = ''
+  const options = {}
+  // check for package with the projectName in manifest File and if found -> return the projectHash on the server
+  const resultSync = await ow.packages.list(options)
+  for (const pkg of resultSync) {
+    if (pkg.annotations.length > 0) {
+      const whiskManaged = pkg.annotations.find(elem => elem.key === 'whisk-managed')
+      if (whiskManaged !== undefined && whiskManaged.value.projectName === projectName) {
+        projectHash = whiskManaged.value.projectHash
+        return projectHash
+      }
+    }
+  }
+  // if no package exists with the projectName -> look in actions
+  const resultActionList = await ow.actions.list()
+  for (const action of resultActionList) {
+    if (action.annotations.length > 0) {
+      const whiskManaged = action.annotations.find(elem => elem.key === 'whisk-managed')
+      if (whiskManaged !== undefined && whiskManaged.value.projectName === projectName) {
+        projectHash = whiskManaged.value.projectHash
+        return projectHash
+      }
+    }
+  }
+
+  // if no action exists with the projectName -> look in triggers
+  const resultTriggerList = await ow.triggers.list()
+  for (const trigger of resultTriggerList) {
+    if (trigger.annotations.length > 0) {
+      const whiskManaged = trigger.annotations.find(elem => elem.key === 'whisk-managed')
+      if (whiskManaged !== undefined && whiskManaged.value.projectName === projectName) {
+        projectHash = whiskManaged.value.projectHash
+        return projectHash
+      }
+    }
+  }
+
+  // if no trigger exists with the projectName -> look in rules
+  const resultRules = await ow.rules.list()
+  for (const rule of resultRules) {
+    if (rule.annotations.length > 0) {
+      const whiskManaged = rule.annotations.find(elem => elem.key === 'whisk-managed')
+      if (whiskManaged !== undefined && whiskManaged.value.projectName === projectName) {
+        projectHash = whiskManaged.value.projectHash
+        return projectHash
+      }
+    }
+  }
+  return projectHash
+}
+
 module.exports = {
   createKeyValueArrayFromFile,
   createKeyValueArrayFromFlag,
@@ -707,5 +828,9 @@ module.exports = {
   undeployPackage,
   processPackage,
   setPaths,
-  deleteEntities
+  deleteEntities,
+  syncPackage,
+  findProjectHashonServer,
+  getProjectHash,
+  addManagedProjectAnnotations
 }
