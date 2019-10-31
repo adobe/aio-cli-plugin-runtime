@@ -629,7 +629,7 @@ async function undeployPackage (entities, ow, logger) {
   logger('Success: Undeployment completed successfully.')
 }
 
-async function syncPackage (entities, ow, logger, projectName, manifestPath, manifestContent) {
+async function syncProject (projectName, manifestPath, manifestContent, entities, ow, logger) {
   // find project hash from server based on entities in the manifest file
   const hashProjectSynced = await findProjectHashonServer(ow, projectName)
 
@@ -829,7 +829,7 @@ module.exports = {
   processPackage,
   setPaths,
   deleteEntities,
-  syncPackage,
+  syncProject,
   findProjectHashonServer,
   getProjectHash,
   addManagedProjectAnnotations

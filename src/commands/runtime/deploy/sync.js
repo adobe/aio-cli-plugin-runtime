@@ -11,7 +11,7 @@ governing permissions and limitations under the License.
 */
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
-const { setPaths, processPackage, syncPackage } = require('../../../runtime-helpers')
+const { setPaths, processPackage, syncProject } = require('../../../runtime-helpers')
 const { flags } = require('@oclif/command')
 
 class DeploySync extends RuntimeBaseCommand {
@@ -30,7 +30,7 @@ class DeploySync extends RuntimeBaseCommand {
       const entities = processPackage(packages, deploymentPackages, deploymentTriggers, params)
       const ow = await this.wsk()
       const logger = this.log
-      await syncPackage(entities, ow, logger, components.projectName, components.manifestPath, components.manifestContent)
+      await syncProject(components.projectName, components.manifestPath, components.manifestContent, entities, ow, logger)
     } catch (err) {
       this.handleError('Failed to sync', err)
     }
