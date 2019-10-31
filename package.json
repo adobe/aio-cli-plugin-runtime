@@ -38,7 +38,6 @@
     "jest": "^24.9.0",
     "jest-junit": "^9.0.0",
     "jest-plugin-fs": "^2.9.0",
-    "memfs": "2.15.5",
     "stdout-stderr": "^0.1.9"
   },
   "engines": {
