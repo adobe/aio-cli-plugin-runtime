@@ -11,6 +11,7 @@ governing permissions and limitations under the License.
 */
 const { flags } = require('@oclif/command')
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
+const { printLogs } = require('./common')
 
 class ActivationGet extends RuntimeBaseCommand {
   async run () {
@@ -26,7 +27,11 @@ class ActivationGet extends RuntimeBaseCommand {
         this.error('missing required argument activationID')
       }
       const result = await ow.activations.get(id)
-      this.logJSON('', result)
+      if (flags.logs) {
+        printLogs(result, true, this.log)
+      } else {
+        this.logJSON('', result)
+      }
     } catch (err) {
       this.handleError('failed to retrieve the activation', err)
     }
@@ -44,6 +49,10 @@ ActivationGet.flags = {
   last: flags.boolean({
     char: 'l',
     description: 'retrieves the most recent activation'
+  }),
+  logs: flags.boolean({
+    char: 'g',
+    description: 'emit only the logs, stripped of time stamps and stream identifier'
   })
 }
 
