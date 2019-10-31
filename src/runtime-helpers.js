@@ -605,7 +605,7 @@ async function undeployPackage (entities, ow, logger) {
     logger(`Info: action [${action.name}] has been successfully undeployed.\n`)
   }
   for (const trigger of entities.triggers) {
-    logger(`Info: Undeploying trigger [${trigger}]...`)
+    logger(`Info: Undeploying trigger [${trigger.name}]...`)
     await ow.triggers.delete(trigger)
     logger(`Info: trigger [${trigger.name}] has been successfully undeployed.\n`)
   }
