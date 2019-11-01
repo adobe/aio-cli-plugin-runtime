@@ -11,30 +11,30 @@ governing permissions and limitations under the License.
 */
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
-const { deleteEntities, undeployPackage, processPackage, setPaths } = require('../../../runtime-helpers')
+const { getProjectEntities, undeployPackage, processPackage, setPaths } = require('../../../runtime-helpers')
 const { flags } = require('@oclif/command')
 
 class DeployUndeploy extends RuntimeBaseCommand {
   async run () {
     const { flags } = this.parse(DeployUndeploy)
     try {
-      // a. delete entities by project name
-      if (flags.projectname) {
-        const ow = await this.wsk()
-        await deleteEntities('', ow, flags.projectname)
-        return
-      }
-
-      // b. delete entities by manifest file
-      const components = setPaths(flags) // if !flags.manifest -> uses default
-      const packages = components.packages
-      // todo support deployment files
-      const deploymentTriggers = {} // components.deploymentTriggers
-      const deploymentPackages = {} // components.deploymentPackages
-      const entities = processPackage(packages, deploymentTriggers, deploymentPackages, {}, true) // true for getting entity namesOnly, we do not need to parse all actions files and so on
-
       const ow = await this.wsk()
       const logger = this.log
+
+      let entities
+      if (flags.projectname) {
+        // a. delete entities by project name
+        entities = await getProjectEntities(flags.projectname, false, ow)
+      } else {
+        // b. delete entities by manifest file
+        const components = setPaths(flags) // if !flags.manifest -> uses default
+        const packages = components.packages
+        // todo support deployment files
+        const deploymentTriggers = {} // components.deploymentTriggers
+        const deploymentPackages = {} // components.deploymentPackages
+        entities = processPackage(packages, deploymentTriggers, deploymentPackages, {}, true) // true for getting entity namesOnly, we do not need to parse all actions files and so on
+      }
+
       await undeployPackage(entities, ow, logger)
     } catch (err) {
       this.handleError('Failed to undeploy', err)

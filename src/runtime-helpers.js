@@ -336,7 +336,7 @@ function createActionObject (thisAction, objAction) {
 }
 
 function processPackage (packages, deploymentPackages, deploymentTriggers, params, namesOnly = false) {
-  const pkgtoCreate = []
+  const pkgAndDeps = []
   const actions = []
   const rules = []
   const triggers = []
@@ -346,7 +346,7 @@ function processPackage (packages, deploymentPackages, deploymentTriggers, param
   const arrSequence = []
 
   Object.keys(packages).forEach((key) => {
-    pkgtoCreate.push({ name: key })
+    pkgAndDeps.push({ name: key })
     // From wskdeploy repo : currently, the 'version' and 'license' values are not stored in Apache OpenWhisk, but there are plans to support it in the future
     // pkg.version = packages[key]['version']
     // pkg.license = packages[key]['license']
@@ -381,7 +381,7 @@ function processPackage (packages, deploymentPackages, deploymentTriggers, param
           }
           objDep.package = objDepPackage
         }
-        pkgtoCreate.push(objDep)
+        pkgAndDeps.push(objDep)
       })
     }
     if (packages[key]['actions']) {
@@ -483,7 +483,7 @@ function processPackage (packages, deploymentPackages, deploymentTriggers, param
     }
   })
   const entities = {
-    pkgtoCreate: pkgtoCreate,
+    pkgAndDeps: pkgAndDeps,
     apis: apis,
     triggers: triggers,
     rules: rules,
@@ -552,7 +552,7 @@ function setPaths (flags) {
 async function deployPackage (entities, ow, logger) {
   const opts = await ow.actions.client.options
   const ns = opts.namespace
-  for (const pkg of entities.pkgtoCreate) {
+  for (const pkg of entities.pkgAndDeps) {
     logger(`Info: Deploying package [${pkg.name}]...`)
     await ow.packages.update(pkg)
     logger(`Info: package [${pkg.name}] has been successfully deployed.\n`)
@@ -619,7 +619,7 @@ async function undeployPackage (entities, ow, logger) {
     await ow.routes.delete({ basepath: api.basepath, relpath: api.relpath }) // cannot use name + basepath
     logger(`Info: api [${api.name}] has been successfully undeployed.\n`)
   }
-  for (const packg of entities.pkgtoCreate) {
+  for (const packg of entities.pkgAndDeps) {
     const options = {}
     options.name = packg.name
     logger(`Info: Undeploying package [${packg.name}]...`)
@@ -639,70 +639,58 @@ async function syncProject (projectName, manifestPath, manifestContent, entities
   await deployPackage(entities, ow, logger)
   if (projectHash !== hashProjectSynced) {
     // delete old files with same project name that do not exist in the manifest file anymore
-    await deleteEntities(hashProjectSynced, ow, '')
+    const junkEntities = await getProjectEntities(hashProjectSynced, true, ow)
+    await undeployPackage(junkEntities, ow, () => {})
   }
 }
-async function deleteEntities (projectHash, ow, projectName) {
-  let valuetobeChecked
+
+async function getProjectEntities (project, isProjectHash, ow) {
   let paramtobeChecked
-  if (projectHash !== '') {
-    valuetobeChecked = projectHash
+  if (isProjectHash) {
     paramtobeChecked = 'projectHash'
   } else {
-    valuetobeChecked = projectName
     paramtobeChecked = 'projectName'
   }
 
-  const resultActionList = await ow.actions.list()
-  for (const action of resultActionList) {
-    if (action.annotations.length > 0) {
-      const whiskManaged = action.annotations.find(elem => elem.key === 'whisk-managed')
-      if (whiskManaged !== undefined && whiskManaged.value[paramtobeChecked] === valuetobeChecked) {
-        let actionName = action.name
-        const ns = action.namespace.split('/')
-        if (ns.length > 1) {
-          actionName = `${ns[1]}/${actionName}`
+  const getEntityList = async id => {
+    const res = []
+    const entityListResult = await ow[id].list()
+    for (const entity of entityListResult) {
+      if (entity.annotations.length > 0) {
+        const whiskManaged = entity.annotations.find(a => a.key === 'whisk-managed')
+        if (whiskManaged !== undefined && whiskManaged.value[paramtobeChecked] === project) {
+          let entityName = entity.name
+          if (id === 'actions') {
+            // get action package name
+            const nsAndPkg = entity.namespace.split('/')
+            if (nsAndPkg.length > 1) {
+              entityName = `${nsAndPkg[1]}/${entityName}`
+            }
+          }
+          res.push({ name: entityName })
         }
-        await ow.actions.delete(actionName)
       }
     }
+    return res
   }
 
-  const options = {}
-  const resultSync = await ow.packages.list(options)
-  for (const pkg of resultSync) {
-    if (pkg.annotations.length > 0) {
-      const whiskManaged = pkg.annotations.find(elem => elem.key === 'whisk-managed')
-      if (whiskManaged !== undefined && whiskManaged.value[paramtobeChecked] === valuetobeChecked) {
-        await ow.packages.delete(pkg.name)
-      }
-    }
+  // parallel io
+  const entitiesArray = await Promise.all(['actions', 'triggers', 'rules', 'packages'].map(getEntityList))
+
+  const entities = {
+    actions: entitiesArray[0],
+    triggers: entitiesArray[1],
+    rules: entitiesArray[2],
+    pkgAndDeps: entitiesArray[3],
+    apis: [] // apis are not whisk-managed (no annotation support)
   }
 
-  const resultTriggerList = await ow.triggers.list()
-  for (const trigger of resultTriggerList) {
-    if (trigger.annotations.length > 0) {
-      const whiskManaged = trigger.annotations.find(elem => elem.key === 'whisk-managed')
-      if (whiskManaged !== undefined && whiskManaged.value[paramtobeChecked] === valuetobeChecked) {
-        await ow.triggers.delete(trigger.name)
-      }
-    }
-  }
-
-  const resultRules = await ow.rules.list()
-  for (const rule of resultRules) {
-    if (rule.annotations.length > 0) {
-      const whiskManaged = rule.annotations.find(elem => elem.key === 'whisk-managed')
-      if (whiskManaged !== undefined && whiskManaged.value[paramtobeChecked] === valuetobeChecked) {
-        await ow.rules.delete(rule.name)
-      }
-    }
-  }
+  return entities
 }
 
 async function addManagedProjectAnnotations (entities, manifestPath, projectName, projectHash) {
   // add whisk managed annotations
-  for (const pkg of entities.pkgtoCreate) {
+  for (const pkg of entities.pkgAndDeps) {
     const options = {}
     options['name'] = pkg.name
     options['package'] = {
@@ -828,7 +816,7 @@ module.exports = {
   undeployPackage,
   processPackage,
   setPaths,
-  deleteEntities,
+  getProjectEntities,
   syncProject,
   findProjectHashonServer,
   getProjectHash,
