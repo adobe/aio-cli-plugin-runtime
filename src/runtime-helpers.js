@@ -601,17 +601,17 @@ async function deployPackage (entities, ow, logger) {
 async function undeployPackage (entities, ow, logger) {
   for (const action of entities.actions) {
     logger(`Info: Undeploying action [${action.name}]...`)
-    await ow.actions.delete(action)
+    await ow.actions.delete({ name: action.name })
     logger(`Info: action [${action.name}] has been successfully undeployed.\n`)
   }
   for (const trigger of entities.triggers) {
     logger(`Info: Undeploying trigger [${trigger.name}]...`)
-    await ow.triggers.delete(trigger)
+    await ow.triggers.delete({ name: trigger.name })
     logger(`Info: trigger [${trigger.name}] has been successfully undeployed.\n`)
   }
   for (const rule of entities.rules) {
     logger(`Info: Undeploying rule [${rule.name}]...`)
-    await ow.rules.delete(rule)
+    await ow.rules.delete({ name: rule.name })
     logger(`Info: rule [${rule.name}] has been successfully undeployed.\n`)
   }
   for (const api of entities.apis) {
@@ -620,10 +620,8 @@ async function undeployPackage (entities, ow, logger) {
     logger(`Info: api [${api.name}] has been successfully undeployed.\n`)
   }
   for (const packg of entities.pkgAndDeps) {
-    const options = {}
-    options.name = packg.name
     logger(`Info: Undeploying package [${packg.name}]...`)
-    await ow.packages.delete(options)
+    await ow.packages.delete({ name: packg.name })
     logger(`Info: package [${packg.name}] has been successfully undeployed.\n`)
   }
   logger('Success: Undeployment completed successfully.')
@@ -659,15 +657,14 @@ async function getProjectEntities (project, isProjectHash, ow) {
       if (entity.annotations.length > 0) {
         const whiskManaged = entity.annotations.find(a => a.key === 'whisk-managed')
         if (whiskManaged !== undefined && whiskManaged.value[paramtobeChecked] === project) {
-          let entityName = entity.name
           if (id === 'actions') {
             // get action package name
             const nsAndPkg = entity.namespace.split('/')
             if (nsAndPkg.length > 1) {
-              entityName = `${nsAndPkg[1]}/${entityName}`
+              entity.name = `${nsAndPkg[1]}/${entity.name}`
             }
           }
-          res.push({ name: entityName })
+          res.push(entity)
         }
       }
     }
