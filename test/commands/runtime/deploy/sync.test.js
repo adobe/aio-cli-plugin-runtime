@@ -418,7 +418,7 @@ describe('instance methods', () => {
       command.argv = ['-m', '/deploy/deployment_syncMissingAction.yaml']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith('testSeq')
+          expect(cmd).toHaveBeenCalledWith({ name: 'testSeq' })
           expect(stdout.output).toMatch('')
         })
     })
@@ -455,7 +455,7 @@ describe('instance methods', () => {
       command.argv = ['-m', '/deploy/deployment_syncMissingAction.yaml']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith('meetPerson')
+          expect(cmd).toHaveBeenCalledWith({ name: 'meetPerson' })
           expect(stdout.output).toMatch('')
         })
     })
@@ -543,7 +543,7 @@ describe('instance methods', () => {
       command.argv = ['-m', '/deploy/deployment_syncMissingAction.yaml']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith('meetPersonRule')
+          expect(cmd).toHaveBeenCalledWith({ name: 'meetPersonRule' })
           expect(stdout.output).toMatch('')
         })
     })
