@@ -12,7 +12,7 @@ governing permissions and limitations under the License.
 
 const { flags } = require('@oclif/command')
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
-const { printLogs } = require('./common')
+const { printLogs } = require('../../../runtime-helpers')
 
 class ActivationLogs extends RuntimeBaseCommand {
   async run () {
