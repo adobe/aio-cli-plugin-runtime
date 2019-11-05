@@ -107,6 +107,13 @@ describe('instance methods', () => {
         })
     })
 
+    test('retrieve last activation logs --last --logs : none returned', async () => {
+      ow.mockResolved('activations.list', [])
+      command.argv = ['--last', '--logs']
+      const res = command.run()
+      await expect(res).rejects.toThrow('no activations were returned')
+    })
+
     test('should fail on get activation w/ noflag, no activationId', async () => {
       const runResult = command.run()
       await expect(runResult instanceof Promise).toBeTruthy()
