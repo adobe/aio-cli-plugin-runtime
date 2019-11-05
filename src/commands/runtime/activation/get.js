@@ -11,7 +11,7 @@ governing permissions and limitations under the License.
 */
 const { flags } = require('@oclif/command')
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
-const { printLogs } = require('./common')
+const { printLogs } = require('../../../runtime-helpers')
 
 class ActivationGet extends RuntimeBaseCommand {
   async run () {
@@ -21,15 +21,22 @@ class ActivationGet extends RuntimeBaseCommand {
       const ow = await this.wsk()
       if (flags.last) {
         const ax = await ow.activations.list({ limit: 1, skip: 0 })
-        id = ax[0].activationId
+        if (ax && ax.length > 0) {
+          id = ax[0].activationId
+        } else {
+          this.handleError('no activations were returned')
+        }
       }
       if (!id) {
         this.error('missing required argument activationID')
       }
-      const result = await ow.activations.get(id)
+
       if (flags.logs) {
+        this.log('activation logs %s', id)
+        const result = await ow.activations.logs(id)
         printLogs(result, true, this.log)
       } else {
+        const result = await ow.activations.get(id)
         this.logJSON('', result)
       }
     } catch (err) {
