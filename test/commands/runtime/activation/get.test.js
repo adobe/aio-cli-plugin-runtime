@@ -73,7 +73,8 @@ describe('instance methods', () => {
     })
 
     test('retrieve logs for an activation --logs', () => {
-      const cmd = ow.mockResolved(owAction, { logs: ['line1', 'line2', '2019-10-11T19:08:57.298Z  stdout: login-success'] })
+      // note: when we call with an id, and --logs, we never call `get`, just activations.logs(id)
+      const cmd = ow.mockResolved('activations.logs', { logs: ['line1', 'line2', '2019-10-11T19:08:57.298Z  stdout: login-success'] })
       command.argv = ['12345', '--logs']
       return command.run()
         .then(() => {
@@ -96,7 +97,7 @@ describe('instance methods', () => {
 
     test('retrieve last activation logs --last --logs', () => {
       const axList = ow.mockResolved('activations.list', [{ activationId: '12345' }])
-      const axGet = ow.mockResolved(owAction, { logs: ['line1', 'line2', '2019-10-11T19:08:57.298Z   stdout: login-success'] })
+      const axGet = ow.mockResolved('activations.logs', { logs: ['line1', 'line2', '2019-10-11T19:08:57.298Z   stdout: login-success'] })
       command.argv = ['--last', '--logs']
       return command.run()
         .then(() => {
