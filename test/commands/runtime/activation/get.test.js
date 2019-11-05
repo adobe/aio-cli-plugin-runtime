@@ -38,10 +38,15 @@ test('args', async () => {
 })
 
 test('flags', async () => {
-  const flag = TheCommand.flags.last
-  expect(flag).toBeDefined()
-  expect(flag.description).toBeDefined()
-  expect(flag.char).toBe('l')
+  const lastFlag = TheCommand.flags.last
+  expect(lastFlag).toBeDefined()
+  expect(lastFlag.description).toBeDefined()
+  expect(lastFlag.char).toBe('l')
+
+  const logsFlag = TheCommand.flags.logs
+  expect(logsFlag).toBeDefined()
+  expect(logsFlag.description).toBeDefined()
+  expect(logsFlag.char).toBe('g')
 })
 
 describe('instance methods', () => {
@@ -67,6 +72,16 @@ describe('instance methods', () => {
         })
     })
 
+    test('retrieve logs for an activation --logs', () => {
+      const cmd = ow.mockResolved(owAction, { logs: ['line1', 'line2', '2019-10-11T19:08:57.298Z  stdout: login-success'] })
+      command.argv = ['12345', '--logs']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith('12345')
+          expect(stdout.output).toMatch('line1\nline2\nlogin-success')
+        })
+    })
+
     test('retrieve last activation --last', () => {
       const axList = ow.mockResolved('activations.list', [{ activationId: '12345' }])
       const axGet = ow.mockResolved(owAction, '')
@@ -76,6 +91,18 @@ describe('instance methods', () => {
           expect(axList).toHaveBeenCalled()
           expect(axGet).toHaveBeenCalledWith('12345')
           expect(stdout.output).toMatch('')
+        })
+    })
+
+    test('retrieve last activation logs --last --logs', () => {
+      const axList = ow.mockResolved('activations.list', [{ activationId: '12345' }])
+      const axGet = ow.mockResolved(owAction, { logs: ['line1', 'line2', '2019-10-11T19:08:57.298Z   stdout: login-success'] })
+      command.argv = ['--last', '--logs']
+      return command.run()
+        .then(() => {
+          expect(axList).toHaveBeenCalled()
+          expect(axGet).toHaveBeenCalledWith('12345')
+          expect(stdout.output).toMatch('line1\nline2\nlogin-success')
         })
     })
 

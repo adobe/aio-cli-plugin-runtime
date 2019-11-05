@@ -83,12 +83,12 @@ describe('instance methods', () => {
     })
 
     test('retrieve logs of an activation --strip', () => {
-      const cmd = ow.mockResolved(owAction, { logs: ['line1', 'line2', '2019-10-11T19:08:57.298Z       stdout: login-success'] })
+      const cmd = ow.mockResolved(owAction, { logs: ['line1', 'line2', '2019-10-11T19:08:57.298Z  stdout: login-success'] })
       command.argv = ['12345', '-r']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalledWith('12345')
-          expect(stdout.output).toMatch('line1\nline2\nstdout: login-success')
+          expect(stdout.output).toMatch('line1\nline2\nlogin-success')
         })
     })
 
