@@ -99,3 +99,48 @@ describe('parsePathPattern', () => {
     expect(name).toEqual('name1')
   })
 })
+
+describe('fileExtensionForKind', () => {
+  test('map action kind to file extension', () => {
+    expect(TheHelper.fileExtensionForKind('ballerina:abc')).toEqual('.bal')
+    expect(TheHelper.fileExtensionForKind('dotnet:abc')).toEqual('.cs')
+    expect(TheHelper.fileExtensionForKind('go:abc')).toEqual('.go')
+    expect(TheHelper.fileExtensionForKind('java:abc')).toEqual('.java')
+    expect(TheHelper.fileExtensionForKind('nodejs:abc')).toEqual('.js')
+    expect(TheHelper.fileExtensionForKind('php:abc')).toEqual('.php')
+    expect(TheHelper.fileExtensionForKind('python:abc')).toEqual('.py')
+    expect(TheHelper.fileExtensionForKind('ruby:abc')).toEqual('.rb')
+    expect(TheHelper.fileExtensionForKind('rust:abc')).toEqual('.rs')
+    expect(TheHelper.fileExtensionForKind('swift:abc')).toEqual('.swift')
+
+    // all kinds are colon separated but test defensively anyway
+    expect(TheHelper.fileExtensionForKind('swift')).toEqual('.swift')
+
+    // unknown kinds return ''
+    expect(TheHelper.fileExtensionForKind('???:???')).toEqual('')
+    expect(TheHelper.fileExtensionForKind('???')).toEqual('')
+    expect(TheHelper.fileExtensionForKind('')).toEqual('')
+    expect(TheHelper.fileExtensionForKind(undefined)).toEqual('')
+  })
+})
+
+describe('kindForFileExtension', () => {
+  test('map action kind to file extension', () => {
+    expect(TheHelper.kindForFileExtension('f.bal')).toEqual('ballerina:default')
+    expect(TheHelper.kindForFileExtension('f.cs')).toEqual('dotnet:default')
+    expect(TheHelper.kindForFileExtension('f.go')).toEqual('go:default')
+    expect(TheHelper.kindForFileExtension('f.java')).toEqual('java:default')
+    expect(TheHelper.kindForFileExtension('f.js')).toEqual('nodejs:default')
+    expect(TheHelper.kindForFileExtension('f.php')).toEqual('php:default')
+    expect(TheHelper.kindForFileExtension('f.py')).toEqual('python:default')
+    expect(TheHelper.kindForFileExtension('f.rb')).toEqual('ruby:default')
+    expect(TheHelper.kindForFileExtension('f.rs')).toEqual('rust:default')
+    expect(TheHelper.kindForFileExtension('f.swift')).toEqual('swift:default')
+
+    expect(TheHelper.kindForFileExtension(undefined)).toEqual(undefined)
+    expect(TheHelper.kindForFileExtension('')).toEqual(undefined)
+    expect(TheHelper.kindForFileExtension('.')).toEqual(undefined)
+    expect(TheHelper.kindForFileExtension('.js')).toEqual(undefined)
+    expect(TheHelper.kindForFileExtension('???')).toEqual(undefined)
+  })
+})

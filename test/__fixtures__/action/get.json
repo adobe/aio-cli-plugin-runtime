@@ -15,6 +15,7 @@
   ],
   "exec": {
     "binary": false,
+    "kind": "nodejs:10-fat",
     "code":"this is the code"
   },
   "limits": {
