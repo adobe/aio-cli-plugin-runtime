@@ -31,6 +31,8 @@ delete process.env['WHISK_NAMESPACE']
 delete process.env['WSK_CONFIG_FILE']
 
 // trap console log
+// if you want to see output, you can do this:
+// beforeEach(() => { stdout.start(); stdout.print = true })
 beforeEach(() => { stdout.start() })
 afterEach(() => { stdout.stop() })
 

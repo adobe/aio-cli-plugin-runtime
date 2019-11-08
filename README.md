@@ -36,7 +36,7 @@ $ npm install -g @adobe/aio-cli-plugin-runtime
 $ ./bin/run COMMAND
 running command...
 $ ./bin/run (-v|--version|version)
-@adobe/aio-cli-plugin-runtime/1.1.0 darwin-x64 node-v12.3.1
+@adobe/aio-cli-plugin-runtime/1.1.0 darwin-x64 node-v10.16.1
 $ ./bin/run --help [COMMAND]
 USAGE
   $ ./bin/run COMMAND
@@ -414,6 +414,7 @@ USAGE
   $ ./bin/run runtime:activation:get [ACTIVATIONID]
 
 OPTIONS
+  -g, --logs               emit only the logs, stripped of time stamps and stream identifier
   -i, --insecure           bypass certificate check
   -l, --last               retrieves the most recent activation
   -u, --auth=auth          whisk auth
@@ -496,8 +497,9 @@ USAGE
   $ ./bin/run runtime:activation:logs [ACTIVATIONID]
 
 OPTIONS
+  -c, --count=count        [default: 1] used with --last, return the last `count` activation logs. Max 5
   -i, --insecure           bypass certificate check
-  -l, --last               retrieves the most recent activation log
+  -l, --last               retrieves the most recent activation logs
   -r, --strip              strip timestamp information and output first line only
   -u, --auth=auth          whisk auth
   -v, --verbose            Verbose output
