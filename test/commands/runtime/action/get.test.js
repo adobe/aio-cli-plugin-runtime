@@ -149,6 +149,17 @@ describe('instance methods', () => {
         })
     })
 
+    test('retrieve an action in a package --save', () => {
+      fs.writeFileSync = jest.fn()
+      const cmd = ow.mockResolvedFixture(owAction, 'action/getpackage.json')
+      command.argv = ['pkg/hello', '--save']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith('pkg/hello')
+          expect(fs.writeFileSync).toHaveBeenCalledWith('hello.js', 'this is the code')
+        })
+    })
+
     test('retrieve an action --save-as', () => {
       const cmd = ow.mockResolvedFixture(owAction, 'action/get.json')
       fs.writeFileSync = jest.fn()

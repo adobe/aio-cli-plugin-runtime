@@ -55,12 +55,12 @@ class ActionGet extends RuntimeBaseCommand {
 
         if (flags.save || bSaveFile) {
           if (result.exec.binary) {
-            const saveFileName = bSaveFile ? flags['save-as'] : `${name}.zip`
+            const saveFileName = bSaveFile ? flags['save-as'] : `${result.name}.zip`
             const data = Buffer.from(result.exec.code, 'base64')
             fs.writeFileSync(saveFileName, data, 'buffer')
           } else {
             const extension = fileExtensionForKind(result.exec.kind)
-            const saveFileName = bSaveFile ? flags['save-as'] : `${name}${extension}`
+            const saveFileName = bSaveFile ? flags['save-as'] : `${result.name}${extension}`
             fs.writeFileSync(saveFileName, result.exec.code)
           }
         } else {
