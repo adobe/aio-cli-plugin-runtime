@@ -10,9 +10,10 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
-const { flags } = require('@oclif/command')
 const fs = require('fs')
+const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
+const { fileExtensionForKind } = require('../../../runtime-helpers')
+const { flags } = require('@oclif/command')
 
 class ActionGet extends RuntimeBaseCommand {
   async run () {
@@ -58,7 +59,8 @@ class ActionGet extends RuntimeBaseCommand {
             const data = Buffer.from(result.exec.code, 'base64')
             fs.writeFileSync(saveFileName, data, 'buffer')
           } else {
-            const saveFileName = bSaveFile ? flags['save-as'] : `${name}.js`
+            const extension = fileExtensionForKind(result.exec.kind)
+            const saveFileName = bSaveFile ? flags['save-as'] : `${name}${extension}`
             fs.writeFileSync(saveFileName, result.exec.code)
           }
         } else {
