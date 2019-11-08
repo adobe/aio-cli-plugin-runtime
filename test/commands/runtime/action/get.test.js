@@ -66,48 +66,48 @@ describe('instance methods', () => {
     test('retrieve an action --url with web flags', () => {
       const cmd = ow.mockResolvedFixture(owAction, 'action/get.json')
       ow.mockResolved('actions.client.options', '')
-      ow.actions.client.options = { api: 'api/', namespace: 'namespace' }
+      ow.actions.client.options = { api: 'api/' }
       command.argv = ['hello', '--url']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalled()
-          expect(stdout.output).toMatch('api/web/namespace/default/hello')
+          expect(stdout.output).toMatch('api/web/53444_41603/default/hello')
         })
     })
 
     test('retrieve an action --url with web flags from package', () => {
       const cmd = ow.mockResolvedFixture(owAction, 'action/get.json')
       ow.mockResolved('actions.client.options', '')
-      ow.actions.client.options = { api: 'api/', namespace: 'namespace' }
+      ow.actions.client.options = { api: 'api/' }
       command.argv = ['test/hello', '--url']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalled()
-          expect(stdout.output).toMatch('api/web/namespace/test/hello')
+          expect(stdout.output).toMatch('api/web/53444_41603/test/hello')
         })
     })
 
     test('retrieve an action --url without web flags', () => {
       const cmd = ow.mockResolvedFixture(owAction, 'action/getWebFalse.json')
       ow.mockResolved('actions.client.options', '')
-      ow.actions.client.options = { api: 'api/', namespace: 'namespace' }
+      ow.actions.client.options = { api: 'api/' }
       command.argv = ['hello', '--url']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalled()
-          expect(stdout.output).toMatch('api/namespaces/namespace/actions/hello')
+          expect(stdout.output).toMatch('api/namespaces/53444_41603/actions/hello')
         })
     })
 
     test('retrieve an action --url when annotation array is absent', () => {
       const cmd = ow.mockResolvedFixture(owAction, 'action/get_NoWebFlag.json')
       ow.mockResolved('actions.client.options', '')
-      ow.actions.client.options = { api: 'api/', namespace: 'namespace' }
+      ow.actions.client.options = { api: 'api/' }
       command.argv = ['hello', '--url']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalled()
-          expect(stdout.output).toMatch('api/namespaces/namespace/actions/hello')
+          expect(stdout.output).toMatch('api/namespaces/53444_41603/actions/hello')
         })
     })
 
