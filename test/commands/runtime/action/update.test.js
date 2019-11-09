@@ -13,6 +13,7 @@ governing permissions and limitations under the License.
 const { stdout } = require('stdout-stderr')
 const TheCommand = require('../../../../src/commands/runtime/action/update.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
+const { createKeyValueArrayFromObject } = require('../../../../src/runtime-helpers.js')
 const ow = require('openwhisk')()
 const owAction = 'actions.update'
 
@@ -93,276 +94,496 @@ describe('instance methods', () => {
       expect(command.run).toBeInstanceOf(Function)
     })
 
-    test('updates an action with action name and action path', () => {
+    test('updates an action with action name only', () => {
+      const name = 'hello'
       const cmd = ow.mockResolved(owAction, '')
-      command.argv = ['hello', '/action/actionFile.js']
+      command.argv = [name]
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ name: 'hello', action: jsFile, annotations: {}, limits: {}, params: {} })
+          expect(cmd).toHaveBeenCalledWith({ name, action: { name } })
+          expect(stdout.output).toMatch('')
+        })
+    })
+
+    test('updates an action with action name and action path', () => {
+      const name = 'hello'
+      const cmd = ow.mockResolved(owAction, '')
+      command.argv = [name, '/action/actionFile.js']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith({ name, action: { name, exec: { code: jsFile, kind: 'nodejs:default' } } })
           expect(stdout.output).toMatch('')
         })
     })
 
     test('updates an action with action name and action path --json', () => {
+      const name = 'hello'
       const cmd = ow.mockResolved(owAction, '')
-      command.argv = ['hello', '/action/actionFile.js', '--json']
+      command.argv = [name, '/action/actionFile.js', '--json']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ name: 'hello', action: jsFile, annotations: {}, limits: {}, params: {} })
+          expect(cmd).toHaveBeenCalledWith({ name, action: { name, exec: { code: jsFile, kind: 'nodejs:default' } } })
           expect(stdout.output).toMatch('')
         })
     })
 
     test('updates an action with action name and action path to zip file', () => {
+      const name = 'hello'
       const zipFile = Buffer.from('fakezipfile')
       const cmd = ow.mockResolved(owAction, '')
-      command.argv = ['hello', '/action/zipAction.zip', '--kind', 'nodejs:10']
+      command.argv = [name, '/action/zipAction.zip', '--kind', 'nodejs:10']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ name: 'hello', action: zipFile, annotations: {}, kind: 'nodejs:10', limits: {}, params: {} })
+          expect(cmd).toHaveBeenCalledWith({ name, action: { name, exec: { code: zipFile, kind: 'nodejs:10' } } })
           expect(stdout.output).toMatch('')
         })
     })
 
     test('updates an action with action name, action path and --param flag', () => {
+      const name = 'hello'
       const cmd = ow.mockResolved(owAction, '')
-      command.argv = ['hello', '/action/actionFile.js', '--param', 'a', 'b', '--param', 'c', 'd']
+      command.argv = [name, '/action/actionFile.js', '--param', 'a', 'b', '--param', 'c', 'd']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalledWith({
-            name: 'hello',
-            params: { a: 'b', c: 'd' },
-            action: jsFile,
-            annotations: {},
-            limits: {}
+            name,
+            action: {
+              name,
+              exec: {
+                code: jsFile,
+                kind: 'nodejs:default'
+              },
+              parameters: createKeyValueArrayFromObject({ a: 'b', c: 'd' })
+            }
+          })
+          expect(stdout.output).toMatch('')
+        })
+    })
+
+    test('updates an action --param flag', () => {
+      const name = 'hello'
+      const cmd = ow.mockResolved(owAction, '')
+      command.argv = [name, '--param', 'a', 'b', '--param', 'c', 'd']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith({
+            name,
+            action: {
+              name,
+              parameters: createKeyValueArrayFromObject({ a: 'b', c: 'd' })
+            }
           })
           expect(stdout.output).toMatch('')
         })
     })
 
     test('updates an action with action name and --sequence flag', () => {
+      const name = 'hello'
       const cmd = ow.mockResolved(owAction, '')
       ow.actions.client.options = { namespace: 'ns' }
-      command.argv = ['hello', '--sequence', 'a,b,c']
+      command.argv = [name, '--sequence', 'a,b,c']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalledWith({
-            name: 'hello',
-            action: '',
-            annotations: {},
-            limits: {},
-            params: {},
-            exec: {
-              kind: 'sequence',
-              components: ['/ns/a', '/ns/b', '/ns/c']
+            name,
+            action: {
+              name,
+              exec: {
+                kind: 'sequence',
+                components: ['/_/a', '/_/b', '/_/c']
+              }
             }
-          })
-          expect(stdout.output).toMatch('')
-        })
-    })
-
-    test('updates an action with --main flag', () => {
-      const cmd = ow.mockResolved(owAction, '')
-      command.argv = ['hello', '/action/actionFile.js', '--main', 'maynard']
-      return command.run()
-        .then(() => {
-          expect(cmd).toHaveBeenCalledWith({
-            name: 'hello',
-            exec: { main: 'maynard' },
-            params: {},
-            action: jsFile,
-            annotations: {},
-            limits: {}
-          })
-          expect(stdout.output).toMatch('')
-        })
-    })
-
-    test('update an action with --main flag and --sequence', () => {
-      const cmd = ow.mockResolved(owAction, '')
-      command.argv = ['hello', '/action/actionFile.js', '--main', 'maynard', '--sequence', 'a,b,c']
-      return command.run()
-        .then(() => {
-          expect(cmd).toHaveBeenCalledWith({
-            name: 'hello',
-            exec: {
-              main: 'maynard',
-              kind: 'sequence',
-              components: ['/ns/a', '/ns/b', '/ns/c']
-            },
-            params: {},
-            action: jsFile,
-            annotations: {},
-            limits: {}
           })
           expect(stdout.output).toMatch('')
         })
     })
 
     test('updates an action with action name, action path and --param-file flag', () => {
+      const name = 'hello'
       const cmd = ow.mockResolved(owAction, '')
-      command.argv = ['hello', '/action/actionFile.js', '--param-file', '/action/parameters.json']
+      command.argv = [name, '/action/actionFile.js', '--param-file', '/action/parameters.json']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalledWith({
-            name: 'hello',
-            params: { param1: 'param1value', param2: 'param2value' },
-            action: jsFile,
-            annotations: {},
-            limits: {}
+            name,
+            action: {
+              name,
+              exec: {
+                code: jsFile,
+                kind: 'nodejs:default'
+              },
+              parameters: createKeyValueArrayFromObject({ param1: 'param1value', param2: 'param2value' })
+            }
+          })
+          expect(stdout.output).toMatch('')
+        })
+    })
+
+    test('updates an action with action name and --param-file flag', () => {
+      const name = 'hello'
+      const cmd = ow.mockResolved(owAction, '')
+      command.argv = [name, '--param-file', '/action/parameters.json']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith({
+            name,
+            action: {
+              name,
+              parameters: createKeyValueArrayFromObject({ param1: 'param1value', param2: 'param2value' })
+            }
           })
           expect(stdout.output).toMatch('')
         })
     })
 
     test('updates an action with action name, action path, --params flag and limits', () => {
+      const name = 'hello'
       const cmd = ow.mockResolved(owAction, '')
-      command.argv = ['hello', '/action/actionFile.js', '--param', 'a', 'b', '--param', 'c', 'd', '--logsize', '8', '--memory', '128', '--timeout', '20000']
+      command.argv = [name, '/action/actionFile.js', '--param', 'a', 'b', '--param', 'c', 'd', '--logsize', '8', '--memory', '128', '--timeout', '20000']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalledWith({
-            name: 'hello',
-            params: { a: 'b', c: 'd' },
-            action: jsFile,
-            annotations: {},
-            limits: {
-              logs: 8,
-              memory: 128,
-              timeout: 20000
+            name,
+            action: {
+              name,
+              exec: {
+                code: jsFile,
+                kind: 'nodejs:default'
+              },
+              parameters: createKeyValueArrayFromObject({ a: 'b', c: 'd' }),
+              limits: {
+                logs: 8,
+                memory: 128,
+                timeout: 20000
+              }
             }
           })
           expect(stdout.output).toMatch('')
         })
     })
 
-    test('updates an action with action name, action path, --params flag and limits with shorter flag version', () => {
+    test('updates an action with action name, --params flag and limits', () => {
+      const name = 'hello'
       const cmd = ow.mockResolved(owAction, '')
-      command.argv = ['hello', '/action/actionFile.js', '-p', 'a', 'b', '-p', 'c', 'd', '-l', '8', '-m', '128', '-t', '20000']
+      command.argv = [name, '--param', 'a', 'b', '--param', 'c', 'd', '--logsize', '8', '--memory', '128', '--timeout', '20000']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalledWith({
-            name: 'hello',
-            params: { a: 'b', c: 'd' },
-            action: jsFile,
-            annotations: {},
-            limits: {
-              logs: 8,
-              memory: 128,
-              timeout: 20000
+            name,
+            action: {
+              name,
+              parameters: createKeyValueArrayFromObject({ a: 'b', c: 'd' }),
+              limits: {
+                logs: 8,
+                memory: 128,
+                timeout: 20000
+              }
             }
           })
           expect(stdout.output).toMatch('')
         })
     })
 
-    test('updates an action with action name, action path, --params flag ,limits and kind ', () => {
+    test('updates an action with action name, --params flag and limits with shorter flag version', () => {
+      const name = 'hello'
       const cmd = ow.mockResolved(owAction, '')
-      command.argv = ['hello', '/action/actionFile.js', '--param', 'a', 'b', '--param', 'c', 'd', '--logsize', '8', '--memory', '128', '--kind', 'nodejs:default']
+      command.argv = [name, '-p', 'a', 'b', '-p', 'c', 'd', '-l', '8', '-m', '128', '-t', '20000']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalledWith({
-            name: 'hello',
-            params: { a: 'b', c: 'd' },
-            action: jsFile,
-            annotations: {},
-            kind: 'nodejs:default',
-            limits: {
-              logs: 8,
-              memory: 128
+            name,
+            action: {
+              name,
+              parameters: createKeyValueArrayFromObject({ a: 'b', c: 'd' }),
+              limits: {
+                logs: 8,
+                memory: 128,
+                timeout: 20000
+              }
             }
           })
           expect(stdout.output).toMatch('')
         })
     })
 
-    test('updates an action with action name, action path, --params flag and annotation flag ', () => {
+    test('updates an action with action name, action path, --params flag, limits and kind', () => {
+      const name = 'hello'
       const cmd = ow.mockResolved(owAction, '')
-      command.argv = ['hello', '/action/actionFile.js', '--param', 'a', 'b', '--param', 'c', 'd', '--annotation', 'desc', 'Description']
+      command.argv = [name, '/action/actionFile.js', '--param', 'a', 'b', '--param', 'c', 'd', '--logsize', '8', '--memory', '128', '--kind', 'nodejs:10']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalledWith({
-            name: 'hello',
-            params: { a: 'b', c: 'd' },
-            action: jsFile,
-            annotations: {
-              desc: 'Description'
-            },
-            limits: {}
+            name,
+            action: {
+              name,
+              exec: {
+                code: jsFile,
+                kind: 'nodejs:10'
+              },
+              parameters: createKeyValueArrayFromObject({ a: 'b', c: 'd' }),
+              limits: {
+                logs: 8,
+                memory: 128
+              }
+            }
           })
           expect(stdout.output).toMatch('')
         })
     })
 
-    test('updates an action with action name, action path, --params flag and annotation-file flag ', () => {
+    test('updates an action with action name, --params flag, limits', () => {
+      const name = 'hello'
       const cmd = ow.mockResolved(owAction, '')
-      command.argv = ['hello', '/action/actionFile.js', '-p', 'a', 'b', '-p', 'c', 'd', '-A', '/action/parameters.json']
+      command.argv = [name, '--param', 'a', 'b', '--param', 'c', 'd', '--logsize', '8', '--memory', '128']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalledWith({
-            name: 'hello',
-            params: { a: 'b', c: 'd' },
-            action: jsFile,
-            annotations: {
-              param1: 'param1value',
-              param2: 'param2value'
-            },
-            limits: {}
+            name,
+            action: {
+              name,
+              parameters: createKeyValueArrayFromObject({ a: 'b', c: 'd' }),
+              limits: {
+                logs: 8,
+                memory: 128
+              }
+            }
           })
           expect(stdout.output).toMatch('')
         })
     })
 
-    test('updates an action with action name, action path, --params flag and web flag as raw ', () => {
+    test('updates an action with action name and log limits', () => {
+      const name = 'hello'
       const cmd = ow.mockResolved(owAction, '')
-      command.argv = ['hello', '/action/actionFile.js', '-p', 'a', 'b', '-p', 'c', 'd', '--web', 'raw']
+      command.argv = [name, '--logsize', '8']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalledWith({
-            name: 'hello',
-            params: { a: 'b', c: 'd' },
-            action: jsFile,
-            annotations: {
-              'web-export': true,
-              'raw-http': true
-            },
-            limits: {}
+            name,
+            action: {
+              name,
+              limits: {
+                logs: 8
+              }
+            }
           })
           expect(stdout.output).toMatch('')
         })
     })
 
-    test('updates an action with action name, action path, --params flag and web flag as false ', () => {
+    test('updates an action with action name and memory limits', () => {
+      const name = 'hello'
       const cmd = ow.mockResolved(owAction, '')
-      command.argv = ['hello', '/action/actionFile.js', '-p', 'a', 'b', '-p', 'c', 'd', '--web', 'false']
+      command.argv = [name, '--memory', '128']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalledWith({
-            name: 'hello',
-            params: { a: 'b', c: 'd' },
-            action: jsFile,
-            annotations: {
-              'web-export': false
-            },
-            limits: {}
+            name,
+            action: {
+              name,
+              limits: {
+                memory: 128
+              }
+            }
           })
           expect(stdout.output).toMatch('')
         })
     })
 
-    test('updates an action with action name, action path, --params flag, annotations and web flag as true ', () => {
+    test('updates an action with action name and timeout limits', () => {
+      const name = 'hello'
       const cmd = ow.mockResolved(owAction, '')
-      command.argv = ['hello', '/action/actionFile.js', '-p', 'a', 'b', '-p', 'c', 'd', '-a', 'desc', 'Description', '--web', 'true']
+      command.argv = [name, '--timeout', '20000']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalledWith({
-            name: 'hello',
-            params: { a: 'b', c: 'd' },
-            action: jsFile,
-            annotations: {
-              'web-export': true,
-              desc: 'Description'
-            },
-            limits: {}
+            name,
+            action: {
+              name,
+              limits: {
+                timeout: 20000
+              }
+            }
+          })
+          expect(stdout.output).toMatch('')
+        })
+    })
+
+    test('updates an action with action name, action path, --params flag and annotation flag', () => {
+      const name = 'hello'
+      const cmd = ow.mockResolved(owAction, '')
+      command.argv = [name, '/action/actionFile.js', '--param', 'a', 'b', '--param', 'c', 'd', '--annotation', 'desc', 'Description']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith({
+            name,
+            action: {
+              name,
+              exec: {
+                code: jsFile,
+                kind: 'nodejs:default'
+              },
+              parameters: createKeyValueArrayFromObject({ a: 'b', c: 'd' }),
+              annotations: createKeyValueArrayFromObject({ desc: 'Description' })
+            }
+          })
+          expect(stdout.output).toMatch('')
+        })
+    })
+
+    test('updates an action with action name, --params flag and annotation flag', () => {
+      const name = 'hello'
+      const cmd = ow.mockResolved(owAction, '')
+      command.argv = [name, '--param', 'a', 'b', '--param', 'c', 'd', '--annotation', 'desc', 'Description']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith({
+            name,
+            action: {
+              name,
+              parameters: createKeyValueArrayFromObject({ a: 'b', c: 'd' }),
+              annotations: createKeyValueArrayFromObject({ desc: 'Description' })
+            }
+          })
+          expect(stdout.output).toMatch('')
+        })
+    })
+
+    test('updates an action with action name, annotation flag', () => {
+      const name = 'hello'
+      const cmd = ow.mockResolved(owAction, '')
+      command.argv = [name, '--annotation', 'desc', 'Description']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith({
+            name,
+            action: {
+              name,
+              annotations: createKeyValueArrayFromObject({ desc: 'Description' })
+            }
+          })
+          expect(stdout.output).toMatch('')
+        })
+    })
+
+    test('updates an action with action name, action path, --params flag and annotation-file flag', () => {
+      const name = 'hello'
+      const cmd = ow.mockResolved(owAction, '')
+      command.argv = [name, '/action/actionFile.js', '-p', 'a', 'b', '-p', 'c', 'd', '-A', '/action/parameters.json']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith({
+            name,
+            action: {
+              name,
+              exec: {
+                code: jsFile,
+                kind: 'nodejs:default'
+              },
+              parameters: createKeyValueArrayFromObject({ a: 'b', c: 'd' }),
+              annotations: createKeyValueArrayFromObject({ param1: 'param1value', param2: 'param2value' })
+            }
+          })
+          expect(stdout.output).toMatch('')
+        })
+    })
+
+    test('updates an action with action name, --params flag and annotation-file flag', () => {
+      const name = 'hello'
+      const cmd = ow.mockResolved(owAction, '')
+      command.argv = [name, '-p', 'a', 'b', '-p', 'c', 'd', '-A', '/action/parameters.json']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith({
+            name,
+            action: {
+              name,
+              parameters: createKeyValueArrayFromObject({ a: 'b', c: 'd' }),
+              annotations: createKeyValueArrayFromObject({ param1: 'param1value', param2: 'param2value' })
+            }
+          })
+          expect(stdout.output).toMatch('')
+        })
+    })
+
+    test('updates an action with action name and annotation-file flag', () => {
+      const name = 'hello'
+      const cmd = ow.mockResolved(owAction, '')
+      command.argv = [name, '-A', '/action/parameters.json']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith({
+            name,
+            action: {
+              name,
+              annotations: createKeyValueArrayFromObject({ param1: 'param1value', param2: 'param2value' })
+            }
+          })
+          expect(stdout.output).toMatch('')
+        })
+    })
+
+    test('updates an action with action name, action path, --params flag and web flag as raw', () => {
+      const name = 'hello'
+      const cmd = ow.mockResolved(owAction, '')
+      command.argv = [name, '/action/actionFile.js', '-p', 'a', 'b', '-p', 'c', 'd', '--web', 'raw']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith({
+            name,
+            action: {
+              name,
+              exec: {
+                code: jsFile,
+                kind: 'nodejs:default'
+              },
+              parameters: createKeyValueArrayFromObject({ a: 'b', c: 'd' }),
+              annotations: createKeyValueArrayFromObject({ 'web-export': true, 'raw-http': true })
+            }
+          })
+          expect(stdout.output).toMatch('')
+        })
+    })
+
+    test('updates an action with action name, action path, --params flag and web flag as false', () => {
+      const name = 'hello'
+      const cmd = ow.mockResolved(owAction, '')
+      command.argv = [name, '/action/actionFile.js', '-p', 'a', 'b', '-p', 'c', 'd', '--web', 'false']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith({
+            name,
+            action: {
+              name,
+              exec: {
+                code: jsFile,
+                kind: 'nodejs:default'
+              },
+              parameters: createKeyValueArrayFromObject({ a: 'b', c: 'd' }),
+              annotations: createKeyValueArrayFromObject({ 'web-export': false })
+            }
+          })
+          expect(stdout.output).toMatch('')
+        })
+    })
+
+    test('updates an action with action name, action path, --params flag, annotations and web flag as true', () => {
+      const name = 'hello'
+      const cmd = ow.mockResolved(owAction, '')
+      command.argv = [name, '/action/actionFile.js', '-p', 'a', 'b', '-p', 'c', 'd', '-a', 'desc', 'Description', '--web', 'true']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith({
+            name,
+            action: {
+              name,
+              exec: {
+                code: jsFile,
+                kind: 'nodejs:default'
+              },
+              parameters: createKeyValueArrayFromObject({ a: 'b', c: 'd' }),
+              annotations: createKeyValueArrayFromObject({ desc: 'Description', 'web-export': true })
+            }
           })
           expect(stdout.output).toMatch('')
         })
@@ -407,6 +628,19 @@ describe('instance methods', () => {
       })
     })
 
+    test('tests for incorrect action with --kind', () => {
+      return new Promise((resolve, reject) => {
+        ow.mockRejected(owAction, '')
+        command.argv = ['hello', '--kind', 'nodejs:10']
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('failed to update the action', new Error('A kind can only be specified when you provide a code artifact'))
+            resolve()
+          })
+      })
+    })
+
     test('tests for incorrect action path', () => {
       return new Promise((resolve, reject) => {
         ow.mockRejected(owAction, '')
@@ -441,6 +675,58 @@ describe('instance methods', () => {
           .then(() => reject(new Error('does not throw error')))
           .catch(() => {
             expect(handleError).toHaveBeenLastCalledWith('failed to update the action', new Error('Invalid argument(s). creating an action from a .zip artifact requires specifying the action kind explicitly'))
+            resolve()
+          })
+      })
+    })
+
+    test('tests for incorrect update with --main flag', () => {
+      return new Promise((resolve, reject) => {
+        ow.mockRejected(owAction, '')
+        command.argv = ['hello', '--main', 'maynard']
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('failed to update the action', new Error('The function handler can only be specified when you provide a code artifact'))
+            resolve()
+          })
+      })
+    })
+
+    test('tests for incorrect update with --main flag and --sequence', () => {
+      return new Promise((resolve, reject) => {
+        ow.mockRejected(owAction, '')
+        command.argv = ['hello', '--main', 'maynard', '--sequence', 'a,b,c']
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('failed to update the action', new Error('The function handler can only be specified when you provide a code artifact'))
+            resolve()
+          })
+      })
+    })
+
+    test('tests for incorrect update with file artifact and --sequence', () => {
+      return new Promise((resolve, reject) => {
+        ow.mockRejected(owAction, '')
+        command.argv = ['hello', '/action/actionFile.js', '--sequence', 'a,b,c']
+        command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('failed to update the action', new Error('Cannot specify sequence and a code artifact at the same time'))
+            resolve()
+          })
+      })
+    })
+
+    test('tests for incorrect update with file artifact and --sequence and --main', () => {
+      return new Promise((resolve, reject) => {
+        ow.mockRejected(owAction, '')
+        command.argv = ['hello', '/action/actionFile.js', '--main', 'maynard', '--sequence', 'a,b,c']
+        command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('failed to update the action', new Error('Cannot specify sequence and a code artifact at the same time'))
             resolve()
           })
       })

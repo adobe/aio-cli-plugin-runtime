@@ -48,6 +48,15 @@ function printLogs (activation, strip, logger) {
 }
 
 /**
+ * @description returns key value array from the object supplied.
+ * @param object: JSON object
+ * @returns An array of key value pairs in this format : [{key : 'Your key 1' , value: 'Your value 1'}, {key : 'Your key 2' , value: 'Your value 2'} ]
+ */
+function createKeyValueArrayFromObject (object) {
+  return Object.keys(object).map(key => ({ key, value: object[key] }))
+}
+
+/**
  * @description returns key value array from the parameters supplied. Used to create --param and --annotation key value pairs
  * @param flag : flags.param or flags.annotation
  * @returns An array of key value pairs in this format : [{key : 'Your key 1' , value: 'Your value 1'}, {key : 'Your key 2' , value: 'Your value 2'} ]
@@ -863,6 +872,7 @@ function kindForFileExtension (filename) {
 }
 
 module.exports = {
+  createKeyValueArrayFromObject,
   createKeyValueArrayFromFile,
   createKeyValueArrayFromFlag,
   createKeyValueObjectFromFlag,
