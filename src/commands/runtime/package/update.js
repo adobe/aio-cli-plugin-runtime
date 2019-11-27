@@ -17,7 +17,7 @@ const { flags } = require('@oclif/command')
 class PackageUpdate extends RuntimeBaseCommand {
   async run () {
     const { args, flags } = this.parse(PackageUpdate)
-    let paramsPackage = []
+    let paramsPackage // omit if no params are defined explicitly
     try {
       if (flags.param) {
         // each --param flag expects two values ( a key and a value ). Multiple --param flags can be passed
@@ -26,7 +26,7 @@ class PackageUpdate extends RuntimeBaseCommand {
       } else if (flags['param-file']) {
         paramsPackage = createKeyValueArrayFromFile(flags['param-file'])
       }
-      let annotationParams = []
+      let annotationParams // omit if no annotations are defined explicitly
       if (flags.annotation) {
         // Annotations that describe packages include : 'description' and 'parameters'
         // TODO -- should we check if annotation keys match description or parameters ?
@@ -51,7 +51,10 @@ class PackageUpdate extends RuntimeBaseCommand {
       }
       const options = {}
       options['name'] = args.packageName
-      options['package'] = packageParams
+      // only provide 'pacakge' property if it's not empty
+      if (Object.entries(packageParams).filter(([_, v]) => v !== undefined).length > 0) {
+        options['package'] = packageParams
+      }
       const ow = await this.wsk()
       const result = await ow.packages.update(options)
       if (flags.json) {
