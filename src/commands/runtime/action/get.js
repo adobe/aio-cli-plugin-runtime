@@ -46,8 +46,9 @@ class ActionGet extends RuntimeBaseCommand {
             actionValue = '/default'
           }
         }
+        const [namespace] = result.namespace.split('/')
         const opts = ow.actions.client.options
-        this.log(`${opts.api}${web}/${opts.namespace}${actionValue}/${name}`)
+        this.log(`${opts.api}${web}/${namespace}${actionValue}/${name}`)
       } else {
         const bSaveFile = flags['save-as'] && flags['save-as'].length > 0
 
