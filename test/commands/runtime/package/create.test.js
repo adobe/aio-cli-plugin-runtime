@@ -78,7 +78,6 @@ describe('instance methods', () => {
           expect(cmd).toHaveBeenCalledWith({
             name: 'packageName',
             package: {
-              annotations: [],
               parameters: [
                 {
                   key: 'a',
@@ -103,7 +102,6 @@ describe('instance methods', () => {
           expect(cmd).toHaveBeenCalledWith({
             name: 'packageName',
             package: {
-              annotations: [],
               parameters: [
                 {
                   key: 'a',
@@ -126,11 +124,7 @@ describe('instance methods', () => {
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalledWith({
-            name: 'packageName',
-            package: {
-              annotations: [],
-              parameters: []
-            }
+            name: 'packageName'
           })
           expect(stdout.output).toMatch('')
         })
@@ -150,7 +144,6 @@ describe('instance methods', () => {
           expect(cmd).toHaveBeenCalledWith({
             name: 'packageName',
             package: {
-              annotations: [],
               parameters: [
                 {
                   key: 'param1',
@@ -181,7 +174,6 @@ describe('instance methods', () => {
           expect(cmd).toHaveBeenCalledWith({
             name: 'packageName',
             package: {
-              parameters: [],
               annotations: [
                 {
                   key: 'param1',
@@ -266,8 +258,6 @@ describe('instance methods', () => {
           expect(cmd).toHaveBeenCalledWith({
             name: 'packageName',
             package: {
-              annotations: [],
-              parameters: [],
               publish: true
             }
           })
@@ -281,11 +271,7 @@ describe('instance methods', () => {
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalledWith({
-            name: 'packageName',
-            package: {
-              annotations: [],
-              parameters: []
-            }
+            name: 'packageName'
           })
           expect(stdout.output).toMatch('')
         })
