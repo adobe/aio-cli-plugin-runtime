@@ -14,7 +14,6 @@ const { flags } = require('@oclif/command')
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 const { printLogs } = require('../../../runtime-helpers')
 const chalk = require('chalk')
-const { cli } = require('cli-ux')
 
 class ActivationLogs extends RuntimeBaseCommand {
   async run () {
@@ -32,19 +31,15 @@ class ActivationLogs extends RuntimeBaseCommand {
       this.error('Missing required arg: `activationId`')
     }
 
-    try {
-      const logger = this.log
-      activations.forEach((ax) => {
-        ow.activations.logs(ax.activationId).then((result) => {
-          logger(chalk.dim('=== ') + chalk.bold('activation logs %s %s:%s'), ax.activationId, ax.name || '', ax.version || '')
-          printLogs(result, flags.strip, logger)
-        }, (err) => {
-          throw err
-        })
+    const logger = this.log
+    activations.forEach((ax) => {
+      ow.activations.logs(ax.activationId).then((result) => {
+        logger(chalk.dim('=== ') + chalk.bold('activation logs %s %s:%s'), ax.activationId, ax.name || '', ax.version || '')
+        printLogs(result, flags.strip, logger)
+      }, (err) => {
+        this.handleError('failed to retrieve logs for activation', err)
       })
-    } catch (err) {
-      this.handleError('failed to retrieve the logs', err)
-    }
+    })
   }
 }
 

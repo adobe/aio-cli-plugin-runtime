@@ -92,13 +92,16 @@ describe('instance methods', () => {
         })
     })
 
-    // test('errors out on api error', () => {
-    //   return new Promise((resolve, reject) => {
-    //     ow.mockRejected(owAction, '')
-    //     command.argv = ['12345']
-    //     return expect(command.run()).rejects.toThrow('')
-    //   })
-    // })
+    test('throws error retrieve logs of an activation', () => {
+      ow.mockResolved('activations.list', [{ activationId: '12345' }])
+      const cmd = ow.mockRejected(owAction, new Error('Async error'))
+      command.argv = ['-l', '-c', '2']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith('12345')
+          expect(handleError).toHaveBeenCalledWith('failed to retrieve logs for activation', expect.any(Error))
+        })
+    })
 
     test('retrieve last log -l', () => {
       const listCmd = ow.mockResolved('activations.list', [{ activationId: '12345' }])
@@ -120,6 +123,19 @@ describe('instance methods', () => {
         .then(() => {
           expect(listCmd).toHaveBeenCalledWith(expect.objectContaining({ limit: 1 }))
           expect(logCmd).toHaveBeenCalledWith('12345')
+          expect(stdout.output).toMatch('line3')
+        })
+    })
+
+    test('retrieve last -c logs', () => {
+      const listCmd = ow.mockResolved('activations.list', [{ activationId: '12345' }, { activationId: '12346' }])
+      const logCmd = ow.mockResolved(owAction, { logs: ['line1', 'line2', 'line3'] })
+      command.argv = ['-l', '-c', '2']
+      return command.run()
+        .then(() => {
+          expect(listCmd).toHaveBeenCalledWith(expect.objectContaining({ limit: 2 }))
+          expect(logCmd).toHaveBeenCalledWith('12345')
+          expect(logCmd).toHaveBeenCalledWith('12346')
           expect(stdout.output).toMatch('line3')
         })
     })
