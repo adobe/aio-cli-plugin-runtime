@@ -497,8 +497,9 @@ USAGE
   $ ./bin/run runtime:activation:logs [ACTIVATIONID]
 
 OPTIONS
+  -c, --count=count        [default: 1] used with --last, return the last `count` activation logs. Max 5
   -i, --insecure           bypass certificate check
-  -l, --last               retrieves the most recent activation log
+  -l, --last               retrieves the most recent activation logs
   -r, --strip              strip timestamp information and output first line only
   -u, --auth=auth          whisk auth
   -v, --verbose            Verbose output
