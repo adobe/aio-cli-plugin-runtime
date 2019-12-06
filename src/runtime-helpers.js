@@ -48,6 +48,15 @@ function printLogs (activation, strip, logger) {
 }
 
 /**
+ * @description returns key value array from the object supplied.
+ * @param object: JSON object
+ * @returns An array of key value pairs in this format : [{key : 'Your key 1' , value: 'Your value 1'}, {key : 'Your key 2' , value: 'Your value 2'} ]
+ */
+function createKeyValueArrayFromObject (object) {
+  return Object.keys(object).map(key => ({ key, value: object[key] }))
+}
+
+/**
  * @description returns key value array from the parameters supplied. Used to create --param and --annotation key value pairs
  * @param flag : flags.param or flags.annotation
  * @returns An array of key value pairs in this format : [{key : 'Your key 1' , value: 'Your value 1'}, {key : 'Your key 2' , value: 'Your value 2'} ]
@@ -127,12 +136,13 @@ function createKeyValueObjectFromFile (file) {
   return JSON.parse(jsonData)
 }
 
-function createComponentsfromSequence (sequenceAction, ns) {
+function createComponentsfromSequence (sequenceAction) {
+  const fqn = require('openwhisk-fqn')
   const objSequence = {}
   objSequence['kind'] = 'sequence'
   // The components array requires fully qualified names [/namespace/package_name/action_name] of all the actions passed as sequence
-  sequenceAction = sequenceAction.map(sequence => {
-    return `/${ns}/${sequence}`
+  sequenceAction = sequenceAction.map(component => {
+    return fqn(component)
   })
   objSequence['components'] = sequenceAction
   return objSequence
@@ -823,7 +833,47 @@ async function findProjectHashonServer (ow, projectName) {
   return projectHash
 }
 
+function fileExtensionForKind (kind) {
+  if (kind) {
+    const [lang] = kind.split(':')
+    switch (lang.toLowerCase()) {
+      case 'ballerina': return '.bal'
+      case 'dotnet': return '.cs'
+      case 'go': return '.go'
+      case 'java': return '.java'
+      case 'nodejs': return '.js'
+      case 'php': return '.php'
+      case 'python': return '.py'
+      case 'ruby': return '.rb'
+      case 'rust': return '.rs'
+      case 'swift': return '.swift'
+    }
+  }
+  return ''
+}
+
+function kindForFileExtension (filename) {
+  if (filename) {
+    const path = require('path')
+    const ext = path.extname(filename)
+    switch (ext.toLowerCase()) {
+      case '.bal': return 'ballerina:default'
+      case '.cs': return 'dotnet:default'
+      case '.go': return 'go:default'
+      case '.java': return 'java:default'
+      case '.js': return 'nodejs:default'
+      case '.php': return 'php:default'
+      case '.py': return 'python:default'
+      case '.rb': return 'ruby:default'
+      case '.rs': return 'rust:default'
+      case '.swift': return 'swift:default'
+    }
+  }
+  return undefined
+}
+
 module.exports = {
+  createKeyValueArrayFromObject,
   createKeyValueArrayFromFile,
   createKeyValueArrayFromFlag,
   createKeyValueObjectFromFlag,
@@ -850,5 +900,7 @@ module.exports = {
   findProjectHashonServer,
   getProjectHash,
   addManagedProjectAnnotations,
-  printLogs
+  printLogs,
+  fileExtensionForKind,
+  kindForFileExtension
 }

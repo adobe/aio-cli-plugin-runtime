@@ -25,7 +25,7 @@
     "timeout": 60000
   },
   "name": "hello",
-  "namespace": "53444_41603",
+  "namespace": "53444_41603/pkg",
   "publish": false,
   "updated": 1549408742750,
   "version": "0.0.2"

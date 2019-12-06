@@ -10,110 +10,10 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const fs = require('fs')
-const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
-const { createKeyValueObjectFromFlag, createKeyValueObjectFromFile, createComponentsfromSequence } = require('../../../runtime-helpers')
-const { flags } = require('@oclif/command')
+const ActionCreate = require('./create')
 
-class ActionUpdate extends RuntimeBaseCommand {
-  async run () {
-    const { args, flags } = this.parse(ActionUpdate)
-    const name = args.actionName
-    let action = ''
-    let paramsAction = {}
-    let annotationParams = {}
-    try {
-      if (args.actionPath) {
-        if (fs.existsSync(args.actionPath)) {
-          if (args.actionPath.endsWith('.zip')) {
-            if (!flags.kind) {
-              throw (new Error('Invalid argument(s). creating an action from a .zip artifact requires specifying the action kind explicitly'))
-            }
-            action = fs.readFileSync(args.actionPath)
-          } else {
-            action = fs.readFileSync(args.actionPath, { encoding: 'utf8' })
-          }
-        } else {
-          throw new Error('Provide a valid path for ACTION')
-        }
-      }
-      if (flags.param) {
-        // each --param flag expects two values ( a key and a value ). Multiple --param flags can be passed
-        // For example : aio runtime:action:update --param name "foo" --param city "bar"
-        paramsAction = createKeyValueObjectFromFlag(flags.param)
-      } else if (flags['param-file']) {
-        paramsAction = createKeyValueObjectFromFile(flags['param-file'])
-      }
-      if (flags.annotation) {
-        // each --annotation flag expects two values ( a key and a value ). Multiple --annotation flags can be passed
-        // For example : aio runtime:action:update -a description "foo" -a sampleInput "bar
-        annotationParams = createKeyValueObjectFromFlag(flags.annotation)
-      } else if (flags['annotation-file']) {
-        annotationParams = createKeyValueObjectFromFile(flags['annotation-file'])
-      }
-      if (flags.web) {
-        // use: --web true or --web yes to make it a web action and --web raw to make it raw HTTP web action
-        // TODO : Implement require-whisk-auth flag
-        switch (flags.web) {
-          case 'true':
-          case 'yes' :
-            annotationParams['web-export'] = true
-            break
-          case 'raw' :
-            annotationParams['web-export'] = true
-            annotationParams['raw-http'] = true
-            break
-          case 'false':
-          case 'no':
-            annotationParams['web-export'] = false
-        }
-      }
-      const ow = await this.wsk()
-      const options = {}
-      options['name'] = name
-      options['action'] = action
-      const limits = {}
-      if (flags.timeout) {
-        limits['timeout'] = flags.timeout
-      }
-      if (flags.logsize) {
-        limits['logs'] = flags.logsize
-      }
-      if (flags.memory) {
-        limits['memory'] = flags.memory
-      }
-      options['limits'] = limits
-      if (flags.sequence) {
-        const sequenceAction = flags.sequence.trim().split(',')
-        if (sequenceAction[0].length === 0) {
-          throw new Error('Provide a valid sequence component')
-        } else {
-          const opts = await ow.actions.client.options
-          const ns = opts.namespace
-          options['exec'] = createComponentsfromSequence(sequenceAction, ns)
-        }
-      }
-
-      if (flags.main) {
-        if (!options.exec) {
-          options.exec = {}
-        }
-        options.exec.main = flags.main
-      }
-
-      if (flags.kind) {
-        options['kind'] = flags.kind
-      }
-      options['params'] = paramsAction
-      options['annotations'] = annotationParams
-      const result = await ow.actions.update(options)
-      if (flags.json) {
-        this.logJSON('', result)
-      }
-    } catch (err) {
-      this.handleError(`failed to update the action`, err)
-    }
-  }
+class ActionUpdate extends ActionCreate {
+  isUpdate () { return true }
 }
 
 ActionUpdate.args = [
@@ -126,55 +26,7 @@ ActionUpdate.args = [
   }
 ]
 
-ActionUpdate.flags = {
-  ...RuntimeBaseCommand.flags,
-  param: flags.string({
-    char: 'p',
-    description: 'parameter to be passed to the action', // help description for flag
-    multiple: true // allow setting this flag multiple times
-  }),
-  web: flags.string({
-    description: 'treat ACTION as a web action or as a raw HTTP web action. web = true/yes|raw or web = false/no', // help description for flag
-    options: ['true', 'yes', 'false', 'no', 'raw']
-  }),
-  'param-file': flags.string({
-    char: 'P',
-    description: 'parameter to be passed to the action for json params' // help description for flag
-  }),
-  timeout: flags.integer({
-    char: 't',
-    description: 'the timeout LIMIT in milliseconds after which the action is terminated (default 60000)' // help description for flag
-  }),
-  memory: flags.integer({
-    char: 'm',
-    description: 'the maximum memory LIMIT in MB for the action (default 256)' // help description for flag
-  }),
-  logsize: flags.integer({
-    char: 'l',
-    description: 'the maximum log size LIMIT in MB for the action (default 10)' // help description for flag
-  }),
-  kind: flags.string({
-    description: 'the KIND of the action runtime (example: swift:default, nodejs:default)' // help description for flag
-  }),
-  annotation: flags.string({
-    char: 'a',
-    description: 'annotation values in KEY VALUE format', // help description for flag
-    multiple: true // allow setting this flag multiple times
-  }),
-  'annotation-file': flags.string({
-    char: 'A',
-    description: 'FILE containing annotation values in JSON format' // help description for flag
-  }),
-  json: flags.boolean({
-    description: 'output raw json'
-  }),
-  sequence: flags.string({
-    description: 'treat ACTION as comma separated sequence of actions to invoke' // help description for flag
-  }),
-  main: flags.string({
-    description: 'the name of the action entry point (function or fully-qualified method name when applicable)'
-  })
-}
+ActionUpdate.flags = ActionCreate.flags
 
 ActionUpdate.description = 'Updates an Action'
 
