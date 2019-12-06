@@ -136,12 +136,13 @@ function createKeyValueObjectFromFile (file) {
   return JSON.parse(jsonData)
 }
 
-function createComponentsfromSequence (sequenceAction, ns) {
+function createComponentsfromSequence (sequenceAction) {
+  const fqn = require('openwhisk-fqn')
   const objSequence = {}
   objSequence['kind'] = 'sequence'
   // The components array requires fully qualified names [/namespace/package_name/action_name] of all the actions passed as sequence
-  sequenceAction = sequenceAction.map(sequence => {
-    return `/${ns}/${sequence}`
+  sequenceAction = sequenceAction.map(component => {
+    return fqn(component)
   })
   objSequence['components'] = sequenceAction
   return objSequence

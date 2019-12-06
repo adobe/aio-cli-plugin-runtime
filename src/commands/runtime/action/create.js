@@ -75,9 +75,7 @@ class ActionCreate extends RuntimeBaseCommand {
         if (sequenceAction[0].length === 0) {
           throw new Error('Provide a valid sequence component')
         } else {
-          // use underscore (the "default" namespace) and the backend derives the namespace
-          const ns = '_'
-          exec = createComponentsfromSequence(sequenceAction, ns)
+          exec = createComponentsfromSequence(sequenceAction)
         }
       }
 
