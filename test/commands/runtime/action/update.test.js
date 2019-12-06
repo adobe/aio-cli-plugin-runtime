@@ -181,7 +181,7 @@ describe('instance methods', () => {
       const name = 'hello'
       const cmd = ow.mockResolved(owAction, '')
       ow.actions.client.options = { namespace: 'ns' }
-      command.argv = [name, '--sequence', 'a,b,c']
+      command.argv = [name, '--sequence', 'a,p/b,ns/p/c,/ns2/p/d,/ns3/e']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalledWith({
@@ -190,7 +190,7 @@ describe('instance methods', () => {
               name,
               exec: {
                 kind: 'sequence',
-                components: ['/_/a', '/_/b', '/_/c']
+                components: ['/_/a', '/_/p/b', '/ns/p/c', '/ns2/p/d', '/ns3/e']
               }
             }
           })
