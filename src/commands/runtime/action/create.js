@@ -30,8 +30,12 @@ class ActionCreate extends RuntimeBaseCommand {
       // sanity check must either be a sequence or a file but permit neither in case of an update
       if (args.actionPath && flags.sequence) {
         throw (new Error('Cannot specify sequence and a code artifact at the same time'))
-      } else if (!args.actionPath && !flags.sequence && !this.isUpdate()) {
-        throw (new Error('Must provide a code artifact or define a sequence'))
+      } else if (flags.docker && flags.sequence) {
+        throw (new Error('Cannot specify sequence and a container image at the same time'))
+      } else if (flags.docker && flags.kind) {
+        throw (new Error('Cannot specify a kind and a container image at the same time'))
+      } else if (!args.actionPath && !flags.sequence && !flags.docker && !this.isUpdate()) {
+        throw (new Error('Must provide a code artifact, container image, or a sequence'))
       }
 
       // can only specify main handler when also providing a file
@@ -51,8 +55,8 @@ class ActionCreate extends RuntimeBaseCommand {
           exec = {}
 
           if (args.actionPath.endsWith('.zip') || flags.binary) {
-            if (!flags.kind) {
-              throw (new Error('Invalid argument(s). creating an action from a .zip artifact requires specifying the action kind explicitly'))
+            if (!flags.kind && !flags.docker) {
+              throw (new Error('Invalid argument(s). creating an action from a zip/binary artifact requires specifying the action kind explicitly'))
             }
             exec.code = fs.readFileSync(args.actionPath).toString('base64')
           } else {
@@ -65,7 +69,7 @@ class ActionCreate extends RuntimeBaseCommand {
 
           if (flags.kind) {
             exec.kind = flags.kind
-          } else {
+          } else if (!flags.docker) {
             exec.kind = kindForFileExtension(args.actionPath)
           }
         } else {
@@ -78,6 +82,12 @@ class ActionCreate extends RuntimeBaseCommand {
         } else {
           exec = createComponentsfromSequence(sequenceAction)
         }
+      }
+
+      if (flags.docker) {
+        exec = exec || {}
+        exec.kind = 'blackbox'
+        exec.image = flags.docker
       }
 
       if (flags.param) {
@@ -233,6 +243,9 @@ ActionCreate.flags = {
   }),
   sequence: flags.string({
     description: 'treat ACTION as comma separated sequence of actions to invoke' // help description for flag
+  }),
+  docker: flags.string({
+    description: 'use provided Docker image (a path on DockerHub) to run the action' // help description for flag
   }),
   main: flags.string({
     description: 'the name of the action entry point (function or fully-qualified method name when applicable)'
