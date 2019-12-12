@@ -34,7 +34,7 @@ test('aliases', async () => {
 test('args', async () => {
   const logName = TheCommand.args[0]
   expect(logName.name).toBeDefined()
-  expect(logName.name).toEqual('activationID')
+  expect(logName.name).toEqual('activationId')
 })
 
 test('flags', async () => {
@@ -76,9 +76,9 @@ describe('instance methods', () => {
       const cmd = ow.mockResolved(owAction, { logs: ['this is a log', 'so is this'] })
       command.argv = ['12345']
       return command.run()
-        .then(() => {
+        .then((res) => {
           expect(cmd).toHaveBeenCalledWith('12345')
-          expect(stdout.output).toMatch('this is a log')
+          expect(stdout.output).toMatchFixture('logs/activation-logs.txt')
         })
     })
 
@@ -92,17 +92,15 @@ describe('instance methods', () => {
         })
     })
 
-    test('errors out on api error', () => {
-      return new Promise((resolve, reject) => {
-        ow.mockRejected(owAction, new Error('an error'))
-        command.argv = ['12345']
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to retrieve the logs', new Error('an error'))
-            resolve()
-          })
-      })
+    test('throws error retrieve logs of an activation', () => {
+      ow.mockResolved('activations.list', [{ activationId: '12345' }])
+      const cmd = ow.mockRejected(owAction, new Error('Async error'))
+      command.argv = ['-l', '-c', '2']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith('12345')
+          expect(handleError).toHaveBeenCalledWith('failed to retrieve logs for activation', expect.any(Error))
+        })
     })
 
     test('retrieve last log -l', () => {
@@ -129,6 +127,19 @@ describe('instance methods', () => {
         })
     })
 
+    test('retrieve last -c logs', () => {
+      const listCmd = ow.mockResolved('activations.list', [{ activationId: '12345' }, { activationId: '12346' }])
+      const logCmd = ow.mockResolved(owAction, { logs: ['line1', 'line2', 'line3'] })
+      command.argv = ['-l', '-c', '2']
+      return command.run()
+        .then(() => {
+          expect(listCmd).toHaveBeenCalledWith(expect.objectContaining({ limit: 2 }))
+          expect(logCmd).toHaveBeenCalledWith('12345')
+          expect(logCmd).toHaveBeenCalledWith('12346')
+          expect(stdout.output).toMatch('line3')
+        })
+    })
+
     test('errors if np axId or --last flag', () => {
       return new Promise((resolve, reject) => {
         command.argv = []
@@ -136,7 +147,7 @@ describe('instance methods', () => {
         return command.run()
           .then(() => reject(new Error('does not throw error')))
           .catch(() => {
-            expect(error).toHaveBeenLastCalledWith('Missing required arg: `activationID`')
+            expect(error).toHaveBeenLastCalledWith('Missing required arg: `activationId`')
             resolve()
           })
       })
