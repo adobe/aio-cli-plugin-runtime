@@ -190,7 +190,7 @@ function processInputs (input, params) {
         } else if (typeof input[key] === 'string' && input[key].startsWith('$')) {
           let val = input[key]
           val = val.substr(1)
-          input[key] = process.env[val]
+          input[key] = process.env[val] || ''
         }
       }
     }
