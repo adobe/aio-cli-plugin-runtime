@@ -37,6 +37,7 @@ ActionDelete.args = [
 ]
 
 ActionDelete.flags = {
+  ...RuntimeBaseCommand.flags,
   json: flags.boolean({
     description: 'output raw json'
   })
