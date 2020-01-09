@@ -4,7 +4,6 @@
 npm --no-git-tag-version version [major | minor | patch]
 # get the package.json version in a variable
 export PKG_VER=`node -e "console.log(require('./package.json').version)"`
-npm run version
 ```
 ## 2. Commit the changed files
 ```
