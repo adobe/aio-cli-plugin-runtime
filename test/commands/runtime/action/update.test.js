@@ -129,7 +129,7 @@ describe('instance methods', () => {
 
     test('updates an action with action name and action path to zip file', () => {
       const name = 'hello'
-      const zipFile = Buffer.from('fakezipfile')
+      const zipFile = Buffer.from('fakezipfile').toString('base64')
       const cmd = ow.mockResolved(owAction, '')
       command.argv = [name, '/action/zipAction.zip', '--kind', 'nodejs:10']
       return command.run()
