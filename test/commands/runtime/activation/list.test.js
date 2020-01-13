@@ -190,5 +190,27 @@ describe('instance methods', () => {
           })
       })
     })
+
+    test('ignore activation without annotations', () => {
+      const data = [
+        {
+          activationId: '12345',
+          annotations: [
+          ],
+          duration: 23,
+          name: 'foo',
+          namespace: '8888_9999',
+          start: 1558507178861,
+          statusCode: 0,
+          version: '0.0.1'
+        }]
+      const cmd = ow.mockResolved(owAction, data)
+      command.argv = ['12345']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith({ name: '12345' })
+          expect(stdout.output).toMatch('')
+        })
+    })
   })
 })

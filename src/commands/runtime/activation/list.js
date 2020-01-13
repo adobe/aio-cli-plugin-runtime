@@ -62,8 +62,8 @@ class ActivationList extends RuntimeBaseCommand {
           },
           Kind: {
             get: (row) => {
-              const { annotations } = row;
-              if (!annotations || !annotations.length) return;
+              const { annotations } = row
+              if (!annotations || !annotations.length) return
               return annotations.find((elem) => {
                 return (elem.key === 'kind')
               }).value
@@ -71,8 +71,8 @@ class ActivationList extends RuntimeBaseCommand {
           },
           Start: {
             get: (row) => {
-              const { annotations } = row;
-              if (!annotations || !annotations.length) return;
+              const { annotations } = row
+              if (!annotations || !annotations.length) return
               const elem = annotations.find((elem) => {
                 return (elem.key === 'initTime')
               })
@@ -90,8 +90,8 @@ class ActivationList extends RuntimeBaseCommand {
           },
           Entity: {
             get: (row) => {
-              const { annotations } = row;
-              if (!annotations || !annotations.length) return;
+              const { annotations } = row
+              if (!annotations || !annotations.length) return
               const path = annotations.find((elem) => {
                 return (elem.key === 'path')
               }).value
