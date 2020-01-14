@@ -31,25 +31,23 @@ class ActionGet extends RuntimeBaseCommand {
           Properties.APIVersion
           qualifiedName.GetPackageName()
         */
-        let web = 'namespaces'
-        let actionValue = '/actions'
-        const webFlag = result.annotations.find(elem => elem.key === 'web-export')
-        let actionPartOfPackage = false
-        // check if action belongs to a package
-        if (name.split('/').length > 1) {
-          actionPartOfPackage = true
-        }
-        if (webFlag !== undefined && webFlag.value === true) {
-          web = 'web'
-          if (actionPartOfPackage) {
-            actionValue = ''
-          } else {
-            actionValue = '/default'
-          }
-        }
-        const [namespace] = result.namespace.split('/')
         const opts = ow.actions.client.options
-        this.log(`${opts.api}${web}/${namespace}${actionValue}/${name}`)
+        const webFlag = result.annotations.find(elem => elem.key === 'web-export')
+        const webAction = webFlag !== undefined && webFlag.value === true
+
+        let [namespace, packageName] = result.namespace.split('/')
+        const actionPartOfPackage = !!packageName
+
+        if (webAction) {
+          const web = 'web'
+          packageName = actionPartOfPackage ? packageName : 'default'
+          this.log(`${opts.api}${web}/${namespace}/${packageName}/${result.name}`)
+        } else {
+          const nsPrefix = 'namespaces'
+          const actionPrefix = 'actions'
+          packageName = actionPartOfPackage ? packageName + '/' : ''
+          this.log(`${opts.api}${nsPrefix}/${namespace}/${actionPrefix}/${packageName}${result.name}`)
+        }
       } else {
         const bSaveFile = flags['save-as'] && flags['save-as'].length > 0
 
