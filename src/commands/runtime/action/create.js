@@ -49,11 +49,11 @@ class ActionCreate extends RuntimeBaseCommand {
         if (fs.existsSync(args.actionPath)) {
           exec = {}
 
-          if (args.actionPath.endsWith('.zip')) {
+          if (args.actionPath.endsWith('.zip') || flags.binary) {
             if (!flags.kind) {
               throw (new Error('Invalid argument(s). creating an action from a .zip artifact requires specifying the action kind explicitly'))
             }
-            exec.code = fs.readFileSync(args.actionPath)
+            exec.code = fs.readFileSync(args.actionPath).toString('base64')
           } else {
             exec.code = fs.readFileSync(args.actionPath, { encoding: 'utf8' })
           }
@@ -201,6 +201,9 @@ ActionCreate.flags = {
   }),
   main: flags.string({
     description: 'the name of the action entry point (function or fully-qualified method name when applicable)'
+  }),
+  binary: flags.boolean({
+    description: 'treat code artifact as binary'
   }),
   json: flags.boolean({
     description: 'output raw json'

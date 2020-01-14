@@ -76,10 +76,58 @@ describe('instance methods', () => {
     })
 
     test('retrieve an action --url with web flags from package', () => {
-      const cmd = ow.mockResolvedFixture(owAction, 'action/get.json')
+      const cmd = ow.mockResolvedFixture(owAction, 'action/get-package.json')
       ow.mockResolved('actions.client.options', '')
       ow.actions.client.options = { api: 'api/' }
       command.argv = ['test/hello', '--url']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalled()
+          expect(stdout.output).toMatch('api/web/53444_41603/test/hello')
+        })
+    })
+
+    test('retrieve an action --url with web flags from fully qualified name with implicit namespace and no package', () => {
+      const cmd = ow.mockResolvedFixture(owAction, 'action/get.json')
+      ow.mockResolved('actions.client.options', '')
+      ow.actions.client.options = { api: 'api/' }
+      command.argv = ['/_/hello', '--url']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalled()
+          expect(stdout.output).toMatch('api/web/53444_41603/default/hello')
+        })
+    })
+
+    test('retrieve an action --url with web flags from fully qualified name using explicit namespace and no package', () => {
+      const cmd = ow.mockResolvedFixture(owAction, 'action/get.json')
+      ow.mockResolved('actions.client.options', '')
+      ow.actions.client.options = { api: 'api/' }
+      command.argv = ['/_/hello', '--url']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalled()
+          expect(stdout.output).toMatch('api/web/53444_41603/default/hello')
+        })
+    })
+
+    test('retrieve an action --url with web flags from fully qualified name with implicit namespace', () => {
+      const cmd = ow.mockResolvedFixture(owAction, 'action/get-package.json')
+      ow.mockResolved('actions.client.options', '')
+      ow.actions.client.options = { api: 'api/' }
+      command.argv = ['/_/test/hello', '--url']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalled()
+          expect(stdout.output).toMatch('api/web/53444_41603/test/hello')
+        })
+    })
+
+    test('retrieve an action --url with web flags from fully qualified name using explicit namespace', () => {
+      const cmd = ow.mockResolvedFixture(owAction, 'action/get-package.json')
+      ow.mockResolved('actions.client.options', '')
+      ow.actions.client.options = { api: 'api/' }
+      command.argv = ['/_/test/hello', '--url']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalled()
@@ -96,6 +144,18 @@ describe('instance methods', () => {
         .then(() => {
           expect(cmd).toHaveBeenCalled()
           expect(stdout.output).toMatch('api/namespaces/53444_41603/actions/hello')
+        })
+    })
+
+    test('retrieve an action --url in package without web flags', () => {
+      const cmd = ow.mockResolvedFixture(owAction, 'action/getWebFalse-package.json')
+      ow.mockResolved('actions.client.options', '')
+      ow.actions.client.options = { api: 'api/' }
+      command.argv = ['hello', '--url']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalled()
+          expect(stdout.output).toMatch('api/namespaces/53444_41603/actions/test/hello')
         })
     })
 
