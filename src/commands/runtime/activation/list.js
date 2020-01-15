@@ -62,14 +62,18 @@ class ActivationList extends RuntimeBaseCommand {
           },
           Kind: {
             get: (row) => {
-              return row.annotations.find((elem) => {
+              const { annotations } = row
+              if (!annotations || !annotations.length) return
+              return annotations.find((elem) => {
                 return (elem.key === 'kind')
               }).value
             }
           },
           Start: {
             get: (row) => {
-              const elem = row.annotations.find((elem) => {
+              const { annotations } = row
+              if (!annotations || !annotations.length) return
+              const elem = annotations.find((elem) => {
                 return (elem.key === 'initTime')
               })
               return elem ? 'cold' : 'warm'
@@ -86,7 +90,9 @@ class ActivationList extends RuntimeBaseCommand {
           },
           Entity: {
             get: (row) => {
-              const path = row.annotations.find((elem) => {
+              const { annotations } = row
+              if (!annotations || !annotations.length) return
+              const path = annotations.find((elem) => {
                 return (elem.key === 'path')
               }).value
               return `${path}:${row.version}`
