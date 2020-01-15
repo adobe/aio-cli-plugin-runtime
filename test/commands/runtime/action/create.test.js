@@ -77,7 +77,8 @@ describe('instance methods', () => {
     const json = {
       'action/parameters.json': fixtureFile('trigger/parameters.json'),
       'action/actionFile.js': fixtureFile('action/actionFile.js'),
-      'action/zipAction.zip': 'fakezipfile'
+      'action/zipAction.zip': 'fakezipfile',
+      'action/zipAction.bin': 'fakezipfile'
     }
     fakeFileSystem.addJson(json)
   })
@@ -148,9 +149,30 @@ describe('instance methods', () => {
 
     test('creates an action with action name and action path to zip file', () => {
       const name = 'hello'
-      const zipFile = Buffer.from('fakezipfile')
+      const zipFile = Buffer.from('fakezipfile').toString('base64')
       const cmd = ow.mockResolved(owAction, '')
       command.argv = [name, '/action/zipAction.zip', '--kind', 'nodejs:8']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith({
+            name,
+            action: {
+              name,
+              exec: {
+                code: zipFile,
+                kind: 'nodejs:8'
+              }
+            }
+          })
+          expect(stdout.output).toMatch('')
+        })
+    })
+
+    test('creates an action with action name and action path to binary file', () => {
+      const name = 'hello'
+      const zipFile = Buffer.from('fakezipfile').toString('base64')
+      const cmd = ow.mockResolved(owAction, '')
+      command.argv = [name, '/action/zipAction.bin', '--kind', 'nodejs:8', '--binary']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalledWith({

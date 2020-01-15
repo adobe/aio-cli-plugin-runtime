@@ -669,7 +669,7 @@ async function undeployPackage (entities, ow, logger) {
   logger('Success: Undeployment completed successfully.')
 }
 
-async function syncProject (projectName, manifestPath, manifestContent, entities, ow, logger) {
+async function syncProject (projectName, manifestPath, manifestContent, entities, ow, logger, deleteEntities = true) {
   // find project hash from server based on entities in the manifest file
   const hashProjectSynced = await findProjectHashonServer(ow, projectName)
 
@@ -677,7 +677,7 @@ async function syncProject (projectName, manifestPath, manifestContent, entities
   const projectHash = getProjectHash(manifestContent, manifestPath)
   await addManagedProjectAnnotations(entities, manifestPath, projectName, projectHash)
   await deployPackage(entities, ow, logger)
-  if (projectHash !== hashProjectSynced) {
+  if (deleteEntities && (projectHash !== hashProjectSynced)) {
     // delete old files with same project name that do not exist in the manifest file anymore
     const junkEntities = await getProjectEntities(hashProjectSynced, true, ow)
     await undeployPackage(junkEntities, ow, () => {})
