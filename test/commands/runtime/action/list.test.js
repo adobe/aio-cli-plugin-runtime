@@ -82,6 +82,16 @@ describe('instance methods', () => {
         })
     })
 
+    test('return list of actions in a package', () => {
+      const cmd = ow.mockResolvedFixture(owAction, 'action/list.json')
+      command.argv = ['somepackage']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith(expect.objectContaining({ id: 'somepackage/' }))
+          expect(stdout.output).toMatchFixture('action/list-output.txt')
+        })
+    })
+
     test('return list of actions - coverage (public/private)', () => {
       const json = fixtureJson('action/list.json')
       json[0].publish = true
