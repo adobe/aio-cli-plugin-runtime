@@ -459,7 +459,7 @@ describe('instance methods', () => {
         return command.run()
           .then(() => reject(new Error('does not throw error')))
           .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('Failed to deploy', new Error('Invalid or missing location in the manifest for this action: mypackage'))
+            expect(handleError).toHaveBeenLastCalledWith('Failed to deploy', new Error('Invalid or missing property "location" in the manifest for this action: mypackage'))
             resolve()
           })
       })
@@ -746,7 +746,7 @@ describe('instance methods', () => {
         return command.run()
           .then(() => reject(new Error('does not throw error')))
           .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('Failed to deploy', new Error('Invalid or missing runtime in the manifest for this action: demo_package/sampleAction'))
+            expect(handleError).toHaveBeenLastCalledWith('Failed to deploy', new Error('Invalid or missing property "runtime" in the manifest for this action: demo_package/sampleAction'))
             resolve()
           })
       })
