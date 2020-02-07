@@ -349,7 +349,7 @@ function checkWebFlags (flag) {
 function createActionObject (thisAction, objAction) {
   if (thisAction['function'].endsWith('.zip')) {
     if (!thisAction['runtime']) {
-      throw (new Error(`Invalid or missing runtime in the manifest for this action: ${objAction.name}`))
+      throw (new Error(`Invalid or missing property "runtime" in the manifest for this action: ${objAction.name}`))
     }
     objAction.action = fs.readFileSync(thisAction['function'])
   } else {
@@ -407,7 +407,7 @@ function processPackage (packages, deploymentPackages, deploymentTriggers, param
               }
             }
           } catch (ex) {
-            throw (new Error(`Invalid or missing location in the manifest for this action: ${depName}`))
+            throw (new Error(`Invalid or missing property "location" in the manifest for this action: ${depName}`))
           }
           // Parse inputs
           let deploymentInputs = {}
