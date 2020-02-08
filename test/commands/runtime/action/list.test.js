@@ -46,7 +46,7 @@ describe('List command meta', () => {
   })
 
   test('args', async () => {
-    expect(TheCommand.args).toBeUndefined()
+    expect(TheCommand.args).toBeDefined()
   })
 })
 
