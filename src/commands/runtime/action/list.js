@@ -16,10 +16,16 @@ const { cli } = require('cli-ux')
 
 class ActionList extends RuntimeBaseCommand {
   async run () {
-    const { flags } = this.parse(ActionList)
+    const { flags, args } = this.parse(ActionList)
+    const options = {
+      ...flags
+    }
+    if (args.package) {
+      options.id = `${args.package}/`
+    }
     try {
       const ow = await this.wsk()
-      const result = await ow.actions.list(flags)
+      const result = await ow.actions.list(options)
       if (flags['name-sort'] || flags.name) {
         result.sort((a, b) => a.name.localeCompare(b.name))
       }
@@ -50,6 +56,13 @@ class ActionList extends RuntimeBaseCommand {
     }
   }
 }
+
+ActionList.args = [
+  {
+    name: 'package',
+    required: false
+  }
+]
 
 ActionList.flags = {
   ...RuntimeBaseCommand.flags,
