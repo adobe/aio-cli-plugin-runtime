@@ -46,7 +46,7 @@ describe('List command meta', () => {
   })
 
   test('args', async () => {
-    expect(TheCommand.args).toBeUndefined()
+    expect(TheCommand.args).toBeDefined()
   })
 })
 
@@ -78,6 +78,16 @@ describe('instance methods', () => {
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalled()
+          expect(stdout.output).toMatchFixture('action/list-output.txt')
+        })
+    })
+
+    test('return list of actions in a package', () => {
+      const cmd = ow.mockResolvedFixture(owAction, 'action/list.json')
+      command.argv = ['somepackage']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith(expect.objectContaining({ id: 'somepackage/' }))
           expect(stdout.output).toMatchFixture('action/list-output.txt')
         })
     })
