@@ -97,7 +97,7 @@ describe('instance methods', () => {
       const cmd = ow.mockRejected(owAction, new Error('Async error'))
       command.argv = ['-l', '-c', '2']
       return command.run()
-        .then(() => {
+        .catch(() => {
           expect(cmd).toHaveBeenCalledWith('12345')
           expect(handleError).toHaveBeenCalledWith('failed to retrieve logs for activation', expect.any(Error))
         })
