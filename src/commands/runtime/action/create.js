@@ -23,6 +23,7 @@ class ActionCreate extends RuntimeBaseCommand {
     const name = args.actionName
     let exec
     let paramsAction
+    let envParams
     let annotationParams
 
     try {
@@ -85,6 +86,31 @@ class ActionCreate extends RuntimeBaseCommand {
         paramsAction = createKeyValueArrayFromFlag(flags.param)
       } else if (flags['param-file']) {
         paramsAction = createKeyValueArrayFromFile(flags['param-file'])
+      }
+
+      if (flags.env) {
+        // each --env flag expects two values ( a key and a value ). Multiple --env flags can be passed
+        // For example : aio runtime:action:update --env name "foo" --env city "bar"
+        envParams = createKeyValueArrayFromFlag(flags.env)
+      } else if (flags['env-file']) {
+        envParams = createKeyValueArrayFromFile(flags['env-file'])
+      }
+
+      // merge parametes and environemtn variables
+      if (envParams) {
+        envParams = envParams.map(e => ({ ...e, init: true }))
+        if (paramsAction) {
+          // check for overlap and flag errors
+          const paramNames = new Set(envParams.map(_ => _.key))
+          const overlap = paramsAction.filter(_ => paramNames.has(_.key))
+          if (overlap.length === 0) {
+            paramsAction = paramsAction.concat(envParams)
+          } else {
+            throw (new Error(`Invalid argument(s). Environment variables and function parameters may not overlap`))
+          }
+        } else {
+          paramsAction = envParams
+        }
       }
 
       if (flags.annotation) {
@@ -164,6 +190,11 @@ ActionCreate.flags = {
     description: 'parameter values in KEY VALUE format', // help description for flag
     multiple: true // allow setting this flag multiple times
   }),
+  env: flags.string({
+    char: 'e',
+    description: 'environment values in KEY VALUE format', // help description for flag
+    multiple: true // allow setting this flag multiple times
+  }),
   web: flags.string({
     description: 'treat ACTION as a web action or as a raw HTTP web action', // help description for flag
     options: ['true', 'yes', 'false', 'no', 'raw']
@@ -171,6 +202,10 @@ ActionCreate.flags = {
   'param-file': flags.string({
     char: 'P',
     description: 'FILE containing parameter values in JSON format' // help description for flag
+  }),
+  'env-file': flags.string({
+    char: 'P',
+    description: 'FILE containing environment variables in JSON format' // help description for flag
   }),
   timeout: flags.integer({
     char: 't',
