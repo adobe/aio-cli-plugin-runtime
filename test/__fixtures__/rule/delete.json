@@ -1,0 +1,17 @@
+{
+  "action": {
+    "name": "hello",
+    "path": "abcxyz-81khn753xw7jx"
+  },
+  "annotations": [],
+  "name": "r",
+  "namespace": "abcxyz-81khn753xw7jx",
+  "publish": false,
+  "status": "inactive",
+  "trigger": {
+    "name": "t",
+    "path": "abcxyz-81khn753xw7jx"
+  },
+  "updated": 1581455653032,
+  "version": "0.0.1"
+}
