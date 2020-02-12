@@ -29,7 +29,7 @@ class ActionCreate extends RuntimeBaseCommand {
       // sanity check must either be a sequence or a file but permit neither in case of an update
       if (args.actionPath && flags.sequence) {
         throw (new Error('Cannot specify sequence and a code artifact at the same time'))
-      } else if (!args.actionPath && !flags.sequence && !this.isUpdate()) {
+      } else if (!args.actionPath && !flags.sequence && !this.isUpdate() && !flags.docker) {
         throw (new Error('Must provide a code artifact or define a sequence'))
       }
 
@@ -50,7 +50,7 @@ class ActionCreate extends RuntimeBaseCommand {
           exec = {}
 
           if (args.actionPath.endsWith('.zip') || flags.binary) {
-            if (!flags.kind) {
+            if (!flags.kind && (flags.docker === null || typeof(flags.docker) === "undefined") ) {
               throw (new Error('Invalid argument(s). creating an action from a .zip artifact requires specifying the action kind explicitly'))
             }
             exec.code = fs.readFileSync(args.actionPath).toString('base64')
@@ -77,6 +77,12 @@ class ActionCreate extends RuntimeBaseCommand {
         } else {
           exec = createComponentsfromSequence(sequenceAction)
         }
+      }
+
+      if (flags.docker !== null && typeof(flags.docker) !== "undefined") {
+        exec = exec || {}
+        exec.kind = "blackbox"
+        exec.image = flags.docker
       }
 
       if (flags.param) {
@@ -207,6 +213,9 @@ ActionCreate.flags = {
   }),
   json: flags.boolean({
     description: 'output raw json'
+  }),
+  docker: flags.string({
+    description: 'Restricted ! Use provided docker image (a path on DockerHub) to run the action'
   })
 }
 
