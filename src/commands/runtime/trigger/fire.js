@@ -37,7 +37,7 @@ class TriggerFire extends RuntimeBaseCommand {
 
       const options = {
         name: args.triggerName,
-        trigger: triggerParams
+        params: triggerParams
       }
 
       const ow = await this.wsk()
