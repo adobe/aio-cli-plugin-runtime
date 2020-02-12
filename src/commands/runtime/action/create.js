@@ -204,7 +204,7 @@ ActionCreate.flags = {
     description: 'FILE containing parameter values in JSON format' // help description for flag
   }),
   'env-file': flags.string({
-    char: 'P',
+    char: 'E',
     description: 'FILE containing environment variables in JSON format' // help description for flag
   }),
   timeout: flags.integer({
