@@ -181,6 +181,23 @@ describe('instance methods', () => {
         })
     })
 
+    test('return list of trigger activations', () => {
+      const data = [
+        {
+          activationId: 'a5e7fdaeaa2e4384a7fdaeaa2e438442',
+          name: 'trigger',
+          namespace: '8888_9999',
+          start: 1606487719405,
+          statusCode: 0,
+          version: '0.0.1'
+        }]
+      rtLib.mockResolved(rtAction, data)
+      return command.run()
+        .then(() => {
+          expect(stdout.output).toMatchFixture('activation/list-triggers-output.txt')
+        })
+    })
+
     test('errors out on api error', () => {
       return new Promise((resolve, reject) => {
         rtLib.mockRejected(rtAction, new Error('an error'))
