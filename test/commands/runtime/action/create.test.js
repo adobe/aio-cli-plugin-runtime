@@ -308,6 +308,105 @@ describe('instance methods', () => {
         })
     })
 
+    test('creates an action with action name, action path and --env flag', () => {
+      const name = 'hello'
+      const cmd = ow.mockResolved(owAction, '')
+      command.argv = [name, '/action/actionFile.js', '--env', 'a', 'b', '--env', 'c', 'd']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith({
+            name,
+            action: {
+              name,
+              exec: {
+                code: jsFile,
+                kind: 'nodejs:default'
+              },
+              parameters: createKeyValueArrayFromObject({ a: 'b', c: 'd' }).map(_ => ({ ..._, init: true }))
+            }
+          })
+          expect(stdout.output).toMatch('')
+        })
+    })
+
+    test('creates an action with action name, action path and --e flag', () => {
+      const name = 'hello'
+      const cmd = ow.mockResolved(owAction, '')
+      command.argv = [name, '/action/actionFile.js', '--env', 'a', 'b', '-e', 'c', 'd']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith({
+            name,
+            action: {
+              name,
+              exec: {
+                code: jsFile,
+                kind: 'nodejs:default'
+              },
+              parameters: createKeyValueArrayFromObject({ a: 'b', c: 'd' }).map(_ => ({ ..._, init: true }))
+            }
+          })
+          expect(stdout.output).toMatch('')
+        })
+    })
+
+    test('creates an action with action name, action path and --env and --param flag', () => {
+      const name = 'hello'
+      const cmd = ow.mockResolved(owAction, '')
+      command.argv = [name, '/action/actionFile.js', '--env', 'a', 'b', '--param', 'c', 'd']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith({
+            name,
+            action: {
+              name,
+              exec: {
+                code: jsFile,
+                kind: 'nodejs:default'
+              },
+              // order matters in array for the check, env params come last
+              parameters: createKeyValueArrayFromObject({ c: 'd', a: 'b' }).map(_ => { return _.key === 'a' ? { ..._, init: true } : _ })
+            }
+          })
+          expect(stdout.output).toMatch('')
+        })
+    })
+
+    test('creates an action with action name, action path and overlapping --env and --param keys', () => {
+      return new Promise((resolve, reject) => {
+        ow.mockRejected(owAction, '')
+        const name = 'hello'
+        command.argv = [name, '/action/actionFile.js', '--env', 'a', 'b', '--param', 'a', 'd']
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error('Invalid argument(s). Environment variables and function parameters may not overlap'))
+            resolve()
+          })
+      })
+    })
+
+    test('creates an action with action name, action path and --env-file flag', () => {
+      const name = 'hello'
+      const cmd = ow.mockResolved(owAction, '')
+      command.argv = [name, '/action/actionFile.js', '--env-file', '/action/parameters.json']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith({
+            name,
+            action: {
+              name,
+              exec: {
+                code: jsFile,
+                kind: 'nodejs:default'
+              },
+              parameters: createKeyValueArrayFromObject({ param1: 'param1value', param2: 'param2value' }).map(_ => ({ ..._, init: true }))
+            }
+          })
+          expect(stdout.output).toMatch('')
+        })
+    })
+
     test('creates an action with action name, action path, --params flag and annotation flag', () => {
       const name = 'hello'
       const cmd = ow.mockResolved(owAction, '')
