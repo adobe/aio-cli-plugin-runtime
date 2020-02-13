@@ -245,7 +245,7 @@ ActionCreate.flags = {
     description: 'treat ACTION as comma separated sequence of actions to invoke' // help description for flag
   }),
   docker: flags.string({
-    description: 'use provided Docker image (a path on DockerHub) to run the action' // help description for flag
+    description: '[Restricted Access] use provided Docker image (a path on DockerHub) to run the action' // help description for flag
   }),
   main: flags.string({
     description: 'the name of the action entry point (function or fully-qualified method name when applicable)'
