@@ -10,16 +10,19 @@ governing permissions and limitations under the License.
 */
 
 const execa = require('execa')
-const chalk = require('chalk').default
+const chalk = require('chalk')
+const { stdout } = require('stdout-stderr')
+const fs = require('fs')
 
-test('sdk init test', async () => {
+stdout.print = true 
 
-  console.log(chalk)
+test('aio-cli-plugin-runtime test', async () => {
 
-  const name = 'aio-cli-plugin-runtime'
+  const packagejson = JSON.parse(fs.readFileSync('package.json').toString())
+  const name = `${packagejson.name}`
   console.log(chalk.blue(`> e2e tests for ${chalk.bold(name)}`))
 
   console.log(chalk.bold('    - listing actions'))
-  execa.sync('./bin/run', ['runtime:action:list', '--auth', process.env['AUTH']], { stderr: 'inherit' })
+  expect(() => { execa.sync('./bin/run', ['runtime:action:list', '--auth', process.env['AUTH']], { stderr: 'inherit' }) }).not.toThrow()
   console.log(chalk.green(`    - done for ${chalk.bold(name)}`))
 });
