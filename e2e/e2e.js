@@ -14,10 +14,9 @@ const chalk = require('chalk')
 const { stdout } = require('stdout-stderr')
 const fs = require('fs')
 
-stdout.print = true 
+stdout.print = true
 
 test('aio-cli-plugin-runtime test', async () => {
-
   const packagejson = JSON.parse(fs.readFileSync('package.json').toString())
   const name = `${packagejson.name}`
   console.log(chalk.blue(`> e2e tests for ${chalk.bold(name)}`))
@@ -25,4 +24,4 @@ test('aio-cli-plugin-runtime test', async () => {
   console.log(chalk.bold('    - listing actions'))
   expect(() => { execa.sync('./bin/run', ['runtime:action:list', '--auth', process.env['AUTH']], { stderr: 'inherit' }) }).not.toThrow()
   console.log(chalk.green(`    - done for ${chalk.bold(name)}`))
-});
+})
