@@ -58,7 +58,8 @@
     "bin": "./bin/run",
     "devPlugins": [
       "@oclif/plugin-help"
-    ]
+    ],
+    "repositoryPrefix": "<%- repo %>/blob/<%- version %>/<%- commandPath %>"
   },
   "main": "src/runtime-helpers.js",
   "repository": "adobe/aio-cli-plugin-runtime",
