@@ -23,14 +23,19 @@ class ActionCreate extends RuntimeBaseCommand {
     const name = args.actionName
     let exec
     let paramsAction
+    let envParams
     let annotationParams
 
     try {
       // sanity check must either be a sequence or a file but permit neither in case of an update
       if (args.actionPath && flags.sequence) {
         throw (new Error('Cannot specify sequence and a code artifact at the same time'))
-      } else if (!args.actionPath && !flags.sequence && !this.isUpdate()) {
-        throw (new Error('Must provide a code artifact or define a sequence'))
+      } else if (flags.docker && flags.sequence) {
+        throw (new Error('Cannot specify sequence and a container image at the same time'))
+      } else if (flags.docker && flags.kind) {
+        throw (new Error('Cannot specify a kind and a container image at the same time'))
+      } else if (!args.actionPath && !flags.sequence && !flags.docker && !this.isUpdate()) {
+        throw (new Error('Must provide a code artifact, container image, or a sequence'))
       }
 
       // can only specify main handler when also providing a file
@@ -50,8 +55,8 @@ class ActionCreate extends RuntimeBaseCommand {
           exec = {}
 
           if (args.actionPath.endsWith('.zip') || flags.binary) {
-            if (!flags.kind) {
-              throw (new Error('Invalid argument(s). creating an action from a .zip artifact requires specifying the action kind explicitly'))
+            if (!flags.kind && !flags.docker) {
+              throw (new Error('Invalid argument(s). creating an action from a zip/binary artifact requires specifying the action kind explicitly'))
             }
             exec.code = fs.readFileSync(args.actionPath).toString('base64')
           } else {
@@ -64,7 +69,7 @@ class ActionCreate extends RuntimeBaseCommand {
 
           if (flags.kind) {
             exec.kind = flags.kind
-          } else {
+          } else if (!flags.docker) {
             exec.kind = kindForFileExtension(args.actionPath)
           }
         } else {
@@ -79,12 +84,43 @@ class ActionCreate extends RuntimeBaseCommand {
         }
       }
 
+      if (flags.docker) {
+        exec = exec || {}
+        exec.kind = 'blackbox'
+        exec.image = flags.docker
+      }
+
       if (flags.param) {
         // each --param flag expects two values ( a key and a value ). Multiple --param flags can be passed
         // For example : aio runtime:action:update --param name "foo" --param city "bar"
         paramsAction = createKeyValueArrayFromFlag(flags.param)
       } else if (flags['param-file']) {
         paramsAction = createKeyValueArrayFromFile(flags['param-file'])
+      }
+
+      if (flags.env) {
+        // each --env flag expects two values ( a key and a value ). Multiple --env flags can be passed
+        // For example : aio runtime:action:update --env name "foo" --env city "bar"
+        envParams = createKeyValueArrayFromFlag(flags.env)
+      } else if (flags['env-file']) {
+        envParams = createKeyValueArrayFromFile(flags['env-file'])
+      }
+
+      // merge parametes and environemtn variables
+      if (envParams) {
+        envParams = envParams.map(e => ({ ...e, init: true }))
+        if (paramsAction) {
+          // check for overlap and flag errors
+          const paramNames = new Set(envParams.map(_ => _.key))
+          const overlap = paramsAction.filter(_ => paramNames.has(_.key))
+          if (overlap.length === 0) {
+            paramsAction = paramsAction.concat(envParams)
+          } else {
+            throw (new Error(`Invalid argument(s). Environment variables and function parameters may not overlap`))
+          }
+        } else {
+          paramsAction = envParams
+        }
       }
 
       if (flags.annotation) {
@@ -164,6 +200,11 @@ ActionCreate.flags = {
     description: 'parameter values in KEY VALUE format', // help description for flag
     multiple: true // allow setting this flag multiple times
   }),
+  env: flags.string({
+    char: 'e',
+    description: 'environment values in KEY VALUE format', // help description for flag
+    multiple: true // allow setting this flag multiple times
+  }),
   web: flags.string({
     description: 'treat ACTION as a web action or as a raw HTTP web action', // help description for flag
     options: ['true', 'yes', 'false', 'no', 'raw']
@@ -171,6 +212,10 @@ ActionCreate.flags = {
   'param-file': flags.string({
     char: 'P',
     description: 'FILE containing parameter values in JSON format' // help description for flag
+  }),
+  'env-file': flags.string({
+    char: 'E',
+    description: 'FILE containing environment variables in JSON format' // help description for flag
   }),
   timeout: flags.integer({
     char: 't',
@@ -198,6 +243,9 @@ ActionCreate.flags = {
   }),
   sequence: flags.string({
     description: 'treat ACTION as comma separated sequence of actions to invoke' // help description for flag
+  }),
+  docker: flags.string({
+    description: '[Restricted Access] use provided Docker image (a path on DockerHub) to run the action' // help description for flag
   }),
   main: flags.string({
     description: 'the name of the action entry point (function or fully-qualified method name when applicable)'

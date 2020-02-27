@@ -32,14 +32,14 @@ class ActivationLogs extends RuntimeBaseCommand {
     }
 
     const logger = this.log
-    activations.forEach((ax) => {
-      ow.activations.logs(ax.activationId).then((result) => {
+    await Promise.all(activations.map((ax) => {
+      return ow.activations.logs(ax.activationId).then((result) => {
         logger(chalk.dim('=== ') + chalk.bold('activation logs %s %s:%s'), ax.activationId, ax.name || '', ax.version || '')
         printLogs(result, flags.strip, logger)
       }, (err) => {
         this.handleError('failed to retrieve logs for activation', err)
       })
-    })
+    }))
   }
 }
 

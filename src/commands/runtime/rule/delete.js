@@ -10,15 +10,18 @@ governing permissions and limitations under the License.
 */
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
+const { flags } = require('@oclif/command')
 
 class RuleDelete extends RuntimeBaseCommand {
   async run () {
-    const { args } = this.parse(RuleDelete)
+    const { flags, args } = this.parse(RuleDelete)
     try {
       const ow = await this.wsk()
       const RuleDeleteObject = { ...args }
       const deleteRule = await ow.rules.delete(RuleDeleteObject)
-      this.log(`Rules Deleted! ${JSON.stringify(deleteRule, null, 2)}`)
+      if (flags.json) {
+        this.logJSON('', deleteRule)
+      }
     } catch (err) {
       this.handleError('failed to delete rules', err)
     }
@@ -36,7 +39,10 @@ RuleDelete.args = [
 ]
 
 RuleDelete.flags = {
-  ...RuntimeBaseCommand.flags
+  ...RuntimeBaseCommand.flags,
+  json: flags.boolean({
+    description: 'output raw json'
+  })
 }
 
 RuleDelete.aliases = [

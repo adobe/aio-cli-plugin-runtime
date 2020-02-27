@@ -76,6 +76,18 @@ describe('instance methods', () => {
         })
     })
 
+    test('delete simple rule with --json', () => {
+      const cmd = ow.mockResolvedFixture(owAction, 'rule/delete.json')
+      command.argv = ['nameFoo', '--json']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith({
+            name: 'nameFoo'
+          })
+          expect(JSON.parse(stdout.output)).toMatchFixtureJson('rule/delete.json')
+        })
+    })
+
     test('errors out on api error', () => {
       return new Promise((resolve, reject) => {
         ow.mockRejected('rules.delete', new Error('an error'))

@@ -13,7 +13,7 @@
     "cli-ux": "^5.2.0",
     "js-yaml": "^3.13.1",
     "node-fetch": "^2.3.0",
-    "openwhisk": "^3.20.0",
+    "openwhisk": "^3.21.1",
     "openwhisk-fqn": "^0.0.2",
     "properties-reader": "0.3.0",
     "sha1": "^1.1.1"
@@ -58,18 +58,20 @@
     "bin": "./bin/run",
     "devPlugins": [
       "@oclif/plugin-help"
-    ]
+    ],
+    "repositoryPrefix": "<%- repo %>/blob/<%- version %>/<%- commandPath %>"
   },
   "main": "src/runtime-helpers.js",
   "repository": "adobe/aio-cli-plugin-runtime",
   "scripts": {
-    "eslint-fix": "eslint src test --fix",
-    "posttest": "eslint src test",
+    "eslint-fix": "eslint src test e2e --fix",
+    "posttest": "eslint src test e2e",
     "test": "npm run unit-tests",
     "unit-tests": "jest --ci",
     "prepack": "oclif-dev manifest && oclif-dev readme",
     "postpack": "rm -f oclif.manifest.json",
-    "version": "oclif-dev readme && git add README.md"
+    "version": "oclif-dev readme && git add README.md",
+    "e2e": "jest --collectCoverage=false --testRegex './e2e/e2e.js'"
   },
   "jest": {
     "collectCoverage": true,

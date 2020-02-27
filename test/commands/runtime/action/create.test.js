@@ -108,7 +108,6 @@ describe('instance methods', () => {
 
     test('creates an action with action name and --sequence flag', () => {
       const name = 'hello'
-      ow.actions.client.options = { namespace: 'ns' }
       const cmd = ow.mockResolved(owAction, '')
       command.argv = [name, '--sequence', 'a,p/b,ns/p/c,/ns2/p/d,/ns3/e']
       return command.run()
@@ -120,6 +119,47 @@ describe('instance methods', () => {
               exec: {
                 kind: 'sequence',
                 components: ['/_/a', '/_/p/b', '/ns/p/c', '/ns2/p/d', '/ns3/e']
+              }
+            }
+          })
+          expect(stdout.output).toMatch('')
+        })
+    })
+
+    test('creates an action with action name and --docker flag', () => {
+      const name = 'hello'
+      const cmd = ow.mockResolved(owAction, '')
+      command.argv = [name, '--docker', 'some-image']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith({
+            name,
+            action: {
+              name,
+              exec: {
+                kind: 'blackbox',
+                image: 'some-image'
+              }
+            }
+          })
+          expect(stdout.output).toMatch('')
+        })
+    })
+
+    test('creates an action with action name and action path and --docker flag', () => {
+      const name = 'hello'
+      const cmd = ow.mockResolved(owAction, '')
+      command.argv = [name, '/action/actionFile.js', '--docker', 'some-image']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith({
+            name,
+            action: {
+              name,
+              exec: {
+                code: jsFile,
+                kind: 'blackbox',
+                image: 'some-image'
               }
             }
           })
@@ -308,6 +348,105 @@ describe('instance methods', () => {
         })
     })
 
+    test('creates an action with action name, action path and --env flag', () => {
+      const name = 'hello'
+      const cmd = ow.mockResolved(owAction, '')
+      command.argv = [name, '/action/actionFile.js', '--env', 'a', 'b', '--env', 'c', 'd']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith({
+            name,
+            action: {
+              name,
+              exec: {
+                code: jsFile,
+                kind: 'nodejs:default'
+              },
+              parameters: createKeyValueArrayFromObject({ a: 'b', c: 'd' }).map(_ => ({ ..._, init: true }))
+            }
+          })
+          expect(stdout.output).toMatch('')
+        })
+    })
+
+    test('creates an action with action name, action path and --e flag', () => {
+      const name = 'hello'
+      const cmd = ow.mockResolved(owAction, '')
+      command.argv = [name, '/action/actionFile.js', '--env', 'a', 'b', '-e', 'c', 'd']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith({
+            name,
+            action: {
+              name,
+              exec: {
+                code: jsFile,
+                kind: 'nodejs:default'
+              },
+              parameters: createKeyValueArrayFromObject({ a: 'b', c: 'd' }).map(_ => ({ ..._, init: true }))
+            }
+          })
+          expect(stdout.output).toMatch('')
+        })
+    })
+
+    test('creates an action with action name, action path and --env and --param flag', () => {
+      const name = 'hello'
+      const cmd = ow.mockResolved(owAction, '')
+      command.argv = [name, '/action/actionFile.js', '--env', 'a', 'b', '--param', 'c', 'd']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith({
+            name,
+            action: {
+              name,
+              exec: {
+                code: jsFile,
+                kind: 'nodejs:default'
+              },
+              // order matters in array for the check, env params come last
+              parameters: createKeyValueArrayFromObject({ c: 'd', a: 'b' }).map(_ => { return _.key === 'a' ? { ..._, init: true } : _ })
+            }
+          })
+          expect(stdout.output).toMatch('')
+        })
+    })
+
+    test('creates an action with action name, action path and overlapping --env and --param keys', () => {
+      return new Promise((resolve, reject) => {
+        ow.mockRejected(owAction, '')
+        const name = 'hello'
+        command.argv = [name, '/action/actionFile.js', '--env', 'a', 'b', '--param', 'a', 'd']
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error('Invalid argument(s). Environment variables and function parameters may not overlap'))
+            resolve()
+          })
+      })
+    })
+
+    test('creates an action with action name, action path and --env-file flag', () => {
+      const name = 'hello'
+      const cmd = ow.mockResolved(owAction, '')
+      command.argv = [name, '/action/actionFile.js', '--env-file', '/action/parameters.json']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith({
+            name,
+            action: {
+              name,
+              exec: {
+                code: jsFile,
+                kind: 'nodejs:default'
+              },
+              parameters: createKeyValueArrayFromObject({ param1: 'param1value', param2: 'param2value' }).map(_ => ({ ..._, init: true }))
+            }
+          })
+          expect(stdout.output).toMatch('')
+        })
+    })
+
     test('creates an action with action name, action path, --params flag and annotation flag', () => {
       const name = 'hello'
       const cmd = ow.mockResolved(owAction, '')
@@ -443,6 +582,32 @@ describe('instance methods', () => {
       })
     })
 
+    test('creates an action with --docker and --sequence', () => {
+      return new Promise((resolve, reject) => {
+        ow.mockRejected(owAction, '')
+        command.argv = ['hello', '--docker', 'some-image', '--sequence', 'a,b,c']
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error('Cannot specify sequence and a container image at the same time'))
+            resolve()
+          })
+      })
+    })
+
+    test('creates an action with --docker and --kind', () => {
+      return new Promise((resolve, reject) => {
+        ow.mockRejected(owAction, '')
+        command.argv = ['hello', '/action/actionFile.js', '--kind', 'nodejs:8', '--docker', 'some-image']
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error('Cannot specify a kind and a container image at the same time'))
+            resolve()
+          })
+      })
+    })
+
     test('tests for incorrect action create missing code and sequence', () => {
       return new Promise((resolve, reject) => {
         ow.mockRejected(owAction, '')
@@ -450,7 +615,7 @@ describe('instance methods', () => {
         return command.run()
           .then(() => reject(new Error('does not throw error')))
           .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error('Must provide a code artifact or define a sequence'))
+            expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error('Must provide a code artifact, container image, or a sequence'))
             resolve()
           })
       })

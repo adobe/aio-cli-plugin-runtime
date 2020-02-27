@@ -125,6 +125,129 @@ describe('instance methods', () => {
         })
     })
 
+    test('invokes an action with action name, and gets an activation id', () => {
+      const result = { activationId: '123456' }
+      const cmd = ow.mockResolved(owAction, result)
+      command.argv = ['hello']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith({
+            name: 'hello',
+            blocking: false,
+            params: {},
+            result: false
+          })
+          expect(stdout.output).toMatch(JSON.stringify(result, null, 2))
+        })
+    })
+
+    test('invokes an action with action name and --blocking, and gets an activation record as the response', () => {
+      const result = { activationId: '123456', response: { result: { msg: '123456' } } }
+      const cmd = ow.mockResolved(owAction, result)
+      command.argv = ['hello', '--blocking']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith({
+            name: 'hello',
+            blocking: true,
+            params: {},
+            result: false
+          })
+          expect(stdout.output).toMatch(JSON.stringify(result, null, 2))
+        })
+    })
+
+    test('invokes an action with action name and --result, and gets an activation result as the response', () => {
+      const result = { msg: '123456' }
+      const cmd = ow.mockResolved(owAction, result)
+      command.argv = ['hello', '--result']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith({
+            name: 'hello',
+            blocking: true,
+            params: {},
+            result: true
+          })
+          expect(stdout.output).toMatch(JSON.stringify(result, null, 2))
+        })
+    })
+
+    test('invokes an action with action name and --blocking but activation is demoted to async', () => {
+      // when the API returns with 202 it demoted the activation to async request, providing only an activation id
+      const result = { activationId: '123456' }
+      const cmd = ow.mockRejected(owAction, result)
+      command.argv = ['hello', '--blocking']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith({
+            name: 'hello',
+            blocking: true,
+            params: {},
+            result: false
+          })
+
+          expect(stdout.output).toMatch(`activation took too long, use activation id 123456 to check for completion.`)
+        })
+    })
+
+    test('invokes an action with action name and --result but activation is demoted to async', () => {
+      // when the API returns with 202 it demoted the activation to async request, providing only an activation id
+      const result = { activationId: '123456' }
+      const cmd = ow.mockRejected(owAction, result)
+      command.argv = ['hello', '--result']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith({
+            name: 'hello',
+            blocking: true,
+            params: {},
+            result: true
+          })
+
+          expect(stdout.output).toMatch(`activation took too long, use activation id 123456 to check for completion.`)
+        })
+    })
+
+    test('invokes an action with action name and --blocking, and gets an activation record where the result is an error (API status code is 502)', () => {
+      // when the API returns with 502 due to an application error in the function
+      // the result is the entire activation wrapped in an error object
+      const result = { activationId: '123456', response: { result: { error: 'oops' } } }
+      const cmd = ow.mockRejected(owAction, { error: result })
+      command.argv = ['hello', '--blocking']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith({
+            name: 'hello',
+            blocking: true,
+            params: {},
+            result: false
+          })
+
+          expect(stdout.output).toMatch(JSON.stringify(result, null, 2))
+        })
+    })
+
+    test('invokes an action with action name and --result, and gets an activation record where the result is an error (API status code is 502)', () => {
+      // npm openwhisk does a blocking invoke for "--result" and then projects the result
+      // so when the API returns with 502 due to an application error in the function
+      // the result is the entire activation wrapped in an error object
+      const result = { activationId: '123456', response: { result: { error: 'oops' } } }
+      const cmd = ow.mockRejected(owAction, { error: result })
+      command.argv = ['hello', '--result']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith({
+            name: 'hello',
+            blocking: true,
+            params: {},
+            result: true
+          })
+
+          expect(stdout.output).toMatch(JSON.stringify(result.response.result, null, 2))
+        })
+    })
+
     test('invokes an action with all flags', () => {
       const cmd = ow.mockResolved(owAction, '')
       command.argv = ['hello', '--param', 'a', 'b', '--param', 'c', 'd', '--blocking', '--result']

@@ -36,7 +36,20 @@ class ActionInvoke extends RuntimeBaseCommand {
       })
       this.logJSON('', result)
     } catch (err) {
-      this.handleError('failed to invoke the action', err)
+      // a blocking/result only invoke which errors produces a 502 http status code
+      // and the promise will fail and enter this catch block due to the await above
+      // so here, check if the error object contains an activation id (hence the
+      // result of the synchronous invoke) and then either log it to console or
+      // project the respose result if the result only flag is used.
+      if (err.activationId) {
+        this.log(`activation took too long, use activation id ${err.activationId} to check for completion.`)
+      } else if (flags.result && err.error && err.error.response && err.error.response.result) {
+        this.logJSON('', err.error.response.result)
+      } else if (flags.blocking && err.error && err.error.activationId) {
+        this.logJSON('', err.error)
+      } else {
+        this.handleError('failed to invoke the action', err)
+      }
     }
   }
 }
