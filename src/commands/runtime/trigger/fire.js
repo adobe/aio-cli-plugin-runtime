@@ -41,7 +41,8 @@ class TriggerFire extends RuntimeBaseCommand {
       }
 
       const ow = await this.wsk()
-      await ow.triggers.invoke(options)
+      const result = await ow.triggers.invoke(options)
+      this.logJSON('', result)
     } catch (err) {
       this.handleError('failed to fire the trigger', err)
     }
