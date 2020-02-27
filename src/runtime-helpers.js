@@ -356,10 +356,17 @@ function createActionObject (thisAction, objAction) {
     objAction.action = fs.readFileSync(thisAction['function'], { encoding: 'utf8' })
   }
 
-  objAction.exec = {
-    main: thisAction.main,
-    kind: thisAction.docker ? 'blackbox' : thisAction.runtime,
-    image: thisAction.docker
+  if (thisAction.main || thisAction.docker || thisAction.runtime) {
+    objAction.exec = {}
+    if (thisAction.main) {
+      objAction.exec.main = thisAction.main
+    }
+    if (thisAction.docker) {
+      objAction.exec.kind = 'blackbox'
+      objAction.exec.image = thisAction.docker
+    } else if (thisAction.runtime) {
+      objAction.exec.kind = thisAction.runtime
+    }
   }
 
   if (thisAction.limits) {
