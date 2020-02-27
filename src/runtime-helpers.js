@@ -348,7 +348,7 @@ function checkWebFlags (flag) {
 
 function createActionObject (thisAction, objAction) {
   if (thisAction['function'].endsWith('.zip')) {
-    if (!thisAction['runtime']) {
+    if (!thisAction['runtime'] && !thisAction['docker']) {
       throw (new Error(`Invalid or missing property "runtime" in the manifest for this action: ${objAction.name}`))
     }
     objAction.action = fs.readFileSync(thisAction['function'])
@@ -356,13 +356,17 @@ function createActionObject (thisAction, objAction) {
     objAction.action = fs.readFileSync(thisAction['function'], { encoding: 'utf8' })
   }
 
-  if (thisAction['runtime']) {
-    // thisAction['runtime'] = thisAction['runtime'].replace('@', ':')  - Conflict in documentation
-    objAction['kind'] = thisAction['runtime']
-  }
-
-  if (thisAction['main']) {
-    objAction['exec'] = { main: thisAction['main'] }
+  if (thisAction.main || thisAction.docker || thisAction.runtime) {
+    objAction.exec = {}
+    if (thisAction.main) {
+      objAction.exec.main = thisAction.main
+    }
+    if (thisAction.docker) {
+      objAction.exec.kind = 'blackbox'
+      objAction.exec.image = thisAction.docker
+    } else if (thisAction.runtime) {
+      objAction.exec.kind = thisAction.runtime
+    }
   }
 
   if (thisAction.limits) {
@@ -600,7 +604,7 @@ async function deployPackage (entities, ow, logger) {
     logger(`Info: package [${pkg.name}] has been successfully deployed.\n`)
   }
   for (const action of entities.actions) {
-    if (action['exec'] && action['exec']['kind']) {
+    if (action['exec'] && action['exec']['kind'] === 'sequence') {
       action['exec']['components'] = action['exec']['components'].map(sequence => {
         /*
           Input => Output
