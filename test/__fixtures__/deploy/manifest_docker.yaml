@@ -1,0 +1,13 @@
+# Licensed to the Apache Software Foundation (ASF) under one or more contributor
+# license agreements; and to You under the Apache License, Version 2.0.
+
+# Example: Blackbox action with a custom docker image
+packages:
+  demo_package:
+    actions:
+      sampleAction:
+        function: /deploy/main.js
+        main: split
+        web: false
+        docker: my/docker-image:1.0.0
+

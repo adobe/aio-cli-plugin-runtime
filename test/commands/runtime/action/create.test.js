@@ -108,7 +108,6 @@ describe('instance methods', () => {
 
     test('creates an action with action name and --sequence flag', () => {
       const name = 'hello'
-      ow.actions.client.options = { namespace: 'ns' }
       const cmd = ow.mockResolved(owAction, '')
       command.argv = [name, '--sequence', 'a,p/b,ns/p/c,/ns2/p/d,/ns3/e']
       return command.run()
@@ -120,6 +119,47 @@ describe('instance methods', () => {
               exec: {
                 kind: 'sequence',
                 components: ['/_/a', '/_/p/b', '/ns/p/c', '/ns2/p/d', '/ns3/e']
+              }
+            }
+          })
+          expect(stdout.output).toMatch('')
+        })
+    })
+
+    test('creates an action with action name and --docker flag', () => {
+      const name = 'hello'
+      const cmd = ow.mockResolved(owAction, '')
+      command.argv = [name, '--docker', 'some-image']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith({
+            name,
+            action: {
+              name,
+              exec: {
+                kind: 'blackbox',
+                image: 'some-image'
+              }
+            }
+          })
+          expect(stdout.output).toMatch('')
+        })
+    })
+
+    test('creates an action with action name and action path and --docker flag', () => {
+      const name = 'hello'
+      const cmd = ow.mockResolved(owAction, '')
+      command.argv = [name, '/action/actionFile.js', '--docker', 'some-image']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith({
+            name,
+            action: {
+              name,
+              exec: {
+                code: jsFile,
+                kind: 'blackbox',
+                image: 'some-image'
               }
             }
           })
@@ -542,6 +582,32 @@ describe('instance methods', () => {
       })
     })
 
+    test('creates an action with --docker and --sequence', () => {
+      return new Promise((resolve, reject) => {
+        ow.mockRejected(owAction, '')
+        command.argv = ['hello', '--docker', 'some-image', '--sequence', 'a,b,c']
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error('Cannot specify sequence and a container image at the same time'))
+            resolve()
+          })
+      })
+    })
+
+    test('creates an action with --docker and --kind', () => {
+      return new Promise((resolve, reject) => {
+        ow.mockRejected(owAction, '')
+        command.argv = ['hello', '/action/actionFile.js', '--kind', 'nodejs:8', '--docker', 'some-image']
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error('Cannot specify a kind and a container image at the same time'))
+            resolve()
+          })
+      })
+    })
+
     test('tests for incorrect action create missing code and sequence', () => {
       return new Promise((resolve, reject) => {
         ow.mockRejected(owAction, '')
@@ -549,7 +615,7 @@ describe('instance methods', () => {
         return command.run()
           .then(() => reject(new Error('does not throw error')))
           .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error('Must provide a code artifact or define a sequence'))
+            expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error('Must provide a code artifact, container image, or a sequence'))
             resolve()
           })
       })

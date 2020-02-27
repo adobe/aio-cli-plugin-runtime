@@ -96,6 +96,7 @@ describe('instance methods', () => {
       'deploy/manifest_api.yaml': fixtureFile('deploy/manifest_api.yaml'),
       'deploy/manifest_main.yaml': fixtureFile('deploy/manifest_main.yaml'),
       'deploy/manifest_final.yaml': fixtureFile('deploy/manifest_final.yaml'),
+      'deploy/manifest_docker.yaml': fixtureFile('deploy/manifest_docker.yaml'),
       'deploy/manifest_api_incorrect.yaml': fixtureFile('deploy/manifest_api_incorrect.yaml'),
       'deploy/deployment_syncMissingAction.yaml': fixtureFile('deploy/deployment_syncMissingAction.yaml'),
       'deploy/manifest_multiple_packages.yaml': fixtureFile('deploy/manifest_multiple_packages.yaml'),
@@ -353,6 +354,29 @@ describe('instance methods', () => {
               final: true,
               'raw-http': true,
               'require-whisk-auth': true
+            }
+          })
+          expect(stdout.output).toMatch('')
+        })
+    })
+
+    test('deploys actions with docker image', () => {
+      const cmd = ow.mockResolved(owAction, '')
+      const mainAction = fixtureFile('deploy/main.js')
+      command.argv = ['-m', '/deploy/manifest_docker.yaml']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith({
+            name: 'demo_package/sampleAction',
+            action: mainAction,
+            annotations: {
+              'raw-http': false,
+              'web-export': false
+            },
+            exec: {
+              image: 'my/docker-image:1.0.0',
+              kind: 'blackbox',
+              main: 'split'
             }
           })
           expect(stdout.output).toMatch('')
