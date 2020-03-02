@@ -4,6 +4,9 @@
   "version": "1.5.0",
   "author": "Adobe Inc.",
   "bugs": "https://github.com/adobe/aio-cli-plugin-runtime/issues",
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "@adobe/aio-lib-core-config": "^1.2.4",
     "@oclif/command": "^1.5.6",
