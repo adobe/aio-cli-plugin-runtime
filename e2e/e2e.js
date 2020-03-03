@@ -12,7 +12,7 @@ governing permissions and limitations under the License.
 const execa = require('execa')
 const chalk = require('chalk')
 const { stdout } = require('stdout-stderr')
-const fs = require('fs')
+const fs = require.requireActual('fs')
 
 stdout.print = true
 
