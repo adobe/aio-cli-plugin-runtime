@@ -91,7 +91,7 @@ describe('instance methods', () => {
       command.argv = ['trigger1']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ name: 'trigger1', trigger: {} })
+          expect(cmd).toHaveBeenCalledWith({ name: 'trigger1', params: {} })
           expect(stdout.output).toMatch('')
         })
     })
@@ -115,7 +115,7 @@ describe('instance methods', () => {
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalledWith({ name: 'trigger1',
-            trigger: {
+            params: {
               parameters: [
                 {
                   key: 'a',
@@ -139,7 +139,7 @@ describe('instance methods', () => {
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalledWith({ name: 'trigger1',
-            trigger: {
+            params: {
               parameters: [
                 {
                   key: 'param1',
