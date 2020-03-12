@@ -381,7 +381,101 @@ function createActionObject (thisAction, objAction) {
   return objAction
 }
 
+/**
+ * This is a temporary function that implements the support for the `require-adobe-auth`
+ * annotation for web actions by rewriting the action to a sequence that first executes
+ * the /adobeio/shared-validators/ims validator.
+ *
+ * As an example, the following manifest:
+ * ```
+ * packages:
+ *   helloworld:
+ *     actions:
+ *       hello:
+ *         function: path/to/hello.js
+ *         web: 'yes'
+ *         require-adobe-auth: true
+ * ```
+ * will be deployed as:
+ * ```
+ * packages:
+ *   helloworld:
+ *     actions:
+ *       __secured_hello:
+ *         function: path/to/hello.js
+ *         web: 'yes'
+ *         annotations:
+ *           require-whisk-auth: true #makes sure action cannot be called by itself anymore
+ *     sequences:
+ *       hello:
+ *        actions: '/adobeio/shared-validators/ims,helloworld/__secured_hello'
+ * ```
+ *
+ * The annotation will soon be natively supported in Adobe I/O Runtime, at which point
+ * this function and references to it can be safely deleted.
+ *
+ */
+function _rewriteActionsWithAdobeAuthAnnotation (packages, deploymentPackages) {
+  // do not modify those
+  const ADOBE_AUTH_ANNOTATION = 'require-adobe-auth'
+  const ADOBE_AUTH_ACTION = '/adobeio/shared-validators/ims'
+  const REWRITE_ACTION_PREFIX = '__secured_'
+
+  // traverse all actions in all packages
+  Object.keys(packages).forEach((key) => {
+    if (packages[key]['actions']) {
+      Object.keys(packages[key]['actions']).forEach((actionName) => {
+        const thisAction = packages[key]['actions'][actionName]
+
+        const isWeb = checkWebFlags(thisAction['web-export'])['web-export'] || checkWebFlags(thisAction['web'])['web-export']
+
+        // check if the annotation is defined AND the action is a web action
+        if (isWeb && thisAction.annotations && thisAction.annotations[ADOBE_AUTH_ANNOTATION]) {
+          // 1. delete the adobe-auth annotation and secure the renamed action
+          delete thisAction.annotations[ADOBE_AUTH_ANNOTATION]
+          thisAction.annotations['require-whisk-auth'] = true
+
+          // 2. rename the action
+          const renamedAction = REWRITE_ACTION_PREFIX + actionName
+          /* istanbul ignore if */
+          if (packages[key]['actions'][renamedAction] !== undefined) {
+            // unlikely
+            throw new Error(`Failed to rename the action '${key}/${actionName}' to '${key}/${renamedAction}': an action with the same name exists already.`)
+          }
+          // set the action content to the new key
+          packages[key]['actions'][renamedAction] = thisAction
+          // delete the old key
+          delete packages[key]['actions'][actionName]
+
+          // make sure any content in the deployment package is linked to the new action name
+          if (deploymentPackages[key] && deploymentPackages[key]['actions'] && deploymentPackages[key]['actions'][actionName]) {
+            deploymentPackages[key]['actions'][renamedAction] = deploymentPackages[key]['actions'][actionName]
+            delete deploymentPackages[key]['actions'][actionName]
+          }
+
+          // 3. create the sequence
+          if (packages[key]['sequences'] === undefined) {
+            packages[key]['sequences'] = {}
+          }
+          /* istanbul ignore if */
+          if (packages[key]['sequences'][actionName] !== undefined) {
+            // unlikely
+            throw new Error(`The name '${key}/${actionName}' is defined both for an action and a sequence, it should be unique`)
+          }
+          // set the sequence content
+          packages[key]['sequences'][actionName] = {
+            actions: `${ADOBE_AUTH_ACTION},${key}/${renamedAction}`,
+            web: 'yes'
+          }
+        }
+      })
+    }
+  })
+}
+
 function processPackage (packages, deploymentPackages, deploymentTriggers, params, namesOnly = false) {
+  _rewriteActionsWithAdobeAuthAnnotation(packages, deploymentPackages)
+
   const pkgAndDeps = []
   const actions = []
   const rules = []
