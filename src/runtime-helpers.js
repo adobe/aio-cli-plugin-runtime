@@ -420,7 +420,6 @@ function _rewriteActionsWithAdobeAuthAnnotation (packages, deploymentPackages) {
   const ADOBE_AUTH_ANNOTATION = 'require-adobe-auth'
   const ADOBE_AUTH_ACTION = '/adobeio/shared-validators/ims'
   const REWRITE_ACTION_PREFIX = '__secured_'
-
   // traverse all actions in all packages
   Object.keys(packages).forEach((key) => {
     if (packages[key]['actions']) {
@@ -431,6 +430,8 @@ function _rewriteActionsWithAdobeAuthAnnotation (packages, deploymentPackages) {
 
         // check if the annotation is defined AND the action is a web action
         if (isWeb && thisAction.annotations && thisAction.annotations[ADOBE_AUTH_ANNOTATION]) {
+          debug(`found annotation '${ADOBE_AUTH_ANNOTATION}' in action '${key}/${actionName}'`)
+
           // 1. delete the adobe-auth annotation and secure the renamed action
           delete thisAction.annotations[ADOBE_AUTH_ANNOTATION]
           thisAction.annotations['require-whisk-auth'] = true
@@ -452,6 +453,7 @@ function _rewriteActionsWithAdobeAuthAnnotation (packages, deploymentPackages) {
             deploymentPackages[key]['actions'][renamedAction] = deploymentPackages[key]['actions'][actionName]
             delete deploymentPackages[key]['actions'][actionName]
           }
+          debug(`renamed action '${key}/${actionName}' to '${key}/${renamedAction}'`)
 
           // 3. create the sequence
           if (packages[key]['sequences'] === undefined) {
@@ -467,6 +469,7 @@ function _rewriteActionsWithAdobeAuthAnnotation (packages, deploymentPackages) {
             actions: `${ADOBE_AUTH_ACTION},${key}/${renamedAction}`,
             web: 'yes'
           }
+          debug(`defined new sequence '${key}/${actionName}': '${ADOBE_AUTH_ACTION},${key}/${renamedAction}'`)
         }
       })
     }
