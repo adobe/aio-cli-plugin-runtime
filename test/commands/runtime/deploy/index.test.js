@@ -878,5 +878,61 @@ describe('instance methods', () => {
           })
       })
     })
+
+    // Tests for the require-adobe-auth annotation.
+    // Parsing the annotation in the runtime plugin is temporary, delete the tests
+    //   and fixtures once the annotation is natively supported by Adobe I/O Runtime.
+    describe('require-adobe-auth annotation', () => {
+      beforeEach(() => {
+        fakeFileSystem.addJson({
+          'deploy/manifest_with_adobe_auth.yaml': fixtureFile('deploy/manifest_with_adobe_auth.yaml')
+        })
+      })
+      test('deploys web action with require-adobe-auth annotation', () => {
+        const cmd = ow.mockResolved(owAction, '')
+        command.argv = ['-m', 'manifest_with_adobe_auth.yaml']
+        return command.run()
+          .then(() => {
+            // pkg1
+            // defined sequence (untouched)
+            expect(cmd).toHaveBeenCalledWith({ name: 'testSeq/helloSeq', action: '', annotations: { 'web-export': false, 'raw-http': false }, exec: { components: ['/ns/testSeq/helloAction', '/global/fake/action'], kind: 'sequence' } })
+            // action
+            expect(cmd).toHaveBeenCalledWith({ name: 'testSeq/__secured_helloAction', action: hello, annotations: { 'web-export': true, 'require-whisk-auth': true }, params: { name: 'Elrond' } })
+            // generated sequence
+            expect(cmd).toHaveBeenCalledWith({ name: 'testSeq/helloAction', action: '', annotations: { 'web-export': true }, exec: { components: ['/adobeio/shared-validators/ims', '/ns/testSeq/__secured_helloAction'], kind: 'sequence' } })
+            // pkg2
+            // action
+            expect(cmd).toHaveBeenCalledWith({ name: 'demo_package/__secured_sampleAction', action: hello, annotations: { 'web-export': true, 'require-whisk-auth': true } })
+            // sequence
+            expect(cmd).toHaveBeenCalledWith({ name: 'demo_package/sampleAction', action: '', annotations: { 'web-export': true }, exec: { components: ['/adobeio/shared-validators/ims', '/ns/demo_package/__secured_sampleAction'], kind: 'sequence' } })
+            expect(cmd).toHaveBeenCalledTimes(5)
+            expect(stdout.output).toMatch('')
+          })
+      })
+      test('deploys web action with require-adobe-auth annotation and deployment.yaml', () => {
+        const cmd = ow.mockResolved(owAction, '')
+        command.argv = ['-m', 'manifest_with_adobe_auth.yaml', '-d', 'deployment_correctpackage.yaml']
+        return command.run()
+          .then(() => {
+            // pkg1
+            // defined sequence (untouched)
+            expect(cmd).toHaveBeenCalledWith({ name: 'testSeq/helloSeq', action: '', annotations: { 'web-export': false, 'raw-http': false }, exec: { components: ['/ns/testSeq/helloAction', '/global/fake/action'], kind: 'sequence' } })
+            // action
+            // eslint-disable-next-line object-property-newline
+            expect(cmd).toHaveBeenCalledWith({ name: 'testSeq/__secured_helloAction', action: hello, annotations: { 'web-export': true, 'require-whisk-auth': true },
+              params: { name: 'Runtime' } // only difference in this test is the changed param
+            })
+            // sequence
+            expect(cmd).toHaveBeenCalledWith({ name: 'testSeq/helloAction', action: '', annotations: { 'web-export': true }, exec: { components: ['/adobeio/shared-validators/ims', '/ns/testSeq/__secured_helloAction'], kind: 'sequence' } })
+            // pkg2
+            // action
+            expect(cmd).toHaveBeenCalledWith({ name: 'demo_package/__secured_sampleAction', action: hello, annotations: { 'web-export': true, 'require-whisk-auth': true } })
+            // sequence
+            expect(cmd).toHaveBeenCalledWith({ name: 'demo_package/sampleAction', action: '', annotations: { 'web-export': true }, exec: { components: ['/adobeio/shared-validators/ims', '/ns/demo_package/__secured_sampleAction'], kind: 'sequence' } })
+            expect(cmd).toHaveBeenCalledTimes(5)
+            expect(stdout.output).toMatch('')
+          })
+      })
+    })
   })
 })
