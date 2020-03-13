@@ -1,0 +1,29 @@
+# Licensed to the Apache Software Foundation (ASF) under one or more contributor
+# license agreements; and to You under the Apache License, Version 2.0.
+
+# Example: Hello World action using Adobe auth annotation
+packages:
+  testSeq:
+    version: 1.0
+    license: Apache-2.0
+    actions:
+      helloAction:
+        function: ./hello.js
+        web: 'yes'
+        annotations:
+          require-adobe-auth: true
+        inputs:
+          name: Elrond
+    sequences:
+      helloSeq:
+        actions: 'testSeq/helloAction,global/fake/action' # testSeq/helloAction will be converted to a seq
+  demo_package:
+    version: 1.0
+    license: Apache-2.0
+    actions:
+      sampleAction:
+        function: ./hello.js
+        web: 'yes'
+        annotations:
+          require-adobe-auth: true
+
