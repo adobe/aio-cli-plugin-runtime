@@ -896,16 +896,18 @@ describe('instance methods', () => {
             // pkg1
             // defined sequence (untouched)
             expect(cmd).toHaveBeenCalledWith({ name: 'testSeq/helloSeq', action: '', annotations: { 'web-export': false, 'raw-http': false }, exec: { components: ['/ns/testSeq/helloAction', '/global/fake/action'], kind: 'sequence' } })
-            // action
+            // actions
             expect(cmd).toHaveBeenCalledWith({ name: 'testSeq/__secured_helloAction', action: hello, annotations: { 'web-export': true, 'require-whisk-auth': true }, params: { name: 'Elrond' } })
-            // generated sequence
+            expect(cmd).toHaveBeenCalledWith({ name: 'testSeq/__secured_helloAction2', action: hello, annotations: { 'web-export': true, 'require-whisk-auth': true } })
+            // generated sequences
             expect(cmd).toHaveBeenCalledWith({ name: 'testSeq/helloAction', action: '', annotations: { 'web-export': true }, exec: { components: ['/adobeio/shared-validators/ims', '/ns/testSeq/__secured_helloAction'], kind: 'sequence' } })
+            expect(cmd).toHaveBeenCalledWith({ name: 'testSeq/helloAction2', action: '', annotations: { 'web-export': true }, exec: { components: ['/adobeio/shared-validators/ims', '/ns/testSeq/__secured_helloAction2'], kind: 'sequence' } })
             // pkg2
             // action
             expect(cmd).toHaveBeenCalledWith({ name: 'demo_package/__secured_sampleAction', action: hello, annotations: { 'web-export': true, 'require-whisk-auth': true } })
             // sequence
             expect(cmd).toHaveBeenCalledWith({ name: 'demo_package/sampleAction', action: '', annotations: { 'web-export': true }, exec: { components: ['/adobeio/shared-validators/ims', '/ns/demo_package/__secured_sampleAction'], kind: 'sequence' } })
-            expect(cmd).toHaveBeenCalledTimes(5)
+            expect(cmd).toHaveBeenCalledTimes(7)
             expect(stdout.output).toMatch('')
           })
       })
@@ -917,19 +919,21 @@ describe('instance methods', () => {
             // pkg1
             // defined sequence (untouched)
             expect(cmd).toHaveBeenCalledWith({ name: 'testSeq/helloSeq', action: '', annotations: { 'web-export': false, 'raw-http': false }, exec: { components: ['/ns/testSeq/helloAction', '/global/fake/action'], kind: 'sequence' } })
-            // action
+            // actions
             // eslint-disable-next-line object-property-newline
             expect(cmd).toHaveBeenCalledWith({ name: 'testSeq/__secured_helloAction', action: hello, annotations: { 'web-export': true, 'require-whisk-auth': true },
               params: { name: 'Runtime' } // only difference in this test is the changed param
             })
-            // sequence
+            expect(cmd).toHaveBeenCalledWith({ name: 'testSeq/__secured_helloAction2', action: hello, annotations: { 'web-export': true, 'require-whisk-auth': true } })
+            // sequences
             expect(cmd).toHaveBeenCalledWith({ name: 'testSeq/helloAction', action: '', annotations: { 'web-export': true }, exec: { components: ['/adobeio/shared-validators/ims', '/ns/testSeq/__secured_helloAction'], kind: 'sequence' } })
+            expect(cmd).toHaveBeenCalledWith({ name: 'testSeq/helloAction2', action: '', annotations: { 'web-export': true }, exec: { components: ['/adobeio/shared-validators/ims', '/ns/testSeq/__secured_helloAction2'], kind: 'sequence' } })
             // pkg2
             // action
             expect(cmd).toHaveBeenCalledWith({ name: 'demo_package/__secured_sampleAction', action: hello, annotations: { 'web-export': true, 'require-whisk-auth': true } })
             // sequence
             expect(cmd).toHaveBeenCalledWith({ name: 'demo_package/sampleAction', action: '', annotations: { 'web-export': true }, exec: { components: ['/adobeio/shared-validators/ims', '/ns/demo_package/__secured_sampleAction'], kind: 'sequence' } })
-            expect(cmd).toHaveBeenCalledTimes(5)
+            expect(cmd).toHaveBeenCalledTimes(7)
             expect(stdout.output).toMatch('')
           })
       })
