@@ -14,6 +14,7 @@ const fs = require('fs')
 const yaml = require('js-yaml')
 const debug = require('debug')('aio-cli-plugin-runtime/deploy')
 const sha1 = require('sha1')
+const cloneDeep = require('lodash.clonedeep')
 
 // for lines starting with date-time-string followed by stdout|stderr a ':' and a log-line, return only the logline
 const dtsRegex = /\d{4}-[01]{1}\d{1}-[0-3]{1}\d{1}T[0-2]{1}\d{1}:[0-6]{1}\d{1}:[0-6]{1}\d{1}.\d+Z( *(stdout|stderr):)?\s(.*)/
@@ -423,14 +424,14 @@ function rewriteActionsWithAdobeAuthAnnotation (packages, deploymentPackages) {
   const REWRITE_ACTION_PREFIX = '__secured_'
 
   // avoid side effects, do not modify input packages
-  const newPackages = { ...packages }
-  const newDeploymentPackages = { ...deploymentPackages }
+  const newPackages = cloneDeep(packages)
+  const newDeploymentPackages = cloneDeep(deploymentPackages)
 
   // traverse all actions in all packages
-  Object.keys(packages).forEach((key) => {
-    if (packages[key]['actions']) {
-      Object.keys(packages[key]['actions']).forEach((actionName) => {
-        const thisAction = packages[key]['actions'][actionName]
+  Object.keys(newPackages).forEach((key) => {
+    if (newPackages[key]['actions']) {
+      Object.keys(newPackages[key]['actions']).forEach((actionName) => {
+        const thisAction = newPackages[key]['actions'][actionName]
 
         const isWeb = checkWebFlags(thisAction['web-export'])['web-export'] || checkWebFlags(thisAction['web'])['web-export']
 
@@ -438,59 +439,46 @@ function rewriteActionsWithAdobeAuthAnnotation (packages, deploymentPackages) {
         if (isWeb && thisAction.annotations && thisAction.annotations[ADOBE_AUTH_ANNOTATION]) {
           debug(`found annotation '${ADOBE_AUTH_ANNOTATION}' in action '${key}/${actionName}'`)
 
-          // 0. second level copy
-          newPackages[key] = { ...packages[key] }
-          newDeploymentPackages[key] = { ...deploymentPackages[key] }
-
           // 1. rename the action
           const renamedAction = REWRITE_ACTION_PREFIX + actionName
           /* istanbul ignore if */
-          if (packages[key]['actions'][renamedAction] !== undefined) {
+          if (newPackages[key]['actions'][renamedAction] !== undefined) {
             // unlikely
             throw new Error(`Failed to rename the action '${key}/${actionName}' to '${key}/${renamedAction}': an action with the same name exists already.`)
           }
 
-          // copy actions to the new package and move the action content to the new key
-          newPackages[key]['actions'] = {
-            ...packages[key]['actions'],
-            [renamedAction]: { ...thisAction }
-          }
+          // set the action to the new key
+          newPackages[key]['actions'][renamedAction] = thisAction
           // delete the old key
           delete newPackages[key]['actions'][actionName]
 
           // make sure any content in the deployment package is linked to the new action name
-          if (deploymentPackages[key] && deploymentPackages[key]['actions'] && deploymentPackages[key]['actions'][actionName]) {
-            newDeploymentPackages[key]['actions'] = {
-              ...deploymentPackages[key]['actions'],
-              [renamedAction]: deploymentPackages[key]['actions'][actionName]
-            }
+          if (newDeploymentPackages[key] && newDeploymentPackages[key]['actions'] && newDeploymentPackages[key]['actions'][actionName]) {
+            newDeploymentPackages[key]['actions'][renamedAction] = newDeploymentPackages[key]['actions'][actionName]
             delete newDeploymentPackages[key]['actions'][actionName]
           }
 
           // 2. delete the adobe-auth annotation and secure the renamed action
-          newPackages[key]['actions'][renamedAction]['annotations'] = {
-            ...packages[key]['actions'][actionName]['annotations'],
-            'require-whisk-auth': true
-          }
+          newPackages[key]['actions'][renamedAction]['annotations']['require-whisk-auth'] = true
           delete newPackages[key]['actions'][renamedAction]['annotations'][ADOBE_AUTH_ANNOTATION]
 
           debug(`renamed action '${key}/${actionName}' to '${key}/${renamedAction}'`)
 
           // 3. create the sequence
-          if (packages[key]['sequences'] === undefined) {
+          if (newPackages[key]['sequences'] === undefined) {
             newPackages[key]['sequences'] = {}
-          } /* istanbul ignore next */ else if (packages[key]['sequences'][actionName] !== undefined) {
+          }
+          /* istanbul ignore if */
+          if (newPackages[key]['sequences'][actionName] !== undefined) {
             // unlikely
             throw new Error(`The name '${key}/${actionName}' is defined both for an action and a sequence, it should be unique`)
           }
           // set the sequence content
-          newPackages[key]['sequences'] = {
-            ...packages[key]['sequences'],
-            [actionName]: {
-              actions: `${ADOBE_AUTH_ACTION},${key}/${renamedAction}`,
-              web: 'yes'
-            }
+          newPackages[key]['sequences'][actionName] = {
+            actions: `${ADOBE_AUTH_ACTION},${key}/${renamedAction}`,
+            web: 'yes'
           }
+
           debug(`defined new sequence '${key}/${actionName}': '${ADOBE_AUTH_ACTION},${key}/${renamedAction}'`)
         }
       })

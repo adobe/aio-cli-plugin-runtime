@@ -14,6 +14,11 @@ packages:
           require-adobe-auth: true
         inputs:
           name: Elrond
+      helloAction2:
+        function: ./hello.js
+        web: 'yes'
+        annotations:
+          require-adobe-auth: true
     sequences:
       helloSeq:
         actions: 'testSeq/helloAction,global/fake/action' # testSeq/helloAction will be converted to a seq
