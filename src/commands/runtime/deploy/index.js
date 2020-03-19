@@ -30,9 +30,9 @@ class IndexCommand extends RuntimeBaseCommand {
       } else if (flags['param-file']) {
         params = createKeyValueObjectFromFile(flags['param-file'])
       }
-
-      const entities = processPackage(packages, deploymentPackages, deploymentTriggers, params)
-      const ow = await this.wsk()
+      const options = await this.getOptions()
+      const entities = processPackage(packages, deploymentPackages, deploymentTriggers, params, false, options)
+      const ow = await this.wsk(options)
       const logger = this.log
       await deployPackage(entities, ow, logger)
     } catch (err) {

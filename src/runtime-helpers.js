@@ -498,11 +498,14 @@ function rewriteActionsWithAdobeAuthAnnotation (packages, deploymentPackages) {
   }
 }
 
-function processPackage (packages, deploymentPackages, deploymentTriggers, params, namesOnly = false) {
-  // rewrite packages if needed
-  const { newPackages, newDeploymentPackages } = rewriteActionsWithAdobeAuthAnnotation(packages, deploymentPackages)
-  packages = newPackages
-  deploymentPackages = newDeploymentPackages
+function processPackage (packages, deploymentPackages, deploymentTriggers, params, namesOnly = false, owOptions = {}) {
+  if (owOptions.apihost === 'https://adobeioruntime.net') {
+    // rewrite packages in case there are any `require-adobe-auth` annotations
+    // this is a temporary feature and will be replaced by a native support in Adobe I/O Runtime
+    const { newPackages, newDeploymentPackages } = rewriteActionsWithAdobeAuthAnnotation(packages, deploymentPackages)
+    packages = newPackages
+    deploymentPackages = newDeploymentPackages
+  }
 
   const pkgAndDeps = []
   const actions = []

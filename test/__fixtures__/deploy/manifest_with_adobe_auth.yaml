@@ -31,4 +31,13 @@ packages:
         web-export: 'raw'
         annotations:
           require-adobe-auth: true
-
+      sampleActionNoAnnotation:
+        function: ./hello.js
+        web-export: 'yes'
+      sampleActionNoWeb:
+        function: ./hello.js
+        annotations:
+          require-adobe-auth: true
+  no_actions_pkg:
+    version: 1.0
+    license: Apache-2.0

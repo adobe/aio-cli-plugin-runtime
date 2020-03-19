@@ -20,7 +20,7 @@ const OpenWhisk = require('openwhisk')
 const config = require('@adobe/aio-lib-core-config')
 
 class RuntimeBaseCommand extends Command {
-  async wsk () {
+  async getOptions () {
     const { flags } = this.parse(this.constructor)
     const properties = propertiesFile()
 
@@ -59,6 +59,13 @@ class RuntimeBaseCommand extends Command {
       process.env['__OW_USER_AGENT'] = flags.useragent
     }
 
+    return options
+  }
+
+  async wsk (options) {
+    if (!options) {
+      options = await this.getOptions()
+    }
     return OpenWhisk(options)
   }
 

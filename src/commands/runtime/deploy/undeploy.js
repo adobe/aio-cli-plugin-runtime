@@ -18,7 +18,8 @@ class DeployUndeploy extends RuntimeBaseCommand {
   async run () {
     const { flags } = this.parse(DeployUndeploy)
     try {
-      const ow = await this.wsk()
+      const options = await this.getOptions()
+      const ow = await this.wsk(options)
       const logger = this.log
 
       let entities
@@ -32,7 +33,7 @@ class DeployUndeploy extends RuntimeBaseCommand {
         // todo support deployment files
         const deploymentTriggers = {} // components.deploymentTriggers
         const deploymentPackages = {} // components.deploymentPackages
-        entities = processPackage(packages, deploymentTriggers, deploymentPackages, {}, true) // true for getting entity namesOnly, we do not need to parse all actions files and so on
+        entities = processPackage(packages, deploymentTriggers, deploymentPackages, {}, true, options) // true for getting entity namesOnly, we do not need to parse all actions files and so on
       }
 
       await undeployPackage(entities, ow, logger)

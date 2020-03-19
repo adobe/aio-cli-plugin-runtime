@@ -888,9 +888,33 @@ describe('instance methods', () => {
           'deploy/manifest_with_adobe_auth.yaml': fixtureFile('deploy/manifest_with_adobe_auth.yaml')
         })
       })
+
+      test('processPackage with no owOptions', () => {
+        // for coverage..
+        // should not rewrite
+        const helpers = require('../../../../src/runtime-helpers')
+        const res = helpers.processPackage({
+          hello: { actions: { helloAction: { function: 'hello.js', annotations: { 'require-adobe-auth': true } } } }
+        }, {}, {}, {})
+        expect(res).toEqual(expect.objectContaining({ actions: [expect.objectContaining({ name: 'hello/helloAction', annotations: { 'web-export': false, 'raw-http': false } })] }))
+      })
+
+      test('ignores require-adobe-auth annotation if apihost is not I/O Runtime', () => {
+        const cmd = ow.mockResolved(owAction, '')
+        command.argv = ['-m', 'manifest_with_adobe_auth.yaml', '--apihost', 'https://not.runtime.net']
+        return command.run()
+          .then(() => {
+            cmd.mock.calls.forEach(call => {
+              expect(call[0]).not.toEqual(expect.objectContaining({
+                name: expect.stringContaining('__secured')
+              }))
+            })
+            expect(cmd).toHaveBeenCalledTimes(6)
+          })
+      })
       test('deploys web action with require-adobe-auth annotation', () => {
         const cmd = ow.mockResolved(owAction, '')
-        command.argv = ['-m', 'manifest_with_adobe_auth.yaml']
+        command.argv = ['-m', 'manifest_with_adobe_auth.yaml', '--apihost', 'https://adobeioruntime.net']
         return command.run()
           .then(() => {
             // pkg1
@@ -904,16 +928,18 @@ describe('instance methods', () => {
             expect(cmd).toHaveBeenCalledWith({ name: 'testSeq/helloAction2', action: '', annotations: { 'web-export': true }, exec: { components: ['/adobeio/shared-validators/ims', '/ns/testSeq/__secured_helloAction2'], kind: 'sequence' } })
             // pkg2
             // action
+            expect(cmd).toHaveBeenCalledWith({ name: 'demo_package/sampleActionNoAnnotation', action: hello, annotations: { 'web-export': true } })
+            expect(cmd).toHaveBeenCalledWith({ name: 'demo_package/sampleActionNoWeb', action: hello, annotations: { 'web-export': false, 'raw-http': false } })
             expect(cmd).toHaveBeenCalledWith({ name: 'demo_package/__secured_sampleAction', action: hello, annotations: { 'web-export': false, 'raw-http': false } })
             // sequence
             expect(cmd).toHaveBeenCalledWith({ name: 'demo_package/sampleAction', action: '', annotations: { 'web-export': true, 'raw-http': true }, exec: { components: ['/adobeio/shared-validators/ims', '/ns/demo_package/__secured_sampleAction'], kind: 'sequence' } })
-            expect(cmd).toHaveBeenCalledTimes(7)
+            expect(cmd).toHaveBeenCalledTimes(9)
             expect(stdout.output).toMatch('')
           })
       })
       test('deploys web action with require-adobe-auth annotation and deployment.yaml', () => {
         const cmd = ow.mockResolved(owAction, '')
-        command.argv = ['-m', 'manifest_with_adobe_auth.yaml', '-d', 'deployment_correctpackage.yaml']
+        command.argv = ['-m', 'manifest_with_adobe_auth.yaml', '-d', 'deployment_correctpackage.yaml', '--apihost', 'https://adobeioruntime.net']
         return command.run()
           .then(() => {
             // pkg1
@@ -930,10 +956,12 @@ describe('instance methods', () => {
             expect(cmd).toHaveBeenCalledWith({ name: 'testSeq/helloAction2', action: '', annotations: { 'web-export': true }, exec: { components: ['/adobeio/shared-validators/ims', '/ns/testSeq/__secured_helloAction2'], kind: 'sequence' } })
             // pkg2
             // action
+            expect(cmd).toHaveBeenCalledWith({ name: 'demo_package/sampleActionNoAnnotation', action: hello, annotations: { 'web-export': true } })
+            expect(cmd).toHaveBeenCalledWith({ name: 'demo_package/sampleActionNoWeb', action: hello, annotations: { 'web-export': false, 'raw-http': false } })
             expect(cmd).toHaveBeenCalledWith({ name: 'demo_package/__secured_sampleAction', action: hello, annotations: { 'web-export': false, 'raw-http': false } })
             // sequence
             expect(cmd).toHaveBeenCalledWith({ name: 'demo_package/sampleAction', action: '', annotations: { 'web-export': true, 'raw-http': true }, exec: { components: ['/adobeio/shared-validators/ims', '/ns/demo_package/__secured_sampleAction'], kind: 'sequence' } })
-            expect(cmd).toHaveBeenCalledTimes(7)
+            expect(cmd).toHaveBeenCalledTimes(9)
             expect(stdout.output).toMatch('')
           })
       })
