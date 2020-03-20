@@ -9,7 +9,7 @@ packages:
     actions:
       helloAction:
         function: ./hello.js
-        web: 'yes'
+        web-export: 'yes'
         annotations:
           require-adobe-auth: true
         inputs:
@@ -28,7 +28,16 @@ packages:
     actions:
       sampleAction:
         function: ./hello.js
-        web: 'yes'
+        web-export: 'raw'
         annotations:
           require-adobe-auth: true
-
+      sampleActionNoAnnotation:
+        function: ./hello.js
+        web-export: 'yes'
+      sampleActionNoWeb:
+        function: ./hello.js
+        annotations:
+          require-adobe-auth: true
+  no_actions_pkg:
+    version: 1.0
+    license: Apache-2.0

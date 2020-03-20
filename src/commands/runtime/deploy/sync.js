@@ -27,8 +27,9 @@ class DeploySync extends RuntimeBaseCommand {
         throw new Error('The mandatory key [project name] is missing')
       }
       const params = {}
-      const entities = processPackage(packages, deploymentPackages, deploymentTriggers, params)
-      const ow = await this.wsk()
+      const options = await this.getOptions()
+      const entities = processPackage(packages, deploymentPackages, deploymentTriggers, params, false, options)
+      const ow = await this.wsk(options)
       const logger = this.log
       await syncProject(components.projectName, components.manifestPath, components.manifestContent, entities, ow, logger)
     } catch (err) {

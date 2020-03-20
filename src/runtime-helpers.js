@@ -433,10 +433,12 @@ function rewriteActionsWithAdobeAuthAnnotation (packages, deploymentPackages) {
       Object.keys(newPackages[key]['actions']).forEach((actionName) => {
         const thisAction = newPackages[key]['actions'][actionName]
 
-        const isWeb = checkWebFlags(thisAction['web-export'])['web-export'] || checkWebFlags(thisAction['web'])['web-export']
+        const isWebExport = checkWebFlags(thisAction['web-export'])['web-export']
+        const isWeb = checkWebFlags(thisAction['web'])['web-export']
+        const isRaw = checkWebFlags(thisAction['web'])['raw-http'] || checkWebFlags(thisAction['web-export'])['raw-http']
 
         // check if the annotation is defined AND the action is a web action
-        if (isWeb && thisAction.annotations && thisAction.annotations[ADOBE_AUTH_ANNOTATION]) {
+        if ((isWeb || isWebExport) && thisAction.annotations && thisAction.annotations[ADOBE_AUTH_ANNOTATION]) {
           debug(`found annotation '${ADOBE_AUTH_ANNOTATION}' in action '${key}/${actionName}'`)
 
           // 1. rename the action
@@ -459,7 +461,13 @@ function rewriteActionsWithAdobeAuthAnnotation (packages, deploymentPackages) {
           }
 
           // 2. delete the adobe-auth annotation and secure the renamed action
-          newPackages[key]['actions'][renamedAction]['annotations']['require-whisk-auth'] = true
+          // the renamed action is made secure by removing its web property
+          if (isWeb) {
+            newPackages[key]['actions'][renamedAction]['web'] = false
+          }
+          if (isWebExport) {
+            newPackages[key]['actions'][renamedAction]['web-export'] = false
+          }
           delete newPackages[key]['actions'][renamedAction]['annotations'][ADOBE_AUTH_ANNOTATION]
 
           debug(`renamed action '${key}/${actionName}' to '${key}/${renamedAction}'`)
@@ -476,7 +484,7 @@ function rewriteActionsWithAdobeAuthAnnotation (packages, deploymentPackages) {
           // set the sequence content
           newPackages[key]['sequences'][actionName] = {
             actions: `${ADOBE_AUTH_ACTION},${key}/${renamedAction}`,
-            web: 'yes'
+            web: (isRaw && 'raw') || 'yes'
           }
 
           debug(`defined new sequence '${key}/${actionName}': '${ADOBE_AUTH_ACTION},${key}/${renamedAction}'`)
@@ -490,11 +498,14 @@ function rewriteActionsWithAdobeAuthAnnotation (packages, deploymentPackages) {
   }
 }
 
-function processPackage (packages, deploymentPackages, deploymentTriggers, params, namesOnly = false) {
-  // rewrite packages if needed
-  const { newPackages, newDeploymentPackages } = rewriteActionsWithAdobeAuthAnnotation(packages, deploymentPackages)
-  packages = newPackages
-  deploymentPackages = newDeploymentPackages
+function processPackage (packages, deploymentPackages, deploymentTriggers, params, namesOnly = false, owOptions = {}) {
+  if (owOptions.apihost === 'https://adobeioruntime.net') {
+    // rewrite packages in case there are any `require-adobe-auth` annotations
+    // this is a temporary feature and will be replaced by a native support in Adobe I/O Runtime
+    const { newPackages, newDeploymentPackages } = rewriteActionsWithAdobeAuthAnnotation(packages, deploymentPackages)
+    packages = newPackages
+    deploymentPackages = newDeploymentPackages
+  }
 
   const pkgAndDeps = []
   const actions = []
