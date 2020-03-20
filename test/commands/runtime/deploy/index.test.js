@@ -95,6 +95,7 @@ describe('instance methods', () => {
       'deploy/manifest_zip.yaml': fixtureFile('deploy/manifest_zip.yaml'),
       'deploy/manifest_api.yaml': fixtureFile('deploy/manifest_api.yaml'),
       'deploy/manifest_main.yaml': fixtureFile('deploy/manifest_main.yaml'),
+      'deploy/manifest_conductor.yaml': fixtureFile('deploy/manifest_conductor.yaml'),
       'deploy/manifest_final.yaml': fixtureFile('deploy/manifest_final.yaml'),
       'deploy/manifest_docker.yaml': fixtureFile('deploy/manifest_docker.yaml'),
       'deploy/manifest_api_incorrect.yaml': fixtureFile('deploy/manifest_api_incorrect.yaml'),
@@ -358,6 +359,23 @@ describe('instance methods', () => {
           })
           expect(stdout.output).toMatch('')
         })
+    })
+
+    test('deploys actions with the conductor annotation', () => {
+      const cmd = ow.mockResolved(owAction, '')
+      command.argv = ['-m', '/deploy/manifest_conductor.yaml']
+      return command.run().then(() => {
+        expect(cmd).toHaveBeenCalledWith({
+          name: 'demo_package/anotherAction',
+          action: hello,
+          annotations: {
+            conductor: true,
+            'raw-http': false,
+            'web-export': false
+          }
+        })
+        expect(stdout.output).toMatch('')
+      })
     })
 
     test('deploys actions with docker image', () => {
