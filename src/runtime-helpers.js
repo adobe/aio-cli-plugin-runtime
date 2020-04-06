@@ -243,6 +243,11 @@ function returnDeploymentTriggerInputs (deploymentPackages) {
 
 function returnAnnotations (action) {
   let annotationParams = {}
+
+  if (action['annotations'] && action['annotations']['conductor'] !== undefined) {
+    annotationParams['conductor'] = action['annotations']['conductor']
+  }
+
   if (action['web'] !== undefined) {
     annotationParams = checkWebFlags(action['web'])
   } else if (action['web-export'] !== undefined) {
