@@ -146,6 +146,18 @@ class ActionCreate extends RuntimeBaseCommand {
         }
       }
 
+      if (flags['web-secure']) {
+        const ws = flags['web-secure']
+        const lc = ws.toLowerCase()
+        if (lc === 'true') {
+          annotationParams.push({ key: 'require-whisk-auth', value: true })
+        } else if (lc === 'false') {
+          annotationParams.push({ key: 'require-whisk-auth', value: false })
+        } else {
+          annotationParams.push({ key: 'require-whisk-auth', value: ws })
+        }
+      }
+
       let limits
       if (flags.timeout) {
         limits = limits || {}
@@ -204,6 +216,9 @@ ActionCreate.flags = {
   web: flags.string({
     description: 'treat ACTION as a web action or as a raw HTTP web action', // help description for flag
     options: ['true', 'yes', 'false', 'no', 'raw']
+  }),
+  'web-secure': flags.string({
+    description: 'secure the web action (valid values are true, false, or any string)' // help description for flag
   }),
   'param-file': flags.string({
     char: 'P',
