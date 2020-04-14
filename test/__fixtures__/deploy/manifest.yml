@@ -29,7 +29,7 @@ packages:
       demo_typed_params_for_coverage:
         function: /deploy/hello_plus.js
         inputs:
-          name: $NAME
+          name: ${NAME}
           place: string
           employees: integer
           address: string         
