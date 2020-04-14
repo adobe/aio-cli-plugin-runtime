@@ -189,8 +189,10 @@ function processInputs (input, params) {
         if (Object.prototype.hasOwnProperty.call(dictDataTypes, input[key])) {
           input[key] = dictDataTypes[input[key]]
         } else if (typeof input[key] === 'string' && input[key].startsWith('$')) {
-          let val = input[key]
-          val = val.substr(1)
+          let val = input[key].substr(1)
+          if (val.startsWith('{')) {
+            val = val.slice(1, -1)
+          }
           input[key] = process.env[val] || ''
         }
       }
