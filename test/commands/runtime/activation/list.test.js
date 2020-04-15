@@ -53,6 +53,7 @@ describe('instance methods', () => {
     handleError = jest.spyOn(command, 'handleError')
     rtLib = await RuntimeLib.init({ apihost: 'fakehost', api_key: 'fakekey' })
     rtLib.mockResolved('actions.client.options', '')
+    rtLib.namespaces.list = () => Promise.resolve(['8888_9999'])
     RuntimeLib.mockReset()
   })
 
@@ -131,14 +132,15 @@ describe('instance methods', () => {
         })
     })
 
-    test('return list of actions with activation id + data (cold)', () => {
+    test('return list of actions + data (cold)', () => {
       const data = [
         {
           activationId: '12345',
           annotations: [
             { key: 'path', value: '8888_9999/foo' },
             { key: 'kind', value: 'nodejs:10' },
-            { key: 'initTime', value: 20 }
+            { key: 'initTime', value: 20 },
+            { key: 'waitTime', value: 10 }
           ],
           duration: 23,
           name: 'foo',
@@ -147,16 +149,14 @@ describe('instance methods', () => {
           statusCode: 0,
           version: '0.0.1'
         }]
-      const cmd = rtLib.mockResolved(rtAction, data)
-      command.argv = ['12345']
+      rtLib.mockResolved(rtAction, data)
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ name: '12345' })
-          expect(stdout.output).toMatch('')
+          expect(stdout.output).toMatch(fixtureFileWithTimeZoneAdjustment('activation/list-activation-cold-output.txt', data[0].start))
         })
     })
 
-    test('return list of actions with activation id + data (warm)', () => {
+    test('return list of actions + data (warm)', () => {
       const data = [
         {
           activationId: '12345',
@@ -172,33 +172,108 @@ describe('instance methods', () => {
           statusCode: 0,
           version: '0.0.1'
         }]
-      const cmd = rtLib.mockResolved(rtAction, data)
-      command.argv = ['12345']
+      rtLib.mockResolved(rtAction, data)
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ name: '12345' })
-          expect(stdout.output).toMatch('')
+          expect(stdout.output).toMatch(fixtureFileWithTimeZoneAdjustment('activation/list-activation-warm-output.txt', data[0].start))
         })
     })
 
-    test('return list of trigger activations', () => {
-      const date = 1606487719405
+    test('return list of actions + topmost', () => {
       const data = [
         {
-          activationId: 'a5e7fdaeaa2e4384a7fdaeaa2e438442',
-          name: 'trigger',
+          activationId: '12345',
+          annotations: [
+            { key: 'path', value: '8888_9999/foo' },
+            { key: 'kind', value: 'nodejs:10' },
+            { key: 'topmost', value: true }
+          ],
+          duration: 23,
+          name: 'foo',
           namespace: '8888_9999',
-          start: date,
+          start: 1558507178861,
           statusCode: 0,
           version: '0.0.1'
         }]
       rtLib.mockResolved(rtAction, data)
       return command.run()
         .then(() => {
-          const expDate = new Date(date)
-          let expOutput = fixtureFile('activation/list-triggers-output.txt')
-          expOutput = expOutput.replace('11/27/2020, 9:35:19 AM', expDate.toLocaleString())
-          expect(stdout.output).toMatch(expOutput)
+          expect(stdout.output).toMatch(fixtureFileWithTimeZoneAdjustment('activation/list-activation-topmost-output.txt', data[0].start))
+        })
+    })
+
+    test('return list of actions + sequence', () => {
+      const data = [
+        {
+          activationId: '12345',
+          annotations: [
+            { key: 'path', value: '8888_9999/foo' },
+            { key: 'kind', value: 'nodejs:10' },
+            { key: 'causedBy', value: 'sequence' }
+          ],
+          duration: 23,
+          name: 'foo',
+          namespace: '8888_9999',
+          start: 1558507178861,
+          statusCode: 0,
+          version: '0.0.1'
+        }]
+      rtLib.mockResolved(rtAction, data)
+      return command.run()
+        .then(() => {
+          expect(stdout.output).toMatch(fixtureFileWithTimeZoneAdjustment('activation/list-activation-sequence-output.txt', data[0].start))
+        })
+    })
+
+    test('return list of actions + timeout', () => {
+      const data = [
+        {
+          activationId: '12345',
+          annotations: [
+            { key: 'path', value: '8888_9999/foo' },
+            { key: 'kind', value: 'nodejs:10' },
+            { key: 'timeout', value: true }
+          ],
+          duration: 23,
+          name: 'foo',
+          namespace: '8888_9999',
+          start: 1558507178861,
+          statusCode: 2,
+          version: '0.0.1'
+        }, {
+          activationId: '12346',
+          annotations: [
+            { key: 'path', value: '8888_9999/foo' },
+            { key: 'kind', value: 'nodejs:10' }
+          ],
+          duration: 23,
+          name: 'foo',
+          namespace: '8888_9999',
+          start: 1558507178861,
+          statusCode: 2,
+          version: '0.0.1'
+        }]
+      rtLib.mockResolved(rtAction, data)
+      return command.run()
+        .then(() => {
+          expect(stdout.output).toMatch(fixtureFileWithTimeZoneAdjustment('activation/list-activation-timeout-output.txt', data[0].start))
+        })
+    })
+
+    test('return list of trigger activations', () => {
+      const data = [
+        {
+          activationId: 'a5e7fdaeaa2e4384a7fdaeaa2e438442',
+          name: 'trigger',
+          namespace: '8888_9999',
+          start: 1606487719405,
+          statusCode: 0,
+          version: '0.0.1'
+        }]
+      rtLib.mockResolved(rtAction, data)
+      return command.run()
+        .then(() => {
+          expect(stdout.output).toMatch(fixtureFileWithTimeZoneAdjustment('activation/list-triggers-output.txt', data[0].start))
         })
     })
 

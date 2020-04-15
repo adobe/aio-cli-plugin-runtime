@@ -41,6 +41,66 @@ global.fixtureFile = (output) => {
   return fs.readFileSync(`./test/__fixtures__/${output}`).toString()
 }
 
+// helper for fixtures, with regex replacement of place holders
+global.fixtureFileWithTimeZoneAdjustment = (() => {
+  const moment = require('moment')
+
+  const dateFormatForList = { // only need to replace up to minutes, seconds are the same across timezones
+    month: '2-digit',
+    day: '2-digit',
+    hour12: false,
+    hour: '2-digit',
+    minute: '2-digit'
+  }
+
+  // compute timestamp in current timezone (for list views)
+  const listViewReplaceWith = (timestamp) => {
+    let replaceWith = new Date(timestamp).toLocaleString('en', dateFormatForList)
+    replaceWith = replaceWith.replace(/24:/g, '00:')
+    replaceWith = replaceWith.replace(/,/g, '')
+    return replaceWith
+  }
+
+  // determine the string to replace (for list views)
+  // if 'fromTimeZone' is not specified then assume it is America/NY
+  const listViewToReplace = (timestamp, fromTimeZone) => {
+    let toReplace = new Date(timestamp).toLocaleString('en', Object.assign({}, dateFormatForList, { timeZone: fromTimeZone || 'America/New_York' }))
+    // remote the comma between the date and time
+    toReplace = toReplace.replace(/24:/g, '00:')
+    toReplace = toReplace.replace(/,/g, '')
+    return toReplace
+  }
+
+  // compute timestamp in current timezone (for get views)
+  const getViewReplaceWith = (timestamp) => {
+    const replaceWith = moment(timestamp).format('YYYY-MM-DD HH:mm:ss')
+    return replaceWith
+  }
+
+  // toReplace is either the string to replace or this is a list view,
+  // so will compute what to replace from the given timestamps instead
+  return (output, timestamps, fromTimeZone, replaceMe) => {
+    let expOutput = fixtureFile(output)
+    timestamps = Array.isArray(timestamps) ? timestamps : [timestamps]
+
+    timestamps.forEach(timestamp => {
+      // compute timestamp in current timezone
+      const replaceWith = replaceMe === undefined ? listViewReplaceWith(timestamp) : getViewReplaceWith(timestamp)
+      // determine the string to replace
+      const toReplace = replaceMe || listViewToReplace(timestamp, fromTimeZone)
+
+      const re = new RegExp(toReplace, 'g')
+      expOutput = expOutput.replace(re, replaceWith)
+      if (replaceWith === undefined) {
+        // remove , when in list view
+        expOutput = expOutput.replace(/,/g, '')
+      }
+    })
+
+    return expOutput
+  }
+})()
+
 // helper for fixtures
 global.fixtureJson = (output) => {
   return JSON.parse(fs.readFileSync(`./test/__fixtures__/${output}`).toString())
@@ -62,6 +122,7 @@ const emptyWskPropsFs = {
 
 // set the fake filesystem
 const ffs = require('jest-plugin-fs').default
+
 global.fakeFileSystem = {
   addJson: (json) => {
     // add to existing

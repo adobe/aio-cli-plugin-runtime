@@ -16,5 +16,16 @@
     "publish": true,
     "updated": 1551974798514,
     "version": "0.0.5"
+  },
+  {
+    "name": "demo_package3",
+    "namespace": "53444_51636",
+    "publish": false,
+    "updated": 1569212581883,
+    "version": "0.0.1",
+    "binding": {
+      "name": "some-binding",
+      "namespace": "53444_70361"
+    }
   }
 ]

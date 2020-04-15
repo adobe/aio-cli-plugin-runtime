@@ -59,6 +59,7 @@ describe('instance methods', () => {
     handleError = jest.spyOn(command, 'handleError')
     rtLib = await RuntimeLib.init({ apihost: 'fakehost', api_key: 'fakekey' })
     rtLib.mockResolved('actions.client.options', '')
+    rtLib.namespaces.list = () => Promise.resolve(['53444_41603'])
     RuntimeLib.mockReset()
   })
 
@@ -73,7 +74,8 @@ describe('instance methods', () => {
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalledWith(expect.objectContaining({ limit: 1 }))
-          expect(stdout.output).toMatchFixture('action/list-output.txt')
+          const dates = JSON.parse(fixtureFile('action/list.json')).map(_ => _.updated)
+          expect(stdout.output).toMatch(fixtureFileWithTimeZoneAdjustment('action/list-output.txt', dates))
         })
     })
 
@@ -82,7 +84,18 @@ describe('instance methods', () => {
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalled()
-          expect(stdout.output).toMatchFixture('action/list-output.txt')
+          const dates = JSON.parse(fixtureFile('action/list.json')).map(_ => _.updated)
+          expect(stdout.output).toMatch(fixtureFileWithTimeZoneAdjustment('action/list-output.txt', dates))
+        })
+    })
+
+    test('return list of web actions', () => {
+      const cmd = rtLib.mockResolvedFixture(rtAction, 'action/list3.json')
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalled()
+          const dates = JSON.parse(fixtureFile('action/list3.json')).map(_ => _.updated)
+          expect(stdout.output).toMatch(fixtureFileWithTimeZoneAdjustment('action/list-output-3.txt', dates))
         })
     })
 
@@ -94,7 +107,8 @@ describe('instance methods', () => {
         .then(() => {
           expect(rtUtils.parsePackageName).toHaveBeenCalledWith('somepackage')
           expect(cmd).toHaveBeenCalledWith(expect.objectContaining({ id: 'hola/' }))
-          expect(stdout.output).toMatchFixture('action/list-output.txt')
+          const dates = JSON.parse(fixtureFile('action/list.json')).map(_ => _.updated)
+          expect(stdout.output).toMatch(fixtureFileWithTimeZoneAdjustment('action/list-output.txt', dates))
         })
     })
 
@@ -106,19 +120,21 @@ describe('instance methods', () => {
         .then(() => {
           expect(rtUtils.parsePackageName).toHaveBeenCalledWith('somepackage')
           expect(cmd).toHaveBeenCalledWith(expect.objectContaining({ id: 'hola/', namespace: 'bonjour' }))
-          expect(stdout.output).toMatchFixture('action/list-output.txt')
+          const dates = JSON.parse(fixtureFile('action/list.json')).map(_ => _.updated)
+          expect(stdout.output).toMatch(fixtureFileWithTimeZoneAdjustment('action/list-output.txt', dates))
         })
     })
 
     test('return list of actions - coverage (public/private)', () => {
-      const json = fixtureJson('action/list.json')
+      const json = fixtureJson('action/list2.json')
       json[0].publish = true
 
       const cmd = rtLib.mockResolved(rtAction, json)
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalled()
-          expect(stdout.output).toMatchFixture('action/list-output-2.txt')
+          const dates = JSON.parse(fixtureFile('action/list2.json')).map(_ => _.updated)
+          expect(stdout.output).toMatch(fixtureFileWithTimeZoneAdjustment('action/list-output-2.txt', dates))
         })
     })
 
@@ -138,7 +154,7 @@ describe('instance methods', () => {
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalledWith(expect.objectContaining({ skip: 3 }))
-          expect(stdout.output).toMatch('actions')
+          expect(stdout.output).toMatch('')
         })
     })
 
@@ -172,7 +188,8 @@ describe('instance methods', () => {
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalled()
-          expect(stdout.output).toMatchFixture('action/list-name-sort-output.txt')
+          const dates = JSON.parse(fixtureFile('action/list-name-sort.json')).map(_ => _.updated)
+          expect(stdout.output).toMatch(fixtureFileWithTimeZoneAdjustment('action/list-name-sort-output.txt', dates))
         })
     })
 

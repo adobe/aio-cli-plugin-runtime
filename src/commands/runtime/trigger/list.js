@@ -10,6 +10,7 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
+const moment = require('moment')
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 const { flags } = require('@oclif/command')
 const { cli } = require('cli-ux')
@@ -47,23 +48,46 @@ class TriggerList extends RuntimeBaseCommand {
         result.sort((a, b) => a.name.localeCompare(b.name))
       }
 
-      if (flags.json) {
-        this.logJSON('', result)
-      } else {
-        const columns = {
-          triggers: {
-            header: 'triggers',
-            minWidth: 50,
-            get: row => `/${row.namespace}/${row.name}`
-          },
-          published: {
-            header: '',
-            minWidth: 7,
-            get: row => `${row.publish === false ? 'private' : 'public'}`
+      await Promise.all(
+        result.map(item => {
+          const res = ow.triggers.get(item.name)
+          return res
+        })
+      ).then((resultsWithStatus) => {
+        if (flags.json) {
+          this.logJSON('', resultsWithStatus)
+        } else {
+          const columns = {
+            Datetime: {
+              get: row => moment(row.updated).format('MM/DD HH:mm:ss'),
+              minWidth: 16
+            },
+            status: {
+              header: 'Status',
+              get: row => {
+                let active = 0
+                if (row.rules) {
+                  const entries = Object.entries(row.rules)
+                  active = entries.filter(([k, v]) => v.status === 'active').length
+                }
+                return active > 0 ? `${active} active` : 'inactive'
+              },
+              minWidth: 18
+            },
+            version: {
+              header: 'Version',
+              minWidth: 9,
+              get: row => row.version
+            },
+            triggers: {
+              header: 'Trigger',
+              minWidth: 50,
+              get: row => row.name
+            }
           }
+          cli.table(resultsWithStatus, columns)
         }
-        cli.table(result, columns)
-      }
+      })
     } catch (err) {
       this.handleError('failed to list triggers', err)
     }

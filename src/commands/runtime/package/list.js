@@ -10,6 +10,7 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
+const moment = require('moment')
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 const { flags } = require('@oclif/command')
 const { cli } = require('cli-ux')
@@ -53,15 +54,29 @@ class PackageList extends RuntimeBaseCommand {
         this.logJSON('', result)
       } else {
         const columns = {
-          actions: {
-            header: 'packages',
-            minWidth: 50,
-            get: row => `/${row.namespace}/${row.name}`
+          Datetime: {
+            get: row => moment(row.updated).format('MM/DD HH:mm:ss'),
+            minWidth: 16
           },
           published: {
-            header: '',
-            minWidth: 7,
+            header: 'Access',
+            minWidth: 9,
             get: row => `${row.publish === false ? 'private' : 'public'}`
+          },
+          details: {
+            header: 'Kind',
+            minWidth: 9,
+            get: row => row.binding ? 'binding' : 'package'
+          },
+          version: {
+            header: 'Version',
+            minWidth: 9,
+            get: row => row.version
+          },
+          packages: {
+            header: 'Packages',
+            minWidth: 50,
+            get: row => row.name
           }
         }
         cli.table(result, columns)

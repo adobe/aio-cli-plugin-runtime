@@ -1,5 +1,5 @@
-triggers                                                  
-/53444_70361/a-hello                              private 
-/53444_70361/b-hello                              private 
-/53444_70361/b-hello                              private 
-/53444_70361/c-hello                              private 
+Datetime        Status            Version  Trigger                                           
+11/27 09:35:19  inactive          0.0.1    a-hello                                           
+11/27 09:35:19  inactive          0.0.1    b-hello                                           
+11/27 09:35:19  inactive          0.0.1    b-hello                                           
+11/27 09:35:19  inactive          0.0.1    c-hello                                           

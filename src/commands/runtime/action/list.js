@@ -10,6 +10,7 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
+const moment = require('moment')
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 const { parsePackageName } = require('@adobe/aio-lib-runtime').utils
 const { flags } = require('@oclif/command')
@@ -27,31 +28,59 @@ class ActionList extends RuntimeBaseCommand {
         options.namespace = namespace
         options.id = `${name}/`
       }
+
       const ow = await this.wsk()
+      const ns = (await ow.namespaces.list())[0]
       const result = await ow.actions.list(options)
+
       if (flags['name-sort'] || flags.name) {
         result.sort((a, b) => a.name.localeCompare(b.name))
       }
+
       if (flags.json) {
         this.logJSON('', result)
       } else if (flags.count) {
         this.log(`You have ${result.actions} ${result.actions === 1 ? 'action' : 'actions'} in this namespace.`)
       } else {
         const columns = {
-          actions: {
-            header: 'actions',
-            minWidth: 50,
-            get: row => `/${row.namespace}/${row.name}`
+          Datetime: {
+            get: row => moment(row.updated).format('MM/DD HH:mm:ss'),
+            minWidth: 16
           },
           published: {
-            header: '',
-            minWidth: 7,
-            get: row => `${row.publish === false ? 'private' : 'public'}`
+            header: 'Access',
+            minWidth: 9,
+            get: row => {
+              const web = row.annotations.find(_ => _.key === 'web-export')
+              const auth = row.annotations.find(_ => _.key === 'require-whisk-auth')
+              if (web && web.value !== false) {
+                if (auth && auth.value === true) {
+                  return `web \uD83D\uDD10`
+                } else if (auth && auth.value !== false) {
+                  return `web \uD83D\uDD10`
+                } else {
+                  return 'web'
+                }
+              } else return 'private'
+            }
           },
           details: {
-            header: '',
-            minWidth: 10,
-            get: row => `${row.annotations.filter(elem => elem.key === 'exec')[0].value}`
+            header: 'Kind',
+            minWidth: 9,
+            get: row => `${row.annotations.find(_ => _.key === 'exec').value.split(/[:-]/)[0]}`
+          },
+          version: {
+            header: 'Version',
+            minWidth: 9,
+            get: row => row.version
+          },
+          actions: {
+            header: 'Actions',
+            minWidth: 50,
+            get: row => {
+              const path = `${row.namespace}/${row.name}`
+              return path.replace(`${ns}/`, '')
+            }
           }
         }
         cli.table(result, columns)

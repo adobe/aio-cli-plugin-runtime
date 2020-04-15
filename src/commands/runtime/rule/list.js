@@ -9,6 +9,7 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
+const moment = require('moment')
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 const { flags } = require('@oclif/command')
 const { cli } = require('cli-ux')
@@ -48,18 +49,24 @@ class RuleList extends RuntimeBaseCommand {
           this.logJSON('', resultsWithStatus)
         } else {
           const columns = {
-            actions: {
-              header: 'rules',
-              minWidth: 40,
-              get: row => `/${row.namespace}/${row.name}`
-            },
-            published: {
-              header: '',
-              get: row => `${row.publish === false ? 'private' : 'public'}`
+            Datetime: {
+              get: row => moment(row.updated).format('MM/DD HH:mm:ss'),
+              minWidth: 16
             },
             details: {
-              header: '',
-              get: row => `${row.status}`
+              header: 'Status',
+              get: row => `${row.status}`,
+              minWidth: 18
+            },
+            version: {
+              header: 'Version',
+              minWidth: 9,
+              get: row => row.version
+            },
+            rules: {
+              header: 'Rules',
+              minWidth: 50,
+              get: row => row.name
             }
           }
           cli.table(resultsWithStatus, columns)

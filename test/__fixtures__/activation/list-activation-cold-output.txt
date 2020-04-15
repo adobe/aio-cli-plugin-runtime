@@ -1,0 +1,2 @@
+Datetime        Status   Kind     Version    Activation ID Start Wait Init Duration Entity 
+05/22 02:39:38  success  nodejs   0.0.1      12345         cold  10   20   23ms     foo    

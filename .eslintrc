@@ -29,6 +29,7 @@
     },
     "globals": {
       "fixtureFile": true,
+      "fixtureFileWithTimeZoneAdjustment": true,
       "fixtureJson": true,
       "fixtureZip": true,
       "fakeFileSystem": true,

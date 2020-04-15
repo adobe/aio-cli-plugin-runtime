@@ -10,9 +10,11 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
+const moment = require('moment')
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 const { flags } = require('@oclif/command')
 const { cli } = require('cli-ux')
+const statusStrings = ['success', 'error', 'error\uD83D\uDCA5', 'syserr']
 
 class ActivationList extends RuntimeBaseCommand {
   async run () {
@@ -67,27 +69,64 @@ class ActivationList extends RuntimeBaseCommand {
       if (flags.json) {
         this.logJSON('', listActivation)
       } else {
+        // determine the namespace to use in the activation table
+        const ns = (await ow.namespaces.list())[0]
+
         const columns = {
           Datetime: {
-            get: row => `${new Date(row.start).toLocaleString()}`
+            get: row => moment(row.start).format('MM/DD HH:mm:ss'),
+            minWidth: 16
           },
-          ActivationID: {
-            header: 'Activation ID',
-            get: row => `${row.activationId}`
+          Status: {
+            get: (row) => {
+              const code = statusStrings[row.statusCode || 0]
+              if (row.statusCode === 2) {
+                const timeout = row.annotations.find(_ => _.key === 'timeout')
+                if (timeout && timeout.value) {
+                  return `timeout`
+                }
+              }
+              return code
+            },
+            minWidth: 9
           },
           Kind: {
             get: (row) => {
               if (row.duration !== undefined) {
                 const { annotations } = row
-                if (!annotations || !annotations.length) return
-                return annotations.find((elem) => {
-                  return (elem.key === 'kind')
-                }).value
+                let kind
+                if (annotations && annotations.length) {
+                  kind = annotations.find(_ => _.key === 'kind').value
+                }
+                return kind !== undefined ? kind.split(/[:-]/)[0] : '??'
               } else {
                 // this is a trigger
                 return 'trigger'
               }
+            },
+            minWidth: 9
+          },
+          version: {
+            header: 'Version',
+            minWidth: 9,
+            get: row => row.version
+          },
+          Topmost: {
+            header: '',
+            maxWidth: 2,
+            get: row => {
+              if (row.annotations && row.annotations.length) {
+                const seq = row.annotations.find(_ => _.key === 'causedBy')
+                if (seq && seq.value === 'sequence') return '\u2024'
+                const top = row.annotations.find(_ => _.key === 'topmost')
+                if (top && top.value) return '\u25e1'
+              }
+              return ''
             }
+          },
+          ActivationID: {
+            header: 'Activation ID',
+            get: row => `${row.activationId}`
           },
           Start: {
             get: (row) => {
@@ -103,26 +142,46 @@ class ActivationList extends RuntimeBaseCommand {
               }
             }
           },
+          Wait: {
+            get: (row) => {
+              if (row.duration !== undefined) {
+                const { annotations } = row
+                if (!annotations || !annotations.length) return
+                const elem = annotations.find((elem) => {
+                  return (elem.key === 'waitTime')
+                })
+                return elem ? elem.value : '--'
+              } else {
+                return '--'
+              }
+            }
+          },
+          Init: {
+            get: (row) => {
+              if (row.duration !== undefined) {
+                const { annotations } = row
+                if (!annotations || !annotations.length) return
+                const elem = annotations.find((elem) => {
+                  return (elem.key === 'initTime')
+                })
+                return elem ? elem.value : 0
+              } else {
+                return '--'
+              }
+            }
+          },
           Duration: {
             get: row => row.duration ? `${row.duration}ms` : '--'
-          },
-          Status: {
-            get: (row) => {
-              const statusStrings = ['success', 'application error', 'developer error', 'internal error']
-              return statusStrings[row.statusCode || 0]
-            }
           },
           Entity: {
             get: (row) => {
               const { annotations } = row
+              let path
               if (annotations && annotations.length) {
-                const path = annotations.find((elem) => {
-                  return (elem.key === 'path')
-                }).value
-                return `${path}:${row.version}`
-              } else {
-                return `${row.namespace}/${row.name}:${row.version}`
+                path = annotations.find(_ => _.key === 'path').value
               }
+              path = path || `${row.namespace}/${row.name}`
+              return path.replace(`${ns}/`, '')
             }
           }
         }

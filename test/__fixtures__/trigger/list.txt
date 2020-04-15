@@ -1,3 +1,4 @@
-triggers                                                  
-/namespace1/trigger1                              private 
-/namespace1/trigger2                              public  
+Datetime        Status            Version  Trigger                                           
+11/27 09:35:19  2 active          0.0.1    trigger1                                          
+11/27 09:35:19  inactive          0.0.1    trigger2                                          
+11/27 09:35:19  inactive          0.0.1    trigger3                                          
