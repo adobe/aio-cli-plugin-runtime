@@ -257,5 +257,42 @@ describe('instance methods', () => {
             bufferData, 'buffer')
         })
     })
+
+    test('retrieve an action and do not omit code', () => {
+      TheCommand.fullGet = true
+      const cmd = rtLib.mockResolvedFixture(rtAction, 'action/get.json')
+      command.argv = ['hello']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith('hello')
+          const result = JSON.parse(stdout.output)
+          delete result.date
+          expect(`${JSON.stringify(result, null, 2)}\n`).toMatchFixture('action/get.json')
+        })
+        .finally(() => { TheCommand.fullGet = false })
+    })
+
+    test('show action code --code', () => {
+      const cmd = rtLib.mockResolvedFixture(rtAction, 'action/get.json')
+      command.argv = ['hello', '--code']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith('hello')
+          expect(stdout.output).toMatch('this is the code')
+        })
+    })
+
+    test('report error for show binary action code --code', () => {
+      return new Promise((resolve, reject) => {
+        rtLib.mockResolvedFixture(rtAction, 'action/get.binary.json')
+        command.argv = ['hello', '--code']
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith(TheCommand.codeNotText)
+            resolve()
+          })
+      })
+    })
   })
 })
