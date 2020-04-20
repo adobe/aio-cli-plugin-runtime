@@ -75,7 +75,24 @@ describe('instance methods', () => {
       command.argv = ['hello']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ name: 'hello', blocking: false, params: {}, result: false })
+          expect(cmd).toHaveBeenCalledWith(expect.objectContaining({
+            name: 'hello',
+            blocking: false,
+            params: {},
+            result: false
+          }))
+          expect(stdout.output).toMatch('')
+        })
+    })
+
+    test('sets X-OW-EXTRA-LOGGING header when invoking an action', () => {
+      const cmd = ow.mockResolved(owAction, '')
+      command.argv = ['hello']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith(expect.objectContaining({
+            headers: expect.objectContaining({ 'X-OW-EXTRA-LOGGING': 'on' })
+          }))
           expect(stdout.output).toMatch('')
         })
     })
@@ -85,12 +102,12 @@ describe('instance methods', () => {
       command.argv = ['hello', '--param', 'a', 'b', 'c', 'd']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({
+          expect(cmd).toHaveBeenCalledWith(expect.objectContaining({
             name: 'hello',
             params: { a: 'b', c: 'd' },
             blocking: false,
             result: false
-          })
+          }))
           expect(stdout.output).toMatch('')
         })
     })
@@ -100,12 +117,12 @@ describe('instance methods', () => {
       command.argv = ['hello', '--param', 'a', 'b', '--param', 'c', 'd', '--blocking']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({
+          expect(cmd).toHaveBeenCalledWith(expect.objectContaining({
             name: 'hello',
             params: { a: 'b', c: 'd' },
             blocking: true,
             result: false
-          })
+          }))
           expect(stdout.output).toMatch('')
         })
     })
@@ -115,12 +132,12 @@ describe('instance methods', () => {
       command.argv = ['hello', '--result']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({
+          expect(cmd).toHaveBeenCalledWith(expect.objectContaining({
             name: 'hello',
             blocking: true,
             params: {},
             result: true
-          })
+          }))
           expect(stdout.output).toMatch('')
         })
     })
@@ -131,12 +148,12 @@ describe('instance methods', () => {
       command.argv = ['hello']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({
+          expect(cmd).toHaveBeenCalledWith(expect.objectContaining({
             name: 'hello',
             blocking: false,
             params: {},
             result: false
-          })
+          }))
           expect(stdout.output).toMatch(JSON.stringify(result, null, 2))
         })
     })
@@ -147,12 +164,12 @@ describe('instance methods', () => {
       command.argv = ['hello', '--blocking']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({
+          expect(cmd).toHaveBeenCalledWith(expect.objectContaining({
             name: 'hello',
             blocking: true,
             params: {},
             result: false
-          })
+          }))
           expect(stdout.output).toMatch(JSON.stringify(result, null, 2))
         })
     })
@@ -163,12 +180,12 @@ describe('instance methods', () => {
       command.argv = ['hello', '--result']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({
+          expect(cmd).toHaveBeenCalledWith(expect.objectContaining({
             name: 'hello',
             blocking: true,
             params: {},
             result: true
-          })
+          }))
           expect(stdout.output).toMatch(JSON.stringify(result, null, 2))
         })
     })
@@ -180,12 +197,12 @@ describe('instance methods', () => {
       command.argv = ['hello', '--blocking']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({
+          expect(cmd).toHaveBeenCalledWith(expect.objectContaining({
             name: 'hello',
             blocking: true,
             params: {},
             result: false
-          })
+          }))
 
           expect(stdout.output).toMatch(`activation took too long, use activation id 123456 to check for completion.`)
         })
@@ -198,12 +215,12 @@ describe('instance methods', () => {
       command.argv = ['hello', '--result']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({
+          expect(cmd).toHaveBeenCalledWith(expect.objectContaining({
             name: 'hello',
             blocking: true,
             params: {},
             result: true
-          })
+          }))
 
           expect(stdout.output).toMatch(`activation took too long, use activation id 123456 to check for completion.`)
         })
@@ -217,12 +234,12 @@ describe('instance methods', () => {
       command.argv = ['hello', '--blocking']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({
+          expect(cmd).toHaveBeenCalledWith(expect.objectContaining({
             name: 'hello',
             blocking: true,
             params: {},
             result: false
-          })
+          }))
 
           expect(stdout.output).toMatch(JSON.stringify(result, null, 2))
         })
@@ -237,12 +254,12 @@ describe('instance methods', () => {
       command.argv = ['hello', '--result']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({
+          expect(cmd).toHaveBeenCalledWith(expect.objectContaining({
             name: 'hello',
             blocking: true,
             params: {},
             result: true
-          })
+          }))
 
           expect(stdout.output).toMatch(JSON.stringify(result.response.result, null, 2))
         })
@@ -253,12 +270,12 @@ describe('instance methods', () => {
       command.argv = ['hello', '--param', 'a', 'b', '--param', 'c', 'd', '--blocking', '--result']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({
+          expect(cmd).toHaveBeenCalledWith(expect.objectContaining({
             name: 'hello',
             params: { a: 'b', c: 'd' },
             blocking: true,
             result: true
-          })
+          }))
           expect(stdout.output).toMatch('')
         })
     })
@@ -274,12 +291,12 @@ describe('instance methods', () => {
       command.argv = ['hello', '--param-file', '/action/parameters.json', '--blocking', '--result']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({
+          expect(cmd).toHaveBeenCalledWith(expect.objectContaining({
             name: 'hello',
             params: { param1: 'param1value', param2: 'param2value' },
             blocking: true,
             result: true
-          })
+          }))
           expect(stdout.output).toMatch('')
         })
     })
