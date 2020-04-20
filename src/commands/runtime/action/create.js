@@ -70,7 +70,12 @@ class ActionCreate extends RuntimeBaseCommand {
           if (flags.kind) {
             exec.kind = flags.kind
           } else if (!flags.docker) {
-            exec.kind = kindForFileExtension(args.actionPath)
+            const kind = kindForFileExtension(args.actionPath)
+            if (kind !== undefined) {
+              exec.kind = kind
+            } else {
+              throw new Error('Cannot determine kind of action. Please use --kind to specifiy.')
+            }
           }
         } else {
           throw new Error('Provide a valid path for ACTION')
