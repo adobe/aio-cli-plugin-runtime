@@ -15,7 +15,17 @@
         "standard"
     ],
     "rules": {
-        "no-var": 2
+        "no-var": 2,
+        "node/no-extraneous-require": ["error", {
+            "allowModules": [],
+            "resolvePaths": [],
+            "tryExtensions": [".js"]
+        }],
+        "node/no-missing-require": ["error", {
+            "allowModules": [],
+            "resolvePaths": [],
+            "tryExtensions": [".js"]
+        }]
     },
     "globals": {
       "fixtureFile": true,
