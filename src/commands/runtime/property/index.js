@@ -24,7 +24,8 @@ IndexCommand.description = 'Execute property commands'
 
 IndexCommand.aliases = [
   'runtime:prop',
-  'rt:prop'
+  'rt:prop',
+  'rt:property'
 ]
 
 module.exports = IndexCommand
