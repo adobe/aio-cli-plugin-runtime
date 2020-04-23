@@ -78,7 +78,8 @@ describe('instance methods', () => {
       'action/parameters.json': fixtureFile('trigger/parameters.json'),
       'action/actionFile.js': fixtureFile('action/actionFile.js'),
       'action/zipAction.zip': 'fakezipfile',
-      'action/zipAction.bin': 'fakezipfile'
+      'action/zipAction.bin': 'fakezipfile',
+      'action/fileWithNoExt': 'fakefile'
     }
     fakeFileSystem.addJson(json)
   })
@@ -554,6 +555,19 @@ describe('instance methods', () => {
           })
           expect(stdout.output).toMatch('')
         })
+    })
+
+    test('creates an action with code of unknown kind', () => {
+      return new Promise((resolve, reject) => {
+        ow.mockRejected(owAction, '')
+        command.argv = ['hello', '/action/fileWithNoExt']
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error('Cannot determine kind of action. Please use --kind to specifiy.'))
+            resolve()
+          })
+      })
     })
 
     test('creates an action with code and --sequence', () => {
