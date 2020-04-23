@@ -16,7 +16,7 @@ packages:
     apis:
       testAPI:           # api name
         hello:           # base path
-          helloResource:         # resource path
+          helloResource: # resource path
             hello_world: # action name reference
               method: post
               response: http

@@ -9,19 +9,21 @@ packages:
     actions:
       sampleAction:
         function: /deploy/hello.js
+        web: true
         inputs:
           name: Adobe
           message: Demo
       anotherAction:
         function: /deploy/hello_plus.js
+        web: true
     apis:
       hello-world:
         hello:
           world:
-            hello_world:
+            sampleAction:
               method: GET
       goodbye-world:
         hello:
           world:
-            hello_world:
+            anotherAction:
               method: DELETE

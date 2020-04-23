@@ -282,7 +282,7 @@ function returnAnnotations (action) {
 }
 
 // https://github.com/apache/openwhisk-wskdeploy/blob/master/parsers/manifest_parser.go#L1187
-function createApiRoutes (pkg, apiName, ruleAction, arrSequence, pathOnly) {
+function createApiRoutes (pkg, pkgName, apiName, ruleAction, arrSequence, pathOnly) {
   const packageActions = pkg.actions
   const packageSequences = pkg.sequences
   const rawApi = pkg.apis[apiName]
@@ -300,10 +300,14 @@ function createApiRoutes (pkg, apiName, ruleAction, arrSequence, pathOnly) {
       const resource = basePath[resourceName]
 
       Object.keys(resource).forEach((actionName) => {
-        const actionDefinition = packageActions[actionName]
-          ? packageActions[actionName]
-          : packageSequences[actionName]
+        let actionDefinition = packageActions[actionName]
 
+        // no action of that name, fall back to sequences if available
+        if (!actionDefinition && packageSequences) {
+          actionDefinition = packageSequences[actionName]
+        }
+
+        // neither action nor sequence found, abort
         if (!actionDefinition) {
           throw new Error('Action provided in the api not present in the package')
         }
@@ -316,16 +320,16 @@ function createApiRoutes (pkg, apiName, ruleAction, arrSequence, pathOnly) {
         const opts = {}
 
         if (!pathOnly) {
-          opts.action = `${apiName}/${actionName}`
+          opts.action = `${pkgName}/${actionName}`
           opts.operation = action.method
-          opts.responsetype = action.response
+          opts.responsetype = action.response || 'json'
         }
 
         routes.push({
           name: apiName,
           ...opts,
-          basePath: `/${basePathName}`,
-          relPath: `/${resourceName}`
+          basepath: `/${basePathName}`,
+          relpath: `/${resourceName}`
         })
       })
     })
@@ -673,14 +677,14 @@ function processPackage (packages, deploymentPackages, deploymentTriggers, param
 
     if (packages[key]['apis']) {
       Object.keys(packages[key]['apis']).forEach((apiName) => {
-        const apiRoutes = createApiRoutes(packages[key], apiName, ruleAction, arrSequence, namesOnly)
+        const apiRoutes = createApiRoutes(packages[key], key, apiName, ruleAction, arrSequence, namesOnly)
         routes = routes.concat(apiRoutes)
       })
     }
   })
   return {
     pkgAndDeps,
-    routes,
+    apis: routes,
     triggers,
     rules,
     actions
@@ -774,7 +778,7 @@ async function deployPackage (entities, ow, logger) {
     logger(`Info: action [${action.name}] has been successfully deployed.\n`)
   }
 
-  for (const route of entities.routes) {
+  for (const route of entities.apis) {
     logger(`Info: Deploying route [${route.name}]...`)
     await ow.routes.create(route)
     logger(`Info: route [${route.name}] has been successfully deployed.\n`)
@@ -809,7 +813,7 @@ async function undeployPackage (entities, ow, logger) {
     await ow.rules.delete({ name: rule.name })
     logger(`Info: rule [${rule.name}] has been successfully undeployed.\n`)
   }
-  for (const route of entities.routes) {
+  for (const route of entities.apis) {
     logger(`Info: Undeploying route [${route.name}]...`)
     await ow.routes.delete({ basepath: route.basepath, relpath: route.relpath }) // cannot use name + basepath
     logger(`Info: route [${route.name}] has been successfully undeployed.\n`)
