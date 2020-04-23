@@ -424,11 +424,14 @@ function createActionObject (thisAction, objAction) {
  *
  * @access private
  */
-function rewriteActionsWithAdobeAuthAnnotation (packages, deploymentPackages) {
+function rewriteActionsWithAdobeAuthAnnotation (packages, deploymentPackages, namespace) {
   // do not modify those
   const ADOBE_AUTH_ANNOTATION = 'require-adobe-auth'
   const ADOBE_AUTH_ACTION = '/adobeio/shared-validators/app-registry'
   const REWRITE_ACTION_PREFIX = '__secured_'
+
+  // checks that the namespace is in the correct format for authz validation org-project(-workspace)
+  const namespaceFormatSupportsAuthz = namespace.match(/^[a-zA-Z0-9]+-[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)?$/)
 
   // avoid side effects, do not modify input packages
   const newPackages = cloneDeep(packages)
@@ -447,6 +450,10 @@ function rewriteActionsWithAdobeAuthAnnotation (packages, deploymentPackages) {
         // check if the annotation is defined AND the action is a web action
         if ((isWeb || isWebExport) && thisAction.annotations && thisAction.annotations[ADOBE_AUTH_ANNOTATION]) {
           debug(`found annotation '${ADOBE_AUTH_ANNOTATION}' in action '${key}/${actionName}'`)
+
+          if (!namespaceFormatSupportsAuthz) {
+            throw new Error(`the namespace ${namespace} does not support authorization capabilities, please create a new project in console or remove the 'require-adobe-auth' annotation`)
+          }
 
           // 1. rename the action
           const renamedAction = REWRITE_ACTION_PREFIX + actionName
@@ -509,7 +516,7 @@ function processPackage (packages, deploymentPackages, deploymentTriggers, param
   if (owOptions.apihost === 'https://adobeioruntime.net') {
     // rewrite packages in case there are any `require-adobe-auth` annotations
     // this is a temporary feature and will be replaced by a native support in Adobe I/O Runtime
-    const { newPackages, newDeploymentPackages } = rewriteActionsWithAdobeAuthAnnotation(packages, deploymentPackages)
+    const { newPackages, newDeploymentPackages } = rewriteActionsWithAdobeAuthAnnotation(packages, deploymentPackages, owOptions.namespace)
     packages = newPackages
     deploymentPackages = newDeploymentPackages
   }

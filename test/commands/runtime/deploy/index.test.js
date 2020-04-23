@@ -902,10 +902,11 @@ describe('instance methods', () => {
     //   and fixtures once the annotation is natively supported by Adobe I/O Runtime.
     describe('require-adobe-auth annotation', () => {
       const VALIDATOR = '/adobeio/shared-validators/app-registry'
-
+      const wskprops = [require('path').join(require('os').homedir(), '.wskprops')]
       beforeEach(() => {
         fakeFileSystem.addJson({
-          'deploy/manifest_with_adobe_auth.yaml': fixtureFile('deploy/manifest_with_adobe_auth.yaml')
+          'deploy/manifest_with_adobe_auth.yaml': fixtureFile('deploy/manifest_with_adobe_auth.yaml'),
+          [wskprops]: fixtureFile('wsk-aio.properties')
         })
       })
 
@@ -932,9 +933,17 @@ describe('instance methods', () => {
             expect(cmd).toHaveBeenCalledTimes(6)
           })
       })
+      test('fails if require-adobe-auth w/o a valid namespace', async () => {
+        const theErrorMessage = `the namespace bad does not support authorization capabilities, please create a new project in console or remove the 'require-adobe-auth' annotation`
+        command.argv = ['-m', 'manifest_with_adobe_auth.yaml']
+        fakeFileSystem.addJson({
+          [wskprops]: fixtureFile('wsk-aio-bad.properties')
+        })
+        await expect(command.run()).rejects.toThrow(theErrorMessage)
+      })
       test('deploys web action with require-adobe-auth annotation', () => {
         const cmd = ow.mockResolved(owAction, '')
-        command.argv = ['-m', 'manifest_with_adobe_auth.yaml', '--apihost', 'https://adobeioruntime.net']
+        command.argv = ['-m', 'manifest_with_adobe_auth.yaml']
         return command.run()
           .then(() => {
             // pkg1
@@ -957,9 +966,12 @@ describe('instance methods', () => {
             expect(stdout.output).toMatch('')
           })
       })
-      test('deploys web action with require-adobe-auth annotation and deployment.yaml', () => {
+      test('deploys web action with require-adobe-auth annotation and deployment.yaml and prod namespace', () => {
         const cmd = ow.mockResolved(owAction, '')
-        command.argv = ['-m', 'manifest_with_adobe_auth.yaml', '-d', 'deployment_correctpackage.yaml', '--apihost', 'https://adobeioruntime.net']
+        fakeFileSystem.addJson({
+          [wskprops]: fixtureFile('wsk-aio-prod.properties')
+        })
+        command.argv = ['-m', 'manifest_with_adobe_auth.yaml', '-d', 'deployment_correctpackage.yaml']
         return command.run()
           .then(() => {
             // pkg1
