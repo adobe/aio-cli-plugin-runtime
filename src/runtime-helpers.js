@@ -281,10 +281,28 @@ function returnAnnotations (action) {
   return annotationParams
 }
 
-// https://github.com/apache/openwhisk-wskdeploy/blob/master/parsers/manifest_parser.go#L1187
-function createApiRoutes (pkg, pkgName, apiName, ruleAction, arrSequence, pathOnly) {
-  const packageActions = pkg.actions
-  const packageSequences = pkg.sequences
+/**
+ * Creates an array of route definitions from the given manifest-based package.
+ * See https://github.com/apache/openwhisk-wskdeploy/blob/master/parsers/manifest_parser.go#L1187
+ *
+ * @param pkg The package definition from the manifest.
+ * @param pkgName The name of the package.
+ * @param apiName The name of the HTTP API definition from the manifest.
+ * @param allowedActions List of action names allowed to be used in routes.
+ * @param allowedSequences List of sequence names allowed to be used in routes.
+ * @param pathOnly Skip action, method and response type in route definitions.
+ * @return {{
+ * action: String,
+ * operation: String,
+ * responsetype: String
+ * basepath: String,
+ * relpath: String,
+ * name: String
+ * }[]}
+ */
+function createApiRoutes (pkg, pkgName, apiName, allowedActions, allowedSequences, pathOnly) {
+  const actions = pkg.actions
+  const sequences = pkg.sequences
   const rawApi = pkg.apis[apiName]
 
   if (!rawApi) {
@@ -300,11 +318,29 @@ function createApiRoutes (pkg, pkgName, apiName, ruleAction, arrSequence, pathOn
       const resource = basePath[resourceName]
 
       Object.keys(resource).forEach((actionName) => {
-        let actionDefinition = packageActions[actionName]
+        const route = {
+          name: apiName,
+          basepath: `/${basePathName}`,
+          relpath: `/${resourceName}`
+        }
+
+        // only name/path based information is requested
+        // return basic route here and return
+        if (pathOnly) {
+          routes.push(route)
+          return routes
+        }
+
+        // if action name is among allowed set, get from package actions
+        let actionDefinition = allowedActions.includes(actionName)
+          ? actions[actionName]
+          : null
 
         // no action of that name, fall back to sequences if available
-        if (!actionDefinition && packageSequences) {
-          actionDefinition = packageSequences[actionName]
+        if (!actionDefinition) {
+          actionDefinition = allowedSequences.includes(actionName)
+            ? sequences[actionName]
+            : null
         }
 
         // neither action nor sequence found, abort
@@ -312,24 +348,18 @@ function createApiRoutes (pkg, pkgName, apiName, ruleAction, arrSequence, pathOn
           throw new Error('Action provided in the api not present in the package')
         }
 
+        // ensure action or sequence has the web annotation
         if (!actionDefinition.web && !actionDefinition['web-export']) {
           throw new Error('Action or sequence provided in api is not a web action')
         }
 
         const action = resource[actionName]
-        const opts = {}
-
-        if (!pathOnly) {
-          opts.action = `${pkgName}/${actionName}`
-          opts.operation = action.method
-          opts.responsetype = action.response || 'json'
-        }
 
         routes.push({
-          name: apiName,
-          ...opts,
-          basepath: `/${basePathName}`,
-          relpath: `/${resourceName}`
+          ...route,
+          action: `${pkgName}/${actionName}`,
+          operation: action.method,
+          responsetype: action.response || 'json'
         })
       })
     })
