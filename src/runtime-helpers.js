@@ -282,17 +282,16 @@ function returnAnnotations (action) {
 }
 
 // https://github.com/apache/openwhisk-wskdeploy/blob/master/parsers/manifest_parser.go#L1187
-function createRoutesForApi (packages, packageName, apiName, ruleAction, arrSequence, pathOnly) {
-  const pack = packages[packageName]
-  const packageActions = pack.actions
-  const packageSequences = pack.sequences
-  const rawApi = pack.apis[apiName]
+function createApiRoutes (pkg, apiName, ruleAction, arrSequence, pathOnly) {
+  const packageActions = pkg.actions
+  const packageSequences = pkg.sequences
+  const rawApi = pkg.apis[apiName]
 
   if (!rawApi) {
     throw new Error('Arguments to create API not provided')
   }
 
-  const apiObjects = []
+  const routes = []
 
   Object.keys(rawApi).forEach((basePathName) => {
     const basePath = rawApi[basePathName]
@@ -322,7 +321,7 @@ function createRoutesForApi (packages, packageName, apiName, ruleAction, arrSequ
           opts.responsetype = action.response
         }
 
-        apiObjects.push({
+        routes.push({
           name: apiName,
           ...opts,
           basePath: `/${basePathName}`,
@@ -332,7 +331,7 @@ function createRoutesForApi (packages, packageName, apiName, ruleAction, arrSequ
     })
   })
 
-  return apiObjects
+  return routes
 }
 
 function createSequenceObject (thisSequence, options, key) {
@@ -674,19 +673,18 @@ function processPackage (packages, deploymentPackages, deploymentTriggers, param
 
     if (packages[key]['apis']) {
       Object.keys(packages[key]['apis']).forEach((apiName) => {
-        const apiRoutes = createRoutesForApi(packages, key, apiName, ruleAction, arrSequence, namesOnly)
+        const apiRoutes = createApiRoutes(packages[key], apiName, ruleAction, arrSequence, namesOnly)
         routes = routes.concat(apiRoutes)
       })
     }
   })
-  const entities = {
-    pkgAndDeps: pkgAndDeps,
-    apis: routes,
-    triggers: triggers,
-    rules: rules,
-    actions: actions
+  return {
+    pkgAndDeps,
+    routes,
+    triggers,
+    rules,
+    actions
   }
-  return entities
 }
 
 function setPaths (flags) {
@@ -776,10 +774,10 @@ async function deployPackage (entities, ow, logger) {
     logger(`Info: action [${action.name}] has been successfully deployed.\n`)
   }
 
-  for (const api of entities.apis) {
-    logger(`Info: Deploying api [${api.name}]...`)
-    await ow.routes.create(api)
-    logger(`Info: api [${api.name}] has been successfully deployed.\n`)
+  for (const route of entities.routes) {
+    logger(`Info: Deploying route [${route.name}]...`)
+    await ow.routes.create(route)
+    logger(`Info: route [${route.name}] has been successfully deployed.\n`)
   }
   for (const trigger of entities.triggers) {
     logger(`Info: Deploying trigger [${trigger.name}]...`)
@@ -811,10 +809,10 @@ async function undeployPackage (entities, ow, logger) {
     await ow.rules.delete({ name: rule.name })
     logger(`Info: rule [${rule.name}] has been successfully undeployed.\n`)
   }
-  for (const api of entities.apis) {
-    logger(`Info: Undeploying api [${api.name}]...`)
-    await ow.routes.delete({ basepath: api.basepath, relpath: api.relpath }) // cannot use name + basepath
-    logger(`Info: api [${api.name}] has been successfully undeployed.\n`)
+  for (const route of entities.routes) {
+    logger(`Info: Undeploying route [${route.name}]...`)
+    await ow.routes.delete({ basepath: route.basepath, relpath: route.relpath }) // cannot use name + basepath
+    logger(`Info: route [${route.name}] has been successfully undeployed.\n`)
   }
   for (const packg of entities.pkgAndDeps) {
     logger(`Info: Undeploying package [${packg.name}]...`)
@@ -1044,7 +1042,7 @@ module.exports = {
   createActionObject,
   checkWebFlags,
   createSequenceObject,
-  createApiObject: createRoutesForApi,
+  createApiRoutes,
   returnAnnotations,
   deployPackage,
   undeployPackage,
