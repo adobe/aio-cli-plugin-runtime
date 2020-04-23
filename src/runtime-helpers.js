@@ -706,8 +706,10 @@ function processPackage (packages, deploymentPackages, deploymentTriggers, param
     }
 
     if (packages[key]['apis']) {
-      routes = Object.keys(packages[key]['apis'])
-        .flatMap(apiName => createApiRoutes(packages[key], key, apiName, ruleAction, arrSequence, namesOnly))
+      Object.keys(packages[key]['apis']).forEach((apiName) => {
+        const apiRoutes = createApiRoutes(packages[key], key, apiName, ruleAction, arrSequence, namesOnly)
+        routes = routes.concat(apiRoutes)
+      })
     }
   })
   return {
