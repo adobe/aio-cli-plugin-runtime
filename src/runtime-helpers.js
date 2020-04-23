@@ -303,16 +303,16 @@ function returnAnnotations (action) {
 function createApiRoutes (pkg, pkgName, apiName, allowedActions, allowedSequences, pathOnly) {
   const actions = pkg.actions
   const sequences = pkg.sequences
-  const rawApi = pkg.apis[apiName]
+  const basePaths = pkg.apis[apiName]
 
-  if (!rawApi) {
+  if (!basePaths) {
     throw new Error('Arguments to create API not provided')
   }
 
   const routes = []
 
-  Object.keys(rawApi).forEach((basePathName) => {
-    const basePath = rawApi[basePathName]
+  Object.keys(basePaths).forEach((basePathName) => {
+    const basePath = basePaths[basePathName]
 
     Object.keys(basePath).forEach((resourceName) => {
       const resource = basePath[resourceName]
@@ -325,7 +325,7 @@ function createApiRoutes (pkg, pkgName, apiName, allowedActions, allowedSequence
         }
 
         // only name/path based information is requested
-        // return basic route here and return
+        // add basic route and skip
         if (pathOnly) {
           routes.push(route)
           return
