@@ -328,7 +328,7 @@ function createApiRoutes (pkg, pkgName, apiName, allowedActions, allowedSequence
         // return basic route here and return
         if (pathOnly) {
           routes.push(route)
-          return routes
+          return
         }
 
         // if action name is among allowed set, get from package actions
