@@ -281,35 +281,58 @@ function returnAnnotations (action) {
   return annotationParams
 }
 
-function createApiObject (packages, key, api, ruleAction, arrSequence, pathOnly) {
-  const objectAPI = {}
-  const firstProp = (obj) => Object.keys(obj)[0]
-  objectAPI.basepath = firstProp(packages[key]['apis'][api])
-  objectAPI.relpath = firstProp(packages[key]['apis'][api][objectAPI.basepath])
-  if (!pathOnly) {
-    objectAPI.action = firstProp(packages[key]['apis'][api][objectAPI.basepath][objectAPI.relpath])
-    objectAPI.operation = packages[key]['apis'][api][objectAPI.basepath][objectAPI.relpath][objectAPI.action].method
-    objectAPI.responsetype = packages[key]['apis'][api][objectAPI.basepath][objectAPI.relpath][objectAPI.action].response || 'json' // binding the default parameter
-    if (ruleAction.includes(objectAPI.action)) {
-      if (packages[key]['actions'][objectAPI.action]['web'] || packages[key]['actions'][objectAPI.action]['web-export']) {
-        objectAPI.action = `${key}/${objectAPI.action}`
-      } else {
-        throw new Error('Action provided in api is not a web action')
-      }
-    } else if (arrSequence.includes(objectAPI.action)) {
-      if (packages[key]['sequences'][objectAPI.action]['web'] || packages[key]['sequences'][objectAPI.action]['web-export']) {
-        objectAPI.action = `${key}/${objectAPI.action}`
-      } else {
-        throw new Error('Sequence provided in api is not a web action')
-      }
-    } else {
-      throw new Error('Action provided in the api not present in the package')
-    }
+// https://github.com/apache/openwhisk-wskdeploy/blob/master/parsers/manifest_parser.go#L1187
+function createRoutesForApi (packages, packageName, apiName, ruleAction, arrSequence, pathOnly) {
+  const pack = packages[packageName]
+  const packageActions = pack.actions
+  const packageSequences = pack.sequences
+  const rawApi = pack.apis[apiName]
+
+  if (!rawApi) {
+    throw new Error('Arguments to create API not provided')
   }
 
-  objectAPI.relpath = '/' + objectAPI.relpath
-  objectAPI.basepath = '/' + objectAPI.basepath
-  return objectAPI
+  const apiObjects = []
+
+  Object.keys(rawApi).forEach((basePathName) => {
+    const basePath = rawApi[basePathName]
+
+    Object.keys(basePath).forEach((resourceName) => {
+      const resource = basePath[resourceName]
+
+      Object.keys(resource).forEach((actionName) => {
+        const actionDefinition = packageActions[actionName]
+          ? packageActions[actionName]
+          : packageSequences[actionName]
+
+        if (!actionDefinition) {
+          throw new Error('Action provided in the api not present in the package')
+        }
+
+        if (!actionDefinition.web && !actionDefinition['web-export']) {
+          throw new Error('Action or sequence provided in api is not a web action')
+        }
+
+        const action = resource[actionName]
+        const opts = {}
+
+        if (!pathOnly) {
+          opts.action = `${apiName}/${actionName}`
+          opts.operation = action.method
+          opts.responsetype = action.response
+        }
+
+        apiObjects.push({
+          name: apiName,
+          ...opts,
+          basePath: `/${basePathName}`,
+          relPath: `/${resourceName}`
+        })
+      })
+    })
+  })
+
+  return apiObjects
 }
 
 function createSequenceObject (thisSequence, options, key) {
@@ -520,8 +543,9 @@ function processPackage (packages, deploymentPackages, deploymentTriggers, param
   const triggers = []
   const ruleAction = []
   const ruleTrigger = []
-  const apis = []
   const arrSequence = []
+
+  let routes = []
 
   Object.keys(packages).forEach((key) => {
     pkgAndDeps.push({ name: key })
@@ -649,20 +673,15 @@ function processPackage (packages, deploymentPackages, deploymentTriggers, param
     }
 
     if (packages[key]['apis']) {
-      Object.keys(packages[key]['apis']).forEach((api) => {
-        if (packages[key]['apis'][api]) {
-          const objectAPI = createApiObject(packages, key, api, ruleAction, arrSequence, namesOnly)
-          objectAPI.name = api
-          apis.push(objectAPI)
-        } else {
-          throw new Error('Arguments to create API not provided')
-        }
+      Object.keys(packages[key]['apis']).forEach((apiName) => {
+        const apiRoutes = createRoutesForApi(packages, key, apiName, ruleAction, arrSequence, namesOnly)
+        routes = routes.concat(apiRoutes)
       })
     }
   })
   const entities = {
     pkgAndDeps: pkgAndDeps,
-    apis: apis,
+    apis: routes,
     triggers: triggers,
     rules: rules,
     actions: actions
@@ -1025,7 +1044,7 @@ module.exports = {
   createActionObject,
   checkWebFlags,
   createSequenceObject,
-  createApiObject,
+  createApiObject: createRoutesForApi,
   returnAnnotations,
   deployPackage,
   undeployPackage,
