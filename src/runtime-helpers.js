@@ -427,7 +427,7 @@ function createActionObject (thisAction, objAction) {
 function rewriteActionsWithAdobeAuthAnnotation (packages, deploymentPackages) {
   // do not modify those
   const ADOBE_AUTH_ANNOTATION = 'require-adobe-auth'
-  const ADOBE_AUTH_ACTION = '/adobeio/shared-validators/ims'
+  const ADOBE_AUTH_ACTION = '/adobeio/shared-validators/app-registry'
   const REWRITE_ACTION_PREFIX = '__secured_'
 
   // avoid side effects, do not modify input packages
