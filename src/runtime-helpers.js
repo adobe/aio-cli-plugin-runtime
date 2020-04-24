@@ -572,13 +572,12 @@ function processPackage (packages, deploymentPackages, deploymentTriggers, param
 
   const pkgAndDeps = []
   const actions = []
+  const routes = []
   const rules = []
   const triggers = []
   const ruleAction = []
   const ruleTrigger = []
   const arrSequence = []
-
-  let routes = []
 
   Object.keys(packages).forEach((key) => {
     pkgAndDeps.push({ name: key })
@@ -706,9 +705,9 @@ function processPackage (packages, deploymentPackages, deploymentTriggers, param
     }
 
     if (packages[key]['apis']) {
-      Object.keys(packages[key]['apis']).forEach((apiName) => {
+      Object.keys(packages[key].apis).forEach((apiName) => {
         const apiRoutes = createApiRoutes(packages[key], key, apiName, ruleAction, arrSequence, namesOnly)
-        routes = routes.concat(apiRoutes)
+        routes.push.apply(routes, apiRoutes) // faster than concat for < 100k elements
       })
     }
   })
