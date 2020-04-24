@@ -808,9 +808,7 @@ async function deployPackage (entities, ow, logger) {
   }
 
   for (const route of entities.apis) {
-    const operation = route.operation || ''
-    const action = route.action || ''
-    const routeInfo = `[${operation.toUpperCase()} ${route.basepath}${route.relpath}/${action.split('/').pop()}]`
+    const routeInfo = `[${route.operation} ${route.basepath}${route.relpath} [${route.action}]]`
     logger(`Info: Deploying route ${routeInfo} for API [${route.name}]...`)
     await ow.routes.create(route)
     logger(`Info: route ${routeInfo} successfully deployed.\n`)
@@ -846,9 +844,7 @@ async function undeployPackage (entities, ow, logger) {
     logger(`Info: rule [${rule.name}] has been successfully undeployed.\n`)
   }
   for (const route of entities.apis) {
-    const operation = route.operation || ''
-    const action = route.action || ''
-    const routeInfo = `[${operation.toUpperCase()} ${route.basepath}${route.relpath}/${action.split('/').pop()}]`
+    const routeInfo = `[${route.operation} ${route.basepath}${route.relpath} [${route.action}]]`
     logger(`Info: Deleting route ${routeInfo} for API [${route.name}]...`)
     await ow.routes.delete({ basepath: route.basepath, relpath: route.relpath }) // cannot use name + basepath
     logger(`Info: route ${routeInfo} successfully deleted.\n`)
