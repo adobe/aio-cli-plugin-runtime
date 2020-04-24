@@ -844,9 +844,10 @@ async function undeployPackage (entities, ow, logger) {
     logger(`Info: rule [${rule.name}] has been successfully undeployed.\n`)
   }
   for (const route of entities.apis) {
-    logger(`Info: Undeploying route [${route.name}]...`)
+    const routeInfo = `[${route.operation.toUpperCase()} ${route.basepath}${route.relpath}/${route.action.split('/').pop()}]`
+    logger(`Info: Deleting route ${routeInfo} for API [${route.name}]...`)
     await ow.routes.delete({ basepath: route.basepath, relpath: route.relpath }) // cannot use name + basepath
-    logger(`Info: route [${route.name}] has been successfully undeployed.\n`)
+    logger(`Info: route ${routeInfo} successfully deleted.\n`)
   }
   for (const packg of entities.pkgAndDeps) {
     logger(`Info: Undeploying package [${packg.name}]...`)
