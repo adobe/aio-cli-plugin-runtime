@@ -808,9 +808,10 @@ async function deployPackage (entities, ow, logger) {
   }
 
   for (const route of entities.apis) {
-    logger(`Info: Deploying route [${route.name}]...`)
+    const routeInfo = `[${route.operation.toUpperCase()} ${route.basepath}${route.relpath}/${route.action.split('/').pop()}]`
+    logger(`Info: Deploying route ${routeInfo} for API [${route.name}]...`)
     await ow.routes.create(route)
-    logger(`Info: route [${route.name}] has been successfully deployed.\n`)
+    logger(`Info: route ${routeInfo} successfully deployed.\n`)
   }
   for (const trigger of entities.triggers) {
     logger(`Info: Deploying trigger [${trigger.name}]...`)
