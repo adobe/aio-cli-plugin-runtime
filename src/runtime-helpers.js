@@ -809,9 +809,9 @@ async function deployPackage (entities, ow, logger) {
 
   for (const route of entities.apis) {
     const routeInfo = `[${route.operation} ${route.basepath}${route.relpath} [${route.action}]]`
-    logger(`Info: Deploying route ${routeInfo} for API [${route.name}]...`)
+    logger(`Info: Deploying API route ${routeInfo} for API [${route.name}]...`)
     await ow.routes.create(route)
-    logger(`Info: route ${routeInfo} successfully deployed.\n`)
+    logger(`Info: API route ${routeInfo} successfully deployed.\n`)
   }
   for (const trigger of entities.triggers) {
     logger(`Info: Deploying trigger [${trigger.name}]...`)
@@ -845,9 +845,9 @@ async function undeployPackage (entities, ow, logger) {
   }
   for (const route of entities.apis) {
     const routeInfo = `[${route.operation} ${route.basepath}${route.relpath} [${route.action}]]`
-    logger(`Info: Deleting route ${routeInfo} for API [${route.name}]...`)
+    logger(`Info: Deleting API route ${routeInfo} for API [${route.name}]...`)
     await ow.routes.delete({ basepath: route.basepath, relpath: route.relpath }) // cannot use name + basepath
-    logger(`Info: route ${routeInfo} successfully deleted.\n`)
+    logger(`Info: API route ${routeInfo} successfully deleted.\n`)
   }
   for (const packg of entities.pkgAndDeps) {
     logger(`Info: Undeploying package [${packg.name}]...`)
