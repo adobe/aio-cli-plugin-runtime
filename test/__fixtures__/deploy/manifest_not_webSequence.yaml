@@ -11,7 +11,7 @@ packages:
         function: /deploy/hello.js
       hello:
         function: /deploy/hello.js
-      hello_wrap:
+      hello_world:
         function: /deploy/hello.js
     sequences:
       hello_world:

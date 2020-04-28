@@ -94,6 +94,7 @@ describe('instance methods', () => {
       'deploy/manifest_not_present_action.yaml': fixtureFile('deploy/manifest_not_present_action.yaml'),
       'deploy/manifest_zip.yaml': fixtureFile('deploy/manifest_zip.yaml'),
       'deploy/manifest_api.yaml': fixtureFile('deploy/manifest_api.yaml'),
+      'deploy/manifest_api_multi.yaml': fixtureFile('deploy/manifest_api_multi.yaml'),
       'deploy/manifest_main.yaml': fixtureFile('deploy/manifest_main.yaml'),
       'deploy/manifest_conductor.yaml': fixtureFile('deploy/manifest_conductor.yaml'),
       'deploy/manifest_final.yaml': fixtureFile('deploy/manifest_final.yaml'),
@@ -720,6 +721,32 @@ describe('instance methods', () => {
         })
     })
 
+    test('deploy a api with multiple actions per resource', () => {
+      const cmd = ow.mockResolved(owAPI, '')
+      command.argv = ['-m', '/deploy/manifest_api_multi.yaml']
+      return command.run()
+        .then(() => {
+          expect(cmd.mock.calls).toEqual([
+            [{
+              basepath: '/hello',
+              name: 'testAPI',
+              relpath: '/helloResource',
+              operation: 'post',
+              responsetype: 'http',
+              action: 'testAPI/hello_world'
+            }], // First call
+            [{
+              basepath: '/hello',
+              name: 'testAPI',
+              relpath: '/helloResource',
+              operation: 'get',
+              responsetype: 'http',
+              action: 'testAPI/hello_universe'
+            }] // Second call
+          ])
+        })
+    })
+
     test('web sequence in yaml file should create a web sequence action', () => {
       const cmd = ow.mockResolved(owAction, '')
       command.argv = ['-m', '/deploy/manifest_webSequence.yaml']
@@ -853,7 +880,7 @@ describe('instance methods', () => {
         return command.run()
           .then(() => reject(new Error('does not throw error')))
           .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('Failed to deploy', new Error('Action provided in api is not a web action'))
+            expect(handleError).toHaveBeenLastCalledWith('Failed to deploy', new Error('Action or sequence provided in api is not a web action'))
             resolve()
           })
       })
@@ -866,7 +893,7 @@ describe('instance methods', () => {
         return command.run()
           .then(() => reject(new Error('does not throw error')))
           .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('Failed to deploy', new Error('Sequence provided in api is not a web action'))
+            expect(handleError).toHaveBeenLastCalledWith('Failed to deploy', new Error('Action or sequence provided in api is not a web action'))
             resolve()
           })
       })

@@ -281,35 +281,91 @@ function returnAnnotations (action) {
   return annotationParams
 }
 
-function createApiObject (packages, key, api, ruleAction, arrSequence, pathOnly) {
-  const objectAPI = {}
-  const firstProp = (obj) => Object.keys(obj)[0]
-  objectAPI.basepath = firstProp(packages[key]['apis'][api])
-  objectAPI.relpath = firstProp(packages[key]['apis'][api][objectAPI.basepath])
-  if (!pathOnly) {
-    objectAPI.action = firstProp(packages[key]['apis'][api][objectAPI.basepath][objectAPI.relpath])
-    objectAPI.operation = packages[key]['apis'][api][objectAPI.basepath][objectAPI.relpath][objectAPI.action].method
-    objectAPI.responsetype = packages[key]['apis'][api][objectAPI.basepath][objectAPI.relpath][objectAPI.action].response || 'json' // binding the default parameter
-    if (ruleAction.includes(objectAPI.action)) {
-      if (packages[key]['actions'][objectAPI.action]['web'] || packages[key]['actions'][objectAPI.action]['web-export']) {
-        objectAPI.action = `${key}/${objectAPI.action}`
-      } else {
-        throw new Error('Action provided in api is not a web action')
-      }
-    } else if (arrSequence.includes(objectAPI.action)) {
-      if (packages[key]['sequences'][objectAPI.action]['web'] || packages[key]['sequences'][objectAPI.action]['web-export']) {
-        objectAPI.action = `${key}/${objectAPI.action}`
-      } else {
-        throw new Error('Sequence provided in api is not a web action')
-      }
-    } else {
-      throw new Error('Action provided in the api not present in the package')
-    }
+/**
+ * Creates an array of route definitions from the given manifest-based package.
+ * See https://github.com/apache/openwhisk-wskdeploy/blob/master/parsers/manifest_parser.go#L1187
+ *
+ * @param pkg The package definition from the manifest.
+ * @param pkgName The name of the package.
+ * @param apiName The name of the HTTP API definition from the manifest.
+ * @param allowedActions List of action names allowed to be used in routes.
+ * @param allowedSequences List of sequence names allowed to be used in routes.
+ * @param pathOnly Skip action, method and response type in route definitions.
+ * @return {{
+ * action: String,
+ * operation: String,
+ * responsetype: String
+ * basepath: String,
+ * relpath: String,
+ * name: String
+ * }[]}
+ */
+function createApiRoutes (pkg, pkgName, apiName, allowedActions, allowedSequences, pathOnly) {
+  const actions = pkg.actions
+  const sequences = pkg.sequences
+  const basePaths = pkg.apis[apiName]
+
+  if (!basePaths) {
+    throw new Error('Arguments to create API not provided')
   }
 
-  objectAPI.relpath = '/' + objectAPI.relpath
-  objectAPI.basepath = '/' + objectAPI.basepath
-  return objectAPI
+  const routes = []
+
+  Object.keys(basePaths).forEach((basePathName) => {
+    const basePath = basePaths[basePathName]
+
+    Object.keys(basePath).forEach((resourceName) => {
+      const resource = basePath[resourceName]
+
+      Object.keys(resource).forEach((actionName) => {
+        const route = {
+          name: apiName,
+          basepath: `/${basePathName}`,
+          relpath: `/${resourceName}`
+        }
+
+        // only name/path based information is requested
+        // add basic route and skip
+        if (pathOnly) {
+          routes.push(route)
+          return
+        }
+
+        // if action name is among allowed set, get from package actions
+        let actionDefinition = allowedActions.includes(actionName)
+          ? actions[actionName]
+          : null
+
+        // no action of that name, fall back to sequences if available
+        if (!actionDefinition) {
+          actionDefinition = allowedSequences.includes(actionName)
+            ? sequences[actionName]
+            : null
+        }
+
+        // neither action nor sequence found, abort
+        if (!actionDefinition) {
+          throw new Error('Action provided in the api not present in the package')
+        }
+
+        // ensure action or sequence has the web annotation
+        if (!actionDefinition.web && !actionDefinition['web-export']) {
+          throw new Error('Action or sequence provided in api is not a web action')
+        }
+
+        const action = resource[actionName]
+
+        routes.push({
+          ...route,
+          action: `${pkgName}/${actionName}`,
+          operation: action.method,
+          responsetype: action.response || 'json'
+        })
+      })
+    })
+  })
+
+  return routes
 }
 
 function createSequenceObject (thisSequence, options, key) {
@@ -516,11 +572,11 @@ function processPackage (packages, deploymentPackages, deploymentTriggers, param
 
   const pkgAndDeps = []
   const actions = []
+  const routes = []
   const rules = []
   const triggers = []
   const ruleAction = []
   const ruleTrigger = []
-  const apis = []
   const arrSequence = []
 
   Object.keys(packages).forEach((key) => {
@@ -649,25 +705,19 @@ function processPackage (packages, deploymentPackages, deploymentTriggers, param
     }
 
     if (packages[key]['apis']) {
-      Object.keys(packages[key]['apis']).forEach((api) => {
-        if (packages[key]['apis'][api]) {
-          const objectAPI = createApiObject(packages, key, api, ruleAction, arrSequence, namesOnly)
-          objectAPI.name = api
-          apis.push(objectAPI)
-        } else {
-          throw new Error('Arguments to create API not provided')
-        }
+      Object.keys(packages[key].apis).forEach((apiName) => {
+        const apiRoutes = createApiRoutes(packages[key], key, apiName, ruleAction, arrSequence, namesOnly)
+        routes.push.apply(routes, apiRoutes) // faster than concat for < 100k elements
       })
     }
   })
-  const entities = {
-    pkgAndDeps: pkgAndDeps,
-    apis: apis,
-    triggers: triggers,
-    rules: rules,
-    actions: actions
+  return {
+    pkgAndDeps,
+    apis: routes,
+    triggers,
+    rules,
+    actions
   }
-  return entities
 }
 
 function setPaths (flags) {
@@ -757,10 +807,11 @@ async function deployPackage (entities, ow, logger) {
     logger(`Info: action [${action.name}] has been successfully deployed.\n`)
   }
 
-  for (const api of entities.apis) {
-    logger(`Info: Deploying api [${api.name}]...`)
-    await ow.routes.create(api)
-    logger(`Info: api [${api.name}] has been successfully deployed.\n`)
+  for (const route of entities.apis) {
+    const routeInfo = `[${route.operation} ${route.basepath}${route.relpath} [${route.action}]]`
+    logger(`Info: Deploying API route ${routeInfo} for API [${route.name}]...`)
+    await ow.routes.create(route)
+    logger(`Info: API route ${routeInfo} successfully deployed.\n`)
   }
   for (const trigger of entities.triggers) {
     logger(`Info: Deploying trigger [${trigger.name}]...`)
@@ -792,10 +843,11 @@ async function undeployPackage (entities, ow, logger) {
     await ow.rules.delete({ name: rule.name })
     logger(`Info: rule [${rule.name}] has been successfully undeployed.\n`)
   }
-  for (const api of entities.apis) {
-    logger(`Info: Undeploying api [${api.name}]...`)
-    await ow.routes.delete({ basepath: api.basepath, relpath: api.relpath }) // cannot use name + basepath
-    logger(`Info: api [${api.name}] has been successfully undeployed.\n`)
+  for (const route of entities.apis) {
+    const routeInfo = `[${route.operation} ${route.basepath}${route.relpath} [${route.action}]]`
+    logger(`Info: Deleting API route ${routeInfo} for API [${route.name}]...`)
+    await ow.routes.delete({ basepath: route.basepath, relpath: route.relpath }) // cannot use name + basepath
+    logger(`Info: API route ${routeInfo} successfully deleted.\n`)
   }
   for (const packg of entities.pkgAndDeps) {
     logger(`Info: Undeploying package [${packg.name}]...`)
@@ -1025,7 +1077,7 @@ module.exports = {
   createActionObject,
   checkWebFlags,
   createSequenceObject,
-  createApiObject,
+  createApiRoutes,
   returnAnnotations,
   deployPackage,
   undeployPackage,
