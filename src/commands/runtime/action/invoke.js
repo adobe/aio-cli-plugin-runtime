@@ -32,8 +32,7 @@ class ActionInvoke extends RuntimeBaseCommand {
         name,
         params: paramsAction,
         blocking: flags.blocking || flags.result,
-        result: flags.result,
-        headers: { 'X-OW-EXTRA-LOGGING': 'on' }
+        result: flags.result
       })
       this.logJSON('', result)
     } catch (err) {
