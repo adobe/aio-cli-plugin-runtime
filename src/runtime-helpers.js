@@ -448,7 +448,7 @@ function createActionObject (thisAction, objAction) {
 /**
  * This is a temporary function that implements the support for the `require-adobe-auth`
  * annotation for web actions by rewriting the action to a sequence that first executes
- * the /adobeio/shared-validators/app-registry validator.
+ * the /adobeio/shared-validators-v1/app-registry validator.
  *
  * As an example, the following manifest:
  * ```
@@ -472,7 +472,7 @@ function createActionObject (thisAction, objAction) {
  *           require-whisk-auth: true #makes sure action cannot be called by itself anymore
  *     sequences:
  *       hello:
- *        actions: '/adobeio/shared-validators/app-registry,helloworld/__secured_hello'
+ *        actions: '/adobeio/shared-validators-v1/app-registry,helloworld/__secured_hello'
  * ```
  *
  * The annotation will soon be natively supported in Adobe I/O Runtime, at which point
@@ -483,7 +483,7 @@ function createActionObject (thisAction, objAction) {
 function rewriteActionsWithAdobeAuthAnnotation (packages, deploymentPackages) {
   // do not modify those
   const ADOBE_AUTH_ANNOTATION = 'require-adobe-auth'
-  const ADOBE_AUTH_ACTION = '/adobeio/shared-validators/app-registry'
+  const ADOBE_AUTH_ACTION = '/adobeio/shared-validators-v1/app-registry'
   const REWRITE_ACTION_PREFIX = '__secured_'
 
   // avoid side effects, do not modify input packages
