@@ -1,0 +1,25 @@
+# Licensed to the Apache Software Foundation (ASF) under one or more contributor
+# license agreements; and to You under the Apache License, Version 2.0.
+
+# Example: processing APIs
+packages:
+  testAPI:
+    version: 1.0
+    license: Apache-2.0
+    actions:
+      hello_world:
+        function: /deploy/hello.js
+        web-export: true
+      hello_universe:
+        function: /deploy/hello.js
+        web-export: true
+    apis:
+      testAPI:           # api name
+        hello:           # base path
+          helloResource: # resource path
+            hello_world: # action name reference
+              method: post
+              response: http
+            hello_universe:
+              method: get
+              response: http
