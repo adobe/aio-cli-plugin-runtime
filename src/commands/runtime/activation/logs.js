@@ -25,6 +25,10 @@ class ActivationLogs extends RuntimeBaseCommand {
     if (flags.last) {
       const limit = Math.max(1, Math.min(flags.count, 5))
       activations = await ow.activations.list({ limit: limit, skip: 0 })
+      if (!activations || activations.length < 1) {
+        this.log('No activations to log.')
+        return
+      }
     }
     if (!activations[0].activationId) {
       // just a thought, but we could just return --last activation log when no id is present
