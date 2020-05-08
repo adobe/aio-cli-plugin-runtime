@@ -19,7 +19,7 @@
     "js-yaml": "^3.13.1",
     "lodash.clonedeep": "^4.5.0",
     "node-fetch": "^2.3.0",
-    "openwhisk": "^3.21.1",
+    "openwhisk": "^3.21.2",
     "openwhisk-fqn": "^0.0.2",
     "properties-reader": "2.0.0",
     "sha1": "^1.1.1"
