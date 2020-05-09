@@ -11,6 +11,7 @@ governing permissions and limitations under the License.
 */
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
+const { parsePackageName } = require('../../../runtime-helpers')
 const { flags } = require('@oclif/command')
 const { cli } = require('cli-ux')
 
@@ -20,10 +21,12 @@ class ActionList extends RuntimeBaseCommand {
     const options = {
       ...flags
     }
-    if (args.package) {
-      options.id = `${args.package}/`
-    }
     try {
+      if (args.packageName) {
+        const { namespace, name } = parsePackageName(args.packageName)
+        options.namespace = namespace
+        options.id = `${name}/`
+      }
       const ow = await this.wsk()
       const result = await ow.actions.list(options)
       if (flags['name-sort'] || flags.name) {
@@ -59,7 +62,7 @@ class ActionList extends RuntimeBaseCommand {
 
 ActionList.args = [
   {
-    name: 'package',
+    name: 'packageName',
     required: false
   }
 ]
