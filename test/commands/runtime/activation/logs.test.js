@@ -115,6 +115,16 @@ describe('instance methods', () => {
         })
     })
 
+    test('retrieve last logs - no-results', () => {
+      const cmd = ow.mockResolved('activations.list', [])
+      command.argv = ['-l']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith(expect.objectContaining({ limit: 1 }))
+          expect(stdout.output).toMatch('')
+        })
+    })
+
     test('retrieve last log --last', () => {
       const listCmd = ow.mockResolved('activations.list', [{ activationId: '12345' }])
       const logCmd = ow.mockResolved(owAction, { logs: ['line1', 'line2', 'line3'] })
