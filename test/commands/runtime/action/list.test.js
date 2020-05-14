@@ -92,6 +92,16 @@ describe('instance methods', () => {
         })
     })
 
+    test('return list of actions in a package in /ns', () => {
+      const cmd = ow.mockResolvedFixture(owAction, 'action/list.json')
+      command.argv = ['/ns/somepackage']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith(expect.objectContaining({ namespace: 'ns', id: 'somepackage/' }))
+          expect(stdout.output).toMatchFixture('action/list-output.txt')
+        })
+    })
+
     test('return list of actions - coverage (public/private)', () => {
       const json = fixtureJson('action/list.json')
       json[0].publish = true
@@ -122,6 +132,30 @@ describe('instance methods', () => {
           expect(cmd).toHaveBeenCalledWith(expect.objectContaining({ skip: 3 }))
           expect(stdout.output).toMatch('actions')
         })
+    })
+
+    test('reject invalid package name /', () => {
+      return new Promise((resolve, reject) => {
+        command.argv = ['/']
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('failed to list the actions', new Error('Package name is not valid'))
+            resolve()
+          })
+      })
+    })
+
+    test('reject invalid package name //', () => {
+      return new Promise((resolve, reject) => {
+        command.argv = ['//']
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('failed to list the actions', new Error('Package name is not valid'))
+            resolve()
+          })
+      })
     })
 
     test('errors out on api error', () => {

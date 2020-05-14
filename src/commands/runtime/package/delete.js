@@ -11,6 +11,7 @@ governing permissions and limitations under the License.
 */
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
+const { parsePackageName } = require('../../../runtime-helpers')
 const { flags } = require('@oclif/command')
 
 class PackageDelete extends RuntimeBaseCommand {
@@ -18,8 +19,9 @@ class PackageDelete extends RuntimeBaseCommand {
     const { args, flags } = this.parse(PackageDelete)
     try {
       const ow = await this.wsk()
+      const options = parsePackageName(args.packageName)
       // Packages can be deleted only when there are no actions inside the packages
-      const result = await ow.packages.delete(args.packageName)
+      const result = await ow.packages.delete(options)
       if (flags.json) {
         this.logJSON('', result)
       }

@@ -11,7 +11,7 @@ governing permissions and limitations under the License.
 */
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
-const { createKeyValueArrayFromFlag, createKeyValueArrayFromFile } = require('../../../runtime-helpers')
+const { createKeyValueArrayFromFlag, createKeyValueArrayFromFile, parsePackageName } = require('../../../runtime-helpers')
 const { flags } = require('@oclif/command')
 
 class PackageBind extends RuntimeBaseCommand {
@@ -19,10 +19,13 @@ class PackageBind extends RuntimeBaseCommand {
     const { args, flags } = this.parse(PackageBind)
     const name = args.bindPackageName
     try {
+      const binding = parsePackageName(args.packageName)
       let paramsPackage = []
       if (flags.param) {
         // each --param flag expects two values ( a key and a value ). Multiple --param flags can be passed
         // For example : aio runtime:package:create --param name "foo" --param city "bar"
+        // parameters are expected to be passed as an array of key value pairs
+        // For example : [{key : 'Your key 1' , value: 'Your value 1'}, {key : 'Your key 2' , value: 'Your value 2'} ]
         paramsPackage = createKeyValueArrayFromFlag(flags.param)
       } else if (flags['param-file']) {
         paramsPackage = createKeyValueArrayFromFile(flags['param-file'])
@@ -35,22 +38,15 @@ class PackageBind extends RuntimeBaseCommand {
       } else if (flags['annotation-file']) {
         annotationParams = createKeyValueArrayFromFile(flags['annotation-file'])
       }
-      const ow = await this.wsk()
-      const getPackage = await ow.packages.get(args.packageName)
-      const ns = getPackage.namespace
-      // packageParams.parameters is expected to be passed as an array of key value pairs
-      // For example : [{key : 'Your key 1' , value: 'Your value 1'}, {key : 'Your key 2' , value: 'Your value 2'} ]
-      const packageParams = {
+
+      const options = {}
+      options.name = name
+      options.package = {
         parameters: paramsPackage,
         annotations: annotationParams,
-        binding: {
-          namespace: ns,
-          name: args.packageName
-        }
+        binding
       }
-      const options = {}
-      options['name'] = name
-      options['package'] = packageParams
+      const ow = await this.wsk()
       const result = await ow.packages.create(options)
       if (flags.json) {
         this.logJSON('', result)

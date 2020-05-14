@@ -11,14 +11,14 @@ governing permissions and limitations under the License.
 */
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
+const { parsePackageName } = require('../../../runtime-helpers')
 
 class PackageGet extends RuntimeBaseCommand {
   async run () {
     const { args } = this.parse(PackageGet)
     try {
       const ow = await this.wsk()
-      const options = {}
-      options['name'] = args.packageName
+      const options = parsePackageName(args.packageName)
       const result = await ow.packages.get(options)
       this.logJSON('', result)
     } catch (err) {
@@ -33,6 +33,10 @@ PackageGet.args = [
     required: true
   }
 ]
+
+PackageGet.flags = {
+  ...RuntimeBaseCommand.flags
+}
 
 PackageGet.description = 'Retrieves a Package'
 
