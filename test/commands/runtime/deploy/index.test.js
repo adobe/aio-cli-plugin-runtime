@@ -69,6 +69,7 @@ describe('instance methods', () => {
       'deploy/manifest_triggersRules_IncorrectAction.yaml': fixtureFile('deploy/manifest_triggersRules_IncorrectAction.yaml'),
       'deploy/manifest_triggersRules_noInputs.yaml': fixtureFile('deploy/manifest_triggersRules_noInputs.yaml'),
       'deploy/manifest.yaml': fixtureFile('deploy/manifest.yaml'),
+      'deploy/manifest_params.yml': fixtureFile('deploy/manifest_params.yml'),
       'deploy/manifest_report.yaml': fixtureFile('deploy/manifest_report.yaml'),
       'deploy/manifest_not_webAction.yaml': fixtureFile('deploy/manifest_not_webAction.yaml'),
       'deploy/manifest_not_webSequence.yaml': fixtureFile('deploy/manifest_not_webSequence.yaml'),
@@ -770,6 +771,19 @@ describe('instance methods', () => {
             }
           })
           expect(cmd).toHaveBeenCalledTimes(4)
+          expect(stdout.output).toMatch('')
+        })
+    })
+
+    test('deploys actions defined in manifest.yaml using env vars in params', () => {
+      const cmd = ow.mockResolved(owAction, '')
+      command.argv = ['-m', '/deploy/manifest_params.yml']
+      process.env['NAME'] = 'name_from_env'
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith({ name: 'demo_package/sampleAction', action: hello, annotations: { 'web-export': false, 'raw-http': false }, params: { name: 'name_from_env', message: 'Demo' } })
+          expect(cmd).toHaveBeenCalledWith({ name: 'demo_package/anotherAction', action: hello, annotations: { 'web-export': false, 'raw-http': false }, params: { name: 'name_from_env', message: 'Demo' } })
+          expect(cmd).toHaveBeenCalledTimes(2)
           expect(stdout.output).toMatch('')
         })
     })
