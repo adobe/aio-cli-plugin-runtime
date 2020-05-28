@@ -61,6 +61,7 @@ describe('instance methods', () => {
     test('simple trigger delete', () => {
       return new Promise((resolve) => {
         const cmd = ow.mockResolved(owAction, '')
+        ow.mockResolved('triggers.get', {})
 
         command.argv = ['trigger1']
         return command.run()
@@ -75,6 +76,7 @@ describe('instance methods', () => {
     test('simple trigger delete with namespace in trigger name', () => {
       return new Promise((resolve) => {
         const cmd = ow.mockResolved(owAction, '')
+        ow.mockResolved('triggers.get', {})
         command.argv = ['/MySpecifiedNamespace/trigger1']
         return command.run()
           .then(() => {
@@ -89,6 +91,7 @@ describe('instance methods', () => {
       return new Promise((resolve, reject) => {
         const err = new Error('an error')
         ow.mockRejected(owAction, err)
+        ow.mockResolved('triggers.get', {})
 
         command.argv = ['trigger1']
         return command.run()

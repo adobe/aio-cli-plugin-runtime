@@ -415,6 +415,7 @@ describe('instance methods', () => {
       ow.mockResolved('packages.list', changedPackagelist)
       ow.mockResolved('actions.list', actionList)
       const cmd = ow.mockResolved(owPackageDelete, '')
+      ow.mockResolved('triggers.get', {})
       command.argv = ['-m', '/deploy/deployment_syncMissingAction.yaml']
       return command.run()
         .then(() => {

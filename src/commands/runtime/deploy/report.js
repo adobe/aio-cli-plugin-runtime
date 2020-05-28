@@ -64,6 +64,8 @@ class DeployReport extends RuntimeBaseCommand {
             let allInputs = returnUnion(packageInputs, deploymentInputs)
             allInputs = processInputs(allInputs, {})
             objTrigger.Inputs = allInputs
+            if(packages[key]['triggers'][trigger]['feed'])
+              objTrigger.feed = packages[key]['triggers'][trigger]['feed']
             triggers.push(objTrigger)
           })
         }

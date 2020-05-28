@@ -150,6 +150,8 @@ async function createProjectJSON (entities, projectname, ow, fileDirectory) {
       inputs: returninputsfromKeyValue(getTrigger.parameters),
       annotations: returninputsfromKeyValue(getTrigger.annotations)
     }
+    if(getTrigger.feed)
+      project['packages'][packageName]['triggers'][trigger]['feed'] = getTrigger.feed
   }
 
   for (const rule of entities.rules) {

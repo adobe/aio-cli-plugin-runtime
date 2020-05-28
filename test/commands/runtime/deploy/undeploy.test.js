@@ -162,6 +162,7 @@ describe('instance methods', () => {
 
     test('undeploy a package with manifest file', () => {
       const cmd = ow.mockResolved(owPackage, '')
+      ow.mockResolved('triggers.get', {})
       command.argv = ['-m', '/deploy/manifest_triggersRules.yaml']
       return command.run()
         .then(() => {
@@ -182,6 +183,7 @@ describe('instance methods', () => {
 
     test('package should be created if project is the root', () => {
       const cmd = ow.mockResolved(owPackage, '')
+      ow.mockResolved('triggers.get', {})
       command.argv = ['-m', '/deploy/manifest_report.yaml']
       return command.run()
         .then(() => {
@@ -192,6 +194,7 @@ describe('instance methods', () => {
 
     test('undeploy a trigger with manifest file', () => {
       const cmd = ow.mockResolved(owTrigger, '')
+      ow.mockResolved('triggers.get', {})
       command.argv = ['-m', '/deploy/manifest_triggersRules.yaml']
       return command.run()
         .then(() => {
@@ -202,6 +205,7 @@ describe('instance methods', () => {
 
     test('undeploy a rule with manifest file', () => {
       const cmd = ow.mockResolved(owRules, '')
+      ow.mockResolved('triggers.get', {})
       command.argv = ['-m', '/deploy/manifest_triggersRules.yaml']
       return command.run()
         .then(() => {
@@ -212,6 +216,7 @@ describe('instance methods', () => {
 
     test('undeploy an action with manifest file', () => {
       const cmd = ow.mockResolved(owAction, '')
+      ow.mockResolved('triggers.get', {})
       command.argv = ['-m', '/deploy/manifest_triggersRules.yaml']
       return command.run()
         .then(() => {
