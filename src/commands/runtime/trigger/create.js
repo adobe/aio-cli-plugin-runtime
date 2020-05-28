@@ -27,13 +27,16 @@ class TriggerCreate extends RuntimeBaseCommand {
       } else if (flags['param-file']) {
         triggerPackage = createKeyValueArrayFromFile(flags['param-file'])
       }
-      let annotationParams = {}
+      let annotationParams = []
       if (flags.annotation) {
       // Annotations that describe packages include : 'description' and 'parameters'
       // TODO -- should we check if annotation keys match description or parameters ?
         annotationParams = createKeyValueArrayFromFlag(flags.annotation)
       } else if (flags['annotation-file']) {
         annotationParams = createKeyValueArrayFromFile(flags['annotation-file'])
+      }
+      if(flags.feed) {
+        annotationParams.push({key: 'feed', value: flags.feed})
       }
 
       // triggerParams.parameters is expected to be passed as an array of key value pairs
@@ -54,15 +57,12 @@ class TriggerCreate extends RuntimeBaseCommand {
       const ow = await this.wsk()
       await ow.triggers.create(options)
       if(flags.feed) {
-        try{
-          // This is required because of a bug in openwhisk npm.
-          // https://github.com/apache/openwhisk-client-js/issues/49
-          await ow.feeds.delete({name: flags.feed, trigger: args.triggerName})
+        try {
+          await ow.feeds.create({name: flags.feed, trigger: args.triggerName, params: createKeyValueObjectFromFlag(flags.param)})
         }catch (err) {
-          // Ignore
+          await ow.triggers.delete(options)
+          this.handleError('failed to create the feed, deleted trigger', err)
         }
-        // ow.feeds.update in a non-existent feed throws 502 (Bad Gateway) --> "Response Missing Error Message."
-        await ow.feeds.create({name: flags.feed, trigger: args.triggerName, params: createKeyValueObjectFromFlag(flags.param)})
       }
     } catch (err) {
       this.handleError('failed to create the trigger', err)
