@@ -129,6 +129,28 @@ function createKeyValueObjectFromFlag (flag) {
 }
 
 /**
+ * @description returns key value pairs in an object from the key value array supplied. Used to create parameters object
+ * @returns An object of key value pairs in this format : {Your key1 : 'Your Value 1' , Your key2: 'Your value 2'}
+ */
+function createKeyValueObjectFromArray (inputsArray) {
+  const tempObj = {}
+  inputsArray.forEach((input) => {
+    if (input.key && input.value) {
+      try {
+        // assume it is JSON, there is only 1 way to find out
+        tempObj[input.key] = JSON.parse(input.value)
+      } catch (ex) {
+        // hmm ... not json, treat as string
+        tempObj[input.key] = input.value
+      }
+    } else {
+      throw (new Error('Please provide correct input array with key and value params in each array item'))
+    }
+  })
+  return tempObj
+}
+
+/**
  * @description parses a string and returns the namespace and entity name for a package.
  * @returns An object { namespace: string, name: string }
  */
@@ -699,6 +721,9 @@ function processPackage (packages, deploymentPackages, deploymentTriggers, param
           if (packages[key]['triggers'][triggerName]['annotations']) {
             objTrigger.trigger.annotations = createKeyValueInput(packages[key]['triggers'][triggerName]['annotations'])
           }
+          if (packages[key]['triggers'][triggerName]['feed']) {
+            objTrigger.trigger.feed = packages[key]['triggers'][triggerName]['feed']
+          }
           ruleTrigger.push(triggerName)
         }
         // trigger creation requires only name parameter and hence will be created in all cases
@@ -842,6 +867,18 @@ async function deployPackage (entities, ow, logger) {
     logger(`Info: Deploying trigger [${trigger.name}]...`)
     await ow.triggers.update(trigger)
     logger(`Info: trigger [${trigger.name}] has been successfully deployed.\n`)
+    if(trigger.trigger.feed) {
+      try{
+        // This is required because of a bug in openwhisk npm.
+        // https://github.com/apache/openwhisk-client-js/issues/49
+        await ow.feeds.delete({name: trigger.trigger.feed, trigger: trigger.name})
+      }catch (err) {
+        // Ignore
+      }
+      // ow.feeds.update on a non-existent feed throws 502 (Bad Gateway) --> "Response Missing Error Message."
+      await ow.feeds.create({name: trigger.trigger.feed, trigger: trigger.name, params: createKeyValueObjectFromArray(trigger.trigger.parameters)})
+      logger(`Info: feed for trigger [${trigger.name}] has been successfully deployed.\n`)
+    }
   }
   for (const rule of entities.rules) {
     logger(`Info: Deploying rule [${rule.name}]...`)

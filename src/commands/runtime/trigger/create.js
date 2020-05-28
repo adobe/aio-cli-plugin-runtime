@@ -11,7 +11,7 @@ governing permissions and limitations under the License.
 */
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
-const { createKeyValueArrayFromFlag, createKeyValueArrayFromFile } = require('../../../runtime-helpers')
+const { createKeyValueArrayFromFlag, createKeyValueArrayFromFile, createKeyValueObjectFromFlag } = require('../../../runtime-helpers')
 const { flags } = require('@oclif/command')
 
 class TriggerCreate extends RuntimeBaseCommand {
@@ -53,6 +53,17 @@ class TriggerCreate extends RuntimeBaseCommand {
 
       const ow = await this.wsk()
       await ow.triggers.create(options)
+      if(flags.feed) {
+        try{
+          // This is required because of a bug in openwhisk npm.
+          // https://github.com/apache/openwhisk-client-js/issues/49
+          await ow.feeds.delete({name: flags.feed, trigger: args.triggerName})
+        }catch (err) {
+          // Ignore
+        }
+        // ow.feeds.update in a non-existent feed throws 502 (Bad Gateway) --> "Response Missing Error Message."
+        await ow.feeds.create({name: flags.feed, trigger: args.triggerName, params: createKeyValueObjectFromFlag(flags.param)})
+      }
     } catch (err) {
       this.handleError('failed to create the trigger', err)
     }
@@ -86,6 +97,10 @@ TriggerCreate.flags = {
   'annotation-file': flags.string({
     char: 'A',
     description: 'FILE containing annotation values in JSON format' // help description for flag
+  }),
+  feed: flags.string({
+    char: 'f',
+    description: 'trigger feed ACTION_NAME'
   })
 }
 
