@@ -67,6 +67,17 @@ describe('createKeyValueObjectFromFlag', () => {
   })
 })
 
+describe('createKeyValueObjectFromArray', () => {
+  test('fail when array item does not have key or value', () => {
+    const func = () => TheHelper.createKeyValueObjectFromArray([{}])
+    expect(func).toThrow(new Error('Please provide correct input array with key and value params in each array item'))
+  })
+  test('array of key:value (string) pairs', () => {
+    const res = TheHelper.createKeyValueObjectFromArray([{ key: 'key1', value: 'val2' }])
+    expect(res).toMatchObject({ key1: 'val2' })
+  })
+})
+
 describe('createKeyValueArrayFromFile', () => {
   test('array of key:value pairs', () => {
     const res = TheHelper.createKeyValueArrayFromFile('/file.json')

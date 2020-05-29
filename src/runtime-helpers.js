@@ -723,7 +723,7 @@ function processPackage (packages, deploymentPackages, deploymentTriggers, param
           }
           if (packages[key]['triggers'][triggerName]['feed']) {
             objTrigger.trigger.annotations = objTrigger.trigger.annotations || []
-            objTrigger.trigger.annotations.push({key:'feed', value: packages[key]['triggers'][triggerName]['feed']})
+            objTrigger.trigger.annotations.push({ key: 'feed', value: packages[key]['triggers'][triggerName]['feed'] })
             objTrigger.trigger.feed = packages[key]['triggers'][triggerName]['feed']
           }
           ruleTrigger.push(triggerName)
@@ -869,11 +869,11 @@ async function deployPackage (entities, ow, logger) {
     logger(`Info: Deploying trigger [${trigger.name}]...`)
     await ow.triggers.update(trigger)
     logger(`Info: trigger [${trigger.name}] has been successfully deployed.\n`)
-    if(trigger.trigger.feed) {
-      try{
+    if (trigger.trigger.feed) {
+      try {
         // ow.feeds.update on a non-existent feed throws 502 (Bad Gateway) --> "Response Missing Error Message."
-        await ow.feeds.create({name: trigger.trigger.feed, trigger: trigger.name, params: createKeyValueObjectFromArray(trigger.trigger.parameters)})
-      }catch (err) {
+        await ow.feeds.create({ name: trigger.trigger.feed, trigger: trigger.name, params: createKeyValueObjectFromArray(trigger.trigger.parameters) })
+      } catch (err) {
         await ow.triggers.delete({ name: trigger.name })
         logger(`Info: feed for trigger [${trigger.name}] could not be deployed.\n`)
         logger(`Info: Deleted trigger`)
@@ -897,11 +897,12 @@ async function undeployPackage (entities, ow, logger) {
   }
   for (const trigger of entities.triggers) {
     logger(`Info: Undeploying trigger [${trigger.name}]...`)
-    let retTrigger = await ow.triggers.get({ name: trigger.name})
-    if(retTrigger.annotations)
-    for(const annotation of retTrigger.annotations) {
-      if(annotation.key == 'feed') {
-        await ow.feeds.delete({name: annotation.value, trigger: trigger.name})
+    const retTrigger = await ow.triggers.get({ name: trigger.name })
+    if (retTrigger.annotations) {
+      for (const annotation of retTrigger.annotations) {
+        if (annotation.key === 'feed') {
+          await ow.feeds.delete({ name: annotation.value, trigger: trigger.name })
+        }
       }
     }
     await ow.triggers.delete({ name: trigger.name })
@@ -1133,6 +1134,7 @@ module.exports = {
   createKeyValueArrayFromObject,
   createKeyValueArrayFromFile,
   createKeyValueArrayFromFlag,
+  createKeyValueObjectFromArray,
   createKeyValueObjectFromFlag,
   createKeyValueObjectFromFile,
   parsePathPattern,

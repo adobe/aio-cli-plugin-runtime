@@ -55,6 +55,7 @@ describe('instance methods', () => {
     handleError = jest.spyOn(command, 'handleError')
     const json = {
       'deploy/manifest_triggersRules.yaml': fixtureFile('deploy/manifest_triggersRules.yaml'),
+      'deploy/manifest_dep_Triggers_feeds.yaml': fixtureFile('deploy/manifest_dep_Triggers_feeds.yaml'),
       'deploy/manifest.yaml': fixtureFile('deploy/manifest.yaml'),
       'deploy/manifest_report.yaml': fixtureFile('deploy/manifest_report.yaml'),
       'deploy/deployment_wrongpackage.yaml': fixtureFile('deploy/deployment_wrongpackage.yaml'),
@@ -126,6 +127,14 @@ describe('instance methods', () => {
       return command.run()
         .then(() => {
           expect(stdout.output).toMatchFixture('deploy/report_triggersMissingInputs.txt')
+        })
+    })
+
+    test('print triggers from manifest file when deployment file has trigger with feed', () => {
+      command.argv = ['-m', '/deploy/manifest_dep_Triggers_feeds.yaml']
+      return command.run()
+        .then(() => {
+          expect(stdout.output).toMatchFixture('deploy/report_triggersWithFeed.txt')
         })
     })
 

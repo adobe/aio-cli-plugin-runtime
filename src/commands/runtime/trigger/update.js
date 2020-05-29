@@ -53,8 +53,8 @@ class TriggerUpdate extends RuntimeBaseCommand {
 
       const ow = await this.wsk()
       await ow.triggers.update(options)
-      if(flags.feed) {
-        await ow.feeds.update({name: flags.feed, trigger: args.triggerName, params: createKeyValueObjectFrom(flags.param)})
+      if (flags.feed) {
+        await ow.feeds.update({ name: flags.feed, trigger: args.triggerName, params: createKeyValueObjectFromFlag(flags.param) })
       }
     } catch (err) {
       this.handleError('failed to update the trigger', err)

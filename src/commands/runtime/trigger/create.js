@@ -35,8 +35,8 @@ class TriggerCreate extends RuntimeBaseCommand {
       } else if (flags['annotation-file']) {
         annotationParams = createKeyValueArrayFromFile(flags['annotation-file'])
       }
-      if(flags.feed) {
-        annotationParams.push({key: 'feed', value: flags.feed})
+      if (flags.feed) {
+        annotationParams.push({ key: 'feed', value: flags.feed })
       }
 
       // triggerParams.parameters is expected to be passed as an array of key value pairs
@@ -56,10 +56,10 @@ class TriggerCreate extends RuntimeBaseCommand {
 
       const ow = await this.wsk()
       await ow.triggers.create(options)
-      if(flags.feed) {
+      if (flags.feed) {
         try {
-          await ow.feeds.create({name: flags.feed, trigger: args.triggerName, params: createKeyValueObjectFromFlag(flags.param)})
-        }catch (err) {
+          await ow.feeds.create({ name: flags.feed, trigger: args.triggerName, params: createKeyValueObjectFromFlag(flags.param) })
+        } catch (err) {
           await ow.triggers.delete(options)
           this.handleError('failed to create the feed, deleted trigger', err)
         }

@@ -120,6 +120,72 @@ describe('instance methods', () => {
       })
     })
 
+    test('create a simple trigger, use feed flag', () => {
+      const cmd = ow.mockResolved(owAction, '')
+      const cmdfeed = ow.mockResolved('feeds.create', '')
+      command.argv = ['trigger1', '--feed', '/whisk.system/alarms/alarm', '--param', 'cron', '* * * * *']
+      return command.run()
+        .then(() => {
+          expect(cmdfeed).toHaveBeenLastCalledWith({
+            name: '/whisk.system/alarms/alarm',
+            trigger: 'trigger1',
+            params: {
+              cron: '* * * * *'
+            }
+          })
+          expect(cmd).toHaveBeenCalledWith({ name: 'trigger1',
+            trigger: {
+              annotations: [
+                {
+                  key: 'feed',
+                  value: '/whisk.system/alarms/alarm'
+                }
+              ],
+              parameters: [
+                {
+                  key: 'cron',
+                  value: '* * * * *'
+                }
+              ]
+            } })
+          expect(stdout.output).toMatch('')
+        })
+    })
+
+    test('create a simple trigger, use feed flag - Error', () => {
+      const cmd = ow.mockResolved(owAction, '')
+      const cmdfeed = ow.mockRejected('feeds.create', new Error('an error'))
+      const cmddelete = ow.mockResolved('triggers.delete', '')
+      command.argv = ['trigger1', '--feed', '/whisk.system/alarms/alarm', '--param', 'cron', '* * * * *']
+      return command.run()
+        .catch(() => {
+          expect(cmdfeed).toHaveBeenLastCalledWith({
+            name: '/whisk.system/alarms/alarm',
+            trigger: 'trigger1',
+            params: {
+              cron: '* * * * *'
+            }
+          })
+          expect(cmd).toHaveBeenCalledWith({ name: 'trigger1',
+            trigger: {
+              annotations: [
+                {
+                  key: 'feed',
+                  value: '/whisk.system/alarms/alarm'
+                }
+              ],
+              parameters: [
+                {
+                  key: 'cron',
+                  value: '* * * * *'
+                }
+              ]
+            } })
+          expect(cmddelete).toHaveBeenCalledWith(expect.objectContaining({ name: 'trigger1' }))
+          expect(stdout.output).toMatch('')
+        })
+    })
+
     test('create a simple trigger, use param flag', () => {
       const cmd = ow.mockResolved(owAction, '')
       command.argv = ['trigger1', '--param', 'a', 'b', '--param', 'c', 'd']
