@@ -1,7 +1,7 @@
 {
   "name": "@adobe/aio-cli-plugin-runtime",
   "description": "Adobe I/O Runtime commands for the Adobe I/O CLI",
-  "version": "1.7.2",
+  "version": "1.7.3",
   "author": "Adobe Inc.",
   "bugs": "https://github.com/adobe/aio-cli-plugin-runtime/issues",
   "publishConfig": {
@@ -31,7 +31,6 @@
     "@oclif/test": "^1",
     "babel-jest": "^24.1.0",
     "babel-runtime": "^6.26.0",
-    "codecov": "^3.3.0",
     "dedent-js": "^1.0.1",
     "eol": "^0.9.1",
     "eslint": "^6.0.0",

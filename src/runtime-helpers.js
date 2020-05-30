@@ -127,6 +127,31 @@ function createKeyValueObjectFromFlag (flag) {
     throw (new Error('Please provide correct values for flags'))
   }
 }
+
+/**
+ * @description parses a string and returns the namespace and entity name for a package.
+ * @returns An object { namespace: string, name: string }
+ */
+function parsePackageName (name) {
+  const delimiter = '/'
+  const parts = name.split(delimiter)
+  let n = parts.length
+  const leadingSlash = name[0] === delimiter
+  // accept no more than [/]ns/p
+  // these are all valid entries [/]ns/p, p, [/]_/p
+  if (n < 1 || n > 3 || (leadingSlash && n === 2) || (!leadingSlash && n === 3)) throw (new Error('Package name is not valid'))
+  // skip leading slash, all parts must be non empty (could tighten this check to match EntityName regex)
+  parts.forEach(function (part, i) { if (i > 0 && part.trim().length === 0) throw (new Error('Package name is not valid')) })
+  if (leadingSlash) {
+    parts.shift() // drop leading slash
+    n--
+  }
+  return {
+    namespace: n === 2 ? parts[0] : '_',
+    name: n === 1 ? parts[0] : parts[1]
+  }
+}
+
 /**
  * @description returns key value pairs from the parameters supplied. Used to create --param-file and --annotation-file key value pairs
  * @param file : flags['param-file'] or flags['annotation-file']
@@ -1067,6 +1092,7 @@ module.exports = {
   createKeyValueObjectFromFlag,
   createKeyValueObjectFromFile,
   parsePathPattern,
+  parsePackageName,
   createComponentsfromSequence,
   processInputs,
   createKeyValueInput,

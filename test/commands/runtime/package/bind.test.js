@@ -14,7 +14,7 @@ const { stdout } = require('stdout-stderr')
 const TheCommand = require('../../../../src/commands/runtime/package/bind.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
 const ow = require('openwhisk')()
-const owAction = 'packages.create'
+const owPackage = 'packages.create'
 
 test('exports', async () => {
   expect(typeof TheCommand).toEqual('function')
@@ -74,9 +74,37 @@ describe('instance methods', () => {
     })
 
     test('binds a package with package name param flag', () => {
-      ow.mockResolved('packages.get', { namespace: 'ns' })
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = ow.mockResolved(owPackage, '')
       command.argv = ['packageName', 'bindPackageName', '--param', 'a', 'b', '--param', 'c', 'd']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith({
+            name: 'bindPackageName',
+            package: {
+              annotations: [],
+              binding: {
+                name: 'packageName',
+                namespace: '_'
+              },
+              parameters: [
+                {
+                  key: 'a',
+                  value: 'b'
+                },
+                {
+                  key: 'c',
+                  value: 'd'
+                }
+              ]
+            }
+          })
+          expect(stdout.output).toMatch('')
+        })
+    })
+
+    test('binds a package with package name /ns param flag', () => {
+      const cmd = ow.mockResolved(owPackage, '')
+      command.argv = ['/ns/packageName', 'bindPackageName', '--param', 'a', 'b', '--param', 'c', 'd']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalledWith({
@@ -104,8 +132,7 @@ describe('instance methods', () => {
     })
 
     test('binds a package with package name param flag --json', () => {
-      ow.mockResolved('packages.get', { namespace: 'ns' })
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = ow.mockResolved(owPackage, '')
       command.argv = ['packageName', 'bindPackageName', '--param', 'a', 'b', '--param', 'c', 'd', '--json']
       return command.run()
         .then(() => {
@@ -115,7 +142,7 @@ describe('instance methods', () => {
               annotations: [],
               binding: {
                 name: 'packageName',
-                namespace: 'ns'
+                namespace: '_'
               },
               parameters: [
                 {
@@ -134,9 +161,8 @@ describe('instance methods', () => {
     })
 
     test('binds a package with only packageName and bindPackageName', () => {
-      ow.mockResolved('packages.get', { namespace: 'ns' })
-      const cmd = ow.mockResolved(owAction, '')
-      command.argv = ['packageName', 'bindpackageName']
+      const cmd = ow.mockResolved(owPackage, '')
+      command.argv = ['ns/packageName', 'bindpackageName']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalledWith({
@@ -161,9 +187,8 @@ describe('instance methods', () => {
       fakeFileSystem.addJson({
         '/action': json
       })
-      ow.mockResolved('packages.get', { namespace: 'ns' })
-      const cmd = ow.mockResolved(owAction, '')
-      command.argv = ['packageName', 'bindPackageName', '--param-file', '/action/parameters.json']
+      const cmd = ow.mockResolved(owPackage, '')
+      command.argv = ['ns/packageName', 'bindPackageName', '--param-file', '/action/parameters.json']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalledWith({
@@ -197,8 +222,8 @@ describe('instance methods', () => {
       fakeFileSystem.addJson({
         '/action': json
       })
-      const cmd = ow.mockResolved(owAction, '')
-      command.argv = ['packageName', 'bindPackageName', '--annotation-file', '/action/parameters.json']
+      const cmd = ow.mockResolved(owPackage, '')
+      command.argv = ['ns/packageName', 'bindPackageName', '--annotation-file', '/action/parameters.json']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalledWith({
@@ -226,8 +251,8 @@ describe('instance methods', () => {
     })
 
     test('binds a package with packageName, bindPackageName and annotation and param flags', () => {
-      const cmd = ow.mockResolved(owAction, '')
-      command.argv = ['packageName', 'bindPackageName', '--annotation', 'a', 'b', '--annotation', 'c', 'd', '--param', 'p1', 'p2']
+      const cmd = ow.mockResolved(owPackage, '')
+      command.argv = ['/ns/packageName', 'bindPackageName', '--annotation', 'a', 'b', '--annotation', 'c', 'd', '--param', 'p1', 'p2']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalledWith({
@@ -260,8 +285,8 @@ describe('instance methods', () => {
     })
 
     test('binds a package with packageName, bindPackageName and annotation and param flags with shorter flag version', () => {
-      const cmd = ow.mockResolved(owAction, '')
-      command.argv = ['packageName', 'bindPackageName', '-a', 'a', 'b', '-a', 'c', 'd', '-p', 'p1', 'p2']
+      const cmd = ow.mockResolved(owPackage, '')
+      command.argv = ['ns/packageName', 'bindPackageName', '-a', 'a', 'b', '-a', 'c', 'd', '-p', 'p1', 'p2']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalledWith({
@@ -295,7 +320,7 @@ describe('instance methods', () => {
 
     test('tests for incorrect --param flags', () => {
       return new Promise((resolve, reject) => {
-        ow.mockRejected(owAction, '')
+        ow.mockRejected(owPackage, '')
         command.argv = ['packageName', 'bindPackageName', '--param', 'a', 'b', 'c']
         return command.run()
           .then(() => reject(new Error('does not throw error')))
@@ -308,7 +333,7 @@ describe('instance methods', () => {
 
     test('tests for incorrect --annotation flags', () => {
       return new Promise((resolve, reject) => {
-        ow.mockRejected(owAction, '')
+        ow.mockRejected(owPackage, '')
         command.argv = ['packageName', 'bindPackageName', '--annotation', 'a', 'b', 'c']
         return command.run()
           .then(() => reject(new Error('does not throw error')))
@@ -321,7 +346,7 @@ describe('instance methods', () => {
 
     test('errors out on api error', () => {
       return new Promise((resolve, reject) => {
-        ow.mockRejected(owAction, new Error('an error'))
+        ow.mockRejected(owPackage, new Error('an error'))
         command.argv = ['packageName', 'bindPackageName']
         return command.run()
           .then(() => reject(new Error('does not throw error')))

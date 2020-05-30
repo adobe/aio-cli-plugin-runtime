@@ -14,7 +14,7 @@ const { stdout } = require('stdout-stderr')
 const TheCommand = require('../../../../src/commands/runtime/package/get.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
 const ow = require('openwhisk')()
-const owAction = 'packages.get'
+const owPackage = 'packages.get'
 
 test('exports', async () => {
   expect(typeof TheCommand).toEqual('function')
@@ -52,18 +52,28 @@ describe('instance methods', () => {
     })
 
     test('retrieve a package', () => {
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = ow.mockResolved(owPackage, '')
       command.argv = ['packageName']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ name: 'packageName' })
+          expect(cmd).toHaveBeenCalledWith({ namespace: '_', name: 'packageName' })
+          expect(stdout.output).toMatch('')
+        })
+    })
+
+    test('retrieve a package in namespace', () => {
+      const cmd = ow.mockResolved(owPackage, '')
+      command.argv = ['ns/packageName']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith({ namespace: 'ns', name: 'packageName' })
           expect(stdout.output).toMatch('')
         })
     })
 
     test('errors out on api error', () => {
       return new Promise((resolve, reject) => {
-        ow.mockRejected(owAction, new Error('an error'))
+        ow.mockRejected(owPackage, new Error('an error'))
         command.argv = ['packageName']
         return command.run()
           .then(() => reject(new Error('does not throw error')))
