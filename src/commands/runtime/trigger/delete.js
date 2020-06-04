@@ -22,7 +22,6 @@ class TriggerDelete extends RuntimeBaseCommand {
     try {
       const ow = await this.wsk()
       const obj = { namespace, name }
-
       await ow.triggers.delete(obj)
     } catch (err) {
       this.handleError(`Unable to delete trigger '${triggerPath}'`, err)
