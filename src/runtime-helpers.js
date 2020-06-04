@@ -129,28 +129,6 @@ function createKeyValueObjectFromFlag (flag) {
 }
 
 /**
- * @description returns key value pairs in an object from the key value array supplied. Used to create parameters object
- * @returns An object of key value pairs in this format : {Your key1 : 'Your Value 1' , Your key2: 'Your value 2'}
- */
-function createKeyValueObjectFromArray (inputsArray) {
-  const tempObj = {}
-  inputsArray.forEach((input) => {
-    if (input.key && input.value) {
-      try {
-        // assume it is JSON, there is only 1 way to find out
-        tempObj[input.key] = JSON.parse(input.value)
-      } catch (ex) {
-        // hmm ... not json, treat as string
-        tempObj[input.key] = input.value
-      }
-    } else {
-      throw (new Error('Please provide correct input array with key and value params in each array item'))
-    }
-  })
-  return tempObj
-}
-
-/**
  * @description parses a string and returns the namespace and entity name for a package.
  * @returns An object { namespace: string, name: string }
  */
@@ -722,8 +700,6 @@ function processPackage (packages, deploymentPackages, deploymentTriggers, param
             objTrigger.trigger.annotations = createKeyValueInput(packages[key]['triggers'][triggerName]['annotations'])
           }
           if (packages[key]['triggers'][triggerName]['feed']) {
-            objTrigger.trigger.annotations = objTrigger.trigger.annotations || []
-            objTrigger.trigger.annotations.push({ key: 'feed', value: packages[key]['triggers'][triggerName]['feed'] })
             objTrigger.trigger.feed = packages[key]['triggers'][triggerName]['feed']
           }
           ruleTrigger.push(triggerName)
@@ -869,16 +845,6 @@ async function deployPackage (entities, ow, logger) {
     logger(`Info: Deploying trigger [${trigger.name}]...`)
     await ow.triggers.update(trigger)
     logger(`Info: trigger [${trigger.name}] has been successfully deployed.\n`)
-    if (trigger.trigger.feed) {
-      try {
-        // ow.feeds.update on a non-existent feed throws 502 (Bad Gateway) --> "Response Missing Error Message."
-        await ow.feeds.create({ name: trigger.trigger.feed, trigger: trigger.name, params: createKeyValueObjectFromArray(trigger.trigger.parameters) })
-      } catch (err) {
-        await ow.triggers.delete({ name: trigger.name })
-        logger(`Info: feed for trigger [${trigger.name}] could not be deployed.\n`)
-        logger(`Info: Deleted trigger`)
-      }
-    }
   }
   for (const rule of entities.rules) {
     logger(`Info: Deploying rule [${rule.name}]...`)
@@ -897,14 +863,6 @@ async function undeployPackage (entities, ow, logger) {
   }
   for (const trigger of entities.triggers) {
     logger(`Info: Undeploying trigger [${trigger.name}]...`)
-    const retTrigger = await ow.triggers.get({ name: trigger.name })
-    if (retTrigger.annotations) {
-      for (const annotation of retTrigger.annotations) {
-        if (annotation.key === 'feed') {
-          await ow.feeds.delete({ name: annotation.value, trigger: trigger.name })
-        }
-      }
-    }
     await ow.triggers.delete({ name: trigger.name })
     logger(`Info: trigger [${trigger.name}] has been successfully undeployed.\n`)
   }
@@ -1134,7 +1092,6 @@ module.exports = {
   createKeyValueArrayFromObject,
   createKeyValueArrayFromFile,
   createKeyValueArrayFromFlag,
-  createKeyValueObjectFromArray,
   createKeyValueObjectFromFlag,
   createKeyValueObjectFromFile,
   parsePathPattern,

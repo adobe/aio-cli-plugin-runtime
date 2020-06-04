@@ -11,7 +11,7 @@ governing permissions and limitations under the License.
 */
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
-const { createKeyValueArrayFromFlag, createKeyValueArrayFromFile, createKeyValueObjectFromFlag } = require('../../../runtime-helpers')
+const { createKeyValueArrayFromFlag, createKeyValueArrayFromFile } = require('../../../runtime-helpers')
 const { flags } = require('@oclif/command')
 
 class TriggerCreate extends RuntimeBaseCommand {
@@ -35,9 +35,6 @@ class TriggerCreate extends RuntimeBaseCommand {
       } else if (flags['annotation-file']) {
         annotationParams = createKeyValueArrayFromFile(flags['annotation-file'])
       }
-      if (flags.feed) {
-        annotationParams.push({ key: 'feed', value: flags.feed })
-      }
 
       // triggerParams.parameters is expected to be passed as an array of key value pairs
       // For example : [{key : 'Your key 1' , value: 'Your value 1'}, {key : 'Your key 2' , value: 'Your value 2'} ]
@@ -48,6 +45,9 @@ class TriggerCreate extends RuntimeBaseCommand {
       if (Object.keys(annotationParams).length) {
         triggerParams.annotations = annotationParams
       }
+      if (flags.feed) {
+        triggerParams.feed = flags.feed
+      }
 
       const options = {
         name: args.triggerName,
@@ -56,14 +56,6 @@ class TriggerCreate extends RuntimeBaseCommand {
 
       const ow = await this.wsk()
       await ow.triggers.create(options)
-      if (flags.feed) {
-        try {
-          await ow.feeds.create({ name: flags.feed, trigger: args.triggerName, params: createKeyValueObjectFromFlag(flags.param) })
-        } catch (err) {
-          await ow.triggers.delete(options)
-          this.handleError('failed to create the feed, deleted trigger', err)
-        }
-      }
     } catch (err) {
       this.handleError('failed to create the trigger', err)
     }

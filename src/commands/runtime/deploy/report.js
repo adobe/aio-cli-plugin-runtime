@@ -56,7 +56,7 @@ class DeployReport extends RuntimeBaseCommand {
         if (packages[key]['triggers']) {
           Object.keys(packages[key]['triggers']).forEach((trigger) => {
             const objTrigger = { name: trigger }
-            if (packages[key]['triggers'][trigger]['feed']) { 
+            if (packages[key]['triggers'][trigger]['feed']) {
               objTrigger.feed = packages[key]['triggers'][trigger]['feed']
             }
             const packageInputs = packages[key]['triggers'][trigger]['inputs'] || {}

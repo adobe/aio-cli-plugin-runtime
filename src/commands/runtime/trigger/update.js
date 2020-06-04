@@ -11,7 +11,7 @@ governing permissions and limitations under the License.
 */
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
-const { createKeyValueArrayFromFlag, createKeyValueArrayFromFile, createKeyValueObjectFromFlag } = require('../../../runtime-helpers')
+const { createKeyValueArrayFromFlag, createKeyValueArrayFromFile } = require('../../../runtime-helpers')
 const { flags } = require('@oclif/command')
 
 class TriggerUpdate extends RuntimeBaseCommand {
@@ -53,9 +53,6 @@ class TriggerUpdate extends RuntimeBaseCommand {
 
       const ow = await this.wsk()
       await ow.triggers.update(options)
-      if (flags.feed) {
-        await ow.feeds.update({ name: flags.feed, trigger: args.triggerName, params: createKeyValueObjectFromFlag(flags.param) })
-      }
     } catch (err) {
       this.handleError('failed to update the trigger', err)
     }
@@ -89,10 +86,6 @@ TriggerUpdate.flags = {
   'annotation-file': flags.string({
     char: 'A',
     description: 'FILE containing annotation values in JSON format' // help description for flag
-  }),
-  feed: flags.string({
-    char: 'f',
-    description: 'trigger feed ACTION_NAME'
   })
 }
 

@@ -141,6 +141,7 @@ describe('instance methods', () => {
                   value: '/whisk.system/alarms/alarm'
                 }
               ],
+              feed: '/whisk.system/alarms/alarm',
               parameters: [
                 {
                   key: 'cron',
@@ -174,6 +175,7 @@ describe('instance methods', () => {
                   value: '/whisk.system/alarms/alarm'
                 }
               ],
+              feed: '/whisk.system/alarms/alarm',
               parameters: [
                 {
                   key: 'cron',

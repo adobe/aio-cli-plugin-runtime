@@ -22,14 +22,6 @@ class TriggerDelete extends RuntimeBaseCommand {
     try {
       const ow = await this.wsk()
       const obj = { namespace, name }
-      const retTrigger = await ow.triggers.get(obj)
-      if (retTrigger.annotations) {
-        for (const annotation of retTrigger.annotations) {
-          if (annotation.key === 'feed') {
-            await ow.feeds.delete({ name: annotation.value, trigger: name })
-          }
-        }
-      }
 
       await ow.triggers.delete(obj)
     } catch (err) {

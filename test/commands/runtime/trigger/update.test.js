@@ -120,32 +120,6 @@ describe('instance methods', () => {
       })
     })
 
-    test('update a simple trigger, use feed flag', () => {
-      const cmd = ow.mockResolved(owAction, '')
-      const cmdfeed = ow.mockResolved('feeds.update', '')
-      command.argv = ['trigger1', '--feed', '/whisk.system/alarms/alarm', '--param', 'cron', '* * * * *']
-      return command.run()
-        .then(() => {
-          expect(cmdfeed).toHaveBeenCalledWith({ name: '/whisk.system/alarms/alarm',
-            trigger: 'trigger1',
-            params: {
-              cron: '* * * * *'
-            }
-          })
-          expect(cmd).toHaveBeenCalledWith({ name: 'trigger1',
-            trigger: {
-              parameters: [
-                {
-                  key: 'cron',
-                  value: '* * * * *'
-                }
-              ]
-            }
-          })
-          expect(stdout.output).toMatch('')
-        })
-    })
-
     test('update a simple trigger, use param flag', () => {
       const cmd = ow.mockResolved(owAction, '')
       command.argv = ['trigger1', '--param', 'a', 'b', '--param', 'c', 'd']

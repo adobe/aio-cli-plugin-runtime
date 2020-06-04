@@ -18,7 +18,6 @@ const owPackage = 'packages.update'
 const owAction = 'actions.update'
 const owAPI = 'routes.create'
 const owTriggers = 'triggers.update'
-const owFeeds = 'feeds.create'
 const owRules = 'rules.update'
 
 test('exports', async () => {
@@ -632,23 +631,12 @@ describe('instance methods', () => {
     })
 
     test('deploys trigger with feed in manifest file', () => {
-      const cmd = ow.mockResolved(owFeeds, '')
+      const cmd = ow.mockResolved(owTriggers, '')
       command.argv = ['-m', '/deploy/manifest_dep_Triggers_feeds.yaml']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalled()
-          expect(stdout.output).toMatch('')
-        })
-    })
-
-    test('deploys trigger with feed in manifest file - error', () => {
-      const cmd = ow.mockRejected(owFeeds, new Error('an error'))
-      const cmdDelete = ow.mockResolved('triggers.delete', '')
-      command.argv = ['-m', '/deploy/manifest_dep_Triggers_feeds.yaml']
-      return command.run()
-        .then(() => {
-          expect(cmd).toHaveBeenCalled()
-          expect(cmdDelete).toHaveBeenCalled()
+          expect(cmd).toHaveBeenCalledWith(expect.objectContaining({ trigger: expect.objectContaining({ feed: '/whisk.system/alarms/alarm' }) }))
           expect(stdout.output).toMatch('')
         })
     })
