@@ -983,15 +983,15 @@ describe('instance methods', () => {
             expect(cmd).toHaveBeenCalledWith({ name: 'testSeq/__secured_helloAction', action: hello, annotations: { 'web-export': false, 'raw-http': false }, params: { name: 'Elrond' } })
             expect(cmd).toHaveBeenCalledWith({ name: 'testSeq/__secured_helloAction2', action: hello, annotations: { 'web-export': false, 'raw-http': false } })
             // generated sequences
-            expect(cmd).toHaveBeenCalledWith({ name: 'testSeq/helloAction', action: '', annotations: { 'web-export': true }, exec: { components: ['/adobeio/shared-validators-v1/app-registry', '/ns/testSeq/__secured_helloAction'], kind: 'sequence' } })
-            expect(cmd).toHaveBeenCalledWith({ name: 'testSeq/helloAction2', action: '', annotations: { 'web-export': true }, exec: { components: ['/adobeio/shared-validators-v1/app-registry', '/ns/testSeq/__secured_helloAction2'], kind: 'sequence' } })
+            expect(cmd).toHaveBeenCalledWith({ name: 'testSeq/helloAction', action: '', annotations: { 'web-export': true }, exec: { components: ['/adobeio/shared-validators-v1/headless', '/ns/testSeq/__secured_helloAction'], kind: 'sequence' } })
+            expect(cmd).toHaveBeenCalledWith({ name: 'testSeq/helloAction2', action: '', annotations: { 'web-export': true }, exec: { components: ['/adobeio/shared-validators-v1/headless', '/ns/testSeq/__secured_helloAction2'], kind: 'sequence' } })
             // pkg2
             // action
             expect(cmd).toHaveBeenCalledWith({ name: 'demo_package/sampleActionNoAnnotation', action: hello, annotations: { 'web-export': true } })
             expect(cmd).toHaveBeenCalledWith({ name: 'demo_package/sampleActionNoWeb', action: hello, annotations: { 'web-export': false, 'raw-http': false } })
             expect(cmd).toHaveBeenCalledWith({ name: 'demo_package/__secured_sampleAction', action: hello, annotations: { 'web-export': false, 'raw-http': false } })
             // sequence
-            expect(cmd).toHaveBeenCalledWith({ name: 'demo_package/sampleAction', action: '', annotations: { 'web-export': true, 'raw-http': true }, exec: { components: ['/adobeio/shared-validators-v1/app-registry', '/ns/demo_package/__secured_sampleAction'], kind: 'sequence' } })
+            expect(cmd).toHaveBeenCalledWith({ name: 'demo_package/sampleAction', action: '', annotations: { 'web-export': true, 'raw-http': true }, exec: { components: ['/adobeio/shared-validators-v1/headless', '/ns/demo_package/__secured_sampleAction'], kind: 'sequence' } })
             expect(cmd).toHaveBeenCalledTimes(9)
             expect(stdout.output).toMatch('')
           })
@@ -1011,15 +1011,15 @@ describe('instance methods', () => {
             })
             expect(cmd).toHaveBeenCalledWith({ name: 'testSeq/__secured_helloAction2', action: hello, annotations: { 'web-export': false, 'raw-http': false } })
             // sequences
-            expect(cmd).toHaveBeenCalledWith({ name: 'testSeq/helloAction', action: '', annotations: { 'web-export': true }, exec: { components: ['/adobeio/shared-validators-v1/app-registry', '/ns/testSeq/__secured_helloAction'], kind: 'sequence' } })
-            expect(cmd).toHaveBeenCalledWith({ name: 'testSeq/helloAction2', action: '', annotations: { 'web-export': true }, exec: { components: ['/adobeio/shared-validators-v1/app-registry', '/ns/testSeq/__secured_helloAction2'], kind: 'sequence' } })
+            expect(cmd).toHaveBeenCalledWith({ name: 'testSeq/helloAction', action: '', annotations: { 'web-export': true }, exec: { components: ['/adobeio/shared-validators-v1/headless', '/ns/testSeq/__secured_helloAction'], kind: 'sequence' } })
+            expect(cmd).toHaveBeenCalledWith({ name: 'testSeq/helloAction2', action: '', annotations: { 'web-export': true }, exec: { components: ['/adobeio/shared-validators-v1/headless', '/ns/testSeq/__secured_helloAction2'], kind: 'sequence' } })
             // pkg2
             // action
             expect(cmd).toHaveBeenCalledWith({ name: 'demo_package/sampleActionNoAnnotation', action: hello, annotations: { 'web-export': true } })
             expect(cmd).toHaveBeenCalledWith({ name: 'demo_package/sampleActionNoWeb', action: hello, annotations: { 'web-export': false, 'raw-http': false } })
             expect(cmd).toHaveBeenCalledWith({ name: 'demo_package/__secured_sampleAction', action: hello, annotations: { 'web-export': false, 'raw-http': false } })
             // sequence
-            expect(cmd).toHaveBeenCalledWith({ name: 'demo_package/sampleAction', action: '', annotations: { 'web-export': true, 'raw-http': true }, exec: { components: ['/adobeio/shared-validators-v1/app-registry', '/ns/demo_package/__secured_sampleAction'], kind: 'sequence' } })
+            expect(cmd).toHaveBeenCalledWith({ name: 'demo_package/sampleAction', action: '', annotations: { 'web-export': true, 'raw-http': true }, exec: { components: ['/adobeio/shared-validators-v1/headless', '/ns/demo_package/__secured_sampleAction'], kind: 'sequence' } })
             expect(cmd).toHaveBeenCalledTimes(9)
             expect(stdout.output).toMatch('')
           })
