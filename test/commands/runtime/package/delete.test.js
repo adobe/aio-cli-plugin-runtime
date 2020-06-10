@@ -56,7 +56,17 @@ describe('instance methods', () => {
       command.argv = ['packageName']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith('packageName')
+          expect(cmd).toHaveBeenCalledWith({ namespace: '_', name: 'packageName' })
+          expect(stdout.output).toMatch('')
+        })
+    })
+
+    test('delete a package /ns', () => {
+      const cmd = ow.mockResolved(owAction, '')
+      command.argv = ['ns/packageName']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith({ namespace: 'ns', name: 'packageName' })
           expect(stdout.output).toMatch('')
         })
     })
@@ -66,7 +76,7 @@ describe('instance methods', () => {
       command.argv = ['packageName', '--json']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith('packageName')
+          expect(cmd).toHaveBeenCalledWith({ namespace: '_', name: 'packageName' })
           expect(stdout.output).toMatch('')
         })
     })
