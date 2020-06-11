@@ -990,7 +990,7 @@ describe('instance methods', () => {
         ow.mockResolved(owAction, '')
         command.argv = ['-m', 'manifest_with_adobe_auth.yaml', '--apihost', 'https://adobeioruntime.net']
         fetch.mockResolvedValue({ ok: false })
-        await expect(command.run()).rejects.toThrow('failed setting ims_org_id=fake-ims-org-id into state lib, received status=undefined, please make sure you runtime credentials are correct')
+        await expect(command.run()).rejects.toThrow('failed setting ims_org_id=fake-ims-org-id into state lib, received status=undefined, please make sure your runtime credentials are correct')
       })
 
       test('should call state put endpoint with correct parameters', async () => {

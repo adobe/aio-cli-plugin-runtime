@@ -15,6 +15,7 @@ const yaml = require('js-yaml')
 const debug = require('debug')('aio-cli-plugin-runtime/deploy')
 const sha1 = require('sha1')
 const cloneDeep = require('lodash.clonedeep')
+const aioConfig = require('@adobe/aio-lib-core-config')
 
 // for lines starting with date-time-string followed by stdout|stderr a ':' and a log-line, return only the logline
 const dtsRegex = /\d{4}-[01]{1}\d{1}-[0-3]{1}\d{1}T[0-2]{1}\d{1}:[0-6]{1}\d{1}:[0-6]{1}\d{1}.\d+Z( *(stdout|stderr):)?\s(.*)/
@@ -824,7 +825,7 @@ async function setupAdobeAuth (actions, owOptions) {
   if (hasAnAdobeHeadlessAuthSequence) {
     // if we use the headless (default auth action) we need to store the ims org id in the
     // cloud state lib. This is needed by the auth action to perform an org check.
-    const imsOrgId = require('@adobe/aio-lib-core-config').get(AIO_CONFIG_IMS_ORG_ID)
+    const imsOrgId = aioConfig.get(AIO_CONFIG_IMS_ORG_ID)
     if (!imsOrgId) {
       throw new Error('required .aio \'project.org.ims_org_id\' must be defined when using the Adobe headless auth validator')
     }
@@ -843,7 +844,7 @@ async function setupAdobeAuth (actions, owOptions) {
       })
     })
     if (!res.ok) {
-      throw new Error(`failed setting ims_org_id=${imsOrgId} into state lib, received status=${res.status}, please make sure you runtime credentials are correct`)
+      throw new Error(`failed setting ims_org_id=${imsOrgId} into state lib, received status=${res.status}, please make sure your runtime credentials are correct`)
     }
     debug(`set IMS org id into cloud state, response: ${JSON.stringify(await res.json())}`)
   }
