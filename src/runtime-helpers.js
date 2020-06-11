@@ -15,7 +15,6 @@ const yaml = require('js-yaml')
 const debug = require('debug')('aio-cli-plugin-runtime/deploy')
 const sha1 = require('sha1')
 const cloneDeep = require('lodash.clonedeep')
-const fetch = require('node-fetch')
 
 // for lines starting with date-time-string followed by stdout|stderr a ':' and a log-line, return only the logline
 const dtsRegex = /\d{4}-[01]{1}\d{1}-[0-3]{1}\d{1}T[0-2]{1}\d{1}:[0-6]{1}\d{1}:[0-6]{1}\d{1}.\d+Z( *(stdout|stderr):)?\s(.*)/
