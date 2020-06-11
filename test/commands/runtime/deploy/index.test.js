@@ -121,7 +121,7 @@ describe('instance methods', () => {
   describe('run', () => {
     ow.mockResolved('packages.get', '')
     ow.mockResolved('actions.client.options', '')
-    ow.actions.client.options = { namespace: 'ns' }
+    ow.actions.client.options = { namespace: 'ns', apiKey: 'fake:auth' }
     ow.mockResolved(owRules, '')
     ow.mockResolved(owTriggers, '')
     const hello = fixtureFile('deploy/hello.js')
@@ -942,10 +942,16 @@ describe('instance methods', () => {
     // Parsing the annotation in the runtime plugin is temporary, delete the tests
     //   and fixtures once the annotation is natively supported by Adobe I/O Runtime.
     describe('require-adobe-auth annotation', () => {
+      jest.mock('node-fetch')
+      const fetch = require('node-fetch')
+      const mockConfig = require('@adobe/aio-lib-core-config')
       beforeEach(() => {
         fakeFileSystem.addJson({
           'deploy/manifest_with_adobe_auth.yaml': fixtureFile('deploy/manifest_with_adobe_auth.yaml')
         })
+        fetch.mockReset()
+        mockConfig.get.mockReturnValue('fake-ims-org-id')
+        fetch.mockResolvedValue({ ok: true, json: async () => ({ fake: 'data' }) })
       })
 
       test('processPackage with no owOptions', () => {
@@ -971,6 +977,32 @@ describe('instance methods', () => {
             expect(cmd).toHaveBeenCalledTimes(6)
           })
       })
+
+      test('should fail if project.org.ims_org_id is not set in config', async () => {
+        ow.mockResolved(owAction, '')
+        command.argv = ['-m', 'manifest_with_adobe_auth.yaml', '--apihost', 'https://adobeioruntime.net']
+        mockConfig.get.mockReturnValue(undefined)
+        await expect(command.run()).rejects.toThrow('required .aio \'project.org.ims_org_id\' must be defined when using the Adobe headless auth validator')
+        expect(mockConfig.get).toHaveBeenCalledWith('project.org.ims_org_id')
+      })
+
+      test('should fail if state put response is not ok', async () => {
+        ow.mockResolved(owAction, '')
+        command.argv = ['-m', 'manifest_with_adobe_auth.yaml', '--apihost', 'https://adobeioruntime.net']
+        fetch.mockResolvedValue({ ok: false })
+        await expect(command.run()).rejects.toThrow('failed setting ims_org_id=fake-ims-org-id into state lib, received status=undefined, please make sure your runtime credentials are correct')
+      })
+
+      test('should call state put endpoint with correct parameters', async () => {
+        ow.mockResolved(owAction, '')
+        command.argv = ['-m', 'manifest_with_adobe_auth.yaml', '--apihost', 'https://adobeioruntime.net']
+        await command.run()
+        expect(fetch).toHaveBeenCalledWith('https://adobeio.adobeioruntime.net/api/v1/web/state/put', {
+          body: '{"namespace":"ns","key":"__aio","value":{"project":{"org":{"ims_org_id":"fake-ims-org-id"}}},"ttl":-1}',
+          headers: { Authorization: 'Basic ZmFrZTphdXRo', 'Content-Type': 'application/json' }, // ZmFrZTphdXRo = base64 of fake:auth (defined at the beginning of the file)
+          method: 'post' })
+      })
+
       test('deploys web action with require-adobe-auth annotation', () => {
         const cmd = ow.mockResolved(owAction, '')
         command.argv = ['-m', 'manifest_with_adobe_auth.yaml', '--apihost', 'https://adobeioruntime.net']
@@ -983,15 +1015,15 @@ describe('instance methods', () => {
             expect(cmd).toHaveBeenCalledWith({ name: 'testSeq/__secured_helloAction', action: hello, annotations: { 'web-export': false, 'raw-http': false }, params: { name: 'Elrond' } })
             expect(cmd).toHaveBeenCalledWith({ name: 'testSeq/__secured_helloAction2', action: hello, annotations: { 'web-export': false, 'raw-http': false } })
             // generated sequences
-            expect(cmd).toHaveBeenCalledWith({ name: 'testSeq/helloAction', action: '', annotations: { 'web-export': true }, exec: { components: ['/adobeio/shared-validators/ims', '/ns/testSeq/__secured_helloAction'], kind: 'sequence' } })
-            expect(cmd).toHaveBeenCalledWith({ name: 'testSeq/helloAction2', action: '', annotations: { 'web-export': true }, exec: { components: ['/adobeio/shared-validators/ims', '/ns/testSeq/__secured_helloAction2'], kind: 'sequence' } })
+            expect(cmd).toHaveBeenCalledWith({ name: 'testSeq/helloAction', action: '', annotations: { 'web-export': true }, exec: { components: ['/adobeio/shared-validators-v1/headless', '/ns/testSeq/__secured_helloAction'], kind: 'sequence' } })
+            expect(cmd).toHaveBeenCalledWith({ name: 'testSeq/helloAction2', action: '', annotations: { 'web-export': true }, exec: { components: ['/adobeio/shared-validators-v1/headless', '/ns/testSeq/__secured_helloAction2'], kind: 'sequence' } })
             // pkg2
             // action
             expect(cmd).toHaveBeenCalledWith({ name: 'demo_package/sampleActionNoAnnotation', action: hello, annotations: { 'web-export': true } })
             expect(cmd).toHaveBeenCalledWith({ name: 'demo_package/sampleActionNoWeb', action: hello, annotations: { 'web-export': false, 'raw-http': false } })
             expect(cmd).toHaveBeenCalledWith({ name: 'demo_package/__secured_sampleAction', action: hello, annotations: { 'web-export': false, 'raw-http': false } })
             // sequence
-            expect(cmd).toHaveBeenCalledWith({ name: 'demo_package/sampleAction', action: '', annotations: { 'web-export': true, 'raw-http': true }, exec: { components: ['/adobeio/shared-validators/ims', '/ns/demo_package/__secured_sampleAction'], kind: 'sequence' } })
+            expect(cmd).toHaveBeenCalledWith({ name: 'demo_package/sampleAction', action: '', annotations: { 'web-export': true, 'raw-http': true }, exec: { components: ['/adobeio/shared-validators-v1/headless', '/ns/demo_package/__secured_sampleAction'], kind: 'sequence' } })
             expect(cmd).toHaveBeenCalledTimes(9)
             expect(stdout.output).toMatch('')
           })
@@ -1011,15 +1043,15 @@ describe('instance methods', () => {
             })
             expect(cmd).toHaveBeenCalledWith({ name: 'testSeq/__secured_helloAction2', action: hello, annotations: { 'web-export': false, 'raw-http': false } })
             // sequences
-            expect(cmd).toHaveBeenCalledWith({ name: 'testSeq/helloAction', action: '', annotations: { 'web-export': true }, exec: { components: ['/adobeio/shared-validators/ims', '/ns/testSeq/__secured_helloAction'], kind: 'sequence' } })
-            expect(cmd).toHaveBeenCalledWith({ name: 'testSeq/helloAction2', action: '', annotations: { 'web-export': true }, exec: { components: ['/adobeio/shared-validators/ims', '/ns/testSeq/__secured_helloAction2'], kind: 'sequence' } })
+            expect(cmd).toHaveBeenCalledWith({ name: 'testSeq/helloAction', action: '', annotations: { 'web-export': true }, exec: { components: ['/adobeio/shared-validators-v1/headless', '/ns/testSeq/__secured_helloAction'], kind: 'sequence' } })
+            expect(cmd).toHaveBeenCalledWith({ name: 'testSeq/helloAction2', action: '', annotations: { 'web-export': true }, exec: { components: ['/adobeio/shared-validators-v1/headless', '/ns/testSeq/__secured_helloAction2'], kind: 'sequence' } })
             // pkg2
             // action
             expect(cmd).toHaveBeenCalledWith({ name: 'demo_package/sampleActionNoAnnotation', action: hello, annotations: { 'web-export': true } })
             expect(cmd).toHaveBeenCalledWith({ name: 'demo_package/sampleActionNoWeb', action: hello, annotations: { 'web-export': false, 'raw-http': false } })
             expect(cmd).toHaveBeenCalledWith({ name: 'demo_package/__secured_sampleAction', action: hello, annotations: { 'web-export': false, 'raw-http': false } })
             // sequence
-            expect(cmd).toHaveBeenCalledWith({ name: 'demo_package/sampleAction', action: '', annotations: { 'web-export': true, 'raw-http': true }, exec: { components: ['/adobeio/shared-validators/ims', '/ns/demo_package/__secured_sampleAction'], kind: 'sequence' } })
+            expect(cmd).toHaveBeenCalledWith({ name: 'demo_package/sampleAction', action: '', annotations: { 'web-export': true, 'raw-http': true }, exec: { components: ['/adobeio/shared-validators-v1/headless', '/ns/demo_package/__secured_sampleAction'], kind: 'sequence' } })
             expect(cmd).toHaveBeenCalledTimes(9)
             expect(stdout.output).toMatch('')
           })

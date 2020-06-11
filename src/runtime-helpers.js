@@ -15,6 +15,7 @@ const yaml = require('js-yaml')
 const debug = require('debug')('aio-cli-plugin-runtime/deploy')
 const sha1 = require('sha1')
 const cloneDeep = require('lodash.clonedeep')
+const aioConfig = require('@adobe/aio-lib-core-config')
 
 // for lines starting with date-time-string followed by stdout|stderr a ':' and a log-line, return only the logline
 const dtsRegex = /\d{4}-[01]{1}\d{1}-[0-3]{1}\d{1}T[0-2]{1}\d{1}:[0-6]{1}\d{1}:[0-6]{1}\d{1}.\d+Z( *(stdout|stderr):)?\s(.*)/
@@ -473,7 +474,7 @@ function createActionObject (thisAction, objAction) {
 /**
  * This is a temporary function that implements the support for the `require-adobe-auth`
  * annotation for web actions by rewriting the action to a sequence that first executes
- * the /adobeio/shared-validators/ims validator.
+ * the /adobeio/shared-validators-v1/headless validator.
  *
  * As an example, the following manifest:
  * ```
@@ -491,13 +492,12 @@ function createActionObject (thisAction, objAction) {
  *   helloworld:
  *     actions:
  *       __secured_hello:
+ *         # secured by being non web !
  *         function: path/to/hello.js
- *         web: 'yes'
- *         annotations:
- *           require-whisk-auth: true #makes sure action cannot be called by itself anymore
  *     sequences:
  *       hello:
- *        actions: '/adobeio/shared-validators/ims,helloworld/__secured_hello'
+ *        actions: '/adobeio/shared-validators-v1/headless,helloworld/__secured_hello'
+ *        web: 'yes'
  * ```
  *
  * The annotation will soon be natively supported in Adobe I/O Runtime, at which point
@@ -508,7 +508,7 @@ function createActionObject (thisAction, objAction) {
 function rewriteActionsWithAdobeAuthAnnotation (packages, deploymentPackages) {
   // do not modify those
   const ADOBE_AUTH_ANNOTATION = 'require-adobe-auth'
-  const ADOBE_AUTH_ACTION = '/adobeio/shared-validators/ims'
+  const ADOBE_AUTH_ACTION = '/adobeio/shared-validators-v1/headless'
   const REWRITE_ACTION_PREFIX = '__secured_'
 
   // avoid side effects, do not modify input packages
@@ -802,9 +802,61 @@ function setPaths (flags) {
   return filecomponents
 }
 
+/**
+ * Handle Adobe auth action dependency
+ *
+ * This is a temporary solution and needs to be removed when headless apps will be able to
+ * validate against app-registry
+ *
+ * This function stores the IMS organization id in the Adobe I/O cloud state library which
+ * is required by the headless validator.
+ *
+ * The IMS org id must be stored beforehand in `@adobe/aio-lib-core-config` under the
+ * `'project.org.ims_org_id'` key.
+ */
+async function setupAdobeAuth (actions, owOptions) {
+  // do not modify those
+  const ADOBE_HEADLESS_AUTH_ACTION = '/adobeio/shared-validators-v1/headless'
+  const AIO_STATE_KEY = '__aio'
+  const AIO_CONFIG_IMS_ORG_ID = 'project.org.ims_org_id'
+  const AIO_STATE_PUT_ENDPOINT = 'https://adobeio.adobeioruntime.net/api/v1/web/state/put'
+
+  const hasAnAdobeHeadlessAuthSequence = actions.some(a => a.exec && a.exec.kind === 'sequence' && a.exec.components.includes(ADOBE_HEADLESS_AUTH_ACTION))
+  if (hasAnAdobeHeadlessAuthSequence) {
+    // if we use the headless (default auth action) we need to store the ims org id in the
+    // cloud state lib. This is needed by the auth action to perform an org check.
+    const imsOrgId = aioConfig.get(AIO_CONFIG_IMS_ORG_ID)
+    if (!imsOrgId) {
+      throw new Error('required .aio \'project.org.ims_org_id\' must be defined when using the Adobe headless auth validator')
+    }
+    const fetch = require('node-fetch')
+    const res = await fetch(AIO_STATE_PUT_ENDPOINT, {
+      method: 'post',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Basic ${Buffer.from(owOptions.apiKey).toString('base64')}`
+      },
+      body: JSON.stringify({
+        namespace: owOptions.namespace,
+        key: AIO_STATE_KEY,
+        value: { project: { org: { ims_org_id: imsOrgId } } },
+        ttl: -1 // unlimited
+      })
+    })
+    if (!res.ok) {
+      throw new Error(`failed setting ims_org_id=${imsOrgId} into state lib, received status=${res.status}, please make sure your runtime credentials are correct`)
+    }
+    debug(`set IMS org id into cloud state, response: ${JSON.stringify(await res.json())}`)
+  }
+}
+
 async function deployPackage (entities, ow, logger) {
   const opts = await ow.actions.client.options
   const ns = opts.namespace
+
+  /* this is a temporary workaround to setup Adobe auth dependencies */
+  await setupAdobeAuth(entities.actions, opts)
+
   for (const pkg of entities.pkgAndDeps) {
     logger(`Info: Deploying package [${pkg.name}]...`)
     await ow.packages.update(pkg)
