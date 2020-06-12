@@ -998,20 +998,12 @@ async function getProjectEntities (project, isProjectHash, ow) {
 async function addManagedProjectAnnotations (entities, manifestPath, projectName, projectHash) {
   // add whisk managed annotations
   for (const pkg of entities.pkgAndDeps) {
-    const options = {}
-    options['name'] = pkg.name
-    options['package'] = {
-      annotations: [
-        {
-          key: 'whisk-managed',
-          value: {
-            file: manifestPath,
-            projectDeps: [],
-            projectHash: projectHash,
-            projectName: projectName
-          }
-        }
-      ]
+    pkg.annotations = pkg.annotations || {}
+    pkg.annotations['whisk-managed'] = {
+      file: manifestPath,
+      projectDeps: [],
+      projectHash: projectHash,
+      projectName: projectName
     }
   }
   for (const action of entities.actions) {

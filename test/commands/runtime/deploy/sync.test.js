@@ -352,6 +352,18 @@ describe('instance methods', () => {
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalled()
+          expect(cmd).toHaveBeenCalledWith(
+            expect.objectContaining({
+              annotations: expect.objectContaining({
+                'whisk-managed': {
+                  file: '/deploy/deployment_actionMissingInputs.yaml',
+                  projectDeps: [],
+                  projectHash: 'xyz',
+                  projectName: 'proj'
+                }
+              })
+            })
+          )
           expect(stdout.output).toMatch('')
         })
     })
