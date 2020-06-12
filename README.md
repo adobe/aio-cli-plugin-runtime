@@ -29,84 +29,79 @@ Adobe I/O Runtime plugin for the Adobe I/O CLI
 * [Usage](#usage)
 * [Commands](#commands)
 <!-- tocstop -->
+
 # Usage
-<!-- usage -->
 ```sh-session
-$ npm install -g @adobe/aio-cli-plugin-runtime
-$ ./bin/run COMMAND
-running command...
-$ ./bin/run (-v|--version|version)
-@adobe/aio-cli-plugin-runtime/1.7.3 darwin-x64 node-v10.16.1
-$ ./bin/run --help [COMMAND]
-USAGE
-  $ ./bin/run COMMAND
-...
+$ aio plugins:install -g @adobe/aio-cli-plugin-runtime
+$ # OR
+$ aio discover -i
+$ aio runtime --help
 ```
-<!-- usagestop -->
+
 # Commands
 <!-- commands -->
-* [`./bin/run runtime`](#binrun-runtime)
-* [`./bin/run runtime:action`](#binrun-runtimeaction)
-* [`./bin/run runtime:action:create ACTIONNAME [ACTIONPATH]`](#binrun-runtimeactioncreate-actionname-actionpath)
-* [`./bin/run runtime:action:delete ACTIONNAME`](#binrun-runtimeactiondelete-actionname)
-* [`./bin/run runtime:action:get ACTIONNAME`](#binrun-runtimeactionget-actionname)
-* [`./bin/run runtime:action:invoke ACTIONNAME`](#binrun-runtimeactioninvoke-actionname)
-* [`./bin/run runtime:action:list [PACKAGENAME]`](#binrun-runtimeactionlist-packagename)
-* [`./bin/run runtime:action:update ACTIONNAME [ACTIONPATH]`](#binrun-runtimeactionupdate-actionname-actionpath)
-* [`./bin/run runtime:activation`](#binrun-runtimeactivation)
-* [`./bin/run runtime:activation:get [ACTIVATIONID]`](#binrun-runtimeactivationget-activationid)
-* [`./bin/run runtime:activation:list [ACTIVATIONID]`](#binrun-runtimeactivationlist-activationid)
-* [`./bin/run runtime:activation:logs [ACTIVATIONID]`](#binrun-runtimeactivationlogs-activationid)
-* [`./bin/run runtime:activation:result [ACTIVATIONID]`](#binrun-runtimeactivationresult-activationid)
-* [`./bin/run runtime:deploy`](#binrun-runtimedeploy)
-* [`./bin/run runtime:deploy:export`](#binrun-runtimedeployexport)
-* [`./bin/run runtime:deploy:report`](#binrun-runtimedeployreport)
-* [`./bin/run runtime:deploy:sync`](#binrun-runtimedeploysync)
-* [`./bin/run runtime:deploy:undeploy`](#binrun-runtimedeployundeploy)
-* [`./bin/run runtime:deploy:version`](#binrun-runtimedeployversion)
-* [`./bin/run runtime:namespace`](#binrun-runtimenamespace)
-* [`./bin/run runtime:namespace:get`](#binrun-runtimenamespaceget)
-* [`./bin/run runtime:namespace:list`](#binrun-runtimenamespacelist)
-* [`./bin/run runtime:package`](#binrun-runtimepackage)
-* [`./bin/run runtime:package:bind PACKAGENAME BINDPACKAGENAME`](#binrun-runtimepackagebind-packagename-bindpackagename)
-* [`./bin/run runtime:package:create PACKAGENAME`](#binrun-runtimepackagecreate-packagename)
-* [`./bin/run runtime:package:delete PACKAGENAME`](#binrun-runtimepackagedelete-packagename)
-* [`./bin/run runtime:package:get PACKAGENAME`](#binrun-runtimepackageget-packagename)
-* [`./bin/run runtime:package:list [NAMESPACE]`](#binrun-runtimepackagelist-namespace)
-* [`./bin/run runtime:package:update PACKAGENAME`](#binrun-runtimepackageupdate-packagename)
-* [`./bin/run runtime:property`](#binrun-runtimeproperty)
-* [`./bin/run runtime:property:get`](#binrun-runtimepropertyget)
-* [`./bin/run runtime:property:set`](#binrun-runtimepropertyset)
-* [`./bin/run runtime:property:unset`](#binrun-runtimepropertyunset)
-* [`./bin/run runtime:route`](#binrun-runtimeroute)
-* [`./bin/run runtime:route:create BASEPATH RELPATH APIVERB ACTION`](#binrun-runtimeroutecreate-basepath-relpath-apiverb-action)
-* [`./bin/run runtime:route:delete BASEPATHORAPINAME [RELPATH] [APIVERB]`](#binrun-runtimeroutedelete-basepathorapiname-relpath-apiverb)
-* [`./bin/run runtime:route:get BASEPATHORAPINAME`](#binrun-runtimerouteget-basepathorapiname)
-* [`./bin/run runtime:route:list [BASEPATH] [RELPATH] [APIVERB]`](#binrun-runtimeroutelist-basepath-relpath-apiverb)
-* [`./bin/run runtime:rule`](#binrun-runtimerule)
-* [`./bin/run runtime:rule:create NAME TRIGGER ACTION`](#binrun-runtimerulecreate-name-trigger-action)
-* [`./bin/run runtime:rule:delete NAME`](#binrun-runtimeruledelete-name)
-* [`./bin/run runtime:rule:disable NAME`](#binrun-runtimeruledisable-name)
-* [`./bin/run runtime:rule:enable NAME`](#binrun-runtimeruleenable-name)
-* [`./bin/run runtime:rule:get NAME`](#binrun-runtimeruleget-name)
-* [`./bin/run runtime:rule:list`](#binrun-runtimerulelist)
-* [`./bin/run runtime:rule:status NAME`](#binrun-runtimerulestatus-name)
-* [`./bin/run runtime:rule:update NAME TRIGGER ACTION`](#binrun-runtimeruleupdate-name-trigger-action)
-* [`./bin/run runtime:trigger`](#binrun-runtimetrigger)
-* [`./bin/run runtime:trigger:create TRIGGERNAME`](#binrun-runtimetriggercreate-triggername)
-* [`./bin/run runtime:trigger:delete TRIGGERPATH`](#binrun-runtimetriggerdelete-triggerpath)
-* [`./bin/run runtime:trigger:fire TRIGGERNAME`](#binrun-runtimetriggerfire-triggername)
-* [`./bin/run runtime:trigger:get TRIGGERPATH`](#binrun-runtimetriggerget-triggerpath)
-* [`./bin/run runtime:trigger:list`](#binrun-runtimetriggerlist)
-* [`./bin/run runtime:trigger:update TRIGGERNAME`](#binrun-runtimetriggerupdate-triggername)
+* [`aio runtime`](#aio-runtime)
+* [`aio runtime:action`](#aio-runtimeaction)
+* [`aio runtime:action:create ACTIONNAME [ACTIONPATH]`](#aio-runtimeactioncreate-actionname-actionpath)
+* [`aio runtime:action:delete ACTIONNAME`](#aio-runtimeactiondelete-actionname)
+* [`aio runtime:action:get ACTIONNAME`](#aio-runtimeactionget-actionname)
+* [`aio runtime:action:invoke ACTIONNAME`](#aio-runtimeactioninvoke-actionname)
+* [`aio runtime:action:list [PACKAGENAME]`](#aio-runtimeactionlist-packagename)
+* [`aio runtime:action:update ACTIONNAME [ACTIONPATH]`](#aio-runtimeactionupdate-actionname-actionpath)
+* [`aio runtime:activation`](#aio-runtimeactivation)
+* [`aio runtime:activation:get [ACTIVATIONID]`](#aio-runtimeactivationget-activationid)
+* [`aio runtime:activation:list [ACTIVATIONID]`](#aio-runtimeactivationlist-activationid)
+* [`aio runtime:activation:logs [ACTIVATIONID]`](#aio-runtimeactivationlogs-activationid)
+* [`aio runtime:activation:result [ACTIVATIONID]`](#aio-runtimeactivationresult-activationid)
+* [`aio runtime:deploy`](#aio-runtimedeploy)
+* [`aio runtime:deploy:export`](#aio-runtimedeployexport)
+* [`aio runtime:deploy:report`](#aio-runtimedeployreport)
+* [`aio runtime:deploy:sync`](#aio-runtimedeploysync)
+* [`aio runtime:deploy:undeploy`](#aio-runtimedeployundeploy)
+* [`aio runtime:deploy:version`](#aio-runtimedeployversion)
+* [`aio runtime:namespace`](#aio-runtimenamespace)
+* [`aio runtime:namespace:get`](#aio-runtimenamespaceget)
+* [`aio runtime:namespace:list`](#aio-runtimenamespacelist)
+* [`aio runtime:package`](#aio-runtimepackage)
+* [`aio runtime:package:bind PACKAGENAME BINDPACKAGENAME`](#aio-runtimepackagebind-packagename-bindpackagename)
+* [`aio runtime:package:create PACKAGENAME`](#aio-runtimepackagecreate-packagename)
+* [`aio runtime:package:delete PACKAGENAME`](#aio-runtimepackagedelete-packagename)
+* [`aio runtime:package:get PACKAGENAME`](#aio-runtimepackageget-packagename)
+* [`aio runtime:package:list [NAMESPACE]`](#aio-runtimepackagelist-namespace)
+* [`aio runtime:package:update PACKAGENAME`](#aio-runtimepackageupdate-packagename)
+* [`aio runtime:property`](#aio-runtimeproperty)
+* [`aio runtime:property:get`](#aio-runtimepropertyget)
+* [`aio runtime:property:set`](#aio-runtimepropertyset)
+* [`aio runtime:property:unset`](#aio-runtimepropertyunset)
+* [`aio runtime:route`](#aio-runtimeroute)
+* [`aio runtime:route:create BASEPATH RELPATH APIVERB ACTION`](#aio-runtimeroutecreate-basepath-relpath-apiverb-action)
+* [`aio runtime:route:delete BASEPATHORAPINAME [RELPATH] [APIVERB]`](#aio-runtimeroutedelete-basepathorapiname-relpath-apiverb)
+* [`aio runtime:route:get BASEPATHORAPINAME`](#aio-runtimerouteget-basepathorapiname)
+* [`aio runtime:route:list [BASEPATH] [RELPATH] [APIVERB]`](#aio-runtimeroutelist-basepath-relpath-apiverb)
+* [`aio runtime:rule`](#aio-runtimerule)
+* [`aio runtime:rule:create NAME TRIGGER ACTION`](#aio-runtimerulecreate-name-trigger-action)
+* [`aio runtime:rule:delete NAME`](#aio-runtimeruledelete-name)
+* [`aio runtime:rule:disable NAME`](#aio-runtimeruledisable-name)
+* [`aio runtime:rule:enable NAME`](#aio-runtimeruleenable-name)
+* [`aio runtime:rule:get NAME`](#aio-runtimeruleget-name)
+* [`aio runtime:rule:list`](#aio-runtimerulelist)
+* [`aio runtime:rule:status NAME`](#aio-runtimerulestatus-name)
+* [`aio runtime:rule:update NAME TRIGGER ACTION`](#aio-runtimeruleupdate-name-trigger-action)
+* [`aio runtime:trigger`](#aio-runtimetrigger)
+* [`aio runtime:trigger:create TRIGGERNAME`](#aio-runtimetriggercreate-triggername)
+* [`aio runtime:trigger:delete TRIGGERPATH`](#aio-runtimetriggerdelete-triggerpath)
+* [`aio runtime:trigger:fire TRIGGERNAME`](#aio-runtimetriggerfire-triggername)
+* [`aio runtime:trigger:get TRIGGERPATH`](#aio-runtimetriggerget-triggerpath)
+* [`aio runtime:trigger:list`](#aio-runtimetriggerlist)
+* [`aio runtime:trigger:update TRIGGERNAME`](#aio-runtimetriggerupdate-triggername)
 
-## `./bin/run runtime`
+## `aio runtime`
 
 Execute runtime commands
 
 ```
 USAGE
-  $ ./bin/run runtime
+  $ aio runtime
 
 OPTIONS
   -i, --insecure           bypass certificate check
@@ -121,18 +116,18 @@ OPTIONS
   --version                Show version
 
 ALIASES
-  $ ./bin/run rt
+  $ aio rt
 ```
 
 _See code: [src/commands/runtime/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/1.7.3/src/commands/runtime/index.js)_
 
-## `./bin/run runtime:action`
+## `aio runtime:action`
 
 Manage your actions
 
 ```
 USAGE
-  $ ./bin/run runtime:action
+  $ aio runtime:action
 
 OPTIONS
   -i, --insecure           bypass certificate check
@@ -147,18 +142,18 @@ OPTIONS
   --version                Show version
 
 ALIASES
-  $ ./bin/run rt:action
+  $ aio rt:action
 ```
 
 _See code: [src/commands/runtime/action/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/1.7.3/src/commands/runtime/action/index.js)_
 
-## `./bin/run runtime:action:create ACTIONNAME [ACTIONPATH]`
+## `aio runtime:action:create ACTIONNAME [ACTIONPATH]`
 
 Creates an Action
 
 ```
 USAGE
-  $ ./bin/run runtime:action:create ACTIONNAME [ACTIONPATH]
+  $ aio runtime:action:create ACTIONNAME [ACTIONPATH]
 
 OPTIONS
   -A, --annotation-file=annotation-file  FILE containing annotation values in JSON format
@@ -209,18 +204,18 @@ OPTIONS
   --web=true|yes|false|no|raw            treat ACTION as a web action or as a raw HTTP web action
 
 ALIASES
-  $ ./bin/run rt:action:create
+  $ aio rt:action:create
 ```
 
 _See code: [src/commands/runtime/action/create.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/1.7.3/src/commands/runtime/action/create.js)_
 
-## `./bin/run runtime:action:delete ACTIONNAME`
+## `aio runtime:action:delete ACTIONNAME`
 
 Deletes an Action
 
 ```
 USAGE
-  $ ./bin/run runtime:action:delete ACTIONNAME
+  $ aio runtime:action:delete ACTIONNAME
 
 OPTIONS
   -i, --insecure           bypass certificate check
@@ -236,20 +231,20 @@ OPTIONS
   --version                Show version
 
 ALIASES
-  $ ./bin/run runtime:action:del
-  $ ./bin/run rt:action:delete
-  $ ./bin/run rt:action:del
+  $ aio runtime:action:del
+  $ aio rt:action:delete
+  $ aio rt:action:del
 ```
 
 _See code: [src/commands/runtime/action/delete.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/1.7.3/src/commands/runtime/action/delete.js)_
 
-## `./bin/run runtime:action:get ACTIONNAME`
+## `aio runtime:action:get ACTIONNAME`
 
 Retrieves an Action
 
 ```
 USAGE
-  $ ./bin/run runtime:action:get ACTIONNAME
+  $ aio runtime:action:get ACTIONNAME
 
 OPTIONS
   -i, --insecure           bypass certificate check
@@ -267,18 +262,18 @@ OPTIONS
   --version                Show version
 
 ALIASES
-  $ ./bin/run rt:action:get
+  $ aio rt:action:get
 ```
 
 _See code: [src/commands/runtime/action/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/1.7.3/src/commands/runtime/action/get.js)_
 
-## `./bin/run runtime:action:invoke ACTIONNAME`
+## `aio runtime:action:invoke ACTIONNAME`
 
 Invokes an Action
 
 ```
 USAGE
-  $ ./bin/run runtime:action:invoke ACTIONNAME
+  $ aio runtime:action:invoke ACTIONNAME
 
 OPTIONS
   -P, --param-file=param-file  FILE containing parameter values in JSON format
@@ -297,18 +292,18 @@ OPTIONS
   --version                    Show version
 
 ALIASES
-  $ ./bin/run rt:action:invoke
+  $ aio rt:action:invoke
 ```
 
 _See code: [src/commands/runtime/action/invoke.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/1.7.3/src/commands/runtime/action/invoke.js)_
 
-## `./bin/run runtime:action:list [PACKAGENAME]`
+## `aio runtime:action:list [PACKAGENAME]`
 
 Lists all the Actions
 
 ```
 USAGE
-  $ ./bin/run runtime:action:list [PACKAGENAME]
+  $ aio runtime:action:list [PACKAGENAME]
 
 OPTIONS
   -i, --insecure           bypass certificate check
@@ -328,24 +323,24 @@ OPTIONS
   --version                Show version
 
 ALIASES
-  $ ./bin/run runtime:action:ls
-  $ ./bin/run runtime:actions:list
-  $ ./bin/run runtime:actions:ls
-  $ ./bin/run rt:action:list
-  $ ./bin/run rt:actions:list
-  $ ./bin/run rt:action:ls
-  $ ./bin/run rt:actions:ls
+  $ aio runtime:action:ls
+  $ aio runtime:actions:list
+  $ aio runtime:actions:ls
+  $ aio rt:action:list
+  $ aio rt:actions:list
+  $ aio rt:action:ls
+  $ aio rt:actions:ls
 ```
 
 _See code: [src/commands/runtime/action/list.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/1.7.3/src/commands/runtime/action/list.js)_
 
-## `./bin/run runtime:action:update ACTIONNAME [ACTIONPATH]`
+## `aio runtime:action:update ACTIONNAME [ACTIONPATH]`
 
 Updates an Action
 
 ```
 USAGE
-  $ ./bin/run runtime:action:update ACTIONNAME [ACTIONPATH]
+  $ aio runtime:action:update ACTIONNAME [ACTIONPATH]
 
 OPTIONS
   -A, --annotation-file=annotation-file  FILE containing annotation values in JSON format
@@ -396,18 +391,18 @@ OPTIONS
   --web=true|yes|false|no|raw            treat ACTION as a web action or as a raw HTTP web action
 
 ALIASES
-  $ ./bin/run rt:action:update
+  $ aio rt:action:update
 ```
 
 _See code: [src/commands/runtime/action/update.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/1.7.3/src/commands/runtime/action/update.js)_
 
-## `./bin/run runtime:activation`
+## `aio runtime:activation`
 
 Manage your activations
 
 ```
 USAGE
-  $ ./bin/run runtime:activation
+  $ aio runtime:activation
 
 OPTIONS
   -i, --insecure           bypass certificate check
@@ -422,18 +417,18 @@ OPTIONS
   --version                Show version
 
 ALIASES
-  $ ./bin/run rt:activation
+  $ aio rt:activation
 ```
 
 _See code: [src/commands/runtime/activation/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/1.7.3/src/commands/runtime/activation/index.js)_
 
-## `./bin/run runtime:activation:get [ACTIVATIONID]`
+## `aio runtime:activation:get [ACTIVATIONID]`
 
 Retrieves an Activation
 
 ```
 USAGE
-  $ ./bin/run runtime:activation:get [ACTIVATIONID]
+  $ aio runtime:activation:get [ACTIVATIONID]
 
 OPTIONS
   -g, --logs               emit only the logs, stripped of time stamps and stream identifier
@@ -450,18 +445,18 @@ OPTIONS
   --version                Show version
 
 ALIASES
-  $ ./bin/run rt:activation:get
+  $ aio rt:activation:get
 ```
 
 _See code: [src/commands/runtime/activation/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/1.7.3/src/commands/runtime/activation/get.js)_
 
-## `./bin/run runtime:activation:list [ACTIVATIONID]`
+## `aio runtime:activation:list [ACTIVATIONID]`
 
 Lists all the Activations
 
 ```
 USAGE
-  $ ./bin/run runtime:activation:list [ACTIVATIONID]
+  $ aio runtime:activation:list [ACTIVATIONID]
 
 OPTIONS
   -f, --full               include full activation description
@@ -499,24 +494,24 @@ OPTIONS
   --version                Show version
 
 ALIASES
-  $ ./bin/run runtime:activations:list
-  $ ./bin/run runtime:activation:ls
-  $ ./bin/run runtime:activations:ls
-  $ ./bin/run rt:activation:list
-  $ ./bin/run rt:activation:ls
-  $ ./bin/run rt:activations:list
-  $ ./bin/run rt:activations:ls
+  $ aio runtime:activations:list
+  $ aio runtime:activation:ls
+  $ aio runtime:activations:ls
+  $ aio rt:activation:list
+  $ aio rt:activation:ls
+  $ aio rt:activations:list
+  $ aio rt:activations:ls
 ```
 
 _See code: [src/commands/runtime/activation/list.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/1.7.3/src/commands/runtime/activation/list.js)_
 
-## `./bin/run runtime:activation:logs [ACTIVATIONID]`
+## `aio runtime:activation:logs [ACTIVATIONID]`
 
 Retrieves the Logs for an Activation
 
 ```
 USAGE
-  $ ./bin/run runtime:activation:logs [ACTIVATIONID]
+  $ aio runtime:activation:logs [ACTIVATIONID]
 
 OPTIONS
   -c, --count=count        [default: 1] used with --last, return the last `count` activation logs. Max 5
@@ -534,24 +529,24 @@ OPTIONS
   --version                Show version
 
 ALIASES
-  $ ./bin/run runtime:activation:log
-  $ ./bin/run runtime:log
-  $ ./bin/run runtime:logs
-  $ ./bin/run rt:activation:logs
-  $ ./bin/run rt:activation:log
-  $ ./bin/run rt:log
-  $ ./bin/run rt:logs
+  $ aio runtime:activation:log
+  $ aio runtime:log
+  $ aio runtime:logs
+  $ aio rt:activation:logs
+  $ aio rt:activation:log
+  $ aio rt:log
+  $ aio rt:logs
 ```
 
 _See code: [src/commands/runtime/activation/logs.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/1.7.3/src/commands/runtime/activation/logs.js)_
 
-## `./bin/run runtime:activation:result [ACTIVATIONID]`
+## `aio runtime:activation:result [ACTIVATIONID]`
 
 Retrieves the Results for an Activation
 
 ```
 USAGE
-  $ ./bin/run runtime:activation:result [ACTIVATIONID]
+  $ aio runtime:activation:result [ACTIVATIONID]
 
 OPTIONS
   -i, --insecure           bypass certificate check
@@ -567,18 +562,18 @@ OPTIONS
   --version                Show version
 
 ALIASES
-  $ ./bin/run rt:activation:result
+  $ aio rt:activation:result
 ```
 
 _See code: [src/commands/runtime/activation/result.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/1.7.3/src/commands/runtime/activation/result.js)_
 
-## `./bin/run runtime:deploy`
+## `aio runtime:deploy`
 
 The Runtime Deployment Tool
 
 ```
 USAGE
-  $ ./bin/run runtime:deploy
+  $ aio runtime:deploy
 
 OPTIONS
   -P, --param-file=param-file  FILE containing parameter values in JSON format
@@ -597,18 +592,18 @@ OPTIONS
   --version                    Show version
 
 ALIASES
-  $ ./bin/run rt:deploy
+  $ aio rt:deploy
 ```
 
 _See code: [src/commands/runtime/deploy/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/1.7.3/src/commands/runtime/deploy/index.js)_
 
-## `./bin/run runtime:deploy:export`
+## `aio runtime:deploy:export`
 
 Exports managed project assets from Runtime to manifest and function files
 
 ```
 USAGE
-  $ ./bin/run runtime:deploy:export
+  $ aio runtime:deploy:export
 
 OPTIONS
   -i, --insecure             bypass certificate check
@@ -625,18 +620,18 @@ OPTIONS
   --version                  Show version
 
 ALIASES
-  $ ./bin/run rt:deploy:export
+  $ aio rt:deploy:export
 ```
 
 _See code: [src/commands/runtime/deploy/export.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/1.7.3/src/commands/runtime/deploy/export.js)_
 
-## `./bin/run runtime:deploy:report`
+## `aio runtime:deploy:report`
 
 Provides a summary report of Runtime assets being deployed/undeployed based on manifest/deployment YAML
 
 ```
 USAGE
-  $ ./bin/run runtime:deploy:report
+  $ aio runtime:deploy:report
 
 OPTIONS
   -d, --deployment=deployment  the deployment file location
@@ -653,18 +648,18 @@ OPTIONS
   --version                    Show version
 
 ALIASES
-  $ ./bin/run rt:deploy:report
+  $ aio rt:deploy:report
 ```
 
 _See code: [src/commands/runtime/deploy/report.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/1.7.3/src/commands/runtime/deploy/report.js)_
 
-## `./bin/run runtime:deploy:sync`
+## `aio runtime:deploy:sync`
 
 A tool to sync deployment and undeployment of Runtime packages using a manifest and optional deployment files using YAML
 
 ```
 USAGE
-  $ ./bin/run runtime:deploy:sync
+  $ aio runtime:deploy:sync
 
 OPTIONS
   -d, --deployment=deployment  the path to the deployment file
@@ -681,18 +676,18 @@ OPTIONS
   --version                    Show version
 
 ALIASES
-  $ ./bin/run rt:deploy:sync
+  $ aio rt:deploy:sync
 ```
 
 _See code: [src/commands/runtime/deploy/sync.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/1.7.3/src/commands/runtime/deploy/sync.js)_
 
-## `./bin/run runtime:deploy:undeploy`
+## `aio runtime:deploy:undeploy`
 
 Undeploy removes Runtime assets which were deployed from the manifest and deployment YAML
 
 ```
 USAGE
-  $ ./bin/run runtime:deploy:undeploy
+  $ aio runtime:deploy:undeploy
 
 OPTIONS
   -i, --insecure             bypass certificate check
@@ -709,18 +704,18 @@ OPTIONS
   --version                  Show version
 
 ALIASES
-  $ ./bin/run rt:deploy:undeploy
+  $ aio rt:deploy:undeploy
 ```
 
 _See code: [src/commands/runtime/deploy/undeploy.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/1.7.3/src/commands/runtime/deploy/undeploy.js)_
 
-## `./bin/run runtime:deploy:version`
+## `aio runtime:deploy:version`
 
 Prints the version number of aio runtime deploy
 
 ```
 USAGE
-  $ ./bin/run runtime:deploy:version
+  $ aio runtime:deploy:version
 
 OPTIONS
   -i, --insecure           bypass certificate check
@@ -735,18 +730,18 @@ OPTIONS
   --version                Show version
 
 ALIASES
-  $ ./bin/run rt:deploy:version
+  $ aio rt:deploy:version
 ```
 
 _See code: [src/commands/runtime/deploy/version.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/1.7.3/src/commands/runtime/deploy/version.js)_
 
-## `./bin/run runtime:namespace`
+## `aio runtime:namespace`
 
 Manage your namespaces
 
 ```
 USAGE
-  $ ./bin/run runtime:namespace
+  $ aio runtime:namespace
 
 OPTIONS
   -i, --insecure           bypass certificate check
@@ -761,20 +756,20 @@ OPTIONS
   --version                Show version
 
 ALIASES
-  $ ./bin/run runtime:ns
-  $ ./bin/run rt:namespace
-  $ ./bin/run rt:ns
+  $ aio runtime:ns
+  $ aio rt:namespace
+  $ aio rt:ns
 ```
 
 _See code: [src/commands/runtime/namespace/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/1.7.3/src/commands/runtime/namespace/index.js)_
 
-## `./bin/run runtime:namespace:get`
+## `aio runtime:namespace:get`
 
 Get triggers, actions, and rules in the registry for namespace
 
 ```
 USAGE
-  $ ./bin/run runtime:namespace:get
+  $ aio runtime:namespace:get
 
 OPTIONS
   -i, --insecure           bypass certificate check
@@ -792,22 +787,22 @@ OPTIONS
   --version                Show version
 
 ALIASES
-  $ ./bin/run rt:get
-  $ ./bin/run runtime:list
-  $ ./bin/run rt:list
-  $ ./bin/run runtime:ls
-  $ ./bin/run rt:ls
+  $ aio rt:get
+  $ aio runtime:list
+  $ aio rt:list
+  $ aio runtime:ls
+  $ aio rt:ls
 ```
 
 _See code: [src/commands/runtime/namespace/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/1.7.3/src/commands/runtime/namespace/get.js)_
 
-## `./bin/run runtime:namespace:list`
+## `aio runtime:namespace:list`
 
 Lists all of your namespaces for Adobe I/O Runtime
 
 ```
 USAGE
-  $ ./bin/run runtime:namespace:list
+  $ aio runtime:namespace:list
 
 OPTIONS
   -i, --insecure           bypass certificate check
@@ -823,24 +818,24 @@ OPTIONS
   --version                Show version
 
 ALIASES
-  $ ./bin/run runtime:namespace:ls
-  $ ./bin/run runtime:ns:list
-  $ ./bin/run runtime:ns:ls
-  $ ./bin/run rt:namespace:list
-  $ ./bin/run rt:namespace:ls
-  $ ./bin/run rt:ns:list
-  $ ./bin/run rt:ns:ls
+  $ aio runtime:namespace:ls
+  $ aio runtime:ns:list
+  $ aio runtime:ns:ls
+  $ aio rt:namespace:list
+  $ aio rt:namespace:ls
+  $ aio rt:ns:list
+  $ aio rt:ns:ls
 ```
 
 _See code: [src/commands/runtime/namespace/list.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/1.7.3/src/commands/runtime/namespace/list.js)_
 
-## `./bin/run runtime:package`
+## `aio runtime:package`
 
 Manage your packages
 
 ```
 USAGE
-  $ ./bin/run runtime:package
+  $ aio runtime:package
 
 OPTIONS
   -i, --insecure           bypass certificate check
@@ -855,20 +850,20 @@ OPTIONS
   --version                Show version
 
 ALIASES
-  $ ./bin/run runtime:pkg
-  $ ./bin/run rt:package
-  $ ./bin/run rt:pkg
+  $ aio runtime:pkg
+  $ aio rt:package
+  $ aio rt:pkg
 ```
 
 _See code: [src/commands/runtime/package/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/1.7.3/src/commands/runtime/package/index.js)_
 
-## `./bin/run runtime:package:bind PACKAGENAME BINDPACKAGENAME`
+## `aio runtime:package:bind PACKAGENAME BINDPACKAGENAME`
 
 Bind parameters to a package
 
 ```
 USAGE
-  $ ./bin/run runtime:package:bind PACKAGENAME BINDPACKAGENAME
+  $ aio runtime:package:bind PACKAGENAME BINDPACKAGENAME
 
 OPTIONS
   -A, --annotation-file=annotation-file  FILE containing annotation values in JSON format
@@ -888,20 +883,20 @@ OPTIONS
   --version                              Show version
 
 ALIASES
-  $ ./bin/run runtime:pkg:bind
-  $ ./bin/run rt:package:bind
-  $ ./bin/run rt:pkg:bind
+  $ aio runtime:pkg:bind
+  $ aio rt:package:bind
+  $ aio rt:pkg:bind
 ```
 
 _See code: [src/commands/runtime/package/bind.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/1.7.3/src/commands/runtime/package/bind.js)_
 
-## `./bin/run runtime:package:create PACKAGENAME`
+## `aio runtime:package:create PACKAGENAME`
 
 Creates a Package
 
 ```
 USAGE
-  $ ./bin/run runtime:package:create PACKAGENAME
+  $ aio runtime:package:create PACKAGENAME
 
 OPTIONS
   -A, --annotation-file=annotation-file  FILE containing annotation values in JSON format
@@ -922,39 +917,39 @@ OPTIONS
   --version                              Show version
 
 ALIASES
-  $ ./bin/run runtime:pkg:create
-  $ ./bin/run rt:package:create
-  $ ./bin/run rt:pkg:create
+  $ aio runtime:pkg:create
+  $ aio rt:package:create
+  $ aio rt:pkg:create
 ```
 
 _See code: [src/commands/runtime/package/create.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/1.7.3/src/commands/runtime/package/create.js)_
 
-## `./bin/run runtime:package:delete PACKAGENAME`
+## `aio runtime:package:delete PACKAGENAME`
 
 Deletes a Package
 
 ```
 USAGE
-  $ ./bin/run runtime:package:delete PACKAGENAME
+  $ aio runtime:package:delete PACKAGENAME
 
 OPTIONS
   --json  output raw json
 
 ALIASES
-  $ ./bin/run runtime:pkg:delete
-  $ ./bin/run rt:package:delete
-  $ ./bin/run rt:pkg:delete
+  $ aio runtime:pkg:delete
+  $ aio rt:package:delete
+  $ aio rt:pkg:delete
 ```
 
 _See code: [src/commands/runtime/package/delete.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/1.7.3/src/commands/runtime/package/delete.js)_
 
-## `./bin/run runtime:package:get PACKAGENAME`
+## `aio runtime:package:get PACKAGENAME`
 
 Retrieves a Package
 
 ```
 USAGE
-  $ ./bin/run runtime:package:get PACKAGENAME
+  $ aio runtime:package:get PACKAGENAME
 
 OPTIONS
   -i, --insecure           bypass certificate check
@@ -969,20 +964,20 @@ OPTIONS
   --version                Show version
 
 ALIASES
-  $ ./bin/run runtime:pkg:get
-  $ ./bin/run rt:package:get
-  $ ./bin/run rt:pkg:get
+  $ aio runtime:pkg:get
+  $ aio rt:package:get
+  $ aio rt:pkg:get
 ```
 
 _See code: [src/commands/runtime/package/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/1.7.3/src/commands/runtime/package/get.js)_
 
-## `./bin/run runtime:package:list [NAMESPACE]`
+## `aio runtime:package:list [NAMESPACE]`
 
 Lists all the Packages
 
 ```
 USAGE
-  $ ./bin/run runtime:package:list [NAMESPACE]
+  $ aio runtime:package:list [NAMESPACE]
 
 OPTIONS
   -i, --insecure           bypass certificate check
@@ -1002,24 +997,24 @@ OPTIONS
   --version                Show version
 
 ALIASES
-  $ ./bin/run runtime:package:ls
-  $ ./bin/run runtime:pkg:list
-  $ ./bin/run runtime:pkg:ls
-  $ ./bin/run rt:package:list
-  $ ./bin/run rt:package:ls
-  $ ./bin/run rt:pkg:list
-  $ ./bin/run rt:pkg:ls
+  $ aio runtime:package:ls
+  $ aio runtime:pkg:list
+  $ aio runtime:pkg:ls
+  $ aio rt:package:list
+  $ aio rt:package:ls
+  $ aio rt:pkg:list
+  $ aio rt:pkg:ls
 ```
 
 _See code: [src/commands/runtime/package/list.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/1.7.3/src/commands/runtime/package/list.js)_
 
-## `./bin/run runtime:package:update PACKAGENAME`
+## `aio runtime:package:update PACKAGENAME`
 
 Updates a Package
 
 ```
 USAGE
-  $ ./bin/run runtime:package:update PACKAGENAME
+  $ aio runtime:package:update PACKAGENAME
 
 OPTIONS
   -A, --annotation-file=annotation-file  FILE containing annotation values in JSON format
@@ -1040,20 +1035,20 @@ OPTIONS
   --version                              Show version
 
 ALIASES
-  $ ./bin/run runtime:pkg:update
-  $ ./bin/run rt:package:update
-  $ ./bin/run rt:pkg:update
+  $ aio runtime:pkg:update
+  $ aio rt:package:update
+  $ aio rt:pkg:update
 ```
 
 _See code: [src/commands/runtime/package/update.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/1.7.3/src/commands/runtime/package/update.js)_
 
-## `./bin/run runtime:property`
+## `aio runtime:property`
 
 Execute property commands
 
 ```
 USAGE
-  $ ./bin/run runtime:property
+  $ aio runtime:property
 
 OPTIONS
   -i, --insecure  bypass certificate check
@@ -1068,20 +1063,20 @@ OPTIONS
   --version       Show version
 
 ALIASES
-  $ ./bin/run runtime:prop
-  $ ./bin/run rt:prop
-  $ ./bin/run rt:property
+  $ aio runtime:prop
+  $ aio rt:prop
+  $ aio rt:property
 ```
 
 _See code: [src/commands/runtime/property/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/1.7.3/src/commands/runtime/property/index.js)_
 
-## `./bin/run runtime:property:get`
+## `aio runtime:property:get`
 
 get property
 
 ```
 USAGE
-  $ ./bin/run runtime:property:get
+  $ aio runtime:property:get
 
 OPTIONS
   -i, --insecure  bypass certificate check
@@ -1101,20 +1096,20 @@ OPTIONS
   --version       Show version
 
 ALIASES
-  $ ./bin/run runtime:prop:get
-  $ ./bin/run rt:property:get
-  $ ./bin/run rt:prop:get
+  $ aio runtime:prop:get
+  $ aio rt:property:get
+  $ aio rt:prop:get
 ```
 
 _See code: [src/commands/runtime/property/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/1.7.3/src/commands/runtime/property/get.js)_
 
-## `./bin/run runtime:property:set`
+## `aio runtime:property:set`
 
 set property
 
 ```
 USAGE
-  $ ./bin/run runtime:property:set
+  $ aio runtime:property:set
 
 OPTIONS
   -i, --insecure         bypass certificate check
@@ -1130,20 +1125,20 @@ OPTIONS
   --version              Show version
 
 ALIASES
-  $ ./bin/run runtime:prop:set
-  $ ./bin/run rt:property:set
-  $ ./bin/run rt:prop:set
+  $ aio runtime:prop:set
+  $ aio rt:property:set
+  $ aio rt:prop:set
 ```
 
 _See code: [src/commands/runtime/property/set.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/1.7.3/src/commands/runtime/property/set.js)_
 
-## `./bin/run runtime:property:unset`
+## `aio runtime:property:unset`
 
 unset property
 
 ```
 USAGE
-  $ ./bin/run runtime:property:unset
+  $ aio runtime:property:unset
 
 OPTIONS
   -i, --insecure  bypass certificate check
@@ -1159,20 +1154,20 @@ OPTIONS
   --version       Show version
 
 ALIASES
-  $ ./bin/run runtime:prop:unset
-  $ ./bin/run rt:property:unset
-  $ ./bin/run rt:prop:unset
+  $ aio runtime:prop:unset
+  $ aio rt:property:unset
+  $ aio rt:prop:unset
 ```
 
 _See code: [src/commands/runtime/property/unset.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/1.7.3/src/commands/runtime/property/unset.js)_
 
-## `./bin/run runtime:route`
+## `aio runtime:route`
 
 Manage your routes
 
 ```
 USAGE
-  $ ./bin/run runtime:route
+  $ aio runtime:route
 
 OPTIONS
   -i, --insecure  bypass certificate check
@@ -1187,19 +1182,19 @@ OPTIONS
   --version       Show version
 
 ALIASES
-  $ ./bin/run runtime:api
-  $ ./bin/run rt:api
+  $ aio runtime:api
+  $ aio rt:api
 ```
 
 _See code: [src/commands/runtime/route/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/1.7.3/src/commands/runtime/route/index.js)_
 
-## `./bin/run runtime:route:create BASEPATH RELPATH APIVERB ACTION`
+## `aio runtime:route:create BASEPATH RELPATH APIVERB ACTION`
 
 create a new api route
 
 ```
 USAGE
-  $ ./bin/run runtime:route:create BASEPATH RELPATH APIVERB ACTION
+  $ aio runtime:route:create BASEPATH RELPATH APIVERB ACTION
 
 ARGUMENTS
   BASEPATH  The base path of the api
@@ -1234,20 +1229,20 @@ OPTIONS
   --version                                         Show version
 
 ALIASES
-  $ ./bin/run runtime:api:create
-  $ ./bin/run rt:route:create
-  $ ./bin/run rt:api:create
+  $ aio runtime:api:create
+  $ aio rt:route:create
+  $ aio rt:api:create
 ```
 
 _See code: [src/commands/runtime/route/create.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/1.7.3/src/commands/runtime/route/create.js)_
 
-## `./bin/run runtime:route:delete BASEPATHORAPINAME [RELPATH] [APIVERB]`
+## `aio runtime:route:delete BASEPATHORAPINAME [RELPATH] [APIVERB]`
 
 delete an API
 
 ```
 USAGE
-  $ ./bin/run runtime:route:delete BASEPATHORAPINAME [RELPATH] [APIVERB]
+  $ aio runtime:route:delete BASEPATHORAPINAME [RELPATH] [APIVERB]
 
 ARGUMENTS
   BASEPATHORAPINAME  The base path or api name
@@ -1267,20 +1262,20 @@ OPTIONS
   --version       Show version
 
 ALIASES
-  $ ./bin/run runtime:api:delete
-  $ ./bin/run rt:route:delete
-  $ ./bin/run rt:api:delete
+  $ aio runtime:api:delete
+  $ aio rt:route:delete
+  $ aio rt:api:delete
 ```
 
 _See code: [src/commands/runtime/route/delete.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/1.7.3/src/commands/runtime/route/delete.js)_
 
-## `./bin/run runtime:route:get BASEPATHORAPINAME`
+## `aio runtime:route:get BASEPATHORAPINAME`
 
 get API details
 
 ```
 USAGE
-  $ ./bin/run runtime:route:get BASEPATHORAPINAME
+  $ aio runtime:route:get BASEPATHORAPINAME
 
 ARGUMENTS
   BASEPATHORAPINAME  The base path or api name
@@ -1298,20 +1293,20 @@ OPTIONS
   --version       Show version
 
 ALIASES
-  $ ./bin/run runtime:api:get
-  $ ./bin/run rt:route:get
-  $ ./bin/run rt:api:get
+  $ aio runtime:api:get
+  $ aio rt:route:get
+  $ aio rt:api:get
 ```
 
 _See code: [src/commands/runtime/route/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/1.7.3/src/commands/runtime/route/get.js)_
 
-## `./bin/run runtime:route:list [BASEPATH] [RELPATH] [APIVERB]`
+## `aio runtime:route:list [BASEPATH] [RELPATH] [APIVERB]`
 
 list route/apis for Adobe I/O Runtime
 
 ```
 USAGE
-  $ ./bin/run runtime:route:list [BASEPATH] [RELPATH] [APIVERB]
+  $ aio runtime:route:list [BASEPATH] [RELPATH] [APIVERB]
 
 ARGUMENTS
   BASEPATH  The base path of the api
@@ -1334,24 +1329,24 @@ OPTIONS
   --version          Show version
 
 ALIASES
-  $ ./bin/run runtime:route:ls
-  $ ./bin/run runtime:api:list
-  $ ./bin/run runtime:api:ls
-  $ ./bin/run rt:route:list
-  $ ./bin/run rt:route:ls
-  $ ./bin/run rt:api:list
-  $ ./bin/run rt:api:ls
+  $ aio runtime:route:ls
+  $ aio runtime:api:list
+  $ aio runtime:api:ls
+  $ aio rt:route:list
+  $ aio rt:route:ls
+  $ aio rt:api:list
+  $ aio rt:api:ls
 ```
 
 _See code: [src/commands/runtime/route/list.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/1.7.3/src/commands/runtime/route/list.js)_
 
-## `./bin/run runtime:rule`
+## `aio runtime:rule`
 
 Manage your rules
 
 ```
 USAGE
-  $ ./bin/run runtime:rule
+  $ aio runtime:rule
 
 OPTIONS
   -i, --insecure  bypass certificate check
@@ -1366,18 +1361,18 @@ OPTIONS
   --version       Show version
 
 ALIASES
-  $ ./bin/run rt:rule
+  $ aio rt:rule
 ```
 
 _See code: [src/commands/runtime/rule/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/1.7.3/src/commands/runtime/rule/index.js)_
 
-## `./bin/run runtime:rule:create NAME TRIGGER ACTION`
+## `aio runtime:rule:create NAME TRIGGER ACTION`
 
 Create a Rule
 
 ```
 USAGE
-  $ ./bin/run runtime:rule:create NAME TRIGGER ACTION
+  $ aio runtime:rule:create NAME TRIGGER ACTION
 
 ARGUMENTS
   NAME     Name of the rule
@@ -1398,18 +1393,18 @@ OPTIONS
   --version       Show version
 
 ALIASES
-  $ ./bin/run rt:rule:create
+  $ aio rt:rule:create
 ```
 
 _See code: [src/commands/runtime/rule/create.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/1.7.3/src/commands/runtime/rule/create.js)_
 
-## `./bin/run runtime:rule:delete NAME`
+## `aio runtime:rule:delete NAME`
 
 Delete a Rule
 
 ```
 USAGE
-  $ ./bin/run runtime:rule:delete NAME
+  $ aio runtime:rule:delete NAME
 
 ARGUMENTS
   NAME  Name of the rule
@@ -1428,18 +1423,18 @@ OPTIONS
   --version       Show version
 
 ALIASES
-  $ ./bin/run rt:rule:delete
+  $ aio rt:rule:delete
 ```
 
 _See code: [src/commands/runtime/rule/delete.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/1.7.3/src/commands/runtime/rule/delete.js)_
 
-## `./bin/run runtime:rule:disable NAME`
+## `aio runtime:rule:disable NAME`
 
 Disable a Rule
 
 ```
 USAGE
-  $ ./bin/run runtime:rule:disable NAME
+  $ aio runtime:rule:disable NAME
 
 ARGUMENTS
   NAME  Name of the rule
@@ -1457,18 +1452,18 @@ OPTIONS
   --version       Show version
 
 ALIASES
-  $ ./bin/run rt:rule:disable
+  $ aio rt:rule:disable
 ```
 
 _See code: [src/commands/runtime/rule/disable.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/1.7.3/src/commands/runtime/rule/disable.js)_
 
-## `./bin/run runtime:rule:enable NAME`
+## `aio runtime:rule:enable NAME`
 
 Enable a Rule
 
 ```
 USAGE
-  $ ./bin/run runtime:rule:enable NAME
+  $ aio runtime:rule:enable NAME
 
 ARGUMENTS
   NAME  Name of the rule
@@ -1486,18 +1481,18 @@ OPTIONS
   --version       Show version
 
 ALIASES
-  $ ./bin/run rt:rule:enable
+  $ aio rt:rule:enable
 ```
 
 _See code: [src/commands/runtime/rule/enable.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/1.7.3/src/commands/runtime/rule/enable.js)_
 
-## `./bin/run runtime:rule:get NAME`
+## `aio runtime:rule:get NAME`
 
 Retrieves a Rule
 
 ```
 USAGE
-  $ ./bin/run runtime:rule:get NAME
+  $ aio runtime:rule:get NAME
 
 ARGUMENTS
   NAME  Name of the rule
@@ -1515,18 +1510,18 @@ OPTIONS
   --version       Show version
 
 ALIASES
-  $ ./bin/run rt:rule:get
+  $ aio rt:rule:get
 ```
 
 _See code: [src/commands/runtime/rule/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/1.7.3/src/commands/runtime/rule/get.js)_
 
-## `./bin/run runtime:rule:list`
+## `aio runtime:rule:list`
 
 Retrieves a list of Rules
 
 ```
 USAGE
-  $ ./bin/run runtime:rule:list
+  $ aio runtime:rule:list
 
 OPTIONS
   -i, --insecure     bypass certificate check
@@ -1546,20 +1541,20 @@ OPTIONS
   --version          Show version
 
 ALIASES
-  $ ./bin/run runtime:rule:ls
-  $ ./bin/run rt:rule:list
-  $ ./bin/run rt:rule:ls
+  $ aio runtime:rule:ls
+  $ aio rt:rule:list
+  $ aio rt:rule:ls
 ```
 
 _See code: [src/commands/runtime/rule/list.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/1.7.3/src/commands/runtime/rule/list.js)_
 
-## `./bin/run runtime:rule:status NAME`
+## `aio runtime:rule:status NAME`
 
 Gets the status of a rule
 
 ```
 USAGE
-  $ ./bin/run runtime:rule:status NAME
+  $ aio runtime:rule:status NAME
 
 ARGUMENTS
   NAME  Name of the rule
@@ -1577,18 +1572,18 @@ OPTIONS
   --version       Show version
 
 ALIASES
-  $ ./bin/run rt:rule:status
+  $ aio rt:rule:status
 ```
 
 _See code: [src/commands/runtime/rule/status.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/1.7.3/src/commands/runtime/rule/status.js)_
 
-## `./bin/run runtime:rule:update NAME TRIGGER ACTION`
+## `aio runtime:rule:update NAME TRIGGER ACTION`
 
 Update a Rule
 
 ```
 USAGE
-  $ ./bin/run runtime:rule:update NAME TRIGGER ACTION
+  $ aio runtime:rule:update NAME TRIGGER ACTION
 
 ARGUMENTS
   NAME     Name of the rule
@@ -1609,18 +1604,18 @@ OPTIONS
   --version       Show version
 
 ALIASES
-  $ ./bin/run rt:rule:update
+  $ aio rt:rule:update
 ```
 
 _See code: [src/commands/runtime/rule/update.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/1.7.3/src/commands/runtime/rule/update.js)_
 
-## `./bin/run runtime:trigger`
+## `aio runtime:trigger`
 
 Manage your triggers
 
 ```
 USAGE
-  $ ./bin/run runtime:trigger
+  $ aio runtime:trigger
 
 OPTIONS
   -i, --insecure  bypass certificate check
@@ -1635,18 +1630,18 @@ OPTIONS
   --version       Show version
 
 ALIASES
-  $ ./bin/run rt:trigger
+  $ aio rt:trigger
 ```
 
 _See code: [src/commands/runtime/trigger/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/1.7.3/src/commands/runtime/trigger/index.js)_
 
-## `./bin/run runtime:trigger:create TRIGGERNAME`
+## `aio runtime:trigger:create TRIGGERNAME`
 
 Create a trigger for Adobe I/O Runtime
 
 ```
 USAGE
-  $ ./bin/run runtime:trigger:create TRIGGERNAME
+  $ aio runtime:trigger:create TRIGGERNAME
 
 ARGUMENTS
   TRIGGERNAME  The name of the trigger
@@ -1668,18 +1663,18 @@ OPTIONS
   --version                              Show version
 
 ALIASES
-  $ ./bin/run rt:trigger:create
+  $ aio rt:trigger:create
 ```
 
 _See code: [src/commands/runtime/trigger/create.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/1.7.3/src/commands/runtime/trigger/create.js)_
 
-## `./bin/run runtime:trigger:delete TRIGGERPATH`
+## `aio runtime:trigger:delete TRIGGERPATH`
 
 Get a trigger for Adobe I/O Runtime
 
 ```
 USAGE
-  $ ./bin/run runtime:trigger:delete TRIGGERPATH
+  $ aio runtime:trigger:delete TRIGGERPATH
 
 ARGUMENTS
   TRIGGERPATH  The name of the trigger, in the format /NAMESPACE/NAME
@@ -1697,18 +1692,18 @@ OPTIONS
   --version       Show version
 
 ALIASES
-  $ ./bin/run rt:trigger:delete
+  $ aio rt:trigger:delete
 ```
 
 _See code: [src/commands/runtime/trigger/delete.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/1.7.3/src/commands/runtime/trigger/delete.js)_
 
-## `./bin/run runtime:trigger:fire TRIGGERNAME`
+## `aio runtime:trigger:fire TRIGGERNAME`
 
 Fire a trigger for Adobe I/O Runtime
 
 ```
 USAGE
-  $ ./bin/run runtime:trigger:fire TRIGGERNAME
+  $ aio runtime:trigger:fire TRIGGERNAME
 
 ARGUMENTS
   TRIGGERNAME  The name of the trigger
@@ -1728,18 +1723,18 @@ OPTIONS
   --version                    Show version
 
 ALIASES
-  $ ./bin/run rt:trigger:fire
+  $ aio rt:trigger:fire
 ```
 
 _See code: [src/commands/runtime/trigger/fire.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/1.7.3/src/commands/runtime/trigger/fire.js)_
 
-## `./bin/run runtime:trigger:get TRIGGERPATH`
+## `aio runtime:trigger:get TRIGGERPATH`
 
 Get a trigger for Adobe I/O Runtime
 
 ```
 USAGE
-  $ ./bin/run runtime:trigger:get TRIGGERPATH
+  $ aio runtime:trigger:get TRIGGERPATH
 
 ARGUMENTS
   TRIGGERPATH  The name/path of the trigger, in the format /NAMESPACE/NAME
@@ -1757,18 +1752,18 @@ OPTIONS
   --version       Show version
 
 ALIASES
-  $ ./bin/run rt:trigger:get
+  $ aio rt:trigger:get
 ```
 
 _See code: [src/commands/runtime/trigger/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/1.7.3/src/commands/runtime/trigger/get.js)_
 
-## `./bin/run runtime:trigger:list`
+## `aio runtime:trigger:list`
 
 Lists all of your triggers for Adobe I/O Runtime
 
 ```
 USAGE
-  $ ./bin/run runtime:trigger:list
+  $ aio runtime:trigger:list
 
 OPTIONS
   -i, --insecure     bypass certificate check
@@ -1788,20 +1783,20 @@ OPTIONS
   --version          Show version
 
 ALIASES
-  $ ./bin/run runtime:trigger:ls
-  $ ./bin/run rt:trigger:list
-  $ ./bin/run rt:trigger:ls
+  $ aio runtime:trigger:ls
+  $ aio rt:trigger:list
+  $ aio rt:trigger:ls
 ```
 
 _See code: [src/commands/runtime/trigger/list.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/1.7.3/src/commands/runtime/trigger/list.js)_
 
-## `./bin/run runtime:trigger:update TRIGGERNAME`
+## `aio runtime:trigger:update TRIGGERNAME`
 
 Update or create a trigger for Adobe I/O Runtime
 
 ```
 USAGE
-  $ ./bin/run runtime:trigger:update TRIGGERNAME
+  $ aio runtime:trigger:update TRIGGERNAME
 
 ARGUMENTS
   TRIGGERNAME  The name of the trigger
@@ -1823,7 +1818,7 @@ OPTIONS
   --version                              Show version
 
 ALIASES
-  $ ./bin/run rt:trigger:update
+  $ aio rt:trigger:update
 ```
 
 _See code: [src/commands/runtime/trigger/update.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/1.7.3/src/commands/runtime/trigger/update.js)_
