@@ -61,6 +61,7 @@ describe('instance methods', () => {
     test('simple trigger delete', () => {
       return new Promise((resolve) => {
         const cmd = ow.mockResolved(owAction, '')
+        ow.mockResolved('triggers.get', {})
 
         command.argv = ['trigger1']
         return command.run()
@@ -72,9 +73,60 @@ describe('instance methods', () => {
       })
     })
 
+    test('simple trigger delete with feed', () => {
+      return new Promise((resolve) => {
+        const cmd = ow.mockResolved(owAction, '')
+        const cmdfeed = ow.mockResolved('feeds.delete', '')
+        ow.mockResolved('triggers.get', {
+          annotations: [
+            {
+              key: 'feed',
+              value: '/whisk.system/alarms/alarm'
+            }
+          ],
+          name: 'trigger1'
+        })
+
+        command.argv = ['trigger1']
+        return command.run()
+          .then(() => {
+            expect(cmdfeed).toHaveBeenCalledWith({ name: '/whisk.system/alarms/alarm', trigger: 'trigger1' })
+            expect(cmd).toHaveBeenCalledWith({ name: 'trigger1', namespace: null })
+            expect(stdout.output).toMatch('')
+            resolve()
+          })
+      })
+    })
+
+    test('simple trigger delete with annotations - no feed(codecov)', () => {
+      return new Promise((resolve) => {
+        const cmd = ow.mockResolved(owAction, '')
+        const cmdfeed = ow.mockResolved('feeds.delete', '')
+        ow.mockResolved('triggers.get', {
+          annotations: [
+            {
+              key: 'key1',
+              value: 'value1'
+            }
+          ],
+          name: 'trigger1'
+        })
+
+        command.argv = ['trigger1']
+        return command.run()
+          .then(() => {
+            expect(cmdfeed).not.toHaveBeenCalled()
+            expect(cmd).toHaveBeenCalledWith({ name: 'trigger1', namespace: null })
+            expect(stdout.output).toMatch('')
+            resolve()
+          })
+      })
+    })
+
     test('simple trigger delete with namespace in trigger name', () => {
       return new Promise((resolve) => {
         const cmd = ow.mockResolved(owAction, '')
+        ow.mockResolved('triggers.get', {})
         command.argv = ['/MySpecifiedNamespace/trigger1']
         return command.run()
           .then(() => {
@@ -89,6 +141,7 @@ describe('instance methods', () => {
       return new Promise((resolve, reject) => {
         const err = new Error('an error')
         ow.mockRejected(owAction, err)
+        ow.mockResolved('triggers.get', {})
 
         command.argv = ['trigger1']
         return command.run()

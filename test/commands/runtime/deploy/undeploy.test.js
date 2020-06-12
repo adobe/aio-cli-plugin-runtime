@@ -19,6 +19,7 @@ const owPackage = 'packages.delete'
 const owRules = 'rules.delete'
 const owTrigger = 'triggers.delete'
 const owApi = 'routes.delete'
+const owFeed = 'feeds.delete'
 
 test('exports', async () => {
   expect(typeof TheCommand).toEqual('function')
@@ -162,6 +163,7 @@ describe('instance methods', () => {
 
     test('undeploy a package with manifest file', () => {
       const cmd = ow.mockResolved(owPackage, '')
+      ow.mockResolved('triggers.get', {})
       command.argv = ['-m', '/deploy/manifest_triggersRules.yaml']
       return command.run()
         .then(() => {
@@ -182,6 +184,7 @@ describe('instance methods', () => {
 
     test('package should be created if project is the root', () => {
       const cmd = ow.mockResolved(owPackage, '')
+      ow.mockResolved('triggers.get', {})
       command.argv = ['-m', '/deploy/manifest_report.yaml']
       return command.run()
         .then(() => {
@@ -192,6 +195,7 @@ describe('instance methods', () => {
 
     test('undeploy a trigger with manifest file', () => {
       const cmd = ow.mockResolved(owTrigger, '')
+      ow.mockResolved('triggers.get', {})
       command.argv = ['-m', '/deploy/manifest_triggersRules.yaml']
       return command.run()
         .then(() => {
@@ -200,8 +204,52 @@ describe('instance methods', () => {
         })
     })
 
+    test('undeploy a trigger with manifest file - including feed', () => {
+      const cmd = ow.mockResolved(owTrigger, '')
+      const cmdfeed = ow.mockResolved(owFeed, '')
+      ow.mockResolved('triggers.get', {
+        annotations: [
+          {
+            key: 'feed',
+            value: '/whisk.system/alarms/alarm'
+          }
+        ],
+        name: 'trigger1'
+      })
+      command.argv = ['-m', '/deploy/manifest_triggersRules.yaml']
+      return command.run()
+        .then(() => {
+          expect(cmdfeed).toHaveBeenCalled()
+          expect(cmd).toHaveBeenCalled()
+          expect(stdout.output).toMatch('')
+        })
+    })
+
+    test('undeploy a trigger with manifest file - including feed - codecov', () => {
+      const cmd = ow.mockResolved(owTrigger, '')
+      const cmdfeed = ow.mockResolved(owFeed, '')
+      ow.mockResolved('triggers.get', {
+        annotations: [
+          {
+            key: 'key1',
+            value: 'value1'
+          }
+        ],
+        name: 'trigger1'
+      })
+      ow.mockResolved('feeds.delete', '')
+      command.argv = ['-m', '/deploy/manifest_triggersRules.yaml']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalled()
+          expect(cmdfeed).not.toHaveBeenCalled()
+          expect(stdout.output).toMatch('')
+        })
+    })
+
     test('undeploy a rule with manifest file', () => {
       const cmd = ow.mockResolved(owRules, '')
+      ow.mockResolved('triggers.get', {})
       command.argv = ['-m', '/deploy/manifest_triggersRules.yaml']
       return command.run()
         .then(() => {
@@ -212,6 +260,7 @@ describe('instance methods', () => {
 
     test('undeploy an action with manifest file', () => {
       const cmd = ow.mockResolved(owAction, '')
+      ow.mockResolved('triggers.get', {})
       command.argv = ['-m', '/deploy/manifest_triggersRules.yaml']
       return command.run()
         .then(() => {

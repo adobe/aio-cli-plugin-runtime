@@ -699,6 +699,9 @@ function processPackage (packages, deploymentPackages, deploymentTriggers, param
           if (packages[key]['triggers'][triggerName]['annotations']) {
             objTrigger.trigger.annotations = createKeyValueInput(packages[key]['triggers'][triggerName]['annotations'])
           }
+          if (packages[key]['triggers'][triggerName]['feed']) {
+            objTrigger.trigger.feed = packages[key]['triggers'][triggerName]['feed']
+          }
           ruleTrigger.push(triggerName)
         }
         // trigger creation requires only name parameter and hence will be created in all cases

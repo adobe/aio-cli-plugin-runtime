@@ -65,6 +65,7 @@ describe('instance methods', () => {
       'deploy/parameters.json': fixtureFile('deploy/parameters.json'),
       'deploy/apis_not_implemented.yml': fixtureFile('deploy/apis_not_implemented.yml'),
       'deploy/sequences_implemented.yml': fixtureFile('deploy/sequences_implemented.yml'),
+      'deploy/manifest_dep_Triggers_feeds.yaml': fixtureFile('deploy/manifest_dep_Triggers_feeds.yaml'),
       'deploy/manifest_triggersRules.yaml': fixtureFile('deploy/manifest_triggersRules.yaml'),
       'deploy/manifest_triggersRules_IncorrectAction.yaml': fixtureFile('deploy/manifest_triggersRules_IncorrectAction.yaml'),
       'deploy/manifest_triggersRules_noInputs.yaml': fixtureFile('deploy/manifest_triggersRules_noInputs.yaml'),
@@ -625,6 +626,17 @@ describe('instance methods', () => {
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalled()
+          expect(stdout.output).toMatch('')
+        })
+    })
+
+    test('deploys trigger with feed in manifest file', () => {
+      const cmd = ow.mockResolved(owTriggers, '')
+      command.argv = ['-m', '/deploy/manifest_dep_Triggers_feeds.yaml']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalled()
+          expect(cmd).toHaveBeenCalledWith(expect.objectContaining({ trigger: expect.objectContaining({ feed: '/whisk.system/alarms/alarm' }) }))
           expect(stdout.output).toMatch('')
         })
     })

@@ -1,0 +1,15 @@
+{
+  "name": "",
+  "Inputs": {}
+}
+{
+  "name": "demo_package",
+  "Inputs": {}
+}
+{
+  "name": "meetPerson",
+  "feed": "/whisk.system/alarms/alarm",
+  "Inputs": {
+    "cron": "* * * * *"
+  }
+}

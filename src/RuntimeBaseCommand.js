@@ -16,7 +16,7 @@ const { propertiesFile, PropertyEnv, PropertyDefault } = require('./properties')
 const createDebug = require('debug')
 const debug = createDebug('aio-cli-plugin-runtime')
 const http = require('http')
-const OpenWhisk = require('openwhisk')
+const runtimeLib = require('@adobe/aio-lib-runtime')
 const config = require('@adobe/aio-lib-core-config')
 
 class RuntimeBaseCommand extends Command {
@@ -66,7 +66,7 @@ class RuntimeBaseCommand extends Command {
     if (!options) {
       options = await this.getOptions()
     }
-    return OpenWhisk(options)
+    return runtimeLib.init(options)
   }
 
   async init () {

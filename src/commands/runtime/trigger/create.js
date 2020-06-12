@@ -27,7 +27,7 @@ class TriggerCreate extends RuntimeBaseCommand {
       } else if (flags['param-file']) {
         triggerPackage = createKeyValueArrayFromFile(flags['param-file'])
       }
-      let annotationParams = {}
+      let annotationParams = []
       if (flags.annotation) {
       // Annotations that describe packages include : 'description' and 'parameters'
       // TODO -- should we check if annotation keys match description or parameters ?
@@ -44,6 +44,9 @@ class TriggerCreate extends RuntimeBaseCommand {
       }
       if (Object.keys(annotationParams).length) {
         triggerParams.annotations = annotationParams
+      }
+      if (flags.feed) {
+        triggerParams.feed = flags.feed
       }
 
       const options = {
@@ -86,6 +89,10 @@ TriggerCreate.flags = {
   'annotation-file': flags.string({
     char: 'A',
     description: 'FILE containing annotation values in JSON format' // help description for flag
+  }),
+  feed: flags.string({
+    char: 'f',
+    description: 'trigger feed ACTION_NAME'
   })
 }
 

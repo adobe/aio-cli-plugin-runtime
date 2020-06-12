@@ -150,6 +150,12 @@ async function createProjectJSON (entities, projectname, ow, fileDirectory) {
       inputs: returninputsfromKeyValue(getTrigger.parameters),
       annotations: returninputsfromKeyValue(getTrigger.annotations)
     }
+    for (const annotation of getTrigger.annotations) {
+      if (annotation.key === 'feed') {
+        project['packages'][packageName]['triggers'][trigger]['feed'] = annotation.value
+        break
+      }
+    }
   }
 
   for (const rule of entities.rules) {
@@ -184,7 +190,8 @@ function returninputsfromKeyValue (inputs) {
   const inputObj = {}
   for (const input of inputs) {
     // whisk managed annotation not exported to yaml file
-    if (input.key !== 'whisk-managed') {
+    // and feed annotation becomes feed property in createProjectJSON
+    if (input.key !== 'whisk-managed' && input.key !== 'feed') {
       inputObj[input.key] = input.value
     }
   }

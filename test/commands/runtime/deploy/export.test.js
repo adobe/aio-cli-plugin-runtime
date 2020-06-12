@@ -238,7 +238,26 @@ describe('instance methods', () => {
     trigger: { name: 'meetPerson2', path: 'ns' },
     version: '0.0.2'
   }]
-
+  const triggerWithFeed = [{
+    annotations: [{
+      key: 'whisk-managed',
+      value: {
+        file: 'manifest.yaml',
+        projectDeps: [],
+        projectHash: 'wxyz',
+        projectName: 'proj'
+      }
+    },
+    {
+      key: 'feed',
+      value: '/whisk.system/alarms/alarm'
+    }],
+    name: 'meetPerson',
+    namespace: 'ns',
+    publish: false,
+    updated: 1555527174943,
+    version: '0.0.1'
+  }]
   const triggerNoProjectName = [
     {
       annotations: [{
@@ -295,7 +314,43 @@ describe('instance methods', () => {
     },
     version: '0.0.5'
   }
-
+  const triggerGetWithFeed = {
+    annotations: [{
+      key: 'whisk-managed',
+      value: {
+        file: 'manifest.yaml',
+        projectDeps: [],
+        projectHash: 'wxyz',
+        projectName: 'proj'
+      }
+    }, {
+      key: 'feed',
+      value: '/whisk.system/alarms/alarm'
+    }],
+    limits: {},
+    name: 'meetPerson',
+    namespace: '53444_51981',
+    parameters: [{
+      key: 'name', value: 'Sam'
+    },
+    { key: 'place',
+      value: ''
+    },
+    { key: 'children',
+      value: 0
+    }],
+    publish: false,
+    rules: {
+      '53444_51981/meetPersonRule': {
+        action: {
+          name: 'three',
+          path: '53444_51981/testSeq'
+        },
+        status: 'active'
+      }
+    },
+    version: '0.0.5'
+  }
   const ruleslist = [{
     action: { name: 'three', path: 'ns/testSeq' },
     annotations: [{
@@ -404,6 +459,21 @@ describe('instance methods', () => {
         .then(() => {
           expect(cmd).toHaveBeenCalled()
           expect(stdout.output).toMatch('')
+        })
+    })
+
+    test('write to manifest file when trigger has a feed', () => {
+      ow.mockResolved(owTriggerList, triggerWithFeed)
+      ow.mockResolved('triggers.get', triggerGetWithFeed)
+      ow.mockResolved(owRulesList, ruleslist)
+      fs.writeFileSync = jest.fn()
+      command.argv = ['--projectname', 'proj', '-m', '/deploy/manifest.yaml']
+      const yaml = fixtureFile('deploy/export_yaml_feed.yaml')
+      return command.run()
+        .then(() => {
+          expect(fs.writeFileSync).toHaveBeenCalledWith('/deploy/manifest.yaml', yaml)
+          expect(fs.writeFileSync).toHaveBeenCalledWith('/deploy/testSeq/helloAction1.js', 'code')
+          expect(fs.writeFileSync).toHaveBeenCalledWith('/deploy/testSeq/helloAction.js', 'code')
         })
     })
 
