@@ -11,7 +11,7 @@ governing permissions and limitations under the License.
 */
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
-const { parsePathPattern } = require('../../../runtime-helpers')
+const { parsePathPattern } = require('@adobe/aio-lib-runtime').utils
 
 class TriggerDelete extends RuntimeBaseCommand {
   async run () {

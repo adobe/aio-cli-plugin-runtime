@@ -969,7 +969,7 @@ describe('instance methods', () => {
       test('processPackage with no owOptions', () => {
         // for coverage..
         // should not rewrite
-        const helpers = require('../../../../src/runtime-helpers')
+        const helpers = require('@adobe/aio-lib-runtime').utils
         const res = helpers.processPackage({
           hello: { actions: { helloAction: { function: 'hello.js', annotations: { 'require-adobe-auth': true } } } }
         }, {}, {}, {})

@@ -12,7 +12,7 @@ governing permissions and limitations under the License.
 
 const fs = require('fs')
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
-const { fileExtensionForKind } = require('../../../runtime-helpers')
+const { fileExtensionForKind } = require('@adobe/aio-lib-runtime').utils
 const { flags } = require('@oclif/command')
 
 class ActionGet extends RuntimeBaseCommand {
