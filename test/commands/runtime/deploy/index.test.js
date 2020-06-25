@@ -101,6 +101,7 @@ describe('instance methods', () => {
       'deploy/manifest_conductor.yaml': fixtureFile('deploy/manifest_conductor.yaml'),
       'deploy/manifest_final.yaml': fixtureFile('deploy/manifest_final.yaml'),
       'deploy/manifest_docker.yaml': fixtureFile('deploy/manifest_docker.yaml'),
+      'deploy/manifest_concurrency.yaml': fixtureFile('deploy/manifest_concurrency.yaml'),
       'deploy/manifest_api_incorrect.yaml': fixtureFile('deploy/manifest_api_incorrect.yaml'),
       'deploy/deployment_syncMissingAction.yaml': fixtureFile('deploy/deployment_syncMissingAction.yaml'),
       'deploy/manifest_multiple_packages.yaml': fixtureFile('deploy/manifest_multiple_packages.yaml'),
@@ -398,6 +399,30 @@ describe('instance methods', () => {
               image: 'my/docker-image:1.0.0',
               kind: 'blackbox',
               main: 'split'
+            }
+          })
+          expect(stdout.output).toMatch('')
+        })
+    })
+
+    test('deploys actions with concurrency limit', () => {
+      const cmd = ow.mockResolved(owAction, '')
+      const mainAction = fixtureFile('deploy/main.js')
+      command.argv = ['-m', '/deploy/manifest_concurrency.yaml']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith({
+            name: 'demo_package/sampleAction',
+            action: mainAction,
+            annotations: {
+              'raw-http': false,
+              'web-export': false
+            },
+            limits: {
+              concurrency: 10,
+              logs: 10,
+              memory: 256,
+              timeout: 60000
             }
           })
           expect(stdout.output).toMatch('')

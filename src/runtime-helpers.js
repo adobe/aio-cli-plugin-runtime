@@ -465,6 +465,9 @@ function createActionObject (thisAction, objAction) {
       logs: thisAction.limits['logSize'] || 10,
       timeout: thisAction.limits['timeout'] || 60000
     }
+    if (thisAction.limits.concurrency) {
+      limits.concurrency = thisAction.limits.concurrency
+    }
     objAction['limits'] = limits
   }
   objAction['annotations'] = returnAnnotations(thisAction)
