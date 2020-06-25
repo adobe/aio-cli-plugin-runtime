@@ -68,7 +68,6 @@
     ],
     "repositoryPrefix": "<%- repo %>/blob/<%- version %>/<%- commandPath %>"
   },
-  "main": "src/runtime-helpers.js",
   "repository": "adobe/aio-cli-plugin-runtime",
   "scripts": {
     "eslint-fix": "eslint src test e2e --fix",

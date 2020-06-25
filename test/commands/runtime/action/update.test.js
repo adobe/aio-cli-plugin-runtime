@@ -13,7 +13,7 @@ governing permissions and limitations under the License.
 const { stdout } = require('stdout-stderr')
 const TheCommand = require('../../../../src/commands/runtime/action/update.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
-const { createKeyValueArrayFromObject } = require('../../../../src/runtime-helpers.js')
+const { createKeyValueArrayFromObject } = require('@adobe/aio-lib-runtime').utils
 const ow = require('openwhisk')()
 const owAction = 'actions.update'
 
