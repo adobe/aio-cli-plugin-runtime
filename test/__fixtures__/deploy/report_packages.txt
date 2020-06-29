@@ -11,6 +11,11 @@
   "Inputs": {}
 }
 {
+  "name": "demo_package_shared",
+  "Inputs": {},
+  "public": true
+}
+{
   "name": "sampleAction",
   "Inputs": {
     "name": "Adobe",

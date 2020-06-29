@@ -608,7 +608,12 @@ function processPackage (packages, deploymentPackages, deploymentTriggers, param
   const arrSequence = []
 
   Object.keys(packages).forEach((key) => {
-    pkgAndDeps.push({ name: key })
+    const objPackage = { name: key }
+    if (packages[key]['public']) {
+      objPackage['package'] = { publish: packages[key]['public'] }
+    }
+    pkgAndDeps.push(objPackage)
+
     // From wskdeploy repo : currently, the 'version' and 'license' values are not stored in Apache OpenWhisk, but there are plans to support it in the future
     // pkg.version = packages[key]['version']
     // pkg.license = packages[key]['license']

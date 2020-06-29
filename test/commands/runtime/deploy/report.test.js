@@ -110,7 +110,7 @@ describe('instance methods', () => {
       command.argv = []
       return command.run()
         .then(() => {
-          expect(stdout.output).toMatchFixture('deploy/report_twoPackages.txt')
+          expect(stdout.output).toMatchFixture('deploy/report_packages.txt')
         })
     })
 

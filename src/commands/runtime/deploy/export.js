@@ -100,6 +100,9 @@ async function createProjectJSON (entities, projectname, ow, fileDirectory) {
       sequences: {},
       rules: {}
     }
+    if (pkg.publish) {
+      project['packages'][pkg.name]['public'] = pkg.publish
+    }
   }
 
   const filesObject = []

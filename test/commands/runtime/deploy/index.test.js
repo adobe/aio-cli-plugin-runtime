@@ -221,7 +221,28 @@ describe('instance methods', () => {
       command.argv = ['-m', '/deploy/manifest_multiple_packages.yaml', '--deployment', '/deploy/deployment.yaml']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledTimes(2)
+          expect(cmd).toHaveBeenCalledTimes(4)
+          expect(stdout.output).toMatch('')
+        })
+    })
+
+    test('shared packages should be created', () => {
+      const cmd = ow.mockResolved(owPackage, '')
+      command.argv = ['-m', '/deploy/manifest_multiple_packages.yaml', '--deployment', '/deploy/deployment.yaml']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledTimes(4)
+          expect(cmd).toHaveBeenCalledWith(expect.anything())
+          expect(cmd).toHaveBeenCalledWith(expect.anything())
+          expect(cmd).toHaveBeenCalledWith({
+            name: 'sharedpack1',
+            package: {
+              publish: true
+            }
+          })
+          expect(cmd).toHaveBeenLastCalledWith({
+            name: 'sharedpack2'
+          })
           expect(stdout.output).toMatch('')
         })
     })

@@ -17,3 +17,5 @@ packages:
   demo_package_no_actions:
     version: 1.0
     license: Apache-2.0
+  demo_package_shared:
+    public: true
