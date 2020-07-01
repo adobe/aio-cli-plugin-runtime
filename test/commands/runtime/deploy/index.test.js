@@ -399,6 +399,14 @@ describe('instance methods', () => {
             'web-export': false
           }
         })
+        expect(cmd).toHaveBeenCalledWith({
+          name: 'demo_package/anotherAction2',
+          action: hello,
+          annotations: {
+            conductor: true,
+            'web-export': true
+          }
+        })
         expect(stdout.output).toMatch('')
       })
     })

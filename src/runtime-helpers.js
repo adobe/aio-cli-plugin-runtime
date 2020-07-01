@@ -270,20 +270,23 @@ function returnDeploymentTriggerInputs (deploymentPackages) {
 }
 
 function returnAnnotations (action) {
-  let annotationParams = {}
+  const annotationParams = {}
+
+  // common annotations
 
   if (action['annotations'] && action['annotations']['conductor'] !== undefined) {
     annotationParams['conductor'] = action['annotations']['conductor']
   }
 
+  // web related annotations
+
   if (action['web'] !== undefined) {
-    annotationParams = checkWebFlags(action['web'])
+    Object.assign(annotationParams, checkWebFlags(action['web']))
   } else if (action['web-export'] !== undefined) {
-    annotationParams = checkWebFlags(action['web-export'])
+    Object.assign(annotationParams, checkWebFlags(action['web-export']))
   } else {
     annotationParams['web-export'] = false
     annotationParams['raw-http'] = false
-    return annotationParams
   }
 
   if (action['annotations'] && action['annotations']['require-whisk-auth'] !== undefined) {
