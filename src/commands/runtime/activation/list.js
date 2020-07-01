@@ -14,7 +14,8 @@ const moment = require('moment')
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 const { flags } = require('@oclif/command')
 const { cli } = require('cli-ux')
-const statusStrings = ['success', 'error', 'error\uD83D\uDCA5', 'syserr']
+const decorators = require('../../../decorators').decorators()
+const statusStrings = ['success', 'error', `error${decorators.collision}`, 'syserr']
 
 class ActivationList extends RuntimeBaseCommand {
   async run () {
@@ -118,9 +119,9 @@ class ActivationList extends RuntimeBaseCommand {
             get: row => {
               if (row.annotations && row.annotations.length) {
                 const seq = row.annotations.find(_ => _.key === 'causedBy')
-                if (seq && seq.value === 'sequence') return '\u2024'
+                if (seq && seq.value === 'sequence') return decorators.dot
                 const top = row.annotations.find(_ => _.key === 'topmost')
-                if (top && top.value) return '\u25e1'
+                if (top && top.value) return decorators.half_circle_lower
               }
               return ''
             }

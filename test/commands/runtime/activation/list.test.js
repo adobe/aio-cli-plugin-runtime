@@ -198,7 +198,8 @@ describe('instance methods', () => {
       rtLib.mockResolved(rtAction, data)
       return command.run()
         .then(() => {
-          expect(stdout.output).toMatch(fixtureFileWithTimeZoneAdjustment('activation/list-activation-topmost-output.txt', data[0].start))
+          const fixtureFileName = process.platform !== 'win32' ? 'activation/list-activation-topmost-output.txt' : 'activation/list-activation-topmost-output-win.txt'
+          expect(stdout.output).toMatch(fixtureFileWithTimeZoneAdjustment(fixtureFileName, data[0].start))
         })
     })
 
@@ -221,7 +222,8 @@ describe('instance methods', () => {
       rtLib.mockResolved(rtAction, data)
       return command.run()
         .then(() => {
-          expect(stdout.output).toMatch(fixtureFileWithTimeZoneAdjustment('activation/list-activation-sequence-output.txt', data[0].start))
+          const fixtureFileName = process.platform !== 'win32' ? 'activation/list-activation-sequence-output.txt' : 'activation/list-activation-sequence-output-win.txt'
+          expect(stdout.output).toMatch(fixtureFileWithTimeZoneAdjustment(fixtureFileName, data[0].start))
         })
     })
 
@@ -256,7 +258,8 @@ describe('instance methods', () => {
       rtLib.mockResolved(rtAction, data)
       return command.run()
         .then(() => {
-          expect(stdout.output).toMatch(fixtureFileWithTimeZoneAdjustment('activation/list-activation-timeout-output.txt', data[0].start))
+          const fixtureFileName = process.platform !== 'win32' ? 'activation/list-activation-timeout-output.txt' : 'activation/list-activation-timeout-output-win.txt'
+          expect(stdout.output).toMatch(fixtureFileWithTimeZoneAdjustment(fixtureFileName, data[0].start))
         })
     })
 

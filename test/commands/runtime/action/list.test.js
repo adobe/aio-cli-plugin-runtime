@@ -95,7 +95,8 @@ describe('instance methods', () => {
         .then(() => {
           expect(cmd).toHaveBeenCalled()
           const dates = JSON.parse(fixtureFile('action/list3.json')).map(_ => _.updated)
-          expect(stdout.output).toMatch(fixtureFileWithTimeZoneAdjustment('action/list-output-3.txt', dates))
+          const fixtureFileName = process.platform !== 'win32' ? 'action/list-output-3.txt' : 'action/list-output-3-win.txt'
+          expect(stdout.output).toMatch(fixtureFileWithTimeZoneAdjustment(fixtureFileName, dates))
         })
     })
 
