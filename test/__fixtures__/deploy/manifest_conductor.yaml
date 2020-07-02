@@ -11,4 +11,8 @@ packages:
         function: /deploy/hello.js
         annotations:
             conductor: true
-            raw-http: true
+      anotherAction2:
+        function: /deploy/hello.js
+        web: 'yes'
+        annotations:
+            conductor: true
