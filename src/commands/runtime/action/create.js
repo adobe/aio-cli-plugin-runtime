@@ -144,17 +144,17 @@ class ActionCreate extends RuntimeBaseCommand {
           case 'no':
             annotationParams.push({ key: 'web-export', value: false })
         }
-      }
 
-      if (flags['web-secure']) {
-        const ws = flags['web-secure']
-        const lc = ws.toLowerCase()
-        if (lc === 'true') {
-          annotationParams.push({ key: 'require-whisk-auth', value: true })
-        } else if (lc === 'false') {
-          annotationParams.push({ key: 'require-whisk-auth', value: false })
-        } else {
-          annotationParams.push({ key: 'require-whisk-auth', value: ws })
+        if (flags['web-secure']) {
+          const ws = flags['web-secure']
+          const lc = ws.toLowerCase()
+          if (lc === 'true') {
+            annotationParams.push({ key: 'require-whisk-auth', value: true })
+          } else if (lc === 'false') {
+            annotationParams.push({ key: 'require-whisk-auth', value: false })
+          } else {
+            annotationParams.push({ key: 'require-whisk-auth', value: ws })
+          }
         }
       }
 
@@ -218,7 +218,8 @@ ActionCreate.flags = {
     options: ['true', 'yes', 'false', 'no', 'raw']
   }),
   'web-secure': flags.string({
-    description: 'secure the web action (valid values are true, false, or any string)' // help description for flag
+    description: 'secure the web action (valid values are true, false, or any string)', // help description for flag
+    dependsOn: ['web']
   }),
   'param-file': flags.string({
     char: 'P',
