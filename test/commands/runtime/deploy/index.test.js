@@ -994,7 +994,7 @@ describe('instance methods', () => {
         ow.mockResolved(owAction, '')
         command.argv = ['-m', 'manifest_with_adobe_auth.yaml', '--apihost', 'https://adobeioruntime.net']
         mockConfig.get.mockReturnValue(undefined)
-        await expect(command.run()).rejects.toThrow('required .aio \'project.org.ims_org_id\' must be defined when using the Adobe headless auth validator')
+        await expect(command.run()).rejects.toThrow('Failed to deploy: ')
         expect(mockConfig.get).toHaveBeenCalledWith('project.org.ims_org_id')
       })
 
@@ -1035,7 +1035,10 @@ describe('instance methods', () => {
             expect(cmd).toHaveBeenCalledWith({ name: 'demo_package/sampleActionNoWeb', action: hello, annotations: { 'web-export': false, 'raw-http': false } })
             expect(cmd).toHaveBeenCalledWith({ name: 'demo_package/__secured_sampleAction', action: hello, annotations: { 'web-export': false, 'raw-http': false } })
             // sequence
-            expect(cmd).toHaveBeenCalledWith({ name: 'demo_package/sampleAction', action: '', annotations: { 'web-export': true, 'raw-http': true }, exec: { components: ['/adobeio/shared-validators-v1/headless', '/ns/demo_package/__secured_sampleAction'], kind: 'sequence' } })
+            expect(cmd).toHaveBeenCalledWith({ name: 'demo_package/sampleAction',
+              action: '',
+              annotations: { 'web-export': true, 'raw-http': true },
+              exec: { components: ['/adobeio/shared-validators-v1/headless', '/ns/demo_package/__secured_sampleAction'], kind: 'sequence' } })
             expect(cmd).toHaveBeenCalledTimes(9)
             expect(stdout.output).toMatch('')
           })
