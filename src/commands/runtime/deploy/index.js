@@ -11,7 +11,7 @@ governing permissions and limitations under the License.
 */
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
-const { createKeyValueObjectFromFlag, createKeyValueObjectFromFile, deployPackage, setPaths, processPackage } = require('../../../runtime-helpers')
+const { createKeyValueObjectFromFlag, createKeyValueObjectFromFile, deployPackage, setPaths, processPackage } = require('@adobe/aio-lib-runtime').utils
 const { flags } = require('@oclif/command')
 
 class IndexCommand extends RuntimeBaseCommand {

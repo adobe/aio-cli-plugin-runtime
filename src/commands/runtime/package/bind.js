@@ -11,7 +11,7 @@ governing permissions and limitations under the License.
 */
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
-const { createKeyValueArrayFromFlag, createKeyValueArrayFromFile, parsePackageName } = require('../../../runtime-helpers')
+const { createKeyValueArrayFromFlag, createKeyValueArrayFromFile, parsePackageName } = require('@adobe/aio-lib-runtime').utils
 const { flags } = require('@oclif/command')
 
 class PackageBind extends RuntimeBaseCommand {

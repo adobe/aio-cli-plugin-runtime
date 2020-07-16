@@ -12,7 +12,7 @@ governing permissions and limitations under the License.
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 const { flags } = require('@oclif/command')
-const { createKeyValueObjectFromFlag, createKeyValueObjectFromFile } = require('../../../runtime-helpers')
+const { createKeyValueObjectFromFlag, createKeyValueObjectFromFile } = require('@adobe/aio-lib-runtime').utils
 
 class ActionInvoke extends RuntimeBaseCommand {
   async run () {
