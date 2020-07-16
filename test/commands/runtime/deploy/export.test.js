@@ -54,6 +54,24 @@ describe('instance methods', () => {
     version: '0.0.2'
   }]
 
+  const sharedPackagelist = [{
+    annotations: [{
+      key: 'whisk-managed',
+      value: {
+        file: 'manifest.yaml',
+        projectDeps: [],
+        projectHash: 'xyz',
+        projectName: 'proj'
+      }
+    }],
+    binding: false,
+    name: 'testSeq',
+    namespace: 'ns',
+    publish: true,
+    updated: 1555533204836,
+    version: '0.0.2'
+  }]
+
   const packageNoAnnotations = [{
     annotations: [],
     binding: false,
@@ -77,6 +95,17 @@ describe('instance methods', () => {
     version: '0.0.2'
   }]
 
+  const emptyPackage = {
+    actions: [],
+    annotations: [],
+    binding: {},
+    feeds: [],
+    name: 'testSeq',
+    namespace: 'ns',
+    parameters: [],
+    publish: false,
+    version: '0.0.2'
+  }
   const packageget = {
     actions: [{
       annotations: [],
@@ -431,6 +460,20 @@ describe('instance methods', () => {
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalled()
+          expect(stdout.output).toMatch('')
+        })
+    })
+
+    test('fetch list of packages (shared) to be exported from project name', () => {
+      const cmd = ow.mockResolved('packages.get', emptyPackage)
+      command.argv = ['--projectname', 'proj', '-m', '/deploy/manifest.yaml']
+      ow.mockResolved(owPackageList, sharedPackagelist)
+      ow.mockResolved('actions.get', '')
+      fs.writeFileSync = jest.fn()
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalled()
+          expect(fs.writeFileSync).toHaveBeenCalledWith('/deploy/manifest.yaml', expect.stringContaining('public: true'))
           expect(stdout.output).toMatch('')
         })
     })

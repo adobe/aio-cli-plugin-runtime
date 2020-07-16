@@ -221,7 +221,28 @@ describe('instance methods', () => {
       command.argv = ['-m', '/deploy/manifest_multiple_packages.yaml', '--deployment', '/deploy/deployment.yaml']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledTimes(2)
+          expect(cmd).toHaveBeenCalledTimes(4)
+          expect(stdout.output).toMatch('')
+        })
+    })
+
+    test('shared packages should be created', () => {
+      const cmd = ow.mockResolved(owPackage, '')
+      command.argv = ['-m', '/deploy/manifest_multiple_packages.yaml', '--deployment', '/deploy/deployment.yaml']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledTimes(4)
+          expect(cmd).toHaveBeenCalledWith(expect.anything())
+          expect(cmd).toHaveBeenCalledWith(expect.anything())
+          expect(cmd).toHaveBeenCalledWith({
+            name: 'sharedpack1',
+            package: {
+              publish: true
+            }
+          })
+          expect(cmd).toHaveBeenLastCalledWith({
+            name: 'sharedpack2'
+          })
           expect(stdout.output).toMatch('')
         })
     })
@@ -376,6 +397,14 @@ describe('instance methods', () => {
             conductor: true,
             'raw-http': false,
             'web-export': false
+          }
+        })
+        expect(cmd).toHaveBeenCalledWith({
+          name: 'demo_package/anotherAction2',
+          action: hello,
+          annotations: {
+            conductor: true,
+            'web-export': true
           }
         })
         expect(stdout.output).toMatch('')
@@ -1019,7 +1048,7 @@ describe('instance methods', () => {
         ow.mockResolved(owAction, '')
         command.argv = ['-m', 'manifest_with_adobe_auth.yaml', '--apihost', 'https://adobeioruntime.net']
         mockConfig.get.mockReturnValue(undefined)
-        await expect(command.run()).rejects.toThrow('Failed to deploy: ')
+        await expect(command.run()).rejects.toThrow('Failed to deploy: imsOrgId must be defined when using the Adobe headless auth validator')
         expect(mockConfig.get).toHaveBeenCalledWith('project.org.ims_org_id')
       })
 
@@ -1027,7 +1056,7 @@ describe('instance methods', () => {
         ow.mockResolved(owAction, '')
         command.argv = ['-m', 'manifest_with_adobe_auth.yaml', '--apihost', 'https://adobeioruntime.net']
         fetch.mockResolvedValue({ ok: false })
-        await expect(command.run()).rejects.toThrow('failed setting ims_org_id=fake-ims-org-id into state lib, received status=undefined, please make sure your runtime credentials are correct')
+        await expect(command.run()).rejects.toThrow('Failed to deploy: failed setting ims_org_id=fake-ims-org-id into state lib, received status=401, please make sure your runtime credentials are correct')
       })
 
       test('should call state put endpoint with correct parameters', async () => {

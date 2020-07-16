@@ -31,7 +31,11 @@ class DeployReport extends RuntimeBaseCommand {
       const actions = []
       const triggers = []
       Object.keys(packages).forEach((key) => {
-        pkg.push({ name: key, Inputs: {} })
+        const objPkg = { name: key, Inputs: {} }
+        if (packages[key]['public']) {
+          objPkg.public = packages[key]['public']
+        }
+        pkg.push(objPkg)
         if (packages[key]['actions']) {
           Object.keys(packages[key]['actions']).forEach((action) => {
             const objAction = { name: action, Inputs: {} }
