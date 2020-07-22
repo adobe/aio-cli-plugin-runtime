@@ -24,7 +24,6 @@ module.exports = {
     printLogs: jest.fn()
   },
   init: () => {
-    const Ow = require('../openwhisk')
-    return new Ow()
+    return require('openwhisk')()
   }
 }
