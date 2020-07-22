@@ -23,5 +23,8 @@ module.exports = {
     addManagedProjectAnnotations: jest.fn(),
     printLogs: jest.fn()
   },
-  init: jest.fn()
+  init: () => {
+    const Ow = require('../openwhisk')
+    return new Ow()
+  }
 }
