@@ -234,7 +234,7 @@ describe('instance methods', () => {
 
       expect(utils.processPackage).toHaveBeenCalled()
       // this also tests that the ims_org_id from config is passed to utils.deployPackage
-      expect(utils.deployPackage).toHaveBeenCalledWith(expect.any(Array), expect.any(Object), expect.any(Function), 'fake-config-ims-org-id')
+      expect(utils.deployPackage).toHaveBeenCalledWith(expect.any(Array), undefined, expect.any(Function), 'fake-config-ims-org-id')
 
       expect(stdout.output).toMatch('')
       expect(handleError).not.toHaveBeenCalled()
@@ -1186,12 +1186,12 @@ describe('instance methods', () => {
   //       expect(mockConfig.get).toHaveBeenCalledWith('project.org.ims_org_id')
   //     })
 
-  //      test('should fail if state put response is not ok', async () => {
-  //        ow.mockResolved(owAction, '')
-  //        command.argv = ['-m', 'manifest_with_adobe_auth.yaml', '--apihost', 'https://adobeioruntime.net']
-  //        fetch.mockResolvedValue({ ok: false })
-  //        await expect(command.run()).rejects.toThrow('Failed to deploy: failed setting ims_org_id=fake-ims-org-id into state lib, received status=401, please make sure your runtime credentials are correct')
-  //      })
+      test('should fail if state put response is not ok', async () => {
+        ow.mockResolved(owAction, '')
+        command.argv = ['-m', 'manifest_with_adobe_auth.yaml', '--apihost', 'https://adobeioruntime.net']
+        fetch.mockResolvedValue({ ok: false })
+        await expect(command.run()).rejects.toThrow('Failed to deploy: failed setting ims_org_id=fake-ims-org-id into state lib, received status=401, please make sure your runtime credentials are correct')
+      })
 
   //     // test('should call state put endpoint with correct parameters', async () => {
   //     //   ow.mockResolved(owAction, '')

@@ -435,6 +435,11 @@ describe('instance methods', () => {
   describe('run', () => {
     test('exists', async () => {
       expect(command.run).toBeInstanceOf(Function)
+      ow.mockResolved('rules.get', '')
+      ow.mockResolved('triggers.get', '')
+      ow.mockResolved('actions.get', '')
+      ow.mockResolved(owTriggerList, '')
+      ow.mockResolved(owRulesList, '')
     })
 
     test('fetch list of packages to be exported from project name', () => {
