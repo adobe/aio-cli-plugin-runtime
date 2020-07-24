@@ -3,15 +3,10 @@ const mockOpenWhisk = {
   activations: {},
   namespaces: {},
   packages: {
-    update: jest.fn(),
-    list: jest.fn(() => '')
+    update: jest.fn()
   },
-  rules: {
-    list: jest.fn(() => '')
-  },
-  triggers: {
-    list: jest.fn(() => '')
-  },
+  rules: {},
+  triggers: {},
   feeds: {},
   routes: {},
   mockFn: function (methodName) {
