@@ -13,8 +13,6 @@ governing permissions and limitations under the License.
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 const { createKeyValueObjectFromFlag, createKeyValueObjectFromFile, deployPackage, setPaths, processPackage } = require('@adobe/aio-lib-runtime').utils
 const { flags } = require('@oclif/command')
-const aioConfig = require('@adobe/aio-lib-core-config')
-const AIO_CONFIG_IMS_ORG_ID = 'project.org.ims_org_id'
 
 class IndexCommand extends RuntimeBaseCommand {
   async run () {
@@ -36,7 +34,7 @@ class IndexCommand extends RuntimeBaseCommand {
       const entities = processPackage(packages, deploymentPackages, deploymentTriggers, params, false, options)
       const ow = await this.wsk(options)
       const logger = this.log
-      await deployPackage(entities, ow, logger, aioConfig.get(AIO_CONFIG_IMS_ORG_ID))
+      await deployPackage(entities, ow, logger, this.getImsOrgId())
     } catch (err) {
       this.handleError('Failed to deploy', err)
     }
