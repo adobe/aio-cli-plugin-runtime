@@ -12,7 +12,7 @@ governing permissions and limitations under the License.
 
 const { flags } = require('@oclif/command')
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
-const { printLogs } = require('../../../runtime-helpers')
+const { printLogs } = require('@adobe/aio-lib-runtime').utils
 const chalk = require('chalk')
 
 class ActivationLogs extends RuntimeBaseCommand {

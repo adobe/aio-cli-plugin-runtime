@@ -69,6 +69,10 @@ class RuntimeBaseCommand extends Command {
     return runtimeLib.init(options)
   }
 
+  getImsOrgId () {
+    return config.get('project.org.ims_org_id')
+  }
+
   async init () {
     const { flags } = this.parse(this.constructor)
 

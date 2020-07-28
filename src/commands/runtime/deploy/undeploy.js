@@ -11,7 +11,7 @@ governing permissions and limitations under the License.
 */
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
-const { getProjectEntities, undeployPackage, processPackage, setPaths } = require('../../../runtime-helpers')
+const { getProjectEntities, undeployPackage, processPackage, setPaths } = require('@adobe/aio-lib-runtime').utils
 const { flags } = require('@oclif/command')
 
 class DeployUndeploy extends RuntimeBaseCommand {

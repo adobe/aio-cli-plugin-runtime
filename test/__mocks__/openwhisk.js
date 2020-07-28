@@ -2,7 +2,9 @@ const mockOpenWhisk = {
   actions: {},
   activations: {},
   namespaces: {},
-  packages: {},
+  packages: {
+    update: jest.fn()
+  },
   rules: {},
   triggers: {},
   feeds: {},

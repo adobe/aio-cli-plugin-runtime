@@ -11,7 +11,7 @@ governing permissions and limitations under the License.
 */
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
-const { setPaths, processPackage, syncProject } = require('../../../runtime-helpers')
+const { setPaths, processPackage, syncProject } = require('@adobe/aio-lib-runtime').utils
 const { flags } = require('@oclif/command')
 
 class DeploySync extends RuntimeBaseCommand {
@@ -31,7 +31,7 @@ class DeploySync extends RuntimeBaseCommand {
       const entities = processPackage(packages, deploymentPackages, deploymentTriggers, params, false, options)
       const ow = await this.wsk(options)
       const logger = this.log
-      await syncProject(components.projectName, components.manifestPath, components.manifestContent, entities, ow, logger)
+      await syncProject(components.projectName, components.manifestPath, components.manifestContent, entities, ow, logger, this.getImsOrgId())
     } catch (err) {
       this.handleError('Failed to sync', err)
     }
