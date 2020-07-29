@@ -15,6 +15,8 @@ const { createKeyValueArrayFromFlag, createKeyValueArrayFromFile } = require('@a
 const { flags } = require('@oclif/command')
 
 class TriggerCreate extends RuntimeBaseCommand {
+  isUpdate () { return false }
+
   async run () {
     const { args, flags } = this.parse(TriggerCreate)
 
@@ -45,7 +47,8 @@ class TriggerCreate extends RuntimeBaseCommand {
       if (Object.keys(annotationParams).length) {
         triggerParams.annotations = annotationParams
       }
-      if (flags.feed) {
+      // TODO: Updating a feed is not supported as per wsk cli. Need to check if we can still support it.
+      if (flags.feed && !this.isUpdate()) {
         triggerParams.feed = flags.feed
       }
 
@@ -55,9 +58,11 @@ class TriggerCreate extends RuntimeBaseCommand {
       }
 
       const ow = await this.wsk()
-      await ow.triggers.create(options)
+      const method = this.isUpdate() ? 'update' : 'create'
+      await ow.triggers[method](options)
     } catch (err) {
-      this.handleError('failed to create the trigger', err)
+      const method = this.isUpdate() ? 'update' : 'create'
+      this.handleError(`failed to ${method} the trigger`, err)
     }
   }
 }

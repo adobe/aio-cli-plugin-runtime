@@ -13,17 +13,21 @@ const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 const { flags } = require('@oclif/command')
 
 class RuleCreate extends RuntimeBaseCommand {
+  isUpdate () { return false }
+
   async run () {
     const { args, flags } = this.parse(RuleCreate)
     try {
       const ow = await this.wsk()
       const RuleCreateObject = { ...args }
-      const result = await ow.rules.create(RuleCreateObject)
+      const method = this.isUpdate() ? 'update' : 'create'
+      const result = await ow.rules[method](RuleCreateObject)
       if (flags.json) {
         this.logJSON('', result)
       }
     } catch (err) {
-      this.handleError('failed to create rule', err)
+      const method = this.isUpdate() ? 'update' : 'create'
+      this.handleError(`failed to ${method} rule`, err)
     }
   }
 }

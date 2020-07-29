@@ -15,9 +15,10 @@ const { createKeyValueArrayFromFlag, createKeyValueArrayFromFile } = require('@a
 const { flags } = require('@oclif/command')
 
 class PackageCreate extends RuntimeBaseCommand {
+  isUpdate () { return false }
+
   async run () {
     const { args, flags } = this.parse(PackageCreate)
-    const name = args.packageName
     let paramsPackage // omit if no params are defined explicitly
     try {
       if (flags.param) {
@@ -45,20 +46,27 @@ class PackageCreate extends RuntimeBaseCommand {
         case 'true' :
         case 'yes' :
           packageParams['publish'] = true
+          break
+        case 'false' :
+        case 'no' :
+          packageParams['publish'] = false
+          break
       }
       const options = {}
-      options['name'] = name
+      options['name'] = args.packageName
       // only provide 'pacakge' property if it's not empty
       if (Object.entries(packageParams).filter(([_, v]) => v !== undefined).length > 0) {
         options['package'] = packageParams
       }
       const ow = await this.wsk()
-      const result = await ow.packages.create(options)
+      const method = this.isUpdate() ? 'update' : 'create'
+      const result = await ow.packages[method](options)
       if (flags.json) {
         this.logJSON('', result)
       }
     } catch (err) {
-      this.handleError('failed to create the package', err)
+      const method = this.isUpdate() ? 'update' : 'create'
+      this.handleError(`failed to ${method} the package`, err)
     }
   }
 }
