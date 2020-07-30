@@ -678,7 +678,7 @@ describe('instance methods', () => {
     test('tests for incorrect --param flags', () => {
       return new Promise((resolve, reject) => {
         ow.mockRejected(owAction, '')
-        command.argv = ['hello', '/action/actionFile.js', '--param', 'a', 'b', 'c']
+        command.argv = ['hello', '/action/actionFile.js', '--param', 'a']
         return command.run()
           .then(() => reject(new Error('does not throw error')))
           .catch(() => {
@@ -691,7 +691,7 @@ describe('instance methods', () => {
     test('tests for incorrect --annotation flags', () => {
       return new Promise((resolve, reject) => {
         ow.mockRejected(owAction, '')
-        command.argv = ['hello', '/action/actionFile.js', '--annotation', 'a', 'b', 'c']
+        command.argv = ['hello', '/action/actionFile.js', '--annotation', 'a']
         return command.run()
           .then(() => reject(new Error('does not throw error')))
           .catch(() => {
