@@ -13,7 +13,7 @@ governing permissions and limitations under the License.
 const fs = require('fs')
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 const { createKeyValueArrayFromFlag, createKeyValueArrayFromFile, createComponentsfromSequence } = require('@adobe/aio-lib-runtime').utils
-const { parseAndMergeParameters } = require('../../../utils')
+const { getKeyValueArrayFromMergedParameters } = require('../../../utils')
 const { kindForFileExtension } = require('../../../kinds')
 const { flags } = require('@oclif/command')
 
@@ -97,7 +97,7 @@ class ActionCreate extends RuntimeBaseCommand {
         exec.image = flags.docker
       }
 
-      paramsAction = parseAndMergeParameters(this.argv, '-p', '--param', '-P', '--param-file')
+      paramsAction = getKeyValueArrayFromMergedParameters(this.argv, '-p', '--param', '-P', '--param-file')
 
       if (flags.env) {
         // each --env flag expects two values ( a key and a value ). Multiple --env flags can be passed
@@ -124,7 +124,7 @@ class ActionCreate extends RuntimeBaseCommand {
         }
       }
 
-      annotationParams = parseAndMergeParameters(this.argv, '-a', '--annotation', '-A', '--annotation-file')
+      annotationParams = getKeyValueArrayFromMergedParameters(this.argv, '-a', '--annotation', '-A', '--annotation-file')
 
       if (flags.web) {
         annotationParams = annotationParams || []
