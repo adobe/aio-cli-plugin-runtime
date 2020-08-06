@@ -9,23 +9,10 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
-const { flags } = require('@oclif/command')
+const RuleCreate = require('./create')
 
-class RuleUpdate extends RuntimeBaseCommand {
-  async run () {
-    const { args, flags } = this.parse(RuleUpdate)
-    try {
-      const ow = await this.wsk()
-      const RuleUpdateObject = { ...args }
-      const result = await ow.rules.update(RuleUpdateObject)
-      if (flags.json) {
-        this.logJSON('', result)
-      }
-    } catch (err) {
-      this.handleError('failed to update rule', err)
-    }
-  }
+class RuleUpdate extends RuleCreate {
+  isUpdate () { return true }
 }
 
 RuleUpdate.description = 'Update a Rule'
@@ -48,12 +35,7 @@ RuleUpdate.args = [
   }
 ]
 
-RuleUpdate.flags = {
-  ...RuntimeBaseCommand.flags,
-  json: flags.boolean({
-    description: 'output raw json'
-  })
-}
+RuleUpdate.flags = RuleCreate.flags
 
 RuleUpdate.aliases = [
   'rt:rule:update'
