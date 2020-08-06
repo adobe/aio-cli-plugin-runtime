@@ -97,7 +97,7 @@ class ActionCreate extends RuntimeBaseCommand {
         exec.image = flags.docker
       }
 
-      paramsAction = getKeyValueArrayFromMergedParameters(this.argv, '-p', '--param', '-P', '--param-file')
+      paramsAction = getKeyValueArrayFromMergedParameters(flags.param, flags['param-file'])
 
       if (flags.env) {
         // each --env flag expects two values ( a key and a value ). Multiple --env flags can be passed
@@ -124,7 +124,7 @@ class ActionCreate extends RuntimeBaseCommand {
         }
       }
 
-      annotationParams = getKeyValueArrayFromMergedParameters(this.argv, '-a', '--annotation', '-A', '--annotation-file')
+      annotationParams = getKeyValueArrayFromMergedParameters(flags.annotation, flags['annotation-file'])
 
       if (flags.web) {
         annotationParams = annotationParams || []

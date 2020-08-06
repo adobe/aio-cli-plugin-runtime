@@ -26,7 +26,7 @@ class IndexCommand extends RuntimeBaseCommand {
       const deploymentTriggers = components.deploymentTriggers
       const deploymentPackages = components.deploymentPackages
 
-      let params = getKeyValueObjectFromMergedParameters(this.argv, '-p', '--param', '-P', '--param-file')
+      const params = getKeyValueObjectFromMergedParameters(flags.param, flags['param-file'])
       const options = await this.getOptions()
       const entities = processPackage(packages, deploymentPackages, deploymentTriggers, params, false, options)
       const ow = await this.wsk(options)

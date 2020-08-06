@@ -21,8 +21,8 @@ class TriggerCreate extends RuntimeBaseCommand {
     const { args, flags } = this.parse(TriggerCreate)
 
     try {
-      let triggerPackage = getKeyValueArrayFromMergedParameters(this.argv, '-p', '--param', '-P', '--param-file') || []
-      let annotationParams = getKeyValueArrayFromMergedParameters(this.argv, '-a', '--annotation', '-A', '--annotation-file') || []
+      const triggerPackage = getKeyValueArrayFromMergedParameters(flags.param, flags['param-file']) || []
+      const annotationParams = getKeyValueArrayFromMergedParameters(flags.annotation, flags['annotation-file']) || []
 
       // triggerParams.parameters is expected to be passed as an array of key value pairs
       // For example : [{key : 'Your key 1' , value: 'Your value 1'}, {key : 'Your key 2' , value: 'Your value 2'} ]

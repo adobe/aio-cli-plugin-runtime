@@ -11,7 +11,6 @@ governing permissions and limitations under the License.
 */
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
-const { createKeyValueArrayFromFlag, createKeyValueArrayFromFile } = require('@adobe/aio-lib-runtime').utils
 const { getKeyValueArrayFromMergedParameters } = require('../../../utils')
 const { flags } = require('@oclif/command')
 
@@ -22,9 +21,9 @@ class PackageCreate extends RuntimeBaseCommand {
     const { args, flags } = this.parse(PackageCreate)
     let paramsPackage // omit if no params are defined explicitly
     try {
-      paramsPackage = getKeyValueArrayFromMergedParameters(this.argv, '-p', '--param', '-P', '--param-file')
-      let annotationParams = getKeyValueArrayFromMergedParameters(this.argv, '-a', '--annotation', '-A', '--annotation-file')
-      
+      paramsPackage = getKeyValueArrayFromMergedParameters(flags.param, flags['param-file'])
+      const annotationParams = getKeyValueArrayFromMergedParameters(flags.annotation, flags['annotation-file'])
+
       // packageParams.parameters is expected to be passed as an array of key value pairs
       // For example : [{key : 'Your key 1' , value: 'Your value 1'}, {key : 'Your key 2' , value: 'Your value 2'} ]
       const packageParams = {

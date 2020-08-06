@@ -10,11 +10,9 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const { createKeyValueArrayFromObject, createKeyValueObjectFromFile } = require('@adobe/aio-lib-runtime').utils
-
-function getKeyValueArrayFromMergedParameters (args, paramChar, paramString, paramFileChar, paramFileString) {
-  const paramsActionObj = getKeyValueObjectFromMergedParameters(args, paramChar, paramString, paramFileChar, paramFileString
-    )
+const { createKeyValueObjectFromFlag, createKeyValueArrayFromObject, createKeyValueObjectFromFile } = require('@adobe/aio-lib-runtime').utils
+function getKeyValueArrayFromMergedParameters (paramCharFlags, paramStringFlags) {
+  const paramsActionObj = getKeyValueObjectFromMergedParameters(paramCharFlags, paramStringFlags)
   if (Object.keys(paramsActionObj).length > 0) {
     return createKeyValueArrayFromObject(paramsActionObj)
   } else {
@@ -22,20 +20,14 @@ function getKeyValueArrayFromMergedParameters (args, paramChar, paramString, par
   }
 }
 
-function getKeyValueObjectFromMergedParameters (args, paramChar, paramString, paramFileChar, paramFileString) {
+function getKeyValueObjectFromMergedParameters (paramCharFlags, paramStringFlags) {
   let paramsActionObj = {}
-  args.forEach((value, index) => {
-    if (value === paramChar || value === paramString) {
-      if (args.length < (index + 3) || args[index + 1].startsWith('-') || args[index + 2].startsWith('-')
-          || (args.length > (index + 3) && !args[index+3].startsWith('-'))) {
-        throw (new Error(`Please provide correct values for flags`))
-      }
-      paramsActionObj[args[index + 1]] = args[index + 2]
-    }
-    if (value === paramFileChar || value === paramFileString) {
-      paramsActionObj = Object.assign(paramsActionObj, createKeyValueObjectFromFile(args[index + 1]))
-    }
-  })
+  if (paramStringFlags) {
+    paramsActionObj = createKeyValueObjectFromFile(paramStringFlags)
+  }
+  if (paramCharFlags) {
+    Object.assign(paramsActionObj, createKeyValueObjectFromFlag(paramCharFlags))
+  }
   return paramsActionObj
 }
 

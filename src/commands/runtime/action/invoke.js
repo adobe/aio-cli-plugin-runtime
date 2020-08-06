@@ -20,7 +20,7 @@ class ActionInvoke extends RuntimeBaseCommand {
     const name = args.actionName
     let paramsAction = {}
     try {
-      paramsAction = getKeyValueObjectFromMergedParameters(this.argv, '-p', '--param', '-P', '--param-file')
+      paramsAction = getKeyValueObjectFromMergedParameters(flags.param, flags['param-file'])
 
       const ow = await this.wsk()
       const result = await ow.actions.invoke({

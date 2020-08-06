@@ -21,8 +21,8 @@ class PackageBind extends RuntimeBaseCommand {
     const name = args.bindPackageName
     try {
       const binding = parsePackageName(args.packageName)
-      let paramsPackage = getKeyValueArrayFromMergedParameters(this.argv, '-p', '--param', '-P', '--param-file') || []
-      let annotationParams = getKeyValueArrayFromMergedParameters(this.argv, '-a', '--annotation', '-A', '--annotation-file') || []
+      const paramsPackage = getKeyValueArrayFromMergedParameters(flags.param, flags['param-file']) || []
+      const annotationParams = getKeyValueArrayFromMergedParameters(flags.annotation, flags['annotation-file']) || []
 
       const options = {}
       options.name = name

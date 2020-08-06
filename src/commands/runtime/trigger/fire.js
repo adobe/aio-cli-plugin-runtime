@@ -19,7 +19,7 @@ class TriggerFire extends RuntimeBaseCommand {
     const { args, flags } = this.parse(TriggerFire)
 
     try {
-      let triggerPackage = getKeyValueArrayFromMergedParameters(this.argv, '-p', '--param', '-P', '--param-file') || []
+      const triggerPackage = getKeyValueArrayFromMergedParameters(flags.param, flags['param-file']) || []
 
       // triggerParams.parameters is expected to be passed as an array of key value pairs
       // For example : [{key : 'Your key 1' , value: 'Your value 1'}, {key : 'Your key 2' , value: 'Your value 2'} ]
