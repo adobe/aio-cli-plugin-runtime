@@ -271,7 +271,12 @@ describe('instance methods', () => {
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalledWith({
-            name: 'packageName'
+            name: 'packageName',
+            package: {
+              annotations: undefined,
+              parameters: undefined,
+              publish: false
+            }
           })
           expect(stdout.output).toMatch('')
         })
