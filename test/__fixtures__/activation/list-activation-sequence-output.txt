@@ -1,2 +1,2 @@
-Datetime        Status   Kind     Version    Activation ID Start Wait Init Duration Entity 
-05/22 02:39:38  success  nodejs   0.0.1    ․ 12345         warm  --   0    23ms     foo    
+Datetime        Status   Kind      Version    Activation ID Start Wait Init Duration Entity 
+05/22 02:39:38  success  nodejs:10 0.0.1    ․ 12345         warm  --   0    23ms     foo    

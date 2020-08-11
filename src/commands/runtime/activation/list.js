@@ -98,7 +98,8 @@ class ActivationList extends RuntimeBaseCommand {
                 if (annotations && annotations.length) {
                   kind = annotations.find(_ => _.key === 'kind').value
                 }
-                return kind !== undefined ? kind.split(/[:-]/)[0] : '??'
+                kind = kind || '??'
+                return `${kind.includes('lambda') ? kind.replace('-lambda', '') + ' (λ)' : kind}`
               } else {
                 // this is a trigger
                 return 'trigger'
