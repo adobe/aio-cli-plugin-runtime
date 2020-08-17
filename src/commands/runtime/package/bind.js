@@ -12,7 +12,7 @@ governing permissions and limitations under the License.
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 const { parsePackageName } = require('@adobe/aio-lib-runtime').utils
-const { getKeyValueArrayFromMergedParameters } = require('../../../utils')
+const { getKeyValueArrayFromMergedParameters } = require('@adobe/aio-lib-runtime').utils
 const { flags } = require('@oclif/command')
 
 class PackageBind extends RuntimeBaseCommand {

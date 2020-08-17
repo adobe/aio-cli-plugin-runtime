@@ -12,8 +12,7 @@ governing permissions and limitations under the License.
 
 const fs = require('fs')
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
-const { createKeyValueArrayFromFlag, createKeyValueArrayFromFile, createComponentsfromSequence } = require('@adobe/aio-lib-runtime').utils
-const { getKeyValueArrayFromMergedParameters } = require('../../../utils')
+const { createKeyValueArrayFromFlag, createKeyValueArrayFromFile, createComponentsfromSequence, getKeyValueArrayFromMergedParameters } = require('@adobe/aio-lib-runtime').utils
 const { kindForFileExtension } = require('../../../kinds')
 const { flags } = require('@oclif/command')
 
