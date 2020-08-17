@@ -11,7 +11,7 @@ governing permissions and limitations under the License.
 */
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
-const { createKeyValueObjectFromFlag, createKeyValueObjectFromFile, deployPackage, setPaths, processPackage } = require('@adobe/aio-lib-runtime').utils
+const { deployPackage, setPaths, processPackage, getKeyValueObjectFromMergedParameters } = require('@adobe/aio-lib-runtime').utils
 const { flags } = require('@oclif/command')
 
 class IndexCommand extends RuntimeBaseCommand {
@@ -24,12 +24,8 @@ class IndexCommand extends RuntimeBaseCommand {
       const packages = components.packages
       const deploymentTriggers = components.deploymentTriggers
       const deploymentPackages = components.deploymentPackages
-      let params = {}
-      if (flags.param) {
-        params = createKeyValueObjectFromFlag(flags.param)
-      } else if (flags['param-file']) {
-        params = createKeyValueObjectFromFile(flags['param-file'])
-      }
+
+      const params = getKeyValueObjectFromMergedParameters(flags.param, flags['param-file'])
       const options = await this.getOptions()
       const entities = processPackage(packages, deploymentPackages, deploymentTriggers, params, false, options)
       const ow = await this.wsk(options)

@@ -12,7 +12,7 @@ governing permissions and limitations under the License.
 
 const fs = require('fs')
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
-const { createKeyValueArrayFromFlag, createKeyValueArrayFromFile, createComponentsfromSequence } = require('@adobe/aio-lib-runtime').utils
+const { createKeyValueArrayFromFlag, createKeyValueArrayFromFile, createComponentsfromSequence, getKeyValueArrayFromMergedParameters } = require('@adobe/aio-lib-runtime').utils
 const { kindForFileExtension } = require('../../../kinds')
 const { flags } = require('@oclif/command')
 
@@ -96,13 +96,7 @@ class ActionCreate extends RuntimeBaseCommand {
         exec.image = flags.docker
       }
 
-      if (flags.param) {
-        // each --param flag expects two values ( a key and a value ). Multiple --param flags can be passed
-        // For example : aio runtime:action:update --param name "foo" --param city "bar"
-        paramsAction = createKeyValueArrayFromFlag(flags.param)
-      } else if (flags['param-file']) {
-        paramsAction = createKeyValueArrayFromFile(flags['param-file'])
-      }
+      paramsAction = getKeyValueArrayFromMergedParameters(flags.param, flags['param-file'])
 
       if (flags.env) {
         // each --env flag expects two values ( a key and a value ). Multiple --env flags can be passed
@@ -129,13 +123,7 @@ class ActionCreate extends RuntimeBaseCommand {
         }
       }
 
-      if (flags.annotation) {
-        // each --annotation flag expects two values ( a key and a value ). Multiple --annotation flags can be passed
-        // For example : aio runtime:action:update -a description "foo" -a sampleInput "bar
-        annotationParams = createKeyValueArrayFromFlag(flags.annotation)
-      } else if (flags['annotation-file']) {
-        annotationParams = createKeyValueArrayFromFile(flags['annotation-file'])
-      }
+      annotationParams = getKeyValueArrayFromMergedParameters(flags.annotation, flags['annotation-file'])
 
       if (flags.web) {
         annotationParams = annotationParams || []

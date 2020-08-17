@@ -272,6 +272,27 @@ describe('instance methods', () => {
         })
     })
 
+    test('creates an action with action name, action path, --param-file and param flag (precedence)', () => {
+      const name = 'hello'
+      const cmd = ow.mockResolved(owAction, '')
+      command.argv = [name, '/action/actionFile.js', '--param', 'param1', 'fromcmdline1', '--param', 'cmdparam', 'fromcmdline2', '--param-file', '/action/parameters.json']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith({
+            name,
+            action: {
+              name,
+              exec: {
+                code: jsFile,
+                kind: 'nodejs:default'
+              },
+              parameters: createKeyValueArrayFromObject({ param1: 'fromcmdline1', param2: 'param2value', cmdparam: 'fromcmdline2' })
+            }
+          })
+          expect(stdout.output).toMatch('')
+        })
+    })
+
     test('creates an action with action name, action path, --params flag and limits', () => {
       const name = 'hello'
       const cmd = ow.mockResolved(owAction, '')
