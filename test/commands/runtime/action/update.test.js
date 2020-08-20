@@ -13,9 +13,9 @@ governing permissions and limitations under the License.
 const { stdout } = require('stdout-stderr')
 const TheCommand = require('../../../../src/commands/runtime/action/update.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
-const { createKeyValueArrayFromObject } = require('@adobe/aio-lib-runtime').utils
-const ow = require('openwhisk')()
-const owAction = 'actions.update'
+const RuntimeLib = require('@adobe/aio-lib-runtime')
+const rtUtils = RuntimeLib.utils
+const rtAction = 'actions.update'
 
 test('exports', async () => {
   expect(typeof TheCommand).toEqual('function')
@@ -66,11 +66,13 @@ test('args', async () => {
 })
 
 describe('instance methods', () => {
-  let command, handleError
-
-  beforeEach(() => {
+  let command, handleError, rtLib
+  beforeEach(async () => {
     command = new TheCommand([])
     handleError = jest.spyOn(command, 'handleError')
+    rtLib = await RuntimeLib.init({ apihost: 'fakehost', api_key: 'fakekey' })
+    rtLib.mockResolved('actions.client.options', '')
+    RuntimeLib.mockReset()
   })
 
   beforeAll(() => {
@@ -89,14 +91,13 @@ describe('instance methods', () => {
 
   describe('run', () => {
     const jsFile = fixtureFile('action/actionFile.js')
-    ow.mockResolved('actions.client.options', '')
     test('exists', async () => {
       expect(command.run).toBeInstanceOf(Function)
     })
 
     test('updates an action with action name only', () => {
       const name = 'hello'
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = [name]
       return command.run()
         .then(() => {
@@ -107,7 +108,7 @@ describe('instance methods', () => {
 
     test('updates an action with action name and action path', () => {
       const name = 'hello'
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = [name, '/action/actionFile.js']
       return command.run()
         .then(() => {
@@ -118,7 +119,7 @@ describe('instance methods', () => {
 
     test('updates an action with action name and action path --json', () => {
       const name = 'hello'
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = [name, '/action/actionFile.js', '--json']
       return command.run()
         .then(() => {
@@ -130,7 +131,7 @@ describe('instance methods', () => {
     test('updates an action with action name and action path to zip file', () => {
       const name = 'hello'
       const zipFile = Buffer.from('fakezipfile').toString('base64')
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = [name, '/action/zipAction.zip', '--kind', 'nodejs:10']
       return command.run()
         .then(() => {
@@ -141,7 +142,7 @@ describe('instance methods', () => {
 
     test('updates an action with action name, action path and --param flag', () => {
       const name = 'hello'
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = [name, '/action/actionFile.js', '--param', 'a', 'b', '--param', 'c', 'd']
       return command.run()
         .then(() => {
@@ -153,7 +154,7 @@ describe('instance methods', () => {
                 code: jsFile,
                 kind: 'nodejs:default'
               },
-              parameters: createKeyValueArrayFromObject({ a: 'b', c: 'd' })
+              parameters: rtUtils.createKeyValueArrayFromObject({ a: 'b', c: 'd' })
             }
           })
           expect(stdout.output).toMatch('')
@@ -162,7 +163,7 @@ describe('instance methods', () => {
 
     test('updates an action --param flag', () => {
       const name = 'hello'
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = [name, '--param', 'a', 'b', '--param', 'c', 'd']
       return command.run()
         .then(() => {
@@ -170,7 +171,7 @@ describe('instance methods', () => {
             name,
             action: {
               name,
-              parameters: createKeyValueArrayFromObject({ a: 'b', c: 'd' })
+              parameters: rtUtils.createKeyValueArrayFromObject({ a: 'b', c: 'd' })
             }
           })
           expect(stdout.output).toMatch('')
@@ -179,18 +180,17 @@ describe('instance methods', () => {
 
     test('updates an action with action name and --sequence flag', () => {
       const name = 'hello'
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = [name, '--sequence', 'a,p/b,ns/p/c,/ns2/p/d,/ns3/e']
+      rtUtils.createComponentsfromSequence.mockReturnValue({ fake: 'value' })
       return command.run()
         .then(() => {
+          expect(rtUtils.createComponentsfromSequence).toHaveBeenCalledWith(['a', 'p/b', 'ns/p/c', '/ns2/p/d', '/ns3/e'])
           expect(cmd).toHaveBeenCalledWith({
             name,
             action: {
               name,
-              exec: {
-                kind: 'sequence',
-                components: ['/_/a', '/_/p/b', '/ns/p/c', '/ns2/p/d', '/ns3/e']
-              }
+              exec: { fake: 'value' }
             }
           })
           expect(stdout.output).toMatch('')
@@ -199,36 +199,36 @@ describe('instance methods', () => {
 
     test('updates an action with action name, action path and --param-file flag', () => {
       const name = 'hello'
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
+      rtUtils.createKeyValueArrayFromFile.mockReturnValue([{ key: 'fakeParam', value: 'aaa' }])
       command.argv = [name, '/action/actionFile.js', '--param-file', '/action/parameters.json']
       return command.run()
         .then(() => {
+          expect(rtUtils.createKeyValueArrayFromFile).toHaveBeenCalledWith('/action/parameters.json')
           expect(cmd).toHaveBeenCalledWith({
-            name,
             action: {
-              name,
               exec: {
-                code: jsFile,
-                kind: 'nodejs:default'
-              },
-              parameters: createKeyValueArrayFromObject({ param1: 'param1value', param2: 'param2value' })
-            }
-          })
+                code: jsFile, kind: 'nodejs:default' },
+              name,
+              parameters: [{ key: 'fakeParam', value: 'aaa' }] },
+            name })
           expect(stdout.output).toMatch('')
         })
     })
 
     test('updates an action with action name and --param-file flag', () => {
       const name = 'hello'
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
+      rtUtils.createKeyValueArrayFromFile.mockReturnValue([{ key: 'fakeParam', value: 'aaa' }])
       command.argv = [name, '--param-file', '/action/parameters.json']
       return command.run()
         .then(() => {
+          expect(rtUtils.createKeyValueArrayFromFile).toHaveBeenCalledWith('/action/parameters.json')
           expect(cmd).toHaveBeenCalledWith({
             name,
             action: {
               name,
-              parameters: createKeyValueArrayFromObject({ param1: 'param1value', param2: 'param2value' })
+              parameters: [{ key: 'fakeParam', value: 'aaa' }]
             }
           })
           expect(stdout.output).toMatch('')
@@ -237,10 +237,12 @@ describe('instance methods', () => {
 
     test('updates an action with action name, action path, --params flag and limits', () => {
       const name = 'hello'
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = [name, '/action/actionFile.js', '--param', 'a', 'b', '--param', 'c', 'd', '--logsize', '8', '--memory', '128', '--timeout', '20000']
+      rtUtils.createKeyValueArrayFromFlag.mockReturnValue([{ key: 'fakeParam', value: 'aaa' }])
       return command.run()
         .then(() => {
+          expect(rtUtils.createKeyValueArrayFromFlag).toHaveBeenCalledWith(['a', 'b', 'c', 'd'])
           expect(cmd).toHaveBeenCalledWith({
             name,
             action: {
@@ -249,7 +251,10 @@ describe('instance methods', () => {
                 code: jsFile,
                 kind: 'nodejs:default'
               },
-              parameters: createKeyValueArrayFromObject({ a: 'b', c: 'd' }),
+              parameters: [{
+                key: 'fakeParam',
+                value: 'aaa'
+              }],
               limits: {
                 logs: 8,
                 memory: 128,
@@ -263,15 +268,20 @@ describe('instance methods', () => {
 
     test('updates an action with action name, --params flag and limits', () => {
       const name = 'hello'
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = [name, '--param', 'a', 'b', '--param', 'c', 'd', '--logsize', '8', '--memory', '128', '--timeout', '20000']
+      rtUtils.createKeyValueArrayFromFlag.mockReturnValue([{ key: 'fakeParam', value: 'aaa' }])
       return command.run()
         .then(() => {
+          expect(rtUtils.createKeyValueArrayFromFlag).toHaveBeenCalledWith(['a', 'b', 'c', 'd'])
           expect(cmd).toHaveBeenCalledWith({
             name,
             action: {
               name,
-              parameters: createKeyValueArrayFromObject({ a: 'b', c: 'd' }),
+              parameters: [{
+                key: 'fakeParam',
+                value: 'aaa'
+              }],
               limits: {
                 logs: 8,
                 memory: 128,
@@ -285,15 +295,20 @@ describe('instance methods', () => {
 
     test('updates an action with action name, --params flag and limits with shorter flag version', () => {
       const name = 'hello'
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = [name, '-p', 'a', 'b', '-p', 'c', 'd', '-l', '8', '-m', '128', '-t', '20000']
+      rtUtils.createKeyValueArrayFromFlag.mockReturnValue([{ key: 'fakeParam', value: 'aaa' }])
       return command.run()
         .then(() => {
+          expect(rtUtils.createKeyValueArrayFromFlag).toHaveBeenCalledWith(['a', 'b', 'c', 'd'])
           expect(cmd).toHaveBeenCalledWith({
             name,
             action: {
               name,
-              parameters: createKeyValueArrayFromObject({ a: 'b', c: 'd' }),
+              parameters: [{
+                key: 'fakeParam',
+                value: 'aaa'
+              }],
               limits: {
                 logs: 8,
                 memory: 128,
@@ -307,10 +322,12 @@ describe('instance methods', () => {
 
     test('updates an action with action name, action path, --params flag, limits and kind', () => {
       const name = 'hello'
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = [name, '/action/actionFile.js', '--param', 'a', 'b', '--param', 'c', 'd', '--logsize', '8', '--memory', '128', '--kind', 'nodejs:10']
+      rtUtils.createKeyValueArrayFromFlag.mockReturnValue([{ key: 'fakeParam', value: 'aaa' }])
       return command.run()
         .then(() => {
+          expect(rtUtils.createKeyValueArrayFromFlag).toHaveBeenCalledWith(['a', 'b', 'c', 'd'])
           expect(cmd).toHaveBeenCalledWith({
             name,
             action: {
@@ -319,7 +336,10 @@ describe('instance methods', () => {
                 code: jsFile,
                 kind: 'nodejs:10'
               },
-              parameters: createKeyValueArrayFromObject({ a: 'b', c: 'd' }),
+              parameters: [{
+                key: 'fakeParam',
+                value: 'aaa'
+              }],
               limits: {
                 logs: 8,
                 memory: 128
@@ -332,15 +352,20 @@ describe('instance methods', () => {
 
     test('updates an action with action name, --params flag, limits', () => {
       const name = 'hello'
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = [name, '--param', 'a', 'b', '--param', 'c', 'd', '--logsize', '8', '--memory', '128']
+      rtUtils.createKeyValueArrayFromFlag.mockReturnValue([{ key: 'fakeParam', value: 'aaa' }])
       return command.run()
         .then(() => {
+          expect(rtUtils.createKeyValueArrayFromFlag).toHaveBeenCalledWith(['a', 'b', 'c', 'd'])
           expect(cmd).toHaveBeenCalledWith({
             name,
             action: {
               name,
-              parameters: createKeyValueArrayFromObject({ a: 'b', c: 'd' }),
+              parameters: [{
+                key: 'fakeParam',
+                value: 'aaa'
+              }],
               limits: {
                 logs: 8,
                 memory: 128
@@ -353,15 +378,21 @@ describe('instance methods', () => {
 
     test('updates an action with action name --env flag', () => {
       const name = 'hello'
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = [name, '--env', 'a', 'b', '--env', 'c', 'd']
+      rtUtils.createKeyValueArrayFromFlag.mockReturnValue([{ key: 'fakeEnv', value: 'abc' }])
       return command.run()
         .then(() => {
+          expect(rtUtils.createKeyValueArrayFromFlag).toHaveBeenCalledWith(['a', 'b', 'c', 'd'])
           expect(cmd).toHaveBeenCalledWith({
             name,
             action: {
               name,
-              parameters: createKeyValueArrayFromObject({ a: 'b', c: 'd' }).map(_ => ({ ..._, init: true }))
+              parameters: [{
+                key: 'fakeEnv',
+                value: 'abc',
+                init: true
+              }]
             }
           })
           expect(stdout.output).toMatch('')
@@ -370,15 +401,21 @@ describe('instance methods', () => {
 
     test('updates an action with action name and --e flag', () => {
       const name = 'hello'
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = [name, '--env', 'a', 'b', '-e', 'c', 'd']
+      rtUtils.createKeyValueArrayFromFlag.mockReturnValue([{ key: 'fakeEnv', value: 'abc' }])
       return command.run()
         .then(() => {
+          expect(rtUtils.createKeyValueArrayFromFlag).toHaveBeenCalledWith(['a', 'b', 'c', 'd'])
           expect(cmd).toHaveBeenCalledWith({
             name,
             action: {
               name,
-              parameters: createKeyValueArrayFromObject({ a: 'b', c: 'd' }).map(_ => ({ ..._, init: true }))
+              parameters: [{
+                key: 'fakeEnv',
+                value: 'abc',
+                init: true
+              }]
             }
           })
           expect(stdout.output).toMatch('')
@@ -387,16 +424,26 @@ describe('instance methods', () => {
 
     test('updates an action with action name --env and --param flag', () => {
       const name = 'hello'
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = [name, '--env', 'a', 'b', '--param', 'c', 'd']
+      rtUtils.createKeyValueArrayFromFlag.mockReturnValueOnce([{ key: 'fakeParam', value: 'aaa' }])
+      rtUtils.createKeyValueArrayFromFlag.mockReturnValueOnce([{ key: 'fakeEnv', value: 'abc' }])
       return command.run()
         .then(() => {
+          expect(rtUtils.createKeyValueArrayFromFlag).toHaveBeenCalledWith(['c', 'd'])
+          expect(rtUtils.createKeyValueArrayFromFlag).toHaveBeenCalledWith(['a', 'b'])
           expect(cmd).toHaveBeenCalledWith({
             name,
             action: {
               name,
-              // order matters in array for the check, env params come last
-              parameters: createKeyValueArrayFromObject({ c: 'd', a: 'b' }).map(_ => { return _.key === 'a' ? { ..._, init: true } : _ })
+              parameters: [{
+                key: 'fakeParam',
+                value: 'aaa'
+              }, {
+                key: 'fakeEnv',
+                value: 'abc',
+                init: true
+              }]
             }
           })
           expect(stdout.output).toMatch('')
@@ -405,9 +452,10 @@ describe('instance methods', () => {
 
     test('update an action with action name and overlapping --env and --param keys', () => {
       return new Promise((resolve, reject) => {
-        ow.mockRejected(owAction, '')
+        rtLib.mockRejected(rtAction, '')
         const name = 'hello'
-        command.argv = [name, '--env', 'a', 'b', '--param', 'a', 'd']
+        command.argv = [name, '/action/actionFile.js', '--env', 'a', 'b', '--param', 'a', 'd']
+        rtUtils.createKeyValueArrayFromFlag.mockReturnValue([{ key: 'same', value: 'kv' }])
         return command.run()
           .then(() => reject(new Error('does not throw error')))
           .catch(() => {
@@ -419,10 +467,12 @@ describe('instance methods', () => {
 
     test('update an action with action name, action path and --env-file flag', () => {
       const name = 'hello'
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = [name, '/action/actionFile.js', '--env-file', '/action/parameters.json']
+      rtUtils.createKeyValueArrayFromFile.mockReturnValue([{ key: 'fakeEnv', value: 'abc' }])
       return command.run()
         .then(() => {
+          expect(rtUtils.createKeyValueArrayFromFile).toHaveBeenCalledWith('/action/parameters.json')
           expect(cmd).toHaveBeenCalledWith({
             name,
             action: {
@@ -431,7 +481,11 @@ describe('instance methods', () => {
                 code: jsFile,
                 kind: 'nodejs:default'
               },
-              parameters: createKeyValueArrayFromObject({ param1: 'param1value', param2: 'param2value' }).map(_ => ({ ..._, init: true }))
+              parameters: [{
+                key: 'fakeEnv',
+                value: 'abc',
+                init: true
+              }]
             }
           })
           expect(stdout.output).toMatch('')
@@ -440,7 +494,7 @@ describe('instance methods', () => {
 
     test('updates an action with action name and log limits', () => {
       const name = 'hello'
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = [name, '--logsize', '8']
       return command.run()
         .then(() => {
@@ -459,7 +513,7 @@ describe('instance methods', () => {
 
     test('updates an action with action name and memory limits', () => {
       const name = 'hello'
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = [name, '--memory', '128']
       return command.run()
         .then(() => {
@@ -478,7 +532,7 @@ describe('instance methods', () => {
 
     test('updates an action with action name and timeout limits', () => {
       const name = 'hello'
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = [name, '--timeout', '20000']
       return command.run()
         .then(() => {
@@ -497,10 +551,13 @@ describe('instance methods', () => {
 
     test('updates an action with action name, action path, --params flag and annotation flag', () => {
       const name = 'hello'
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = [name, '/action/actionFile.js', '--param', 'a', 'b', '--param', 'c', 'd', '--annotation', 'desc', 'Description']
+      rtUtils.createKeyValueArrayFromFlag.mockReturnValue([{ key: 'fake', value: 'abc' }])
       return command.run()
         .then(() => {
+          expect(rtUtils.createKeyValueArrayFromFlag).toHaveBeenCalledWith(['a', 'b', 'c', 'd'])
+          expect(rtUtils.createKeyValueArrayFromFlag).toHaveBeenCalledWith(['desc', 'Description'])
           expect(cmd).toHaveBeenCalledWith({
             name,
             action: {
@@ -509,8 +566,14 @@ describe('instance methods', () => {
                 code: jsFile,
                 kind: 'nodejs:default'
               },
-              parameters: createKeyValueArrayFromObject({ a: 'b', c: 'd' }),
-              annotations: createKeyValueArrayFromObject({ desc: 'Description' })
+              parameters: [{
+                key: 'fake',
+                value: 'abc'
+              }],
+              annotations: [{
+                key: 'fake',
+                value: 'abc'
+              }]
             }
           })
           expect(stdout.output).toMatch('')
@@ -519,16 +582,25 @@ describe('instance methods', () => {
 
     test('updates an action with action name, --params flag and annotation flag', () => {
       const name = 'hello'
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = [name, '--param', 'a', 'b', '--param', 'c', 'd', '--annotation', 'desc', 'Description']
+      rtUtils.createKeyValueArrayFromFlag.mockReturnValue([{ key: 'fake', value: 'abc' }])
       return command.run()
         .then(() => {
+          expect(rtUtils.createKeyValueArrayFromFlag).toHaveBeenCalledWith(['a', 'b', 'c', 'd'])
+          expect(rtUtils.createKeyValueArrayFromFlag).toHaveBeenCalledWith(['desc', 'Description'])
           expect(cmd).toHaveBeenCalledWith({
             name,
             action: {
               name,
-              parameters: createKeyValueArrayFromObject({ a: 'b', c: 'd' }),
-              annotations: createKeyValueArrayFromObject({ desc: 'Description' })
+              parameters: [{
+                key: 'fake',
+                value: 'abc'
+              }],
+              annotations: [{
+                key: 'fake',
+                value: 'abc'
+              }]
             }
           })
           expect(stdout.output).toMatch('')
@@ -537,15 +609,20 @@ describe('instance methods', () => {
 
     test('updates an action with action name, annotation flag', () => {
       const name = 'hello'
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = [name, '--annotation', 'desc', 'Description']
+      rtUtils.createKeyValueArrayFromFlag.mockReturnValue([{ key: 'fake', value: 'abc' }])
       return command.run()
         .then(() => {
+          expect(rtUtils.createKeyValueArrayFromFlag).toHaveBeenCalledWith(['desc', 'Description'])
           expect(cmd).toHaveBeenCalledWith({
             name,
             action: {
               name,
-              annotations: createKeyValueArrayFromObject({ desc: 'Description' })
+              annotations: [{
+                key: 'fake',
+                value: 'abc'
+              }]
             }
           })
           expect(stdout.output).toMatch('')
@@ -554,10 +631,14 @@ describe('instance methods', () => {
 
     test('updates an action with action name, action path, --params flag and annotation-file flag', () => {
       const name = 'hello'
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = [name, '/action/actionFile.js', '-p', 'a', 'b', '-p', 'c', 'd', '-A', '/action/parameters.json']
+      rtUtils.createKeyValueArrayFromFlag.mockReturnValue([{ key: 'fake', value: 'abc' }])
+      rtUtils.createKeyValueArrayFromFile.mockReturnValue([{ key: 'fakeAnno', value: 'tation' }])
       return command.run()
         .then(() => {
+          expect(rtUtils.createKeyValueArrayFromFlag).toHaveBeenCalledWith(['a', 'b', 'c', 'd'])
+          expect(rtUtils.createKeyValueArrayFromFile).toHaveBeenCalledWith('/action/parameters.json')
           expect(cmd).toHaveBeenCalledWith({
             name,
             action: {
@@ -566,8 +647,14 @@ describe('instance methods', () => {
                 code: jsFile,
                 kind: 'nodejs:default'
               },
-              parameters: createKeyValueArrayFromObject({ a: 'b', c: 'd' }),
-              annotations: createKeyValueArrayFromObject({ param1: 'param1value', param2: 'param2value' })
+              parameters: [{
+                key: 'fake',
+                value: 'abc'
+              }],
+              annotations: [{
+                key: 'fakeAnno',
+                value: 'tation'
+              }]
             }
           })
           expect(stdout.output).toMatch('')
@@ -576,16 +663,26 @@ describe('instance methods', () => {
 
     test('updates an action with action name, --params flag and annotation-file flag', () => {
       const name = 'hello'
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = [name, '-p', 'a', 'b', '-p', 'c', 'd', '-A', '/action/parameters.json']
+      rtUtils.createKeyValueArrayFromFlag.mockReturnValue([{ key: 'fake', value: 'abc' }])
+      rtUtils.createKeyValueArrayFromFile.mockReturnValue([{ key: 'fakeAnno', value: 'tation' }])
       return command.run()
         .then(() => {
+          expect(rtUtils.createKeyValueArrayFromFlag).toHaveBeenCalledWith(['a', 'b', 'c', 'd'])
+          expect(rtUtils.createKeyValueArrayFromFile).toHaveBeenCalledWith('/action/parameters.json')
           expect(cmd).toHaveBeenCalledWith({
             name,
             action: {
               name,
-              parameters: createKeyValueArrayFromObject({ a: 'b', c: 'd' }),
-              annotations: createKeyValueArrayFromObject({ param1: 'param1value', param2: 'param2value' })
+              parameters: [{
+                key: 'fake',
+                value: 'abc'
+              }],
+              annotations: [{
+                key: 'fakeAnno',
+                value: 'tation'
+              }]
             }
           })
           expect(stdout.output).toMatch('')
@@ -594,15 +691,21 @@ describe('instance methods', () => {
 
     test('updates an action with action name and annotation-file flag', () => {
       const name = 'hello'
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = [name, '-A', '/action/parameters.json']
+      rtUtils.createKeyValueArrayFromFlag.mockReturnValue([{ key: 'fake', value: 'abc' }])
+      rtUtils.createKeyValueArrayFromFile.mockReturnValue([{ key: 'fakeAnno', value: 'tation' }])
       return command.run()
         .then(() => {
+          expect(rtUtils.createKeyValueArrayFromFile).toHaveBeenCalledWith('/action/parameters.json')
           expect(cmd).toHaveBeenCalledWith({
             name,
             action: {
               name,
-              annotations: createKeyValueArrayFromObject({ param1: 'param1value', param2: 'param2value' })
+              annotations: [{
+                key: 'fakeAnno',
+                value: 'tation'
+              }]
             }
           })
           expect(stdout.output).toMatch('')
@@ -611,10 +714,12 @@ describe('instance methods', () => {
 
     test('updates an action with action name, action path, --params flag and web flag as raw', () => {
       const name = 'hello'
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = [name, '/action/actionFile.js', '-p', 'a', 'b', '-p', 'c', 'd', '--web', 'raw']
+      rtUtils.createKeyValueArrayFromFlag.mockImplementation(() => [{ key: 'fake', value: 'abc' }])
       return command.run()
         .then(() => {
+          expect(rtUtils.createKeyValueArrayFromFlag).toHaveBeenCalledWith(['a', 'b', 'c', 'd'])
           expect(cmd).toHaveBeenCalledWith({
             name,
             action: {
@@ -623,8 +728,14 @@ describe('instance methods', () => {
                 code: jsFile,
                 kind: 'nodejs:default'
               },
-              parameters: createKeyValueArrayFromObject({ a: 'b', c: 'd' }),
-              annotations: createKeyValueArrayFromObject({ 'web-export': true, 'raw-http': true })
+              parameters: [{
+                key: 'fake',
+                value: 'abc'
+              }],
+              annotations: [
+                { key: 'web-export', value: true },
+                { key: 'raw-http', value: true }
+              ]
             }
           })
           expect(stdout.output).toMatch('')
@@ -633,10 +744,12 @@ describe('instance methods', () => {
 
     test('updates an action with action name, action path, --params flag and web flag as false', () => {
       const name = 'hello'
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = [name, '/action/actionFile.js', '-p', 'a', 'b', '-p', 'c', 'd', '--web', 'false']
+      rtUtils.createKeyValueArrayFromFlag.mockImplementation(() => [{ key: 'fake', value: 'abc' }])
       return command.run()
         .then(() => {
+          expect(rtUtils.createKeyValueArrayFromFlag).toHaveBeenCalledWith(['a', 'b', 'c', 'd'])
           expect(cmd).toHaveBeenCalledWith({
             name,
             action: {
@@ -645,8 +758,13 @@ describe('instance methods', () => {
                 code: jsFile,
                 kind: 'nodejs:default'
               },
-              parameters: createKeyValueArrayFromObject({ a: 'b', c: 'd' }),
-              annotations: createKeyValueArrayFromObject({ 'web-export': false })
+              parameters: [{
+                key: 'fake',
+                value: 'abc'
+              }],
+              annotations: [
+                { key: 'web-export', value: false }
+              ]
             }
           })
           expect(stdout.output).toMatch('')
@@ -655,10 +773,13 @@ describe('instance methods', () => {
 
     test('updates an action with action name, action path, --params flag, annotations and web flag as true', () => {
       const name = 'hello'
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = [name, '/action/actionFile.js', '-p', 'a', 'b', '-p', 'c', 'd', '-a', 'desc', 'Description', '--web', 'true']
+      rtUtils.createKeyValueArrayFromFlag.mockImplementation(() => [{ key: 'fake', value: 'abc' }])
       return command.run()
         .then(() => {
+          expect(rtUtils.createKeyValueArrayFromFlag).toHaveBeenCalledWith(['a', 'b', 'c', 'd'])
+          expect(rtUtils.createKeyValueArrayFromFlag).toHaveBeenCalledWith(['desc', 'Description'])
           expect(cmd).toHaveBeenCalledWith({
             name,
             action: {
@@ -667,43 +788,23 @@ describe('instance methods', () => {
                 code: jsFile,
                 kind: 'nodejs:default'
               },
-              parameters: createKeyValueArrayFromObject({ a: 'b', c: 'd' }),
-              annotations: createKeyValueArrayFromObject({ desc: 'Description', 'web-export': true })
+              parameters: [{
+                key: 'fake',
+                value: 'abc'
+              }],
+              annotations: [
+                { key: 'fake', value: 'abc' },
+                { key: 'web-export', value: true }
+              ]
             }
           })
           expect(stdout.output).toMatch('')
         })
     })
 
-    test('tests for incorrect --param flags', () => {
-      return new Promise((resolve, reject) => {
-        ow.mockRejected(owAction, '')
-        command.argv = ['hello', '/action/actionFile.js', '--param', 'a', 'b', 'c']
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to update the action', new Error('Please provide correct values for flags'))
-            resolve()
-          })
-      })
-    })
-
-    test('tests for incorrect --annotation flags', () => {
-      return new Promise((resolve, reject) => {
-        ow.mockRejected(owAction, '')
-        command.argv = ['hello', '/action/actionFile.js', '--annotation', 'a', 'b', 'c']
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to update the action', new Error('Please provide correct values for flags'))
-            resolve()
-          })
-      })
-    })
-
     test('tests for incorrect --sequence flags', () => {
       return new Promise((resolve, reject) => {
-        ow.mockRejected(owAction, '')
+        rtLib.mockRejected(rtAction, '')
         command.argv = ['hello', '--sequence', ' ,a,b,c']
         return command.run()
           .then(() => reject(new Error('does not throw error')))
@@ -716,7 +817,7 @@ describe('instance methods', () => {
 
     test('tests for incorrect action with --kind', () => {
       return new Promise((resolve, reject) => {
-        ow.mockRejected(owAction, '')
+        rtLib.mockRejected(rtAction, '')
         command.argv = ['hello', '--kind', 'nodejs:10']
         return command.run()
           .then(() => reject(new Error('does not throw error')))
@@ -729,7 +830,7 @@ describe('instance methods', () => {
 
     test('tests for incorrect action path', () => {
       return new Promise((resolve, reject) => {
-        ow.mockRejected(owAction, '')
+        rtLib.mockRejected(rtAction, '')
         command.argv = ['hello', '/action/file.js', '--kind', 'nodejs:10']
         return command.run()
           .then(() => reject(new Error('does not throw error')))
@@ -742,7 +843,7 @@ describe('instance methods', () => {
 
     test('tests for incorrect action zip path', () => {
       return new Promise((resolve, reject) => {
-        ow.mockRejected(owAction, '')
+        rtLib.mockRejected(rtAction, '')
         command.argv = ['hello', '/action/file.zip', '--kind', 'nodejs:10']
         return command.run()
           .then(() => reject(new Error('does not throw error')))
@@ -755,7 +856,7 @@ describe('instance methods', () => {
 
     test('error out if a zip file is deployed without the --kind flag', () => {
       return new Promise((resolve, reject) => {
-        ow.mockRejected(owAction, '')
+        rtLib.mockRejected(rtAction, '')
         command.argv = ['hello', '/action/zipAction.zip']
         return command.run()
           .then(() => reject(new Error('does not throw error')))
@@ -768,7 +869,7 @@ describe('instance methods', () => {
 
     test('tests for incorrect update with --main flag', () => {
       return new Promise((resolve, reject) => {
-        ow.mockRejected(owAction, '')
+        rtLib.mockRejected(rtAction, '')
         command.argv = ['hello', '--main', 'maynard']
         return command.run()
           .then(() => reject(new Error('does not throw error')))
@@ -781,7 +882,7 @@ describe('instance methods', () => {
 
     test('tests for incorrect update with --main flag and --sequence', () => {
       return new Promise((resolve, reject) => {
-        ow.mockRejected(owAction, '')
+        rtLib.mockRejected(rtAction, '')
         command.argv = ['hello', '--main', 'maynard', '--sequence', 'a,b,c']
         return command.run()
           .then(() => reject(new Error('does not throw error')))
@@ -794,7 +895,7 @@ describe('instance methods', () => {
 
     test('tests for incorrect update with file artifact and --sequence', () => {
       return new Promise((resolve, reject) => {
-        ow.mockRejected(owAction, '')
+        rtLib.mockRejected(rtAction, '')
         command.argv = ['hello', '/action/actionFile.js', '--sequence', 'a,b,c']
         command.run()
           .then(() => reject(new Error('does not throw error')))
@@ -807,7 +908,7 @@ describe('instance methods', () => {
 
     test('tests for incorrect update with file artifact and --sequence and --main', () => {
       return new Promise((resolve, reject) => {
-        ow.mockRejected(owAction, '')
+        rtLib.mockRejected(rtAction, '')
         command.argv = ['hello', '/action/actionFile.js', '--main', 'maynard', '--sequence', 'a,b,c']
         command.run()
           .then(() => reject(new Error('does not throw error')))
@@ -820,7 +921,7 @@ describe('instance methods', () => {
 
     test('errors out on api error', () => {
       return new Promise((resolve, reject) => {
-        ow.mockRejected(owAction, new Error('an error'))
+        rtLib.mockRejected(rtAction, new Error('an error'))
         command.argv = ['hello', '/action/actionFile.js']
         return command.run()
           .then(() => reject(new Error('does not throw error')))

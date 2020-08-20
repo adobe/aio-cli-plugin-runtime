@@ -14,6 +14,7 @@
     "@oclif/config": "^1.9.0",
     "@oclif/errors": "^1.1.2",
     "@oclif/plugin-help": "^2.1.6",
+    "@types/jest": "^26.0.10",
     "chalk": "^4.0.0",
     "cli-ux": "^5.2.0",
     "debug": "^4.1.1",

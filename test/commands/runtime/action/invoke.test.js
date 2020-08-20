@@ -13,8 +13,9 @@ governing permissions and limitations under the License.
 const { stdout } = require('stdout-stderr')
 const TheCommand = require('../../../../src/commands/runtime/action/invoke.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
-const ow = require('openwhisk')()
-const owAction = 'actions.invoke'
+const RuntimeLib = require('@adobe/aio-lib-runtime')
+const rtAction = 'actions.invoke'
+const rtUtils = RuntimeLib.utils
 
 test('exports', async () => {
   expect(typeof TheCommand).toEqual('function')
@@ -53,11 +54,14 @@ test('args', async () => {
 })
 
 describe('instance methods', () => {
-  let command, handleError
+  let command, handleError, rtLib
 
-  beforeEach(() => {
+  beforeEach(async () => {
     command = new TheCommand([])
     handleError = jest.spyOn(command, 'handleError')
+    rtLib = await RuntimeLib.init({ apihost: 'fakehost', api_key: 'fakekey' })
+    rtLib.mockResolved('actions.client.options', '')
+    RuntimeLib.mockReset()
   })
 
   afterAll(() => {
@@ -71,7 +75,7 @@ describe('instance methods', () => {
     })
 
     test('invokes an action only with action name', () => {
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = ['hello']
       return command.run()
         .then(() => {
@@ -86,7 +90,7 @@ describe('instance methods', () => {
     })
 
     test('sets X-OW-EXTRA-LOGGING header when invoking an action', () => {
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = ['hello']
       return command.run()
         .then(() => {
@@ -98,13 +102,15 @@ describe('instance methods', () => {
     })
 
     test('invokes an action with action name and params', () => {
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = ['hello', '--param', 'a', 'b', 'c', 'd']
+      rtUtils.createKeyValueObjectFromFlag.mockReturnValue({ fakeParam: 'aaa' })
       return command.run()
         .then(() => {
+          expect(rtUtils.createKeyValueObjectFromFlag).toHaveBeenCalledWith(['a', 'b', 'c', 'd'])
           expect(cmd).toHaveBeenCalledWith(expect.objectContaining({
             name: 'hello',
-            params: { a: 'b', c: 'd' },
+            params: { fakeParam: 'aaa' },
             blocking: false,
             result: false
           }))
@@ -113,13 +119,15 @@ describe('instance methods', () => {
     })
 
     test('invokes an action with action name, params and blocking', () => {
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = ['hello', '--param', 'a', 'b', '--param', 'c', 'd', '--blocking']
+      rtUtils.createKeyValueObjectFromFlag.mockReturnValue({ fakeParam: 'aaa' })
       return command.run()
         .then(() => {
+          expect(rtUtils.createKeyValueObjectFromFlag).toHaveBeenCalledWith(['a', 'b', 'c', 'd'])
           expect(cmd).toHaveBeenCalledWith(expect.objectContaining({
             name: 'hello',
-            params: { a: 'b', c: 'd' },
+            params: { fakeParam: 'aaa' },
             blocking: true,
             result: false
           }))
@@ -128,7 +136,7 @@ describe('instance methods', () => {
     })
 
     test('invokes an action with action name, params and result. Should still block', () => {
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = ['hello', '--result']
       return command.run()
         .then(() => {
@@ -144,7 +152,7 @@ describe('instance methods', () => {
 
     test('invokes an action with action name, and gets an activation id', () => {
       const result = { activationId: '123456' }
-      const cmd = ow.mockResolved(owAction, result)
+      const cmd = rtLib.mockResolved(rtAction, result)
       command.argv = ['hello']
       return command.run()
         .then(() => {
@@ -160,7 +168,7 @@ describe('instance methods', () => {
 
     test('invokes an action with action name and --blocking, and gets an activation record as the response', () => {
       const result = { activationId: '123456', response: { result: { msg: '123456' } } }
-      const cmd = ow.mockResolved(owAction, result)
+      const cmd = rtLib.mockResolved(rtAction, result)
       command.argv = ['hello', '--blocking']
       return command.run()
         .then(() => {
@@ -176,7 +184,7 @@ describe('instance methods', () => {
 
     test('invokes an action with action name and --result, and gets an activation result as the response', () => {
       const result = { msg: '123456' }
-      const cmd = ow.mockResolved(owAction, result)
+      const cmd = rtLib.mockResolved(rtAction, result)
       command.argv = ['hello', '--result']
       return command.run()
         .then(() => {
@@ -193,7 +201,7 @@ describe('instance methods', () => {
     test('invokes an action with action name and --blocking but activation is demoted to async', () => {
       // when the API returns with 202 it demoted the activation to async request, providing only an activation id
       const result = { activationId: '123456' }
-      const cmd = ow.mockRejected(owAction, result)
+      const cmd = rtLib.mockRejected(rtAction, result)
       command.argv = ['hello', '--blocking']
       return command.run()
         .then(() => {
@@ -211,7 +219,7 @@ describe('instance methods', () => {
     test('invokes an action with action name and --result but activation is demoted to async', () => {
       // when the API returns with 202 it demoted the activation to async request, providing only an activation id
       const result = { activationId: '123456' }
-      const cmd = ow.mockRejected(owAction, result)
+      const cmd = rtLib.mockRejected(rtAction, result)
       command.argv = ['hello', '--result']
       return command.run()
         .then(() => {
@@ -230,7 +238,7 @@ describe('instance methods', () => {
       // when the API returns with 502 due to an application error in the function
       // the result is the entire activation wrapped in an error object
       const result = { activationId: '123456', response: { result: { error: 'oops' } } }
-      const cmd = ow.mockRejected(owAction, { error: result })
+      const cmd = rtLib.mockRejected(rtAction, { error: result })
       command.argv = ['hello', '--blocking']
       return command.run()
         .then(() => {
@@ -250,7 +258,7 @@ describe('instance methods', () => {
       // so when the API returns with 502 due to an application error in the function
       // the result is the entire activation wrapped in an error object
       const result = { activationId: '123456', response: { result: { error: 'oops' } } }
-      const cmd = ow.mockRejected(owAction, { error: result })
+      const cmd = rtLib.mockRejected(rtAction, { error: result })
       command.argv = ['hello', '--result']
       return command.run()
         .then(() => {
@@ -266,13 +274,15 @@ describe('instance methods', () => {
     })
 
     test('invokes an action with all flags', () => {
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = ['hello', '--param', 'a', 'b', '--param', 'c', 'd', '--blocking', '--result']
+      rtUtils.createKeyValueObjectFromFlag.mockReturnValue({ fakeParam: 'aaa' })
       return command.run()
         .then(() => {
+          expect(rtUtils.createKeyValueObjectFromFlag).toHaveBeenCalledWith(['a', 'b', 'c', 'd'])
           expect(cmd).toHaveBeenCalledWith(expect.objectContaining({
             name: 'hello',
-            params: { a: 'b', c: 'd' },
+            params: { fakeParam: 'aaa' },
             blocking: true,
             result: true
           }))
@@ -281,7 +291,7 @@ describe('instance methods', () => {
     })
 
     test('invokes an action with all flags and --param-file', () => {
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       const json = {
         'parameters.json': fixtureFile('trigger/parameters.json')
       }
@@ -289,11 +299,13 @@ describe('instance methods', () => {
         '/action': json
       })
       command.argv = ['hello', '--param-file', '/action/parameters.json', '--blocking', '--result']
+      rtUtils.createKeyValueObjectFromFile.mockReturnValue({ fakeParam: 'aaa' })
       return command.run()
         .then(() => {
+          expect(rtUtils.createKeyValueObjectFromFile).toHaveBeenCalledWith('/action/parameters.json')
           expect(cmd).toHaveBeenCalledWith(expect.objectContaining({
             name: 'hello',
-            params: { param1: 'param1value', param2: 'param2value' },
+            params: { fakeParam: 'aaa' },
             blocking: true,
             result: true
           }))
@@ -303,12 +315,13 @@ describe('instance methods', () => {
 
     test('tests for incorrect parameters', () => {
       return new Promise((resolve, reject) => {
-        ow.mockRejected(owAction, '')
+        rtLib.mockRejected(rtAction, 'not that one')
+        rtUtils.createKeyValueObjectFromFlag.mockImplementation(() => { throw new Error('that is a parsing error') })
         command.argv = ['hello', '--param', 'a', 'b', 'c', '--blocking']
         return command.run()
           .then(() => reject(new Error('does not throw error')))
           .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to invoke the action', new Error('Please provide correct values for flags'))
+            expect(handleError).toHaveBeenLastCalledWith('failed to invoke the action', new Error('that is a parsing error'))
             resolve()
           })
       })
@@ -316,7 +329,7 @@ describe('instance methods', () => {
 
     test('errors out on api error', () => {
       return new Promise((resolve, reject) => {
-        ow.mockRejected(owAction, new Error('an error'))
+        rtLib.mockRejected(rtAction, new Error('an error'))
         command.argv = ['hello']
         return command.run()
           .then(() => reject(new Error('does not throw error')))

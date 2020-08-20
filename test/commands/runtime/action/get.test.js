@@ -11,11 +11,11 @@ governing permissions and limitations under the License.
 */
 
 const { stdout } = require('stdout-stderr')
+const fs = require('fs')
 const TheCommand = require('../../../../src/commands/runtime/action/get.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
-const ow = require('openwhisk')()
-const owAction = 'actions.get'
-const fs = require('fs')
+const RuntimeLib = require('@adobe/aio-lib-runtime')
+const rtAction = 'actions.get'
 
 test('exports', async () => {
   expect(typeof TheCommand).toEqual('function')
@@ -40,12 +40,15 @@ test('args', async () => {
 })
 
 describe('instance methods', () => {
-  let command, handleError
+  let command, handleError, rtLib
 
-  beforeEach(() => {
+  beforeEach(async () => {
     command = new TheCommand([])
     handleError = jest.spyOn(command, 'handleError')
     handleError = jest.spyOn(command, 'handleError')
+    rtLib = await RuntimeLib.init({ apihost: 'fakehost', api_key: 'fakekey' })
+    rtLib.mockResolved('actions.client.options', '')
+    RuntimeLib.mockReset()
   })
 
   describe('run', () => {
@@ -54,7 +57,7 @@ describe('instance methods', () => {
     })
 
     test('retrieve an action', () => {
-      const cmd = ow.mockResolvedFixture(owAction, 'action/get.json')
+      const cmd = rtLib.mockResolvedFixture(rtAction, 'action/get.json')
       command.argv = ['hello']
       return command.run()
         .then(() => {
@@ -64,9 +67,9 @@ describe('instance methods', () => {
     })
 
     test('retrieve an action --url with web flags', () => {
-      const cmd = ow.mockResolvedFixture(owAction, 'action/get.json')
-      ow.mockResolved('actions.client.options', '')
-      ow.actions.client.options = { api: 'api/' }
+      const cmd = rtLib.mockResolvedFixture(rtAction, 'action/get.json')
+      rtLib.mockResolved('actions.client.options', '')
+      rtLib.actions.client.options = { api: 'api/' }
       command.argv = ['hello', '--url']
       return command.run()
         .then(() => {
@@ -76,9 +79,9 @@ describe('instance methods', () => {
     })
 
     test('retrieve an action --url with web flags from package', () => {
-      const cmd = ow.mockResolvedFixture(owAction, 'action/get-package.json')
-      ow.mockResolved('actions.client.options', '')
-      ow.actions.client.options = { api: 'api/' }
+      const cmd = rtLib.mockResolvedFixture(rtAction, 'action/get-package.json')
+      rtLib.mockResolved('actions.client.options', '')
+      rtLib.actions.client.options = { api: 'api/' }
       command.argv = ['test/hello', '--url']
       return command.run()
         .then(() => {
@@ -88,9 +91,9 @@ describe('instance methods', () => {
     })
 
     test('retrieve an action --url with web flags from fully qualified name with implicit namespace and no package', () => {
-      const cmd = ow.mockResolvedFixture(owAction, 'action/get.json')
-      ow.mockResolved('actions.client.options', '')
-      ow.actions.client.options = { api: 'api/' }
+      const cmd = rtLib.mockResolvedFixture(rtAction, 'action/get.json')
+      rtLib.mockResolved('actions.client.options', '')
+      rtLib.actions.client.options = { api: 'api/' }
       command.argv = ['/_/hello', '--url']
       return command.run()
         .then(() => {
@@ -100,9 +103,9 @@ describe('instance methods', () => {
     })
 
     test('retrieve an action --url with web flags from fully qualified name using explicit namespace and no package', () => {
-      const cmd = ow.mockResolvedFixture(owAction, 'action/get.json')
-      ow.mockResolved('actions.client.options', '')
-      ow.actions.client.options = { api: 'api/' }
+      const cmd = rtLib.mockResolvedFixture(rtAction, 'action/get.json')
+      rtLib.mockResolved('actions.client.options', '')
+      rtLib.actions.client.options = { api: 'api/' }
       command.argv = ['/_/hello', '--url']
       return command.run()
         .then(() => {
@@ -112,9 +115,9 @@ describe('instance methods', () => {
     })
 
     test('retrieve an action --url with web flags from fully qualified name with implicit namespace', () => {
-      const cmd = ow.mockResolvedFixture(owAction, 'action/get-package.json')
-      ow.mockResolved('actions.client.options', '')
-      ow.actions.client.options = { api: 'api/' }
+      const cmd = rtLib.mockResolvedFixture(rtAction, 'action/get-package.json')
+      rtLib.mockResolved('actions.client.options', '')
+      rtLib.actions.client.options = { api: 'api/' }
       command.argv = ['/_/test/hello', '--url']
       return command.run()
         .then(() => {
@@ -124,9 +127,9 @@ describe('instance methods', () => {
     })
 
     test('retrieve an action --url with web flags from fully qualified name using explicit namespace', () => {
-      const cmd = ow.mockResolvedFixture(owAction, 'action/get-package.json')
-      ow.mockResolved('actions.client.options', '')
-      ow.actions.client.options = { api: 'api/' }
+      const cmd = rtLib.mockResolvedFixture(rtAction, 'action/get-package.json')
+      rtLib.mockResolved('actions.client.options', '')
+      rtLib.actions.client.options = { api: 'api/' }
       command.argv = ['/_/test/hello', '--url']
       return command.run()
         .then(() => {
@@ -136,9 +139,9 @@ describe('instance methods', () => {
     })
 
     test('retrieve an action --url without web flags', () => {
-      const cmd = ow.mockResolvedFixture(owAction, 'action/getWebFalse.json')
-      ow.mockResolved('actions.client.options', '')
-      ow.actions.client.options = { api: 'api/' }
+      const cmd = rtLib.mockResolvedFixture(rtAction, 'action/getWebFalse.json')
+      rtLib.mockResolved('actions.client.options', '')
+      rtLib.actions.client.options = { api: 'api/' }
       command.argv = ['hello', '--url']
       return command.run()
         .then(() => {
@@ -148,9 +151,9 @@ describe('instance methods', () => {
     })
 
     test('retrieve an action --url in package without web flags', () => {
-      const cmd = ow.mockResolvedFixture(owAction, 'action/getWebFalse-package.json')
-      ow.mockResolved('actions.client.options', '')
-      ow.actions.client.options = { api: 'api/' }
+      const cmd = rtLib.mockResolvedFixture(rtAction, 'action/getWebFalse-package.json')
+      rtLib.mockResolved('actions.client.options', '')
+      rtLib.actions.client.options = { api: 'api/' }
       command.argv = ['hello', '--url']
       return command.run()
         .then(() => {
@@ -160,9 +163,9 @@ describe('instance methods', () => {
     })
 
     test('retrieve an action --url when annotation array is absent', () => {
-      const cmd = ow.mockResolvedFixture(owAction, 'action/get_NoWebFlag.json')
-      ow.mockResolved('actions.client.options', '')
-      ow.actions.client.options = { api: 'api/' }
+      const cmd = rtLib.mockResolvedFixture(rtAction, 'action/get_NoWebFlag.json')
+      rtLib.mockResolved('actions.client.options', '')
+      rtLib.actions.client.options = { api: 'api/' }
       command.argv = ['hello', '--url']
       return command.run()
         .then(() => {
@@ -172,7 +175,7 @@ describe('instance methods', () => {
     })
 
     test('retrieve an action --json', () => {
-      const cmd = ow.mockResolvedFixture(owAction, 'action/get.json')
+      const cmd = rtLib.mockResolvedFixture(rtAction, 'action/get.json')
       command.argv = ['hello']
       return command.run()
         .then(() => {
@@ -183,10 +186,10 @@ describe('instance methods', () => {
 
     test('errors out on api error', () => {
       return new Promise((resolve, reject) => {
-        ow.mockRejected(owAction, new Error('an error'))
+        rtLib.mockRejected(rtAction, new Error('an error'))
         command.argv = ['hello']
         return command.run()
-          .then(() => reject(new Error('does not throw error')))
+          .then(() => reject(new Error('does not thrrtLib error')))
           .catch(() => {
             expect(handleError).toHaveBeenLastCalledWith('failed to retrieve the action', new Error('an error'))
             resolve()
@@ -200,7 +203,7 @@ describe('instance methods', () => {
 
     test('retrieve an action --save', () => {
       fs.writeFileSync = jest.fn()
-      const cmd = ow.mockResolvedFixture(owAction, 'action/get.json')
+      const cmd = rtLib.mockResolvedFixture(rtAction, 'action/get.json')
       command.argv = ['hello', '--save']
       return command.run()
         .then(() => {
@@ -211,7 +214,7 @@ describe('instance methods', () => {
 
     test('retrieve an action in a package --save', () => {
       fs.writeFileSync = jest.fn()
-      const cmd = ow.mockResolvedFixture(owAction, 'action/getpackage.json')
+      const cmd = rtLib.mockResolvedFixture(rtAction, 'action/getpackage.json')
       command.argv = ['pkg/hello', '--save']
       return command.run()
         .then(() => {
@@ -221,7 +224,7 @@ describe('instance methods', () => {
     })
 
     test('retrieve an action --save-as', () => {
-      const cmd = ow.mockResolvedFixture(owAction, 'action/get.json')
+      const cmd = rtLib.mockResolvedFixture(rtAction, 'action/get.json')
       fs.writeFileSync = jest.fn()
       command.argv = ['hello', '--save-as', 'filename.js']
       return command.run()
@@ -232,7 +235,7 @@ describe('instance methods', () => {
     })
 
     test('retrieve an action --save (binary)', () => {
-      const cmd = ow.mockResolvedFixture(owAction, 'action/get.binary.json')
+      const cmd = rtLib.mockResolvedFixture(rtAction, 'action/get.binary.json')
       fs.writeFileSync = jest.fn()
       command.argv = ['hello', '--save']
       return command.run()
@@ -244,7 +247,7 @@ describe('instance methods', () => {
     })
 
     test('retrieve an action --save-as (binary)', () => {
-      const cmd = ow.mockResolvedFixture(owAction, 'action/get.binary.json')
+      const cmd = rtLib.mockResolvedFixture(rtAction, 'action/get.binary.json')
       fs.writeFileSync = jest.fn()
       command.argv = ['hello', '--save-as', 'filename.zip']
       return command.run()

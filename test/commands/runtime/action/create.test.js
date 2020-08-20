@@ -15,6 +15,7 @@ const TheCommand = require('../../../../src/commands/runtime/action/create.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
 const RuntimeLib = require('@adobe/aio-lib-runtime')
 const rtUtils = RuntimeLib.utils
+const rtAction = 'actions.create'
 
 test('exports', async () => {
   expect(typeof TheCommand).toEqual('function')
@@ -98,7 +99,7 @@ describe('instance methods', () => {
 
     test('creates an action with action name and action path', () => {
       const name = 'hello'
-      const cmd = rtLib.mockResolved('actions.create', '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = [name, '/action/actionFile.js']
       return command.run()
         .then(() => {
@@ -109,7 +110,7 @@ describe('instance methods', () => {
 
     test('creates an action with action name and --sequence flag', () => {
       const name = 'hello'
-      const cmd = rtLib.mockResolved('actions.create', '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = [name, '--sequence', 'a,p/b,ns/p/c,/ns2/p/d,/ns3/e']
       rtUtils.createComponentsfromSequence.mockReturnValue({ fake: 'value' })
       return command.run()
@@ -118,15 +119,15 @@ describe('instance methods', () => {
           expect(cmd).toHaveBeenCalledWith({
             action: {
               exec: { fake: 'value' },
-              name: 'hello' },
-            name: 'hello' })
+              name },
+            name })
           expect(stdout.output).toMatch('')
         })
     })
 
     test('creates an action with action name and --docker flag', () => {
       const name = 'hello'
-      const cmd = rtLib.mockResolved('actions.create', '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = [name, '--docker', 'some-image']
       return command.run()
         .then(() => {
@@ -146,7 +147,7 @@ describe('instance methods', () => {
 
     test('creates an action with action name and action path and --docker flag', () => {
       const name = 'hello'
-      const cmd = rtLib.mockResolved('actions.create', '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = [name, '/action/actionFile.js', '--docker', 'some-image']
       return command.run()
         .then(() => {
@@ -167,7 +168,7 @@ describe('instance methods', () => {
 
     test('creates an action with action name and action path --json', () => {
       const name = 'hello'
-      const cmd = rtLib.mockResolved('actions.create', '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = [name, '/action/actionFile.js', '--json']
       return command.run()
         .then(() => {
@@ -188,7 +189,7 @@ describe('instance methods', () => {
     test('creates an action with action name and action path to zip file', () => {
       const name = 'hello'
       const zipFile = Buffer.from('fakezipfile').toString('base64')
-      const cmd = rtLib.mockResolved('actions.create', '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = [name, '/action/zipAction.zip', '--kind', 'nodejs:8']
       return command.run()
         .then(() => {
@@ -209,7 +210,7 @@ describe('instance methods', () => {
     test('creates an action with action name and action path to binary file', () => {
       const name = 'hello'
       const zipFile = Buffer.from('fakezipfile').toString('base64')
-      const cmd = rtLib.mockResolved('actions.create', '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = [name, '/action/zipAction.bin', '--kind', 'nodejs:8', '--binary']
       return command.run()
         .then(() => {
@@ -229,7 +230,7 @@ describe('instance methods', () => {
 
     test('creates an action with action name, action path and --param flag', () => {
       const name = 'hello'
-      const cmd = rtLib.mockResolved('actions.create', '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = [name, '/action/actionFile.js', '--param', 'a', 'b', '--param', 'c', 'd']
       rtUtils.createKeyValueArrayFromFlag.mockReturnValue([{ key: 'fakeParam', value: 'aaa' }])
       return command.run()
@@ -239,16 +240,16 @@ describe('instance methods', () => {
             action: {
               exec: {
                 code: jsFile, kind: 'nodejs:default' },
-              name: 'hello',
+              name,
               parameters: [{ key: 'fakeParam', value: 'aaa' }] },
-          name: 'hello' })
+            name })
           expect(stdout.output).toMatch('')
         })
     })
 
     test('creates an action with action name, action path and --param-file flag', () => {
       const name = 'hello'
-      const cmd = rtLib.mockResolved('actions.create', '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       rtUtils.createKeyValueArrayFromFile.mockReturnValue([{ key: 'fakeParam', value: 'aaa' }])
       command.argv = [name, '/action/actionFile.js', '--param-file', '/action/parameters.json']
       return command.run()
@@ -258,16 +259,16 @@ describe('instance methods', () => {
             action: {
               exec: {
                 code: jsFile, kind: 'nodejs:default' },
-              name: 'hello',
+              name,
               parameters: [{ key: 'fakeParam', value: 'aaa' }] },
-          name: 'hello' })
+            name })
           expect(stdout.output).toMatch('')
         })
     })
 
     test('creates an action with action name, action path, --params flag and limits', () => {
       const name = 'hello'
-      const cmd = rtLib.mockResolved('actions.create', '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = [name, '/action/actionFile.js', '--param', 'a', 'b', '--param', 'c', 'd', '--logsize', '8', '--memory', '128', '--timeout', '20000']
       rtUtils.createKeyValueArrayFromFlag.mockReturnValue([{ key: 'fakeParam', value: 'aaa' }])
       return command.run()
@@ -298,7 +299,7 @@ describe('instance methods', () => {
 
     test('creates an action with action name, action path, --params flag and limits with shorter flag version', () => {
       const name = 'hello'
-      const cmd = rtLib.mockResolved('actions.create', '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       rtUtils.createKeyValueArrayFromFlag.mockReturnValue([{ key: 'fakeParam', value: 'aaa' }])
       command.argv = [name, '/action/actionFile.js', '-p', 'a', 'b', '-p', 'c', 'd', '-l', '8', '-m', '128', '-t', '20000']
       return command.run()
@@ -329,7 +330,7 @@ describe('instance methods', () => {
 
     test('creates an action with action name, action path, --params flag, limits and kind', () => {
       const name = 'hello'
-      const cmd = rtLib.mockResolved('actions.create', '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = [name, '/action/actionFile.js', '--param', 'a', 'b', '--param', 'c', 'd', '--logsize', '8', '--memory', '128', '--kind', 'nodejs:10']
       rtUtils.createKeyValueArrayFromFlag.mockReturnValue([{ key: 'fakeParam', value: 'aaa' }])
       return command.run()
@@ -359,7 +360,7 @@ describe('instance methods', () => {
 
     test('creates an action with action name, action path and --env flag', () => {
       const name = 'hello'
-      const cmd = rtLib.mockResolved('actions.create', '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = [name, '/action/actionFile.js', '--env', 'a', 'b', '--env', 'c', 'd']
       rtUtils.createKeyValueArrayFromFlag.mockReturnValue([{ key: 'fakeEnv', value: 'abc' }])
       return command.run()
@@ -386,7 +387,7 @@ describe('instance methods', () => {
 
     test('creates an action with action name, action path and --e flag', () => {
       const name = 'hello'
-      const cmd = rtLib.mockResolved('actions.create', '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = [name, '/action/actionFile.js', '--env', 'a', 'b', '-e', 'c', 'd']
       rtUtils.createKeyValueArrayFromFlag.mockReturnValue([{ key: 'fakeEnv', value: 'abc' }])
       return command.run()
@@ -413,14 +414,10 @@ describe('instance methods', () => {
 
     test('creates an action with action name, action path and --env and --param flag', () => {
       const name = 'hello'
-      const cmd = rtLib.mockResolved('actions.create', '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = [name, '/action/actionFile.js', '--env', 'a', 'b', '--param', 'c', 'd']
-      let ncall = 0
-      rtUtils.createKeyValueArrayFromFlag.mockImplementation(() => {
-        const ret = (!ncall && [{ key: 'fakeParam', value: 'aaa' }]) || [{ key: 'fakeEnv', value: 'abc' }]
-        ncall++
-        return ret
-      })
+      rtUtils.createKeyValueArrayFromFlag.mockReturnValueOnce([{ key: 'fakeParam', value: 'aaa' }])
+      rtUtils.createKeyValueArrayFromFlag.mockReturnValueOnce([{ key: 'fakeEnv', value: 'abc' }])
       return command.run()
         .then(() => {
           expect(rtUtils.createKeyValueArrayFromFlag).toHaveBeenCalledWith(['c', 'd'])
@@ -449,7 +446,7 @@ describe('instance methods', () => {
 
     test('creates an action with action name, action path and overlapping --env and --param keys', () => {
       return new Promise((resolve, reject) => {
-        rtLib.mockRejected('actions.create', '')
+        rtLib.mockRejected(rtAction, '')
         const name = 'hello'
         command.argv = [name, '/action/actionFile.js', '--env', 'a', 'b', '--param', 'a', 'd']
         rtUtils.createKeyValueArrayFromFlag.mockReturnValue([{ key: 'same', value: 'kv' }])
@@ -464,7 +461,7 @@ describe('instance methods', () => {
 
     test('creates an action with action name, action path and --env-file flag', () => {
       const name = 'hello'
-      const cmd = rtLib.mockResolved('actions.create', '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = [name, '/action/actionFile.js', '--env-file', '/action/parameters.json']
       rtUtils.createKeyValueArrayFromFile.mockReturnValue([{ key: 'fakeEnv', value: 'abc' }])
       return command.run()
@@ -491,7 +488,7 @@ describe('instance methods', () => {
 
     test('creates an action with action name, action path, --params flag and annotation flag', () => {
       const name = 'hello'
-      const cmd = rtLib.mockResolved('actions.create', '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = [name, '/action/actionFile.js', '--param', 'a', 'b', '--param', 'c', 'd', '--annotation', 'desc', 'Description']
       rtUtils.createKeyValueArrayFromFlag.mockReturnValue([{ key: 'fake', value: 'abc' }])
       return command.run()
@@ -522,7 +519,7 @@ describe('instance methods', () => {
 
     test('creates an action with action name, action path, --params flag and annotation-file flag', () => {
       const name = 'hello'
-      const cmd = rtLib.mockResolved('actions.create', '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = [name, '/action/actionFile.js', '-p', 'a', 'b', '-p', 'c', 'd', '-A', '/action/parameters.json']
       rtUtils.createKeyValueArrayFromFlag.mockReturnValue([{ key: 'fake', value: 'abc' }])
       rtUtils.createKeyValueArrayFromFile.mockReturnValue([{ key: 'fakeAnno', value: 'tation' }])
@@ -554,7 +551,7 @@ describe('instance methods', () => {
 
     test('creates an action with action name, action path, --params flag web flag', () => {
       const name = 'hello'
-      const cmd = rtLib.mockResolved('actions.create', '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = [name, '/action/actionFile.js', '-p', 'a', 'b', '-p', 'c', 'd', '--web', 'raw']
       rtUtils.createKeyValueArrayFromFlag.mockReturnValue([{ key: 'fake', value: 'abc' }])
       return command.run()
@@ -581,7 +578,7 @@ describe('instance methods', () => {
 
     test('creates an action with action name, action path, --params flag, annotations and web flag as true', () => {
       const name = 'hello'
-      const cmd = rtLib.mockResolved('actions.create', '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = [name, '/action/actionFile.js', '-p', 'a', 'b', '-p', 'c', 'd', '-a', 'desc', 'Description', '--web', 'true']
       rtUtils.createKeyValueArrayFromFlag.mockImplementation(() => [{ key: 'fake', value: 'abc' }])
       return command.run()
@@ -611,7 +608,7 @@ describe('instance methods', () => {
 
     test('creates an action with --main flag', () => {
       const name = 'hello'
-      const cmd = rtLib.mockResolved('actions.create', '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = [name, '/action/actionFile.js', '--main', 'maynard']
       return command.run()
         .then(() => {
@@ -632,7 +629,7 @@ describe('instance methods', () => {
 
     test('creates an action with code of unknown kind', () => {
       return new Promise((resolve, reject) => {
-        rtLib.mockRejected('actions.create', '')
+        rtLib.mockRejected(rtAction, '')
         command.argv = ['hello', '/action/fileWithNoExt']
         return command.run()
           .then(() => reject(new Error('does not throw error')))
@@ -645,7 +642,7 @@ describe('instance methods', () => {
 
     test('creates an action with code and --sequence', () => {
       return new Promise((resolve, reject) => {
-        rtLib.mockRejected('actions.create', '')
+        rtLib.mockRejected(rtAction, '')
         command.argv = ['hello', '/action/actionFile.js', '--sequence', 'a,b,c']
         return command.run()
           .then(() => reject(new Error('does not throw error')))
@@ -658,7 +655,7 @@ describe('instance methods', () => {
 
     test('tests for incorrect action with --main flag and --sequence', () => {
       return new Promise((resolve, reject) => {
-        rtLib.mockRejected('actions.create', '')
+        rtLib.mockRejected(rtAction, '')
         command.argv = ['hello', '--main', 'maynard', '--sequence', 'a,b,c']
         return command.run()
           .then(() => reject(new Error('does not throw error')))
@@ -671,7 +668,7 @@ describe('instance methods', () => {
 
     test('creates an action with --docker and --sequence', () => {
       return new Promise((resolve, reject) => {
-        rtLib.mockRejected('actions.create', '')
+        rtLib.mockRejected(rtAction, '')
         command.argv = ['hello', '--docker', 'some-image', '--sequence', 'a,b,c']
         return command.run()
           .then(() => reject(new Error('does not throw error')))
@@ -684,7 +681,7 @@ describe('instance methods', () => {
 
     test('creates an action with --docker and --kind', () => {
       return new Promise((resolve, reject) => {
-        rtLib.mockRejected('actions.create', '')
+        rtLib.mockRejected(rtAction, '')
         command.argv = ['hello', '/action/actionFile.js', '--kind', 'nodejs:8', '--docker', 'some-image']
         return command.run()
           .then(() => reject(new Error('does not throw error')))
@@ -697,7 +694,7 @@ describe('instance methods', () => {
 
     test('tests for incorrect action create missing code and sequence', () => {
       return new Promise((resolve, reject) => {
-        rtLib.mockRejected('actions.create', '')
+        rtLib.mockRejected(rtAction, '')
         command.argv = ['hello']
         return command.run()
           .then(() => reject(new Error('does not throw error')))
@@ -710,7 +707,7 @@ describe('instance methods', () => {
 
     test('tests for incorrect action with --kind flag and --sequence', () => {
       return new Promise((resolve, reject) => {
-        rtLib.mockRejected('actions.create', '')
+        rtLib.mockRejected(rtAction, '')
         command.argv = ['hello', '--kind', 'nodejs:10', '--sequence', 'a,b,c']
         return command.run()
           .then(() => reject(new Error('does not throw error')))
@@ -722,7 +719,7 @@ describe('instance methods', () => {
     })
     test('tests for incorrect --sequence flags', () => {
       return new Promise((resolve, reject) => {
-        rtLib.mockRejected('actions.create', '')
+        rtLib.mockRejected(rtAction, '')
         command.argv = ['hello', '--sequence', ' ,a,b,c']
         return command.run()
           .then(() => reject(new Error('does not throw error')))
@@ -735,7 +732,7 @@ describe('instance methods', () => {
 
     test('tests for incorrect action path', () => {
       return new Promise((resolve, reject) => {
-        rtLib.mockRejected('actions.create', '')
+        rtLib.mockRejected(rtAction, '')
         command.argv = ['hello', '/action/file.js', '--kind', 'nodejs:10']
         return command.run()
           .then(() => reject(new Error('does not throw error')))
@@ -748,7 +745,7 @@ describe('instance methods', () => {
 
     test('tests for incorrect action zip path', () => {
       return new Promise((resolve, reject) => {
-        rtLib.mockRejected('actions.create', '')
+        rtLib.mockRejected(rtAction, '')
         command.argv = ['hello', '/action/file.zip', '--kind', 'nodejs:10']
         return command.run()
           .then(() => reject(new Error('does not throw error')))
@@ -760,7 +757,7 @@ describe('instance methods', () => {
     })
     test('errors out on api error', () => {
       return new Promise((resolve, reject) => {
-        rtLib.mockRejected('actions.create', new Error('an error'))
+        rtLib.mockRejected(rtAction, new Error('an error'))
         command.argv = ['hello', '/action/actionFile.js']
         return command.run()
           .then(() => reject(new Error('does not throw error')))
