@@ -18,7 +18,7 @@ const utils = require('@adobe/aio-lib-runtime').utils
 const aioConfig = require('@adobe/aio-lib-core-config')
 
 // const RuntimeLib = require('@adobe/aio-lib-runtime')
-const rtUtils = RuntimeLib.utils
+// const rtUtils = RuntimeLib.utils
 // const owPackage = 'packages.update'
 // const rtAction = 'actions.update'
 // const owAPI = 'routes.create'
