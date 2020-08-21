@@ -63,7 +63,7 @@ describe('instance methods', () => {
     })
 
     test('return list of activations with limits', () => {
-      const cmd = rtLib.mockResolved(rtAction, { res: 'fake' })
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = ['--limit', '3']
       return command.run()
         .then(() => {
@@ -73,7 +73,7 @@ describe('instance methods', () => {
     })
 
     test('return list of activations with skip', () => {
-      const cmd = rtLib.mockResolved(rtAction, { res: 'fake' })
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = ['--skip', '3']
       return command.run()
         .then(() => {
@@ -83,7 +83,7 @@ describe('instance methods', () => {
     })
 
     test('return list of activations with --since', () => {
-      const cmd = rtLib.mockResolved(rtAction, { res: 'fake' })
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = ['--since', '3']
       return command.run()
         .then(() => {
@@ -93,7 +93,7 @@ describe('instance methods', () => {
     })
 
     test('return list of activations with --upto', () => {
-      const cmd = rtLib.mockResolved(rtAction, { res: 'fake' })
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = ['--upto', '3']
       return command.run()
         .then(() => {
@@ -103,7 +103,7 @@ describe('instance methods', () => {
     })
 
     test('return list of actions with activation id', () => {
-      const cmd = rtLib.mockResolved(rtAction, { res: 'fake' })
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = ['12345']
       return command.run()
         .then(() => {
@@ -113,7 +113,7 @@ describe('instance methods', () => {
     })
 
     test('return list of actions with activation id, --full flag', () => {
-      const cmd = rtLib.mockResolved(rtAction, { res: 'fake' })
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = ['12345', '--full']
       return command.run()
         .then(() => {
@@ -123,7 +123,7 @@ describe('instance methods', () => {
     })
 
     test('return list of actions with activation id --json', () => {
-      const cmd = rtLib.mockResolved(rtAction, { res: 'fake' })
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = ['12345', '--json']
       return command.run()
         .then(() => {
