@@ -13,8 +13,9 @@ governing permissions and limitations under the License.
 const { stdout } = require('stdout-stderr')
 const TheCommand = require('../../../../src/commands/runtime/activation/list.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
-const ow = require('openwhisk')()
-const owAction = 'activations.list'
+const RuntimeLib = require('@adobe/aio-lib-runtime')
+const rtUtils = RuntimeLib.utils
+const rtAction = 'activations.list'
 
 test('exports', async () => {
   expect(typeof TheCommand).toEqual('function')
@@ -47,11 +48,13 @@ test('args', async () => {
 })
 
 describe('instance methods', () => {
-  let command, handleError
-
-  beforeEach(() => {
+  let command, handleError, rtLib
+  beforeEach(async () => {
     command = new TheCommand([])
     handleError = jest.spyOn(command, 'handleError')
+    rtLib = await RuntimeLib.init({ apihost: 'fakehost', api_key: 'fakekey' })
+    rtLib.mockResolved('actions.client.options', '')
+    RuntimeLib.mockReset()
   })
 
   describe('run', () => {
@@ -60,7 +63,7 @@ describe('instance methods', () => {
     })
 
     test('return list of activations with limits', () => {
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = ['--limit', '3']
       return command.run()
         .then(() => {
@@ -70,7 +73,7 @@ describe('instance methods', () => {
     })
 
     test('return list of activations with skip', () => {
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = ['--skip', '3']
       return command.run()
         .then(() => {
@@ -80,7 +83,7 @@ describe('instance methods', () => {
     })
 
     test('return list of activations with --since', () => {
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = ['--since', '3']
       return command.run()
         .then(() => {
@@ -90,7 +93,7 @@ describe('instance methods', () => {
     })
 
     test('return list of activations with --upto', () => {
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = ['--upto', '3']
       return command.run()
         .then(() => {
@@ -100,7 +103,7 @@ describe('instance methods', () => {
     })
 
     test('return list of actions with activation id', () => {
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = ['12345']
       return command.run()
         .then(() => {
@@ -110,7 +113,7 @@ describe('instance methods', () => {
     })
 
     test('return list of actions with activation id, --full flag', () => {
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = ['12345', '--full']
       return command.run()
         .then(() => {
@@ -120,7 +123,7 @@ describe('instance methods', () => {
     })
 
     test('return list of actions with activation id --json', () => {
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = ['12345', '--json']
       return command.run()
         .then(() => {
@@ -145,7 +148,7 @@ describe('instance methods', () => {
           statusCode: 0,
           version: '0.0.1'
         }]
-      const cmd = ow.mockResolved(owAction, data)
+      const cmd = rtLib.mockResolved(rtAction, data)
       command.argv = ['12345']
       return command.run()
         .then(() => {
@@ -170,7 +173,7 @@ describe('instance methods', () => {
           statusCode: 0,
           version: '0.0.1'
         }]
-      const cmd = ow.mockResolved(owAction, data)
+      const cmd = rtLib.mockResolved(rtAction, data)
       command.argv = ['12345']
       return command.run()
         .then(() => {
@@ -181,7 +184,7 @@ describe('instance methods', () => {
 
     test('errors out on api error', () => {
       return new Promise((resolve, reject) => {
-        ow.mockRejected(owAction, new Error('an error'))
+        rtLib.mockRejected(rtAction, new Error('an error'))
         return command.run()
           .then(() => reject(new Error('does not throw error')))
           .catch(() => {
@@ -204,7 +207,7 @@ describe('instance methods', () => {
           statusCode: 0,
           version: '0.0.1'
         }]
-      const cmd = ow.mockResolved(owAction, data)
+      const cmd = rtLib.mockResolved(rtAction, data)
       command.argv = ['12345']
       return command.run()
         .then(() => {

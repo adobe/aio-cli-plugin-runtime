@@ -13,9 +13,9 @@ governing permissions and limitations under the License.
 const { stdout } = require('stdout-stderr')
 const TheCommand = require('../../../../src/commands/runtime/activation/logs.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
-const ow = require('openwhisk')()
-const owAction = 'activations.logs'
-
+const RuntimeLib = require('@adobe/aio-lib-runtime')
+const rtUtils = RuntimeLib.utils
+const rtAction = 'activations.logs'
 test('exports', async () => {
   expect(typeof TheCommand).toEqual('function')
   expect(TheCommand.prototype instanceof RuntimeBaseCommand).toBeTruthy()
@@ -50,11 +50,13 @@ test('flags', async () => {
 })
 
 describe('instance methods', () => {
-  let command, handleError
-
-  beforeEach(() => {
+  let command, handleError, rtLib
+  beforeEach(async () => {
     command = new TheCommand([])
     handleError = jest.spyOn(command, 'handleError')
+    rtLib = await RuntimeLib.init({ apihost: 'fakehost', api_key: 'fakekey' })
+    rtLib.mockResolved('actions.client.options', '')
+    RuntimeLib.mockReset()
   })
 
   describe('run', () => {
@@ -63,7 +65,7 @@ describe('instance methods', () => {
     })
 
     test('retrieve logs of an activation - no-results', () => {
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = ['12345']
       return command.run()
         .then(() => {
@@ -73,28 +75,28 @@ describe('instance methods', () => {
     })
 
     test('retrieve logs of an activation - with-results', () => {
-      const cmd = ow.mockResolved(owAction, { logs: ['this is a log', 'so is this'] })
+      const cmd = rtLib.mockResolved(rtAction, { logs: ['this is a log', 'so is this'] })
       command.argv = ['12345']
       return command.run()
         .then((res) => {
           expect(cmd).toHaveBeenCalledWith('12345')
-          expect(stdout.output).toMatchFixture('logs/activation-logs.txt')
+          expect(rtUtils.printLogs).toHaveBeenCalledWith({ logs: ['this is a log', 'so is this'] }, undefined, command.log)
         })
     })
 
     test('retrieve logs of an activation --strip', () => {
-      const cmd = ow.mockResolved(owAction, { logs: ['line1', 'line2', '2019-10-11T19:08:57.298Z  stdout: login-success'] })
+      const cmd = rtLib.mockResolved(rtAction, { logs: ['line1', 'line2', '2019-10-11T19:08:57.298Z  stdout: login-success'] })
       command.argv = ['12345', '-r']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalledWith('12345')
-          expect(stdout.output).toMatch('line1\nline2\nlogin-success')
+          expect(rtUtils.printLogs).toHaveBeenCalledWith({ logs: ['line1', 'line2', '2019-10-11T19:08:57.298Z  stdout: login-success'] }, true, command.log)
         })
     })
 
     test('throws error retrieve logs of an activation', () => {
-      ow.mockResolved('activations.list', [{ activationId: '12345' }])
-      const cmd = ow.mockRejected(owAction, new Error('Async error'))
+      rtLib.mockResolved('activations.list', [{ activationId: '12345' }])
+      const cmd = rtLib.mockRejected(rtAction, new Error('Async error'))
       command.argv = ['-l', '-c', '2']
       return command.run()
         .catch(() => {
@@ -104,19 +106,19 @@ describe('instance methods', () => {
     })
 
     test('retrieve last log -l', () => {
-      const listCmd = ow.mockResolved('activations.list', [{ activationId: '12345' }])
-      const logCmd = ow.mockResolved(owAction, { logs: ['line1', 'line2', 'line3'] })
+      const listCmd = rtLib.mockResolved('activations.list', [{ activationId: '12345' }])
+      const logCmd = rtLib.mockResolved(rtAction, { logs: ['line1', 'line2', 'line3'] })
       command.argv = ['-l']
       return command.run()
         .then(() => {
           expect(listCmd).toHaveBeenCalledWith(expect.objectContaining({ limit: 1 }))
           expect(logCmd).toHaveBeenCalledWith('12345')
-          expect(stdout.output).toMatch('line3')
+          expect(rtUtils.printLogs).toHaveBeenCalledWith({ logs: ['line1', 'line2', 'line3'] }, undefined, command.log)
         })
     })
 
     test('retrieve last logs - no-results', () => {
-      const cmd = ow.mockResolved('activations.list', [])
+      const cmd = rtLib.mockResolved('activations.list', [])
       command.argv = ['-l']
       return command.run()
         .then(() => {
@@ -126,27 +128,27 @@ describe('instance methods', () => {
     })
 
     test('retrieve last log --last', () => {
-      const listCmd = ow.mockResolved('activations.list', [{ activationId: '12345' }])
-      const logCmd = ow.mockResolved(owAction, { logs: ['line1', 'line2', 'line3'] })
+      const listCmd = rtLib.mockResolved('activations.list', [{ activationId: '12345' }])
+      const logCmd = rtLib.mockResolved(rtAction, { logs: ['line1', 'line2', 'line3'] })
       command.argv = ['--last']
       return command.run()
         .then(() => {
           expect(listCmd).toHaveBeenCalledWith(expect.objectContaining({ limit: 1 }))
           expect(logCmd).toHaveBeenCalledWith('12345')
-          expect(stdout.output).toMatch('line3')
+          expect(rtUtils.printLogs).toHaveBeenCalledWith({ logs: ['line1', 'line2', 'line3'] }, undefined, command.log)
         })
     })
 
     test('retrieve last -c logs', () => {
-      const listCmd = ow.mockResolved('activations.list', [{ activationId: '12345' }, { activationId: '12346' }])
-      const logCmd = ow.mockResolved(owAction, { logs: ['line1', 'line2', 'line3'] })
+      const listCmd = rtLib.mockResolved('activations.list', [{ activationId: '12345' }, { activationId: '12346' }])
+      const logCmd = rtLib.mockResolved(rtAction, { logs: ['line1', 'line2', 'line3'] })
       command.argv = ['-l', '-c', '2']
       return command.run()
         .then(() => {
           expect(listCmd).toHaveBeenCalledWith(expect.objectContaining({ limit: 2 }))
           expect(logCmd).toHaveBeenCalledWith('12345')
           expect(logCmd).toHaveBeenCalledWith('12346')
-          expect(stdout.output).toMatch('line3')
+          expect(rtUtils.printLogs).toHaveBeenCalledWith({ logs: ['line1', 'line2', 'line3'] }, undefined, command.log)
         })
     })
 

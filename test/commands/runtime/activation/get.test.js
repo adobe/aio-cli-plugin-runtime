@@ -82,7 +82,7 @@ describe('instance methods', () => {
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalledWith('12345')
-          expect(stdout.output).toMatch('line1\nline2\nlogin-success')
+          expect(rtUtils.printLogs).toHaveBeenCalledWith({ logs: ['line1', 'line2', '2019-10-11T19:08:57.298Z  stdout: login-success'] }, true, command.log)
         })
     })
 
@@ -100,13 +100,13 @@ describe('instance methods', () => {
 
     test('retrieve last activation logs --last --logs', () => {
       const axList = rtLib.mockResolved('activations.list', [{ activationId: '12345' }])
-      const axGet = rtLib.mockResolved('activations.logs', { logs: ['line1', 'line2', '2019-10-11T19:08:57.298Z   stdout: login-success'] })
+      const axGet = rtLib.mockResolved('activations.logs', { logs: ['line1', 'line2', '2019-10-11T19:08:57.298Z  stdout: login-success'] })
       command.argv = ['--last', '--logs']
       return command.run()
         .then(() => {
           expect(axList).toHaveBeenCalled()
           expect(axGet).toHaveBeenCalledWith('12345')
-          expect(stdout.output).toMatch('line1\nline2\nlogin-success')
+          expect(rtUtils.printLogs).toHaveBeenCalledWith({ logs: ['line1', 'line2', '2019-10-11T19:08:57.298Z  stdout: login-success'] }, true, command.log)
         })
     })
 
