@@ -15,7 +15,6 @@ const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
 const { stdout } = require('stdout-stderr')
 const rtAction = 'routes.delete'
 const RuntimeLib = require('@adobe/aio-lib-runtime')
-const rtUtils = RuntimeLib.utils
 
 test('exports', async () => {
   expect(typeof TheCommand).toEqual('function')
@@ -74,7 +73,7 @@ describe('instance methods', () => {
 
   test('error, throws exception', () => {
     return new Promise((resolve, reject) => {
-       rtLib.mockRejected(rtAction, new Error('an error'))
+      rtLib.mockRejected(rtAction, new Error('an error'))
       command.argv = ['/myapi']
       return command.run()
         .then(() => reject(new Error('should not succeed')))

@@ -15,7 +15,6 @@ const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
 const rtAction = 'rules.update'
 const { stdout } = require('stdout-stderr')
 const RuntimeLib = require('@adobe/aio-lib-runtime')
-const rtUtils = RuntimeLib.utils
 
 test('exports', async () => {
   expect(typeof TheCommand).toEqual('function')
@@ -105,7 +104,7 @@ describe('instance methods', () => {
 
     test('errors out on api error', () => {
       return new Promise((resolve, reject) => {
-         rtLib.mockRejected('rules.update', new Error('an error'))
+        rtLib.mockRejected('rules.update', new Error('an error'))
         command.argv = ['nameFoo', 'triggerFoo', 'actionFoo']
         return command.run()
           .then(() => reject(new Error('does not throw error')))

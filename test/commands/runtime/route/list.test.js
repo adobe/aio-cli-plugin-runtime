@@ -14,7 +14,6 @@ const TheCommand = require('../../../../src/commands/runtime/route/list.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
 const rtAction = 'routes.list'
 const RuntimeLib = require('@adobe/aio-lib-runtime')
-const rtUtils = RuntimeLib.utils
 const { stdout } = require('stdout-stderr')
 
 test('exports', async () => {
@@ -107,7 +106,7 @@ describe('instance methods', () => {
 
     test('error, throws exception', () => {
       return new Promise((resolve, reject) => {
-         rtLib.mockRejected(rtAction, new Error('an error'))
+        rtLib.mockRejected(rtAction, new Error('an error'))
         return command.run()
           .then(() => reject(new Error('should not succeed')))
           .catch(() => {

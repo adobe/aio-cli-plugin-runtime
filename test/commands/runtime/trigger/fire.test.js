@@ -62,7 +62,7 @@ test('flags', () => {
 })
 
 describe('instance methods', () => {
-  let command, handleError
+  let command, handleError, rtLib
 
   beforeAll(() => {
     const fsJson = {
@@ -77,9 +77,12 @@ describe('instance methods', () => {
     fakeFileSystem.reset()
   })
 
-  beforeEach(() => {
+  beforeEach(async () => {
     command = new TheCommand([])
     handleError = jest.spyOn(command, 'handleError')
+    rtLib = await RuntimeLib.init({ apihost: 'fakehost', api_key: 'fakekey' })
+    rtLib.mockResolved('actions.client.options', '')
+    RuntimeLib.mockReset()
   })
 
   describe('run', () => {

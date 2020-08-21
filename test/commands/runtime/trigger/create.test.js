@@ -72,7 +72,7 @@ test('args', async () => {
 })
 
 describe('instance methods', () => {
-  let command, handleError
+  let command, handleError, rtLib
 
   beforeAll(() => {
     const fsJson = {
@@ -88,9 +88,12 @@ describe('instance methods', () => {
     fakeFileSystem.reset()
   })
 
-  beforeEach(() => {
+  beforeEach(async () => {
     command = new TheCommand([])
     handleError = jest.spyOn(command, 'handleError')
+    rtLib = await RuntimeLib.init({ apihost: 'fakehost', api_key: 'fakekey' })
+    rtLib.mockResolved('actions.client.options', '')
+    RuntimeLib.mockReset()
   })
 
   describe('run', () => {
@@ -110,7 +113,7 @@ describe('instance methods', () => {
 
     test('create a simple trigger, error', () => {
       return new Promise((resolve, reject) => {
-         rtLib.mockRejected(rtAction, new Error('an error'))
+        rtLib.mockRejected(rtAction, new Error('an error'))
         command.argv = ['trigger1']
         return command.run()
           .then(() => reject(new Error('does not throw error')))
@@ -156,7 +159,7 @@ describe('instance methods', () => {
 
     test('create a simple trigger, use feed flag - Error', () => {
       const cmd = rtLib.mockResolved(rtAction, '')
-      const cmdfeed =  rtLib.mockRejected('feeds.create', new Error('an error'))
+      const cmdfeed = rtLib.mockRejected('feeds.create', new Error('an error'))
       const cmddelete = rtLib.mockResolved('triggers.delete', '')
       command.argv = ['trigger1', '--feed', '/whisk.system/alarms/alarm', '--param', 'cron', '* * * * *']
       return command.run()

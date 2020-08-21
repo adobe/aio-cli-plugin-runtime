@@ -15,7 +15,6 @@ const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
 const rtAction = 'routes.create'
 const { stdout } = require('stdout-stderr')
 const RuntimeLib = require('@adobe/aio-lib-runtime')
-const rtUtils = RuntimeLib.utils
 
 test('exports', async () => {
   expect(typeof TheCommand).toEqual('function')
@@ -129,7 +128,7 @@ describe('instance methods', () => {
 
     test('create a simple api, error', () => {
       return new Promise((resolve, reject) => {
-         rtLib.mockRejected(rtAction, new Error('an error'))
+        rtLib.mockRejected(rtAction, new Error('an error'))
         command.argv = ['/mybase', '/myapi', 'get', 'myaction']
         return command.run()
           .then(() => reject(new Error('does not throw error')))
