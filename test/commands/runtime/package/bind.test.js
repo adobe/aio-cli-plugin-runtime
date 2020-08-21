@@ -13,8 +13,9 @@ governing permissions and limitations under the License.
 const { stdout } = require('stdout-stderr')
 const TheCommand = require('../../../../src/commands/runtime/package/bind.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
-const ow = require('openwhisk')()
-const owPackage = 'packages.create'
+const RuntimeLib = require('@adobe/aio-lib-runtime')
+const rtUtils = RuntimeLib.utils
+const rtAction = 'packages.create'
 
 test('exports', async () => {
   expect(typeof TheCommand).toEqual('function')
@@ -56,11 +57,13 @@ test('args', async () => {
 })
 
 describe('instance methods', () => {
-  let command, handleError
-
-  beforeEach(() => {
+  let command, handleError, rtLib
+  beforeEach(async () => {
     command = new TheCommand([])
     handleError = jest.spyOn(command, 'handleError')
+    rtLib = await RuntimeLib.init({ apihost: 'fakehost', api_key: 'fakekey' })
+    rtLib.mockResolved('actions.client.options', '')
+    RuntimeLib.mockReset()
   })
 
   afterAll(() => {
@@ -74,28 +77,20 @@ describe('instance methods', () => {
     })
 
     test('binds a package with package name param flag', () => {
-      const cmd = ow.mockResolved(owPackage, '')
+      const cmd = rtLib.mockResolved(rtAction, { res: 'fake' })
       command.argv = ['packageName', 'bindPackageName', '--param', 'a', 'b', '--param', 'c', 'd']
+      rtUtils.createKeyValueArrayFromFlag.mockReturnValue([{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }])
+      rtUtils.parsePackageName.mockReturnValue({ name: 'fakeName', namespace: '-' })
       return command.run()
         .then(() => {
+          expect(rtUtils.parsePackageName).toHaveBeenCalledWith('packageName')
+          expect(rtUtils.createKeyValueArrayFromFlag).toHaveBeenCalledWith(['a', 'b', 'c', 'd'])
           expect(cmd).toHaveBeenCalledWith({
             name: 'bindPackageName',
             package: {
               annotations: [],
-              binding: {
-                name: 'packageName',
-                namespace: '_'
-              },
-              parameters: [
-                {
-                  key: 'a',
-                  value: 'b'
-                },
-                {
-                  key: 'c',
-                  value: 'd'
-                }
-              ]
+              binding: { name: 'fakeName', namespace: '-' },
+              parameters: [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }]
             }
           })
           expect(stdout.output).toMatch('')
@@ -103,28 +98,20 @@ describe('instance methods', () => {
     })
 
     test('binds a package with package name /ns param flag', () => {
-      const cmd = ow.mockResolved(owPackage, '')
+      const cmd = rtLib.mockResolved(rtAction, { fake: 'res' })
       command.argv = ['/ns/packageName', 'bindPackageName', '--param', 'a', 'b', '--param', 'c', 'd']
+      rtUtils.createKeyValueArrayFromFlag.mockReturnValue([{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }])
+      rtUtils.parsePackageName.mockReturnValue({ name: 'fakeName', namespace: 'fakeNs' })
       return command.run()
         .then(() => {
+          expect(rtUtils.parsePackageName).toHaveBeenCalledWith('/ns/packageName')
+          expect(rtUtils.createKeyValueArrayFromFlag).toHaveBeenCalledWith(['a', 'b', 'c', 'd'])
           expect(cmd).toHaveBeenCalledWith({
             name: 'bindPackageName',
             package: {
               annotations: [],
-              binding: {
-                name: 'packageName',
-                namespace: 'ns'
-              },
-              parameters: [
-                {
-                  key: 'a',
-                  value: 'b'
-                },
-                {
-                  key: 'c',
-                  value: 'd'
-                }
-              ]
+              binding: { name: 'fakeName', namespace: 'fakeNs' },
+              parameters: [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }]
             }
           })
           expect(stdout.output).toMatch('')
@@ -132,47 +119,38 @@ describe('instance methods', () => {
     })
 
     test('binds a package with package name param flag --json', () => {
-      const cmd = ow.mockResolved(owPackage, '')
+      const cmd = rtLib.mockResolved(rtAction, { fake: 'res' })
       command.argv = ['packageName', 'bindPackageName', '--param', 'a', 'b', '--param', 'c', 'd', '--json']
+      rtUtils.createKeyValueArrayFromFlag.mockReturnValue([{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }])
+      rtUtils.parsePackageName.mockReturnValue({ name: 'fakeName', namespace: '-' })
       return command.run()
         .then(() => {
+          expect(rtUtils.parsePackageName).toHaveBeenCalledWith('packageName')
+          expect(rtUtils.createKeyValueArrayFromFlag).toHaveBeenCalledWith(['a', 'b', 'c', 'd'])
           expect(cmd).toHaveBeenCalledWith({
             name: 'bindPackageName',
             package: {
               annotations: [],
-              binding: {
-                name: 'packageName',
-                namespace: '_'
-              },
-              parameters: [
-                {
-                  key: 'a',
-                  value: 'b'
-                },
-                {
-                  key: 'c',
-                  value: 'd'
-                }
-              ]
+              binding: { name: 'fakeName', namespace: '-' },
+              parameters: [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }]
             }
           })
-          expect(stdout.output).toMatch('')
+          expect(stdout.output).toMatch(JSON.stringify({ fake: 'res' }, null, 2))
         })
     })
 
     test('binds a package with only packageName and bindPackageName', () => {
-      const cmd = ow.mockResolved(owPackage, '')
-      command.argv = ['ns/packageName', 'bindpackageName']
+      const cmd = rtLib.mockResolved(rtAction, { res: 'fake' })
+      rtUtils.parsePackageName.mockReturnValue({ name: 'fakeName', namespace: 'fakeNs' })
+      command.argv = ['ns/packageName', 'bindPackageName']
       return command.run()
         .then(() => {
+          expect(rtUtils.parsePackageName).toHaveBeenCalledWith('ns/packageName')
           expect(cmd).toHaveBeenCalledWith({
-            name: 'bindpackageName',
+            name: 'bindPackageName',
             package: {
               annotations: [],
-              binding: {
-                name: 'packageName',
-                namespace: 'ns'
-              },
+              binding: { name: 'fakeName', namespace: 'fakeNs' },
               parameters: []
             }
           })
@@ -181,34 +159,23 @@ describe('instance methods', () => {
     })
 
     test('binds a package with packageName, bindPackageName and param-file flag', () => {
-      const json = {
-        'parameters.json': fixtureFile('trigger/parameters.json')
-      }
-      fakeFileSystem.addJson({
-        '/action': json
-      })
-      const cmd = ow.mockResolved(owPackage, '')
+      const cmd = rtLib.mockResolved(rtAction, { res: 'fake' })
       command.argv = ['ns/packageName', 'bindPackageName', '--param-file', '/action/parameters.json']
+      rtUtils.createKeyValueArrayFromFile.mockReturnValue([{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }])
+      rtUtils.parsePackageName.mockReturnValue({ name: 'fakeName', namespace: 'fakeNs' })
       return command.run()
         .then(() => {
+          expect(rtUtils.parsePackageName).toHaveBeenCalledWith('ns/packageName')
+          expect(rtUtils.createKeyValueArrayFromFile).toHaveBeenCalledWith('/action/parameters.json')
           expect(cmd).toHaveBeenCalledWith({
             name: 'bindPackageName',
             package: {
               annotations: [],
               binding: {
-                name: 'packageName',
-                namespace: 'ns'
+                name: 'fakeName',
+                namespace: 'fakeNs'
               },
-              parameters: [
-                {
-                  key: 'param1',
-                  value: 'param1value'
-                },
-                {
-                  key: 'param2',
-                  value: 'param2value'
-                }
-              ]
+              parameters: [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }]
             }
           })
           expect(stdout.output).toMatch('')
@@ -216,34 +183,23 @@ describe('instance methods', () => {
     })
 
     test('binds a package with packageName, bindPackageName and annotation-file flag', () => {
-      const json = {
-        'parameters.json': fixtureFile('trigger/parameters.json')
-      }
-      fakeFileSystem.addJson({
-        '/action': json
-      })
-      const cmd = ow.mockResolved(owPackage, '')
+      const cmd = rtLib.mockResolved(rtAction, { res: 'fake' })
       command.argv = ['ns/packageName', 'bindPackageName', '--annotation-file', '/action/parameters.json']
+      rtUtils.createKeyValueArrayFromFile.mockReturnValue([{ key: 'fakeAnnot', value: 'aaa' }])
+      rtUtils.parsePackageName.mockReturnValue({ name: 'fakeName', namespace: 'fakeNs' })
       return command.run()
         .then(() => {
+          expect(rtUtils.parsePackageName).toHaveBeenCalledWith('ns/packageName')
+          expect(rtUtils.createKeyValueArrayFromFile).toHaveBeenCalledWith('/action/parameters.json')
           expect(cmd).toHaveBeenCalledWith({
             name: 'bindPackageName',
             package: {
-              parameters: [],
+              annotations: [{ key: 'fakeAnnot', value: 'aaa' }],
               binding: {
-                name: 'packageName',
-                namespace: 'ns'
+                name: 'fakeName',
+                namespace: 'fakeNs'
               },
-              annotations: [
-                {
-                  key: 'param1',
-                  value: 'param1value'
-                },
-                {
-                  key: 'param2',
-                  value: 'param2value'
-                }
-              ]
+              parameters: []
             }
           })
           expect(stdout.output).toMatch('')
@@ -251,33 +207,29 @@ describe('instance methods', () => {
     })
 
     test('binds a package with packageName, bindPackageName and annotation and param flags', () => {
-      const cmd = ow.mockResolved(owPackage, '')
+      const cmd = rtLib.mockResolved(rtAction, { res: 'fake' })
       command.argv = ['/ns/packageName', 'bindPackageName', '--annotation', 'a', 'b', '--annotation', 'c', 'd', '--param', 'p1', 'p2']
+      rtUtils.createKeyValueArrayFromFlag.mockImplementation(arr => {
+        if (arr.includes('p1')) {
+          return [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }]
+        }
+        return [{ key: 'fakeAnnot', value: 'aaa' }]
+      })
+      rtUtils.parsePackageName.mockReturnValue({ name: 'fakeName', namespace: 'fakeNs' })
       return command.run()
         .then(() => {
+          expect(rtUtils.parsePackageName).toHaveBeenCalledWith('/ns/packageName')
+          expect(rtUtils.createKeyValueArrayFromFlag).toHaveBeenCalledWith(['a', 'b', 'c', 'd'])
+          expect(rtUtils.createKeyValueArrayFromFlag).toHaveBeenCalledWith(['p1', 'p2'])
           expect(cmd).toHaveBeenCalledWith({
             name: 'bindPackageName',
             package: {
-              parameters: [
-                {
-                  key: 'p1',
-                  value: 'p2'
-                }
-              ],
+              annotations: [{ key: 'fakeAnnot', value: 'aaa' }],
               binding: {
-                name: 'packageName',
-                namespace: 'ns'
+                name: 'fakeName',
+                namespace: 'fakeNs'
               },
-              annotations: [
-                {
-                  key: 'a',
-                  value: 'b'
-                },
-                {
-                  key: 'c',
-                  value: 'd'
-                }
-              ]
+              parameters: [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }]
             }
           })
           expect(stdout.output).toMatch('')
@@ -285,60 +237,58 @@ describe('instance methods', () => {
     })
 
     test('binds a package with packageName, bindPackageName and annotation and param flags with shorter flag version', () => {
-      const cmd = ow.mockResolved(owPackage, '')
-      command.argv = ['ns/packageName', 'bindPackageName', '-a', 'a', 'b', '-a', 'c', 'd', '-p', 'p1', 'p2']
+      const cmd = rtLib.mockResolved(rtAction, { res: 'fake' })
+      command.argv = ['/ns/packageName', 'bindPackageName', '-a', 'a', 'b', '-a', 'c', 'd', '-p', 'p1', 'p2']
+      rtUtils.createKeyValueArrayFromFlag.mockImplementation(arr => {
+        if (arr.includes('p1')) {
+          return [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }]
+        }
+        return [{ key: 'fakeAnnot', value: 'aaa' }]
+      })
+      rtUtils.parsePackageName.mockReturnValue({ name: 'fakeName', namespace: 'fakeNs' })
       return command.run()
         .then(() => {
+          expect(rtUtils.parsePackageName).toHaveBeenCalledWith('/ns/packageName')
+          expect(rtUtils.createKeyValueArrayFromFlag).toHaveBeenCalledWith(['a', 'b', 'c', 'd'])
+          expect(rtUtils.createKeyValueArrayFromFlag).toHaveBeenCalledWith(['p1', 'p2'])
           expect(cmd).toHaveBeenCalledWith({
             name: 'bindPackageName',
             package: {
-              parameters: [
-                {
-                  key: 'p1',
-                  value: 'p2'
-                }
-              ],
+              annotations: [{ key: 'fakeAnnot', value: 'aaa' }],
               binding: {
-                name: 'packageName',
-                namespace: 'ns'
+                name: 'fakeName',
+                namespace: 'fakeNs'
               },
-              annotations: [
-                {
-                  key: 'a',
-                  value: 'b'
-                },
-                {
-                  key: 'c',
-                  value: 'd'
-                }
-              ]
+              parameters: [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }]
             }
           })
           expect(stdout.output).toMatch('')
         })
     })
 
-    test('tests for incorrect --param flags', () => {
+    test('error on params flag parsing', () => {
       return new Promise((resolve, reject) => {
-        ow.mockRejected(owPackage, '')
+        rtLib.mockRejected(rtAction, '')
         command.argv = ['packageName', 'bindPackageName', '--param', 'a', 'b', 'c']
+        rtUtils.createKeyValueArrayFromFlag.mockImplementation(() => { throw new Error('parse error') })
         return command.run()
           .then(() => reject(new Error('does not throw error')))
           .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to bind the package', new Error('Please provide correct values for flags'))
+            expect(handleError).toHaveBeenLastCalledWith('failed to bind the package', new Error('parse error'))
             resolve()
           })
       })
     })
 
-    test('tests for incorrect --annotation flags', () => {
+    test('error on annotation flag parsing', () => {
       return new Promise((resolve, reject) => {
-        ow.mockRejected(owPackage, '')
+        rtLib.mockRejected(rtAction, '')
         command.argv = ['packageName', 'bindPackageName', '--annotation', 'a', 'b', 'c']
+        rtUtils.createKeyValueArrayFromFlag.mockImplementation(() => { throw new Error('parse error') })
         return command.run()
           .then(() => reject(new Error('does not throw error')))
           .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to bind the package', new Error('Please provide correct values for flags'))
+            expect(handleError).toHaveBeenLastCalledWith('failed to bind the package', new Error('parse error'))
             resolve()
           })
       })
@@ -346,7 +296,7 @@ describe('instance methods', () => {
 
     test('errors out on api error', () => {
       return new Promise((resolve, reject) => {
-        ow.mockRejected(owPackage, new Error('an error'))
+        rtLib.mockRejected(rtAction, new Error('an error'))
         command.argv = ['packageName', 'bindPackageName']
         return command.run()
           .then(() => reject(new Error('does not throw error')))

@@ -75,7 +75,7 @@ describe('instance methods', () => {
     })
 
     test('invokes an action only with action name', () => {
-      const cmd = rtLib.mockResolved(rtAction, '')
+      const cmd = rtLib.mockResolved(rtAction, { res: 'fake' })
       command.argv = ['hello']
       return command.run()
         .then(() => {
@@ -90,7 +90,7 @@ describe('instance methods', () => {
     })
 
     test('sets X-OW-EXTRA-LOGGING header when invoking an action', () => {
-      const cmd = rtLib.mockResolved(rtAction, '')
+      const cmd = rtLib.mockResolved(rtAction, { res: 'fake' })
       command.argv = ['hello']
       return command.run()
         .then(() => {
@@ -102,7 +102,7 @@ describe('instance methods', () => {
     })
 
     test('invokes an action with action name and params', () => {
-      const cmd = rtLib.mockResolved(rtAction, '')
+      const cmd = rtLib.mockResolved(rtAction, { res: 'fake' })
       command.argv = ['hello', '--param', 'a', 'b', 'c', 'd']
       rtUtils.createKeyValueObjectFromFlag.mockReturnValue({ fakeParam: 'aaa' })
       return command.run()
@@ -119,7 +119,7 @@ describe('instance methods', () => {
     })
 
     test('invokes an action with action name, params and blocking', () => {
-      const cmd = rtLib.mockResolved(rtAction, '')
+      const cmd = rtLib.mockResolved(rtAction, { res: 'fake' })
       command.argv = ['hello', '--param', 'a', 'b', '--param', 'c', 'd', '--blocking']
       rtUtils.createKeyValueObjectFromFlag.mockReturnValue({ fakeParam: 'aaa' })
       return command.run()
@@ -136,7 +136,7 @@ describe('instance methods', () => {
     })
 
     test('invokes an action with action name, params and result. Should still block', () => {
-      const cmd = rtLib.mockResolved(rtAction, '')
+      const cmd = rtLib.mockResolved(rtAction, { res: 'fake' })
       command.argv = ['hello', '--result']
       return command.run()
         .then(() => {
@@ -274,7 +274,7 @@ describe('instance methods', () => {
     })
 
     test('invokes an action with all flags', () => {
-      const cmd = rtLib.mockResolved(rtAction, '')
+      const cmd = rtLib.mockResolved(rtAction, { res: 'fake' })
       command.argv = ['hello', '--param', 'a', 'b', '--param', 'c', 'd', '--blocking', '--result']
       rtUtils.createKeyValueObjectFromFlag.mockReturnValue({ fakeParam: 'aaa' })
       return command.run()
@@ -291,7 +291,7 @@ describe('instance methods', () => {
     })
 
     test('invokes an action with all flags and --param-file', () => {
-      const cmd = rtLib.mockResolved(rtAction, '')
+      const cmd = rtLib.mockResolved(rtAction, { res: 'fake' })
       const json = {
         'parameters.json': fixtureFile('trigger/parameters.json')
       }

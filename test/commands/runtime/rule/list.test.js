@@ -12,9 +12,10 @@ governing permissions and limitations under the License.
 
 const TheCommand = require('../../../../src/commands/runtime/rule/list.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
-const owAction = 'rules.list'
+const rtAction = 'rules.list'
 const { stdout } = require('stdout-stderr')
-const ow = require('openwhisk')()
+const RuntimeLib = require('@adobe/aio-lib-runtime')
+const rtUtils = RuntimeLib.utils
 
 test('exports', async () => {
   expect(typeof TheCommand).toEqual('function')
@@ -55,11 +56,13 @@ test('flags', async () => {
 })
 
 describe('instance methods', () => {
-  let command, handleError
-
-  beforeEach(() => {
+  let command, handleError, rtLib
+  beforeEach(async () => {
     command = new TheCommand([])
     handleError = jest.spyOn(command, 'handleError')
+    rtLib = await RuntimeLib.init({ apihost: 'fakehost', api_key: 'fakekey' })
+    rtLib.mockResolved('actions.client.options', '')
+    RuntimeLib.mockReset()
   })
 
   describe('run', () => {
@@ -68,8 +71,8 @@ describe('instance methods', () => {
     })
 
     test('return list of rules with limits --json', () => {
-      const cmd = ow.mockResolvedFixture(owAction, 'rule/list.json')
-      const cmd2 = ow.mockResolvedFixture('rules.get', 'rule/get.json')
+      const cmd = rtLib.mockResolvedFixture(rtAction, 'rule/list.json')
+      const cmd2 = rtLib.mockResolvedFixture('rules.get', 'rule/get.json')
       command.argv = ['--limit', '2', '--json']
       return command.run()
         .then(() => {
@@ -80,8 +83,8 @@ describe('instance methods', () => {
     })
 
     test('return list of rules with no limits --json', () => {
-      const cmd = ow.mockResolvedFixture(owAction, 'rule/list.json')
-      ow.mockResolvedFixture('rules.get', 'rule/get.json')
+      const cmd = rtLib.mockResolvedFixture(rtAction, 'rule/list.json')
+      rtLib.mockResolvedFixture('rules.get', 'rule/get.json')
       command.argv = ['--json']
       return command.run()
         .then(() => {
@@ -91,7 +94,7 @@ describe('instance methods', () => {
     })
 
     test('return list of rules with skip (no rules) --json', () => {
-      const cmd = ow.mockResolved(owAction, [])
+      const cmd = rtLib.mockResolved(rtAction, [])
       command.argv = ['--skip', '3', '--json']
       return command.run()
         .then(() => {
@@ -101,8 +104,8 @@ describe('instance methods', () => {
     })
 
     test('return list of rules with limits - tabular', () => {
-      const cmd = ow.mockResolvedFixture(owAction, 'rule/list.json')
-      const cmd2 = ow.mockResolvedFixture('rules.get', 'rule/get.json')
+      const cmd = rtLib.mockResolvedFixture(rtAction, 'rule/list.json')
+      const cmd2 = rtLib.mockResolvedFixture('rules.get', 'rule/get.json')
       command.argv = ['--limit', '2']
       return command.run()
         .then(() => {
@@ -113,8 +116,8 @@ describe('instance methods', () => {
     })
 
     test('return list of rules with limits - tabular not-active', () => {
-      const cmd = ow.mockResolvedFixture(owAction, 'rule/list.json')
-      const cmd2 = ow.mockResolvedFixture('rules.get', 'rule/get-public.json')
+      const cmd = rtLib.mockResolvedFixture(rtAction, 'rule/list.json')
+      const cmd2 = rtLib.mockResolvedFixture('rules.get', 'rule/get-public.json')
       command.argv = ['--limit', '2']
       return command.run()
         .then(() => {
@@ -125,8 +128,8 @@ describe('instance methods', () => {
     })
 
     test('return list of rules with no limits --json - tabular not-active', () => {
-      const cmd = ow.mockResolvedFixture(owAction, 'rule/list.json')
-      ow.mockResolvedFixture('rules.get', 'rule/get-public.json')
+      const cmd = rtLib.mockResolvedFixture(rtAction, 'rule/list.json')
+      rtLib.mockResolvedFixture('rules.get', 'rule/get-public.json')
       command.argv = ['--json']
       return command.run()
         .then(() => {
@@ -135,8 +138,8 @@ describe('instance methods', () => {
         })
     })
     test('return list of rules, --name-sort flag', () => {
-      const cmd = ow.mockResolvedFixture(owAction, 'rule/list-name-sort.json')
-      ow.mockResolvedFixtureMulitValue('rules.get', 'rule/get-name-sort.json')
+      const cmd = rtLib.mockResolvedFixture(rtAction, 'rule/list-name-sort.json')
+      rtLib.mockResolvedFixtureMulitValue('rules.get', 'rule/get-name-sort.json')
       command.argv = ['--name']
       return command.run()
         .then(() => {
@@ -147,7 +150,7 @@ describe('instance methods', () => {
 
     // eslint-disable-next-line jest/no-commented-out-tests
     // test('return the number of rules with count flag', () => {
-    //   let cmd = ow.mockResolved(owAction, '2')
+    //   let cmd = rtLib.mockResolved(rtAction, '2')
     //   command.argv = ['--count']
     //   return command.run()
     //     .then(() => {
@@ -158,7 +161,7 @@ describe('instance methods', () => {
 
     test('errors out on api error', () => {
       return new Promise((resolve, reject) => {
-        ow.mockRejected('rules.list', new Error('an error'))
+         rtLib.mockRejected('rules.list', new Error('an error'))
         return command.run()
           .then(() => reject(new Error('does not throw error')))
           .catch(() => {

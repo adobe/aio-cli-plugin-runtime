@@ -12,9 +12,10 @@ governing permissions and limitations under the License.
 
 const TheCommand = require('../../../../src/commands/runtime/trigger/get.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
-const ow = require('openwhisk')()
+const RuntimeLib = require('@adobe/aio-lib-runtime')
+const rtUtils = RuntimeLib.utils
 const { stdout } = require('stdout-stderr')
-const owAction = 'triggers.get'
+const rtAction = 'triggers.get'
 
 test('exports', async () => {
   expect(typeof TheCommand).toEqual('function')
@@ -46,11 +47,13 @@ test('base flags included in command flags',
 )
 
 describe('instance methods', () => {
-  let command, handleError
-
-  beforeEach(() => {
+  let command, handleError, rtLib
+  beforeEach(async () => {
     command = new TheCommand([])
     handleError = jest.spyOn(command, 'handleError')
+    rtLib = await RuntimeLib.init({ apihost: 'fakehost', api_key: 'fakekey' })
+    rtLib.mockResolved('actions.client.options', '')
+    RuntimeLib.mockReset()
   })
 
   describe('run', () => {
@@ -69,7 +72,7 @@ describe('instance methods', () => {
           publish: false,
           version: '0.0.1'
         }
-        const cmd = ow.mockResolved(owAction, obj)
+        const cmd = rtLib.mockResolved(rtAction, obj)
 
         command.argv = ['trigger1']
         return command.run()
@@ -92,7 +95,7 @@ describe('instance methods', () => {
           publish: false,
           version: '0.0.1'
         }
-        const cmd = ow.mockResolved(owAction, obj)
+        const cmd = rtLib.mockResolved(rtAction, obj)
 
         command.argv = ['/MySpecifiedNamespace/trigger1']
         return command.run()
@@ -106,7 +109,7 @@ describe('instance methods', () => {
 
     test('trigger get, error', () => {
       return new Promise((resolve, reject) => {
-        ow.mockRejected(owAction, new Error('an error'))
+         rtLib.mockRejected(rtAction, new Error('an error'))
 
         command.argv = ['trigger1']
         return command.run()

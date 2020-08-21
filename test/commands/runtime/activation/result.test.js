@@ -61,7 +61,7 @@ describe('instance methods', () => {
     })
 
     test('retrieve results of an activation', () => {
-      const cmd = rtLib.mockResolved(rtAction, '')
+      const cmd = rtLib.mockResolved(rtAction, { res: 'fake' })
       command.argv = ['12345']
       return command.run()
         .then(() => {

@@ -13,8 +13,9 @@ governing permissions and limitations under the License.
 const { stdout } = require('stdout-stderr')
 const TheCommand = require('../../../../src/commands/runtime/deploy/undeploy.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
-const ow = require('openwhisk')()
-const owAction = 'actions.delete'
+const RuntimeLib = require('@adobe/aio-lib-runtime')
+const rtUtils = RuntimeLib.utils
+const rtAction = 'actions.delete'
 const owPackage = 'packages.delete'
 const owRules = 'rules.delete'
 const owTrigger = 'triggers.delete'
@@ -119,16 +120,16 @@ describe('instance methods', () => {
 
   describe('run', () => {
     test('exists', async () => {
-      ow.mockResolved(owPackage, '')
-      ow.mockResolved(owAction, '')
-      ow.mockResolved(owRules, '')
-      ow.mockResolved(owTrigger, '')
-      ow.mockResolved(owApi, '')
+      rtLib.mockResolved(owPackage, '')
+      rtLib.mockResolved(rtAction, '')
+      rtLib.mockResolved(owRules, '')
+      rtLib.mockResolved(owTrigger, '')
+      rtLib.mockResolved(owApi, '')
       expect(command.run).toBeInstanceOf(Function)
     })
 
     test('undeploy a package without specifying manifest file', () => {
-      const cmd = ow.mockResolved(owPackage, '')
+      const cmd = rtLib.mockResolved(owPackage, '')
       command.argv = []
       return command.run()
         .then(() => {
@@ -140,7 +141,7 @@ describe('instance methods', () => {
     test('manifest.yaml missing', () => {
       const toRemove = ['/deploy/manifest.yaml']
       fakeFileSystem.removeKeys(toRemove)
-      const cmd = ow.mockResolved(owPackage, '')
+      const cmd = rtLib.mockResolved(owPackage, '')
       command.argv = []
       return command.run()
         .then(() => {
@@ -152,7 +153,7 @@ describe('instance methods', () => {
     test('manifest.yml missing', () => {
       const toRemove = ['/deploy/manifest.yml']
       fakeFileSystem.removeKeys(toRemove)
-      const cmd = ow.mockResolved(owPackage, '')
+      const cmd = rtLib.mockResolved(owPackage, '')
       command.argv = []
       return command.run()
         .then(() => {
@@ -162,8 +163,8 @@ describe('instance methods', () => {
     })
 
     test('undeploy a package with manifest file', () => {
-      const cmd = ow.mockResolved(owPackage, '')
-      ow.mockResolved('triggers.get', {})
+      const cmd = rtLib.mockResolved(owPackage, '')
+      rtLib.mockResolved('triggers.get', {})
       command.argv = ['-m', '/deploy/manifest_triggersRules.yaml']
       return command.run()
         .then(() => {
@@ -173,7 +174,7 @@ describe('instance methods', () => {
     })
 
     test('undeploy a package dependency with manifest file', () => {
-      const cmd = ow.mockResolved(owPackage, '')
+      const cmd = rtLib.mockResolved(owPackage, '')
       command.argv = ['-m', '/deploy/manifest_dependencies.yaml']
       return command.run()
         .then(() => {
@@ -183,8 +184,8 @@ describe('instance methods', () => {
     })
 
     test('package should be created if project is the root', () => {
-      const cmd = ow.mockResolved(owPackage, '')
-      ow.mockResolved('triggers.get', {})
+      const cmd = rtLib.mockResolved(owPackage, '')
+      rtLib.mockResolved('triggers.get', {})
       command.argv = ['-m', '/deploy/manifest_report.yaml']
       return command.run()
         .then(() => {
@@ -194,8 +195,8 @@ describe('instance methods', () => {
     })
 
     test('undeploy a trigger with manifest file', () => {
-      const cmd = ow.mockResolved(owTrigger, '')
-      ow.mockResolved('triggers.get', {})
+      const cmd = rtLib.mockResolved(owTrigger, '')
+      rtLib.mockResolved('triggers.get', {})
       command.argv = ['-m', '/deploy/manifest_triggersRules.yaml']
       return command.run()
         .then(() => {
@@ -205,9 +206,9 @@ describe('instance methods', () => {
     })
 
     test('undeploy a trigger with manifest file - including feed', () => {
-      const cmd = ow.mockResolved(owTrigger, '')
-      const cmdfeed = ow.mockResolved(owFeed, '')
-      ow.mockResolved('triggers.get', {
+      const cmd = rtLib.mockResolved(owTrigger, '')
+      const cmdfeed = rtLib.mockResolved(owFeed, '')
+      rtLib.mockResolved('triggers.get', {
         annotations: [
           {
             key: 'feed',
@@ -226,9 +227,9 @@ describe('instance methods', () => {
     })
 
     test('undeploy a trigger with manifest file - including feed - codecov', () => {
-      const cmd = ow.mockResolved(owTrigger, '')
-      const cmdfeed = ow.mockResolved(owFeed, '')
-      ow.mockResolved('triggers.get', {
+      const cmd = rtLib.mockResolved(owTrigger, '')
+      const cmdfeed = rtLib.mockResolved(owFeed, '')
+      rtLib.mockResolved('triggers.get', {
         annotations: [
           {
             key: 'key1',
@@ -237,7 +238,7 @@ describe('instance methods', () => {
         ],
         name: 'trigger1'
       })
-      ow.mockResolved('feeds.delete', '')
+      rtLib.mockResolved('feeds.delete', '')
       command.argv = ['-m', '/deploy/manifest_triggersRules.yaml']
       return command.run()
         .then(() => {
@@ -248,8 +249,8 @@ describe('instance methods', () => {
     })
 
     test('undeploy a rule with manifest file', () => {
-      const cmd = ow.mockResolved(owRules, '')
-      ow.mockResolved('triggers.get', {})
+      const cmd = rtLib.mockResolved(owRules, '')
+      rtLib.mockResolved('triggers.get', {})
       command.argv = ['-m', '/deploy/manifest_triggersRules.yaml']
       return command.run()
         .then(() => {
@@ -259,8 +260,8 @@ describe('instance methods', () => {
     })
 
     test('undeploy an action with manifest file', () => {
-      const cmd = ow.mockResolved(owAction, '')
-      ow.mockResolved('triggers.get', {})
+      const cmd = rtLib.mockResolved(rtAction, '')
+      rtLib.mockResolved('triggers.get', {})
       command.argv = ['-m', '/deploy/manifest_triggersRules.yaml']
       return command.run()
         .then(() => {
@@ -270,11 +271,11 @@ describe('instance methods', () => {
     })
 
     test('undeploy entities of a certain project name', () => {
-      ow.mockResolved('packages.list', packagelist)
-      ow.mockResolved('actions.list', '')
-      ow.mockResolved('triggers.list', '')
-      ow.mockResolved('rules.list', '')
-      const cmd = ow.mockResolved(owPackage, '')
+      rtLib.mockResolved('packages.list', packagelist)
+      rtLib.mockResolved('actions.list', '')
+      rtLib.mockResolved('triggers.list', '')
+      rtLib.mockResolved('rules.list', '')
+      const cmd = rtLib.mockResolved(owPackage, '')
       command.argv = ['--projectname', 'proj']
       return command.run()
         .then(() => {
@@ -283,11 +284,11 @@ describe('instance methods', () => {
     })
 
     test('do not undeploy entities of a certain project name if no annotations', () => {
-      ow.mockResolved('packages.list', packagelistNoAnnotation)
-      ow.mockResolved('actions.list', '')
-      ow.mockResolved('triggers.list', '')
-      ow.mockResolved('rules.list', '')
-      const cmd = ow.mockResolved(owPackage, '')
+      rtLib.mockResolved('packages.list', packagelistNoAnnotation)
+      rtLib.mockResolved('actions.list', '')
+      rtLib.mockResolved('triggers.list', '')
+      rtLib.mockResolved('rules.list', '')
+      const cmd = rtLib.mockResolved(owPackage, '')
       command.argv = ['--projectname', 'proj']
       return command.run()
         .then(() => {
@@ -296,11 +297,11 @@ describe('instance methods', () => {
     })
 
     test('do not undeploy entities of a certain project name if projectName does not match', () => {
-      ow.mockResolved('packages.list', packagelistNoProjectName)
-      ow.mockResolved('actions.list', '')
-      ow.mockResolved('triggers.list', '')
-      ow.mockResolved('rules.list', '')
-      const cmd = ow.mockResolved(owPackage, '')
+      rtLib.mockResolved('packages.list', packagelistNoProjectName)
+      rtLib.mockResolved('actions.list', '')
+      rtLib.mockResolved('triggers.list', '')
+      rtLib.mockResolved('rules.list', '')
+      const cmd = rtLib.mockResolved(owPackage, '')
       command.argv = ['--projectname', 'proj']
       return command.run()
         .then(() => {
@@ -309,7 +310,7 @@ describe('instance methods', () => {
     })
 
     test('undeploy an api with manifest file', () => {
-      const cmd = ow.mockResolved(owApi, '')
+      const cmd = rtLib.mockResolved(owApi, '')
       command.argv = ['-m', '/deploy/api_manifest.yaml']
       return command.run()
         .then(() => {
@@ -324,7 +325,7 @@ describe('instance methods', () => {
         const toRemove = ['/deploy/manifest.yaml', '/deploy/manifest.yml']
         fakeFileSystem.removeKeys(toRemove)
 
-        ow.mockRejected(owAction, new Error('an error'))
+         rtLib.mockRejected(rtAction, new Error('an error'))
         command.argv = []
         return command.run()
           .then(() => reject(new Error('does not throw error')))

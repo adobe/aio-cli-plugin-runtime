@@ -13,14 +13,15 @@ governing permissions and limitations under the License.
 const TheCommand = require('../../../../src/commands/runtime/deploy/sync.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
 const { stdout } = require('stdout-stderr')
-const ow = require('openwhisk')()
+const RuntimeLib = require('@adobe/aio-lib-runtime')
+const rtUtils = RuntimeLib.utils
 jest.mock('sha1')
 const sha1 = require('sha1')
-const owAction = 'actions.update'
+const rtAction = 'actions.update'
 const owPackage = 'packages.update'
 const owRules = 'rules.update'
 const owTrigger = 'triggers.update'
-const owActionDelete = 'actions.delete'
+const rtActionDelete = 'actions.delete'
 const owPackageDelete = 'packages.delete'
 const owRulesDelete = 'rules.delete'
 const owTriggerDelete = 'triggers.delete'
@@ -325,29 +326,29 @@ describe('instance methods', () => {
 
   describe('run', () => {
     test('exists', async () => {
-      ow.mockResolved(owPackage, '')
-      ow.mockResolved(owAction, '')
-      ow.mockResolved(owRules, '')
-      ow.mockResolved(owTrigger, '')
-      ow.mockResolved(owPackageDelete, '')
-      ow.mockResolved(owActionDelete, '')
-      ow.mockResolved(owRulesDelete, '')
-      ow.mockResolved(owTriggerDelete, '')
-      ow.mockResolved('actions.client.options', '')
+      rtLib.mockResolved(owPackage, '')
+      rtLib.mockResolved(rtAction, '')
+      rtLib.mockResolved(owRules, '')
+      rtLib.mockResolved(owTrigger, '')
+      rtLib.mockResolved(owPackageDelete, '')
+      rtLib.mockResolved(rtActionDelete, '')
+      rtLib.mockResolved(owRulesDelete, '')
+      rtLib.mockResolved(owTriggerDelete, '')
+      rtLib.mockResolved('actions.client.options', '')
       ow.actions.client.options = { namespace: 'ns' }
-      ow.mockResolved('packages.list', '')
-      ow.mockResolved('packages.update', '')
-      ow.mockResolved('actions.update', '')
-      ow.mockResolved('triggers.list', '')
-      ow.mockResolved('triggers.update', '')
-      ow.mockResolved('rules.list', '')
-      ow.mockResolved('rules.update', '')
+      rtLib.mockResolved('packages.list', '')
+      rtLib.mockResolved('packages.update', '')
+      rtLib.mockResolved('actions.update', '')
+      rtLib.mockResolved('triggers.list', '')
+      rtLib.mockResolved('triggers.update', '')
+      rtLib.mockResolved('rules.list', '')
+      rtLib.mockResolved('rules.update', '')
       expect(command.run).toBeInstanceOf(Function)
     })
 
     test('sync a package which has not been deployed on server before', () => {
-      const cmd = ow.mockResolved(owPackage, '')
-      ow.mockResolved('actions.list', [])
+      const cmd = rtLib.mockResolved(owPackage, '')
+      rtLib.mockResolved('actions.list', [])
       command.argv = ['-m', '/deploy/deployment_actionMissingInputs.yaml']
       return command.run()
         .then(() => {
@@ -369,8 +370,8 @@ describe('instance methods', () => {
     })
 
     test('sync a trigger which has not been deployed on server before', () => {
-      ow.mockResolved('actions.list', [])
-      const cmd = ow.mockResolved(owTrigger, '')
+      rtLib.mockResolved('actions.list', [])
+      const cmd = rtLib.mockResolved(owTrigger, '')
       command.argv = ['-m', '/deploy/deployment_actionMissingInputs.yaml']
       return command.run()
         .then(() => {
@@ -380,8 +381,8 @@ describe('instance methods', () => {
     })
 
     test('sync an action which has not been deployed on server before', () => {
-      ow.mockResolved('actions.list', [])
-      const cmd = ow.mockResolved(owAction, '')
+      rtLib.mockResolved('actions.list', [])
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = ['-m', '/deploy/deployment_actionMissingInputs.yaml']
       return command.run()
         .then(() => {
@@ -391,8 +392,8 @@ describe('instance methods', () => {
     })
 
     test('sync a package which has been deployed before but has not changed ', () => {
-      ow.mockResolved('packages.list', packagelist)
-      const cmd = ow.mockResolved(owPackage, '')
+      rtLib.mockResolved('packages.list', packagelist)
+      const cmd = rtLib.mockResolved(owPackage, '')
       command.argv = ['-m', '/deploy/deployment_actionMissingInputs.yaml']
       return command.run()
         .then(() => {
@@ -402,8 +403,8 @@ describe('instance methods', () => {
     })
 
     test('sync a trigger which has been deployed before but has not changed ', () => {
-      ow.mockResolved('packages.list', packagelist)
-      const cmd = ow.mockResolved(owTrigger, '')
+      rtLib.mockResolved('packages.list', packagelist)
+      const cmd = rtLib.mockResolved(owTrigger, '')
       command.argv = ['-m', '/deploy/deployment_actionMissingInputs.yaml']
       return command.run()
         .then(() => {
@@ -413,8 +414,8 @@ describe('instance methods', () => {
     })
 
     test('sync an action which has been deployed before but has not changed ', () => {
-      ow.mockResolved('packages.list', packagelist)
-      const cmd = ow.mockResolved(owAction, '')
+      rtLib.mockResolved('packages.list', packagelist)
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = ['-m', '/deploy/deployment_actionMissingInputs.yaml']
       return command.run()
         .then(() => {
@@ -424,10 +425,10 @@ describe('instance methods', () => {
     })
 
     test('sync a project which has been deployed before and manifest content has changed ', () => {
-      ow.mockResolved('packages.list', changedPackagelist)
-      ow.mockResolved('actions.list', actionList)
-      const cmd = ow.mockResolved(owPackageDelete, '')
-      ow.mockResolved('triggers.get', {})
+      rtLib.mockResolved('packages.list', changedPackagelist)
+      rtLib.mockResolved('actions.list', actionList)
+      const cmd = rtLib.mockResolved(owPackageDelete, '')
+      rtLib.mockResolved('triggers.get', {})
       command.argv = ['-m', '/deploy/deployment_syncMissingAction.yaml']
       return command.run()
         .then(() => {
@@ -437,9 +438,9 @@ describe('instance methods', () => {
     })
 
     test('should not find projectHash from package list with no annotations and package should not be deleted ', () => {
-      ow.mockResolved('packages.list', packageNoAnnotations)
-      ow.mockResolved('actions.list', actionList)
-      const cmd = ow.mockResolved(owPackageDelete, '')
+      rtLib.mockResolved('packages.list', packageNoAnnotations)
+      rtLib.mockResolved('actions.list', actionList)
+      const cmd = rtLib.mockResolved(owPackageDelete, '')
       command.argv = ['-m', '/deploy/deployment_syncMissingAction.yaml']
       return command.run()
         .then(() => {
@@ -449,9 +450,9 @@ describe('instance methods', () => {
     })
 
     test('should not find projectHash from package list with no value for project name and package should not be deleted ', () => {
-      ow.mockResolved('packages.list', packagelistNoProjectName)
-      ow.mockResolved('actions.list', actionList)
-      const cmd = ow.mockResolved(owPackageDelete, '')
+      rtLib.mockResolved('packages.list', packagelistNoProjectName)
+      rtLib.mockResolved('actions.list', actionList)
+      const cmd = rtLib.mockResolved(owPackageDelete, '')
       command.argv = ['-m', '/deploy/deployment_syncMissingAction.yaml']
       return command.run()
         .then(() => {
@@ -461,10 +462,10 @@ describe('instance methods', () => {
     })
 
     test('sync a trigger which has been deployed before and manifest content has changed ', () => {
-      ow.mockResolved('packages.list', [])
-      ow.mockResolved('actions.list', [])
-      ow.mockResolved('triggers.list', triggerlist)
-      const cmd = ow.mockResolved(owTriggerDelete, '')
+      rtLib.mockResolved('packages.list', [])
+      rtLib.mockResolved('actions.list', [])
+      rtLib.mockResolved('triggers.list', triggerlist)
+      const cmd = rtLib.mockResolved(owTriggerDelete, '')
       command.argv = ['-m', '/deploy/deployment_syncMissingAction.yaml']
       return command.run()
         .then(() => {
@@ -474,10 +475,10 @@ describe('instance methods', () => {
     })
 
     test('fail to find projectHash from trigger list which has no annotations and has been deployed before and manifest content has changed ', () => {
-      ow.mockResolved('packages.list', [])
-      ow.mockResolved('actions.list', [])
-      ow.mockResolved('triggers.list', triggerNoAnnotation)
-      const cmd = ow.mockResolved(owTriggerDelete, '')
+      rtLib.mockResolved('packages.list', [])
+      rtLib.mockResolved('actions.list', [])
+      rtLib.mockResolved('triggers.list', triggerNoAnnotation)
+      const cmd = rtLib.mockResolved(owTriggerDelete, '')
       command.argv = ['-m', '/deploy/deployment_syncMissingAction.yaml']
       return command.run()
         .then(() => {
@@ -487,10 +488,10 @@ describe('instance methods', () => {
     })
 
     test('fail to find projectHash from trigger list which has no projectHash and has been deployed before and manifest content has changed ', () => {
-      ow.mockResolved('packages.list', [])
-      ow.mockResolved('actions.list', [])
-      ow.mockResolved('triggers.list', triggerNoProjectName)
-      const cmd = ow.mockResolved(owTriggerDelete, '')
+      rtLib.mockResolved('packages.list', [])
+      rtLib.mockResolved('actions.list', [])
+      rtLib.mockResolved('triggers.list', triggerNoProjectName)
+      const cmd = rtLib.mockResolved(owTriggerDelete, '')
       command.argv = ['-m', '/deploy/deployment_syncMissingAction.yaml']
       return command.run()
         .then(() => {
@@ -500,9 +501,9 @@ describe('instance methods', () => {
     })
 
     test('fail to find projectHash from action list which has no projectHash and has been deployed before and manifest content has changed ', () => {
-      ow.mockResolved('packages.list', [])
-      ow.mockResolved('actions.list', actionWrongHash)
-      const cmd = ow.mockResolved(owActionDelete, '')
+      rtLib.mockResolved('packages.list', [])
+      rtLib.mockResolved('actions.list', actionWrongHash)
+      const cmd = rtLib.mockResolved(rtActionDelete, '')
       command.argv = ['-m', '/deploy/deployment_syncMissingAction.yaml']
       return command.run()
         .then(() => {
@@ -512,9 +513,9 @@ describe('instance methods', () => {
     })
 
     test('fail to find projectHash from action list which has no annotations and has been deployed before and manifest content has changed ', () => {
-      ow.mockResolved('packages.list', [])
-      ow.mockResolved('actions.list', actionNoAnnotations)
-      const cmd = ow.mockResolved(owTriggerDelete, '')
+      rtLib.mockResolved('packages.list', [])
+      rtLib.mockResolved('actions.list', actionNoAnnotations)
+      const cmd = rtLib.mockResolved(owTriggerDelete, '')
       command.argv = ['-m', '/deploy/deployment_syncMissingAction.yaml']
       return command.run()
         .then(() => {
@@ -524,9 +525,9 @@ describe('instance methods', () => {
     })
 
     test('find project hash from action list which has been deployed before and action should be deleted because of projecthash change', () => {
-      ow.mockResolved('packages.list', [])
-      ow.mockResolved('actions.list', changeActionList)
-      const cmd = ow.mockResolved(owActionDelete, '')
+      rtLib.mockResolved('packages.list', [])
+      rtLib.mockResolved('actions.list', changeActionList)
+      const cmd = rtLib.mockResolved(rtActionDelete, '')
       command.argv = ['-m', '/deploy/deployment_syncMissingAction.yaml']
       return command.run()
         .then(() => {
@@ -536,9 +537,9 @@ describe('instance methods', () => {
     })
 
     test('find project hash from action list which has been deployed but not as part of any package before and action should be deleted because of projecthash change', () => {
-      ow.mockResolved('packages.list', [])
-      ow.mockResolved('actions.list', actionListNoPackage)
-      const cmd = ow.mockResolved(owActionDelete, '')
+      rtLib.mockResolved('packages.list', [])
+      rtLib.mockResolved('actions.list', actionListNoPackage)
+      const cmd = rtLib.mockResolved(rtActionDelete, '')
       command.argv = ['-m', '/deploy/deployment_syncMissingAction.yaml']
       return command.run()
         .then(() => {
@@ -548,11 +549,11 @@ describe('instance methods', () => {
     })
 
     test('find project hash from rules which has been deployed before and rule should be deleted because of projecthash change', () => {
-      ow.mockResolved('packages.list', [])
-      ow.mockResolved('actions.list', [])
-      ow.mockResolved('triggers.list', [])
-      ow.mockResolved('rules.list', ruleslist)
-      const cmd = ow.mockResolved(owRulesDelete, '')
+      rtLib.mockResolved('packages.list', [])
+      rtLib.mockResolved('actions.list', [])
+      rtLib.mockResolved('triggers.list', [])
+      rtLib.mockResolved('rules.list', ruleslist)
+      const cmd = rtLib.mockResolved(owRulesDelete, '')
       command.argv = ['-m', '/deploy/deployment_syncMissingAction.yaml']
       return command.run()
         .then(() => {
@@ -562,11 +563,11 @@ describe('instance methods', () => {
     })
 
     test('no project hash found and rule should not be deleted', () => {
-      ow.mockResolved('packages.list', [])
-      ow.mockResolved('actions.list', [])
-      ow.mockResolved('triggers.list', [])
-      ow.mockResolved('rules.list', rulesWrongHash)
-      const cmd = ow.mockResolved(owRulesDelete, '')
+      rtLib.mockResolved('packages.list', [])
+      rtLib.mockResolved('actions.list', [])
+      rtLib.mockResolved('triggers.list', [])
+      rtLib.mockResolved('rules.list', rulesWrongHash)
+      const cmd = rtLib.mockResolved(owRulesDelete, '')
       command.argv = ['-m', '/deploy/deployment_syncMissingAction.yaml']
       return command.run()
         .then(() => {
@@ -576,11 +577,11 @@ describe('instance methods', () => {
     })
 
     test('no project hash found in rule with empty annotations should not be deleted', () => {
-      ow.mockResolved('packages.list', [])
-      ow.mockResolved('actions.list', [])
-      ow.mockResolved('triggers.list', [])
-      ow.mockResolved('rules.list', rulesNoAnnotations)
-      const cmd = ow.mockResolved(owRulesDelete, '')
+      rtLib.mockResolved('packages.list', [])
+      rtLib.mockResolved('actions.list', [])
+      rtLib.mockResolved('triggers.list', [])
+      rtLib.mockResolved('rules.list', rulesNoAnnotations)
+      const cmd = rtLib.mockResolved(owRulesDelete, '')
       command.argv = ['-m', '/deploy/deployment_syncMissingAction.yaml']
       return command.run()
         .then(() => {
@@ -590,9 +591,9 @@ describe('instance methods', () => {
     })
 
     test('find project hash and deploy sequences', () => {
-      ow.mockResolved('packages.list', packagelist)
-      ow.mockResolved('actions.list', actionList)
-      const cmd = ow.mockResolved(owAction, '')
+      rtLib.mockResolved('packages.list', packagelist)
+      rtLib.mockResolved('actions.list', actionList)
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = ['-m', '/deploy/deployment_syncSequences.yaml']
       return command.run()
         .then(() => {

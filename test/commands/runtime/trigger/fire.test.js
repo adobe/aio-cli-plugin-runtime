@@ -12,9 +12,10 @@ governing permissions and limitations under the License.
 
 const TheCommand = require('../../../../src/commands/runtime/trigger/fire.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
-const ow = require('openwhisk')()
+const RuntimeLib = require('@adobe/aio-lib-runtime')
+const rtUtils = RuntimeLib.utils
 const { stdout } = require('stdout-stderr')
-const owAction = 'triggers.invoke'
+const rtAction = 'triggers.invoke'
 
 test('exports', async () => {
   expect(typeof TheCommand).toEqual('function')
@@ -87,7 +88,7 @@ describe('instance methods', () => {
     })
 
     test('fire a simple trigger', () => {
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = ['trigger1']
       return command.run()
         .then(() => {
@@ -98,7 +99,7 @@ describe('instance methods', () => {
 
     test('fire a simple trigger, error', () => {
       return new Promise((resolve, reject) => {
-        ow.mockRejected(owAction, new Error('an error'))
+         rtLib.mockRejected(rtAction, new Error('an error'))
         command.argv = ['trigger1']
         return command.run()
           .then(() => reject(new Error('does not throw error')))
@@ -110,7 +111,7 @@ describe('instance methods', () => {
     })
 
     test('fire a simple trigger, use param flag', () => {
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = ['trigger1', '--param', 'a', 'b', '--param', 'c', 'd']
       return command.run()
         .then(() => {
@@ -133,7 +134,7 @@ describe('instance methods', () => {
     })
 
     test('fire a simple trigger, use param-file flag', () => {
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
 
       command.argv = ['trigger1', '--param-file', '/trigger/parameters.json']
       return command.run()

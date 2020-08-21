@@ -12,9 +12,10 @@ governing permissions and limitations under the License.
 
 const TheCommand = require('../../../../src/commands/runtime/trigger/create.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
-const ow = require('openwhisk')()
+const RuntimeLib = require('@adobe/aio-lib-runtime')
+const rtUtils = RuntimeLib.utils
 const { stdout } = require('stdout-stderr')
-const owAction = 'triggers.create'
+const rtAction = 'triggers.create'
 
 test('exports', async () => {
   expect(typeof TheCommand).toEqual('function')
@@ -98,7 +99,7 @@ describe('instance methods', () => {
     })
 
     test('create a simple trigger, no params or annotations', () => {
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = ['trigger1']
       return command.run()
         .then(() => {
@@ -109,7 +110,7 @@ describe('instance methods', () => {
 
     test('create a simple trigger, error', () => {
       return new Promise((resolve, reject) => {
-        ow.mockRejected(owAction, new Error('an error'))
+         rtLib.mockRejected(rtAction, new Error('an error'))
         command.argv = ['trigger1']
         return command.run()
           .then(() => reject(new Error('does not throw error')))
@@ -121,8 +122,8 @@ describe('instance methods', () => {
     })
 
     test('create a simple trigger, use feed flag', () => {
-      const cmd = ow.mockResolved(owAction, '')
-      const cmdfeed = ow.mockResolved('feeds.create', '')
+      const cmd = rtLib.mockResolved(rtAction, '')
+      const cmdfeed = rtLib.mockResolved('feeds.create', '')
       command.argv = ['trigger1', '--feed', '/whisk.system/alarms/alarm', '--param', 'cron', '* * * * *']
       return command.run()
         .then(() => {
@@ -154,9 +155,9 @@ describe('instance methods', () => {
     })
 
     test('create a simple trigger, use feed flag - Error', () => {
-      const cmd = ow.mockResolved(owAction, '')
-      const cmdfeed = ow.mockRejected('feeds.create', new Error('an error'))
-      const cmddelete = ow.mockResolved('triggers.delete', '')
+      const cmd = rtLib.mockResolved(rtAction, '')
+      const cmdfeed =  rtLib.mockRejected('feeds.create', new Error('an error'))
+      const cmddelete = rtLib.mockResolved('triggers.delete', '')
       command.argv = ['trigger1', '--feed', '/whisk.system/alarms/alarm', '--param', 'cron', '* * * * *']
       return command.run()
         .catch(() => {
@@ -189,7 +190,7 @@ describe('instance methods', () => {
     })
 
     test('create a simple trigger, use param flag', () => {
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = ['trigger1', '--param', 'a', 'b', '--param', 'c', 'd']
       return command.run()
         .then(() => {
@@ -212,7 +213,7 @@ describe('instance methods', () => {
     })
 
     test('create a simple trigger, use param-file flag', () => {
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
 
       command.argv = ['trigger1', '--param-file', '/trigger/parameters.json']
       return command.run()
@@ -236,7 +237,7 @@ describe('instance methods', () => {
     })
 
     test('create a simple trigger, use annotation flag', () => {
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = ['trigger1', '--annotation', 'a', 'b', '--annotation', 'c', 'd']
       return command.run()
         .then(() => {
@@ -259,7 +260,7 @@ describe('instance methods', () => {
     })
 
     test('create a simple trigger, use annotation-file flag', () => {
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
 
       command.argv = ['trigger1', '--annotation-file', '/trigger/annotations.json']
       return command.run()

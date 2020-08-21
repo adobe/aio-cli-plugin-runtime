@@ -17,9 +17,10 @@ const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
 const utils = require('@adobe/aio-lib-runtime').utils
 const aioConfig = require('@adobe/aio-lib-core-config')
 
-// const ow = require('openwhisk')()
+// const RuntimeLib = require('@adobe/aio-lib-runtime')
+const rtUtils = RuntimeLib.utils
 // const owPackage = 'packages.update'
-// const owAction = 'actions.update'
+// const rtAction = 'actions.update'
 // const owAPI = 'routes.create'
 // const owTriggers = 'triggers.update'
 // const owRules = 'rules.update'
@@ -131,12 +132,12 @@ describe('instance methods', () => {
   })
 
   describe('run', () => {
-    // ow.mockResolved('packages.get', '')
-    // ow.mockResolved('actions.client.options', '')
+    // rtLib.mockResolved('packages.get', '')
+    // rtLib.mockResolved('actions.client.options', '')
 
     // ow.actions.client.options = { namespace: 'ns', apiKey: 'fake:auth' }
-    // ow.mockResolved(owRules, '')
-    // ow.mockResolved(owTriggers, '')
+    // rtLib.mockResolved(owRules, '')
+    // rtLib.mockResolved(owTriggers, '')
     // const hello = fixtureFile('deploy/hello.js')
     // const helloPlus = fixtureFile('deploy/hello_plus.js')
 
@@ -270,8 +271,8 @@ describe('instance methods', () => {
     //   const toRemove = ['/deploy/manifest.yaml']
     //   fakeFileSystem.removeKeys(toRemove)
 
-    //   ow.mockResolved(owAction, '')
-    //   const cmd = ow.mockResolved(owPackage, '')
+    //   rtLib.mockResolved(rtAction, '')
+    //   const cmd = rtLib.mockResolved(owPackage, '')
     //   command.argv = []
     //   return command.run()
     //     .then(() => {
@@ -283,7 +284,7 @@ describe('instance methods', () => {
     // test('deployment.yaml missing as flag', () => {
     //   const toRemove = ['/deploy/deployment.yaml']
     //   fakeFileSystem.removeKeys(toRemove)
-    //   const cmd = ow.mockResolved(owPackage, '')
+    //   const cmd = rtLib.mockResolved(owPackage, '')
     //   command.argv = ['-m', '/deploy/manifest_triggersRules.yaml']
     //   return command.run()
     //     .then(() => {
@@ -295,7 +296,7 @@ describe('instance methods', () => {
     // test('deployment.yml missing as flag', () => {
     //   const toRemove = ['/deploy/deployment.yml']
     //   fakeFileSystem.removeKeys(toRemove)
-    //   const cmd = ow.mockResolved(owPackage, '')
+    //   const cmd = rtLib.mockResolved(owPackage, '')
     //   command.argv = ['-m', '/deploy/manifest_triggersRules.yaml']
     //   return command.run()
     //     .then(() => {
@@ -309,7 +310,7 @@ describe('instance methods', () => {
     //   fakeFileSystem.removeKeys(toRemove)
     //   const toRemoveFile = ['/deploy/deployment.yaml']
     //   fakeFileSystem.removeKeys(toRemoveFile)
-    //   const cmd = ow.mockResolved(owPackage, '')
+    //   const cmd = rtLib.mockResolved(owPackage, '')
     //   command.argv = ['-m', '/deploy/manifest_triggersRules.yaml']
     //   return command.run()
     //     .then(() => {
@@ -319,7 +320,7 @@ describe('instance methods', () => {
     // })
 
     // test('deploys triggers with --deployment flag and deployment.yaml', () => {
-    //   const cmd = ow.mockResolved(owTriggers, '')
+    //   const cmd = rtLib.mockResolved(owTriggers, '')
     //   command.argv = ['-m', '/deploy/manifest_dep.yaml', '--deployment', '/deploy/deployment.yaml']
     //   return command.run()
     //     .then(() => {
@@ -351,7 +352,7 @@ describe('instance methods', () => {
     // })
 
     // test('multiple packages should be created even if one package is in common', () => {
-    //   const cmd = ow.mockResolved(owPackage, '')
+    //   const cmd = rtLib.mockResolved(owPackage, '')
     //   command.argv = ['-m', '/deploy/manifest_multiple_packages.yaml', '--deployment', '/deploy/deployment.yaml']
     //   return command.run()
     //     .then(() => {
@@ -361,7 +362,7 @@ describe('instance methods', () => {
     // })
 
     // test('shared packages should be created', () => {
-    //   const cmd = ow.mockResolved(owPackage, '')
+    //   const cmd = rtLib.mockResolved(owPackage, '')
     //   command.argv = ['-m', '/deploy/manifest_multiple_packages.yaml', '--deployment', '/deploy/deployment.yaml']
     //   return command.run()
     //     .then(() => {
@@ -382,7 +383,7 @@ describe('instance methods', () => {
     // })
 
     // test('deploys the sample manifest file exported from wskdeploy', () => {
-    //   const cmd = ow.mockResolved(owPackage, '')
+    //   const cmd = rtLib.mockResolved(owPackage, '')
     //   command.argv = ['-m', '/deploy/wskdeploy_sampleExport.yaml']
     //   return command.run()
     //     .then(() => {
@@ -395,8 +396,8 @@ describe('instance methods', () => {
     //   const toRemove = ['/deploy/manifest.yml']
     //   fakeFileSystem.removeKeys(toRemove)
 
-    //   ow.mockResolved(owAction, '')
-    //   const cmd = ow.mockResolved(owPackage, '')
+    //   rtLib.mockResolved(rtAction, '')
+    //   const cmd = rtLib.mockResolved(owPackage, '')
     //   command.argv = []
     //   return command.run()
     //     .then(() => {
@@ -406,8 +407,8 @@ describe('instance methods', () => {
     // })
 
     // test('deploys triggers defined in manifest file', () => {
-    //   ow.mockResolved(owRules, '')
-    //   const cmd = ow.mockResolved(owTriggers, '')
+    //   rtLib.mockResolved(owRules, '')
+    //   const cmd = rtLib.mockResolved(owTriggers, '')
     //   command.argv = ['-m', '/deploy/manifest_triggersRules.yaml']
     //   return command.run()
     //     .then(() => {
@@ -430,7 +431,7 @@ describe('instance methods', () => {
     // })
 
     // test('deploys triggers with --deployment flag and deployment.yaml with different package name', () => {
-    //   const cmd = ow.mockResolved(owTriggers, '')
+    //   const cmd = rtLib.mockResolved(owTriggers, '')
     //   command.argv = ['-m', '/deploy/manifest_dep.yaml', '--deployment', '/deploy/deployment_wrongpackage.yaml']
     //   return command.run()
     //     .then(() => {
@@ -462,7 +463,7 @@ describe('instance methods', () => {
     // })
 
     // test('deploys actions without deployment inputs with different package name', () => {
-    //   const cmd = ow.mockResolved(owAction, '')
+    //   const cmd = rtLib.mockResolved(rtAction, '')
     //   command.argv = ['-m', '/deploy/manifest_dep.yaml', '--deployment', '/deploy/deployment_wrongpackage.yaml']
     //   return command.run()
     //     .then(() => {
@@ -480,7 +481,7 @@ describe('instance methods', () => {
     // })
 
     // test('deploys actions with main flag and final annotation', () => {
-    //   const cmd = ow.mockResolved(owAction, '')
+    //   const cmd = rtLib.mockResolved(rtAction, '')
     //   const mainAction = fixtureFile('deploy/main.js')
     //   command.argv = ['-m', '/deploy/manifest_main.yaml']
     //   return command.run()
@@ -502,7 +503,7 @@ describe('instance methods', () => {
     // })
 
     // test('deploys actions with the final annotation', () => {
-    //   const cmd = ow.mockResolved(owAction, '')
+    //   const cmd = rtLib.mockResolved(rtAction, '')
     //   command.argv = ['-m', '/deploy/manifest_final.yaml']
     //   return command.run()
     //     .then(() => {
@@ -521,7 +522,7 @@ describe('instance methods', () => {
     // })
 
     // test('deploys actions with the conductor annotation', () => {
-    //   const cmd = ow.mockResolved(owAction, '')
+    //   const cmd = rtLib.mockResolved(rtAction, '')
     //   command.argv = ['-m', '/deploy/manifest_conductor.yaml']
     //   return command.run().then(() => {
     //     expect(cmd).toHaveBeenCalledWith({
@@ -546,7 +547,7 @@ describe('instance methods', () => {
     // })
 
     // test('deploys actions with docker image', () => {
-    //   const cmd = ow.mockResolved(owAction, '')
+    //   const cmd = rtLib.mockResolved(rtAction, '')
     //   const mainAction = fixtureFile('deploy/main.js')
     //   command.argv = ['-m', '/deploy/manifest_docker.yaml']
     //   return command.run()
@@ -569,7 +570,7 @@ describe('instance methods', () => {
     // })
 
     // test('deploys actions with concurrency limit', () => {
-    //   const cmd = ow.mockResolved(owAction, '')
+    //   const cmd = rtLib.mockResolved(rtAction, '')
     //   const mainAction = fixtureFile('deploy/main.js')
     //   command.argv = ['-m', '/deploy/manifest_concurrency.yaml']
     //   return command.run()
@@ -593,7 +594,7 @@ describe('instance methods', () => {
     // })
 
     // test('deploys actions with manifest inputs when no actions present in deployment file', () => {
-    //   const cmd = ow.mockResolved(owAction, '')
+    //   const cmd = rtLib.mockResolved(rtAction, '')
     //   command.argv = ['-m', '/deploy/manifest_dep.yaml', '--deployment', '/deploy/deployment_wrongTrigger.yaml']
     //   return command.run()
     //     .then(() => {
@@ -611,7 +612,7 @@ describe('instance methods', () => {
     // })
 
     // test('deploys triggers with --deployment flag and deployment.yaml with correct package name', () => {
-    //   const cmd = ow.mockResolved(owTriggers, '')
+    //   const cmd = rtLib.mockResolved(owTriggers, '')
     //   command.argv = ['-m', '/deploy/manifest_dep.yaml', '--deployment', '/deploy/deployment_correctpackage.yaml']
     //   return command.run()
     //     .then(() => {
@@ -643,7 +644,7 @@ describe('instance methods', () => {
     // })
 
     // test('deploys dependencies', () => {
-    //   const cmd = ow.mockResolved(owPackage, '')
+    //   const cmd = rtLib.mockResolved(owPackage, '')
     //   command.argv = ['-m', '/deploy/manifest_dependencies.yaml']
     //   return command.run()
     //     .then(() => {
@@ -665,7 +666,7 @@ describe('instance methods', () => {
     // })
 
     // test('deploys dependencies with deployment flag', () => {
-    //   const cmd = ow.mockResolved(owPackage, '')
+    //   const cmd = rtLib.mockResolved(owPackage, '')
     //   command.argv = ['-m', '/deploy/manifest_dep_dependencies.yaml', '--deployment', '/deploy/deployment_dependencies.yaml']
     //   return command.run()
     //     .then(() => {
@@ -699,7 +700,7 @@ describe('instance methods', () => {
     // })
 
     // test('package should be created if project is the root', () => {
-    //   const cmd = ow.mockResolved(owPackage, '')
+    //   const cmd = rtLib.mockResolved(owPackage, '')
     //   command.argv = ['-m', '/deploy/manifest_report.yaml', '--deployment', '/deploy/deployment.yaml']
     //   return command.run()
     //     .then(() => {
@@ -709,7 +710,7 @@ describe('instance methods', () => {
     // })
 
     // test('deploys actions with --deployment flag and deployment.yaml with correct package name', () => {
-    //   const cmd = ow.mockResolved(owAction, '')
+    //   const cmd = rtLib.mockResolved(rtAction, '')
     //   command.argv = ['-m', '/deploy/manifest_dep.yaml', '--deployment', '/deploy/deployment_correctpackage.yaml']
     //   return command.run()
     //     .then(() => {
@@ -727,7 +728,7 @@ describe('instance methods', () => {
     // })
 
     // test('deploys actions with manifest content when no input present in deployment file with correct package name', () => {
-    //   const cmd = ow.mockResolved(owAction, '')
+    //   const cmd = rtLib.mockResolved(rtAction, '')
     //   command.argv = ['-m', '/deploy/manifest_dep.yaml', '--deployment', '/deploy/deployment_actionMissingInputs.yaml']
     //   return command.run()
     //     .then(() => {
@@ -745,7 +746,7 @@ describe('instance methods', () => {
     // })
 
     // test('deploys triggers with manifest content when no trigger inputs present in deployment file ', () => {
-    //   const cmd = ow.mockResolved(owTriggers, '')
+    //   const cmd = rtLib.mockResolved(owTriggers, '')
     //   command.argv = ['-m', '/deploy/manifest_dep.yaml', '--deployment', '/deploy/deployment_triggersMissingInputs.yaml']
     //   return command.run()
     //     .then(() => {
@@ -777,7 +778,7 @@ describe('instance methods', () => {
     // })
 
     // test('deploys triggers with manifest content when no triggers present in deployment file ', () => {
-    //   const cmd = ow.mockResolved(owTriggers, '')
+    //   const cmd = rtLib.mockResolved(owTriggers, '')
     //   command.argv = ['-m', '/deploy/manifest_dep.yaml', '--deployment', '/deploy/deployment_triggersMissing.yaml']
     //   return command.run()
     //     .then(() => {
@@ -809,7 +810,7 @@ describe('instance methods', () => {
     // })
 
     // test('deploys rules defined in manifest file', () => {
-    //   const cmd = ow.mockResolved(owRules, '')
+    //   const cmd = rtLib.mockResolved(owRules, '')
     //   command.argv = ['-m', '/deploy/manifest_triggersRules.yaml']
     //   return command.run()
     //     .then(() => {
@@ -819,7 +820,7 @@ describe('instance methods', () => {
     // })
 
     // test('deploys trigger with feed in manifest file', () => {
-    //   const cmd = ow.mockResolved(owTriggers, '')
+    //   const cmd = rtLib.mockResolved(owTriggers, '')
     //   command.argv = ['-m', '/deploy/manifest_dep_Triggers_feeds.yaml']
     //   return command.run()
     //     .then(() => {
@@ -830,7 +831,7 @@ describe('instance methods', () => {
     // })
 
     // test('deploys trigger without inputs in manifest file', () => {
-    //   const cmd = ow.mockResolved(owRules, '')
+    //   const cmd = rtLib.mockResolved(owRules, '')
     //   command.argv = ['-m', '/deploy/manifest_triggersRules_noInputs.yaml']
     //   return command.run()
     //     .then(() => {
@@ -840,7 +841,7 @@ describe('instance methods', () => {
     // })
 
     // test('deploys multiple triggers', () => {
-    //   const cmd = ow.mockResolved(owTriggers, '')
+    //   const cmd = rtLib.mockResolved(owTriggers, '')
     //   command.argv = ['-m', '/deploy/manifest_dep_Triggers.yaml', '--deployment', '/deploy/deployment.yaml']
     //   return command.run()
     //     .then(() => {
@@ -851,7 +852,7 @@ describe('instance methods', () => {
 
     // test('errors out on rules not having trigger component', () => {
     //   return new Promise((resolve, reject) => {
-    //     ow.mockRejected(owRules, '')
+    //      rtLib.mockRejected(owRules, '')
     //     command.argv = ['-m', '/deploy/manifest_triggersRules_NoTrigger.yaml']
     //     return command.run()
     //       .then(() => reject(new Error('does not throw error')))
@@ -864,7 +865,7 @@ describe('instance methods', () => {
 
     // test('errors out on rules having incorrect action name', () => {
     //   return new Promise((resolve, reject) => {
-    //     ow.mockRejected(owRules, '')
+    //      rtLib.mockRejected(owRules, '')
     //     command.argv = ['-m', '/deploy/manifest_triggersRules_IncorrectAction.yaml']
     //     return command.run()
     //       .then(() => reject(new Error('does not throw error')))
@@ -876,8 +877,8 @@ describe('instance methods', () => {
     // })
 
     // test('deploys a package with path to manifest.yaml', () => {
-    //   ow.mockResolved(owAction, '')
-    //   const cmd = ow.mockResolved(owPackage, '')
+    //   rtLib.mockResolved(rtAction, '')
+    //   const cmd = rtLib.mockResolved(owPackage, '')
     //   command.argv = ['-m', '/deploy/manifest.yaml']
     //   return command.run()
     //     .then(() => {
@@ -887,7 +888,7 @@ describe('instance methods', () => {
     // })
 
     // test('deploys a package with manifest.yml', () => {
-    //   const cmd = ow.mockResolved(owPackage, '')
+    //   const cmd = rtLib.mockResolved(owPackage, '')
     //   command.argv = ['-m', '/deploy/manifest.yml']
     //   return command.run()
     //     .then(() => {
@@ -897,7 +898,7 @@ describe('instance methods', () => {
     // })
 
     // test('deploys actions defined in manifest.yml', () => {
-    //   const cmd = ow.mockResolved(owAction, '')
+    //   const cmd = rtLib.mockResolved(rtAction, '')
     //   command.argv = ['-m', '/deploy/manifest.yml']
     //   return command.run()
     //     .then(() => {
@@ -907,7 +908,7 @@ describe('instance methods', () => {
     // })
 
     // test('deploy a simple api', () => {
-    //   const cmd = ow.mockResolved(owAPI, '')
+    //   const cmd = rtLib.mockResolved(owAPI, '')
     //   command.argv = ['-m', '/deploy/manifest_api.yaml']
     //   return command.run()
     //     .then(() => {
@@ -923,7 +924,7 @@ describe('instance methods', () => {
     // })
 
     // test('deploy a api with multiple actions per resource', () => {
-    //   const cmd = ow.mockResolved(owAPI, '')
+    //   const cmd = rtLib.mockResolved(owAPI, '')
     //   command.argv = ['-m', '/deploy/manifest_api_multi.yaml']
     //   return command.run()
     //     .then(() => {
@@ -949,7 +950,7 @@ describe('instance methods', () => {
     // })
 
     // test('web sequence in yaml file should create a web sequence action', () => {
-    //   const cmd = ow.mockResolved(owAction, '')
+    //   const cmd = rtLib.mockResolved(rtAction, '')
     //   command.argv = ['-m', '/deploy/manifest_webSequence.yaml']
     //   return command.run()
     //     .then(() => {
@@ -976,7 +977,7 @@ describe('instance methods', () => {
     // })
 
     // test('deploys actions defined in manifest.yaml using env vars in params', () => {
-    //   const cmd = ow.mockResolved(owAction, '')
+    //   const cmd = rtLib.mockResolved(rtAction, '')
     //   command.argv = ['-m', '/deploy/manifest_params.yml']
     //   process.env['NAME'] = 'name_from_env'
     //   return command.run()
@@ -989,7 +990,7 @@ describe('instance methods', () => {
     // })
 
     // test('deploys actions defined in manifest.yaml', () => {
-    //   const cmd = ow.mockResolved(owAction, '')
+    //   const cmd = rtLib.mockResolved(rtAction, '')
     //   command.argv = ['-m', '/deploy/manifest.yaml']
     //   return command.run()
     //     .then(() => {
@@ -1001,7 +1002,7 @@ describe('instance methods', () => {
     // })
 
     // test('deploys actions with --param flags defined in manifest.yaml', () => {
-    //   const cmd = ow.mockResolved(owAction, '')
+    //   const cmd = rtLib.mockResolved(rtAction, '')
     //   command.argv = ['-m', '/deploy/manifest.yaml', '--param', 'name', 'Runtime', '--param', 'message', 'Deploy']
     //   return command.run()
     //     .then(() => {
@@ -1012,7 +1013,7 @@ describe('instance methods', () => {
     // })
 
     // test('deploys actions with --param-file flags defined in manifest.yaml', () => {
-    //   const cmd = ow.mockResolved(owAction, '')
+    //   const cmd = rtLib.mockResolved(rtAction, '')
     //   command.argv = ['-m', '/deploy/manifest.yaml', '--param-file', '/deploy/parameters.json']
     //   return command.run()
     //     .then(() => {
@@ -1024,7 +1025,7 @@ describe('instance methods', () => {
 
     // test('errors out on deploying zip without runtime flag error', () => {
     //   return new Promise((resolve, reject) => {
-    //     ow.mockRejected(owAction, new Error('an error'))
+    //      rtLib.mockRejected(rtAction, new Error('an error'))
     //     command.argv = ['-m', '/deploy/manifest_zip.yaml']
     //     return command.run()
     //       .then(() => reject(new Error('does not throw error')))
@@ -1037,7 +1038,7 @@ describe('instance methods', () => {
 
     // test('errors out on deploying API without arguments', () => {
     //   return new Promise((resolve, reject) => {
-    //     ow.mockRejected(owAPI, '')
+    //      rtLib.mockRejected(owAPI, '')
     //     command.argv = ['-m', '/deploy/manifest_api_incorrect.yaml']
     //     return command.run()
     //       .then(() => reject(new Error('does not throw error')))
@@ -1053,7 +1054,7 @@ describe('instance methods', () => {
     //     const toRemove = ['/deploy/manifest.yaml', '/deploy/manifest.yml']
     //     fakeFileSystem.removeKeys(toRemove)
 
-    //     ow.mockRejected(owAction, new Error('an error'))
+    //      rtLib.mockRejected(rtAction, new Error('an error'))
     //     command.argv = []
     //     return command.run()
     //       .then(() => reject(new Error('does not throw error')))
@@ -1065,7 +1066,7 @@ describe('instance methods', () => {
     // })
 
     // test('sequences in yml file should create a sequence action', () => {
-    //   const cmd = ow.mockResolved(owAction, '')
+    //   const cmd = rtLib.mockResolved(rtAction, '')
     //   command.argv = ['-m', '/deploy/sequences_implemented.yml']
     //   return command.run()
     //     .then(() => {
@@ -1076,7 +1077,7 @@ describe('instance methods', () => {
 
     // test('sequences should throw an error when no actions are provided', () => {
     //   return new Promise((resolve, reject) => {
-    //     ow.mockRejected(owAction, new Error('an error'))
+    //      rtLib.mockRejected(rtAction, new Error('an error'))
     //     command.argv = ['-m', '/deploy/sequences_missing_actions.yml']
     //     return command.run()
     //       .then(() => reject(new Error('does not throw error')))
@@ -1089,7 +1090,7 @@ describe('instance methods', () => {
 
     // test('error should be thrown when sequence action mentioned in api is not a web action ', () => {
     //   return new Promise((resolve, reject) => {
-    //     ow.mockRejected(owAction, new Error('an error'))
+    //      rtLib.mockRejected(rtAction, new Error('an error'))
     //     command.argv = ['-m', '/deploy/manifest_not_webAction.yaml']
     //     return command.run()
     //       .then(() => reject(new Error('does not throw error')))
@@ -1102,7 +1103,7 @@ describe('instance methods', () => {
 
     // test('error should be thrown when sequence in api is not a web sequence action', () => {
     //   return new Promise((resolve, reject) => {
-    //     ow.mockRejected(owAction, new Error('an error'))
+    //      rtLib.mockRejected(rtAction, new Error('an error'))
     //     command.argv = ['-m', '/deploy/manifest_not_webSequence.yaml']
     //     return command.run()
     //       .then(() => reject(new Error('does not throw error')))
@@ -1127,7 +1128,7 @@ describe('instance methods', () => {
 
     // test('error should be thrown when action in api is not present in the package', () => {
     //   return new Promise((resolve, reject) => {
-    //     ow.mockRejected(owAction, new Error('an error'))
+    //      rtLib.mockRejected(rtAction, new Error('an error'))
     //     command.argv = ['-m', '/deploy/manifest_not_present_action.yaml']
     //     return command.run()
     //       .then(() => reject(new Error('does not throw error')))
@@ -1165,7 +1166,7 @@ describe('instance methods', () => {
   //     })
 
   //     test('ignores require-adobe-auth annotation if apihost is not I/O Runtime', () => {
-  //       const cmd = ow.mockResolved(owAction, '')
+  //       const cmd = rtLib.mockResolved(rtAction, '')
   //       command.argv = ['-m', 'manifest_with_adobe_auth.yaml', '--apihost', 'https://not.runtime.net']
   //       return command.run()
   //         .then(() => {
@@ -1179,7 +1180,7 @@ describe('instance methods', () => {
   //     })
 
   //     test('should fail if project.org.ims_org_id is not set in config', async () => {
-  //       ow.mockResolved(owAction, '')
+  //       rtLib.mockResolved(rtAction, '')
   //       command.argv = ['-m', 'manifest_with_adobe_auth.yaml', '--apihost', 'https://adobeioruntime.net']
   //       mockConfig.get.mockReturnValue(undefined)
   //       await expect(command.run()).rejects.toThrow('Failed to deploy: imsOrgId must be defined when using the Adobe headless auth validator')
@@ -1187,14 +1188,14 @@ describe('instance methods', () => {
   //     })
 
   //      test('should fail if state put response is not ok', async () => {
-  //        ow.mockResolved(owAction, '')
+  //        rtLib.mockResolved(rtAction, '')
   //        command.argv = ['-m', 'manifest_with_adobe_auth.yaml', '--apihost', 'https://adobeioruntime.net']
   //        fetch.mockResolvedValue({ ok: false })
   //        await expect(command.run()).rejects.toThrow('Failed to deploy: failed setting ims_org_id=fake-ims-org-id into state lib, received status=401, please make sure your runtime credentials are correct')
   //      })
 
   //     // test('should call state put endpoint with correct parameters', async () => {
-  //     //   ow.mockResolved(owAction, '')
+  //     //   rtLib.mockResolved(rtAction, '')
   //     //   command.argv = ['-m', 'manifest_with_adobe_auth.yaml', '--apihost', 'https://adobeioruntime.net']
   //     //   mockConfig.get.mockReturnValue('fake-ims-org-idd')
   //     //   fetch.mockResolvedValue({ ok: false })
@@ -1206,7 +1207,7 @@ describe('instance methods', () => {
   //     // })
 
   //     // test('deploys web action with require-adobe-auth annotation', () => {
-  //     //   const cmd = ow.mockResolved(owAction, '')
+  //     //   const cmd = rtLib.mockResolved(rtAction, '')
   //     //   command.argv = ['-m', 'manifest_with_adobe_auth.yaml', '--apihost', 'https://adobeioruntime.net']
   //     //   return command.run()
   //     //     .then(() => {
@@ -1235,7 +1236,7 @@ describe('instance methods', () => {
   //     // })
 
   //   //   test('deploys web action with require-adobe-auth annotation and deployment.yaml', () => {
-  //   //     const cmd = ow.mockResolved(owAction, '')
+  //   //     const cmd = rtLib.mockResolved(rtAction, '')
   //   //     command.argv = ['-m', 'manifest_with_adobe_auth.yaml', '-d', 'deployment_correctpackage.yaml', '--apihost', 'https://adobeioruntime.net']
   //   //     return command.run()
   //   //       .then(() => {
