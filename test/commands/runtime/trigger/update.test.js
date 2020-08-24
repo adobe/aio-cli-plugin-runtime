@@ -74,20 +74,6 @@ test('base flags included in command flags',
 describe('instance methods', () => {
   let command, handleError, rtLib
 
-  beforeAll(() => {
-    const fsJson = {
-      'trigger/parameters.json': fixtureFile('trigger/parameters.json'),
-      'trigger/annotations.json': fixtureFile('trigger/annotations.json')
-    }
-    // merge the global fakeFileSystem with our new
-    fakeFileSystem.addJson(fsJson)
-  })
-
-  afterAll(() => {
-    // reset back to normal
-    fakeFileSystem.reset()
-  })
-
   beforeEach(async () => {
     command = new TheCommand([])
     handleError = jest.spyOn(command, 'handleError')
@@ -113,7 +99,7 @@ describe('instance methods', () => {
 
     test('update a simple trigger, error', () => {
       return new Promise((resolve, reject) => {
-         rtLib.mockRejected(rtAction, new Error('an error'))
+        rtLib.mockRejected(rtAction, new Error('an error'))
         command.argv = ['trigger1']
         return command.run()
           .then(() => reject(new Error('does not throw error')))
@@ -127,21 +113,13 @@ describe('instance methods', () => {
     test('update a simple trigger, use param flag', () => {
       const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = ['trigger1', '--param', 'a', 'b', '--param', 'c', 'd']
+      rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation(params => params && [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }])
       return command.run()
         .then(() => {
+          expect(rtUtils.getKeyValueArrayFromMergedParameters).toHaveBeenCalledWith(['a', 'b', 'c', 'd'], undefined)
           expect(cmd).toHaveBeenCalledWith({ name: 'trigger1',
             trigger: {
-              parameters: [
-                {
-                  key: 'a',
-                  value: 'b'
-                },
-                {
-                  key: 'c',
-                  value: 'd'
-                }
-
-              ]
+              parameters: [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }]
             } })
           expect(stdout.output).toMatch('')
         })
@@ -151,21 +129,17 @@ describe('instance methods', () => {
       const cmd = rtLib.mockResolved(rtAction, '')
 
       command.argv = ['trigger1', '--param-file', '/trigger/parameters.json']
+      rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation((k, file) => {
+        if (file && file === '/trigger/parameters.json') {
+          return [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }]
+        }
+      })
       return command.run()
         .then(() => {
+          expect(rtUtils.getKeyValueArrayFromMergedParameters).toHaveBeenCalledWith(undefined, '/trigger/parameters.json')
           expect(cmd).toHaveBeenCalledWith({ name: 'trigger1',
             trigger: {
-              parameters: [
-                {
-                  key: 'param1',
-                  value: 'param1value'
-                },
-                {
-                  key: 'param2',
-                  value: 'param2value'
-                }
-
-              ]
+              parameters: [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }]
             } })
           expect(stdout.output).toMatch('')
         })
@@ -174,21 +148,13 @@ describe('instance methods', () => {
     test('update a simple trigger, use annotation flag', () => {
       const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = ['trigger1', '--annotation', 'a', 'b', '--annotation', 'c', 'd']
+      rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation(params => params && [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }])
       return command.run()
         .then(() => {
+          expect(rtUtils.getKeyValueArrayFromMergedParameters).toHaveBeenCalledWith(['a', 'b', 'c', 'd'], undefined)
           expect(cmd).toHaveBeenCalledWith({ name: 'trigger1',
             trigger: {
-              annotations: [
-                {
-                  key: 'a',
-                  value: 'b'
-                },
-                {
-                  key: 'c',
-                  value: 'd'
-                }
-
-              ]
+              annotations: [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }]
             } })
           expect(stdout.output).toMatch('')
         })
@@ -198,21 +164,17 @@ describe('instance methods', () => {
       const cmd = rtLib.mockResolved(rtAction, '')
 
       command.argv = ['trigger1', '--annotation-file', '/trigger/annotations.json']
+      rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation((k, file) => {
+        if (file && file === '/trigger/annotations.json') {
+          return [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }]
+        }
+      })
       return command.run()
         .then(() => {
+          expect(rtUtils.getKeyValueArrayFromMergedParameters).toHaveBeenCalledWith(undefined, '/trigger/annotations.json')
           expect(cmd).toHaveBeenCalledWith({ name: 'trigger1',
             trigger: {
-              annotations: [
-                {
-                  key: 'annotation1',
-                  value: 'annotation1value'
-                },
-                {
-                  key: 'annotation2',
-                  value: 'annotation2value'
-                }
-
-              ]
+              annotations: [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }]
             } })
           expect(stdout.output).toMatch('')
         })

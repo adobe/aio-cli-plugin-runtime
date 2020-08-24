@@ -64,6 +64,8 @@ const mockRtUtils = {
   createKeyValueArrayFromFlag: jest.fn(),
   createKeyValueObjectFromFlag: jest.fn(),
   createKeyValueObjectFromFile: jest.fn(),
+  getKeyValueArrayFromMergedParameters: jest.fn(),
+  getKeyValueObjectFromMergedParameters: jest.fn(),
   parsePathPattern: jest.fn(),
   parsePackageName: jest.fn(),
   createComponentsfromSequence: jest.fn(),
@@ -78,7 +80,8 @@ const mockRtUtils = {
   findProjectHashonServer: jest.fn(),
   getProjectHash: jest.fn(),
   addManagedProjectAnnotations: jest.fn(),
-  printLogs: jest.fn()
+  printLogs: jest.fn(),
+  parsePathPattern: jest.fn()
 }
 
 module.exports = {

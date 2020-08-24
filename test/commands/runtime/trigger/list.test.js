@@ -13,7 +13,6 @@ governing permissions and limitations under the License.
 const TheCommand = require('../../../../src/commands/runtime/trigger/list.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
 const RuntimeLib = require('@adobe/aio-lib-runtime')
-const rtUtils = RuntimeLib.utils
 const { stdout } = require('stdout-stderr')
 const rtAction = 'triggers.list'
 
@@ -127,7 +126,7 @@ describe('instance methods', () => {
 
     test('trigger list, error', () => {
       return new Promise((resolve, reject) => {
-         rtLib.mockRejected('triggers.list', new Error('an error'))
+        rtLib.mockRejected('triggers.list', new Error('an error'))
         return command.run()
           .then(() => reject(new Error('does not throw error')))
           .catch(() => {

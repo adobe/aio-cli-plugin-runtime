@@ -65,60 +65,10 @@ describe('instance methods', () => {
       return new Promise((resolve) => {
         const cmd = rtLib.mockResolved(rtAction, '')
         rtLib.mockResolved('triggers.get', {})
-
         command.argv = ['trigger1']
+        rtUtils.parsePathPattern.mockReturnValue([null, null, 'trigger1'])
         return command.run()
           .then(() => {
-            expect(cmd).toHaveBeenCalledWith({ name: 'trigger1', namespace: null })
-            expect(stdout.output).toMatch('')
-            resolve()
-          })
-      })
-    })
-
-    test('simple trigger delete with feed', () => {
-      return new Promise((resolve) => {
-        const cmd = rtLib.mockResolved(rtAction, '')
-        const cmdfeed = rtLib.mockResolved('feeds.delete', '')
-        rtLib.mockResolved('triggers.get', {
-          annotations: [
-            {
-              key: 'feed',
-              value: '/whisk.system/alarms/alarm'
-            }
-          ],
-          name: 'trigger1'
-        })
-
-        command.argv = ['trigger1']
-        return command.run()
-          .then(() => {
-            expect(cmdfeed).toHaveBeenCalledWith({ name: '/whisk.system/alarms/alarm', trigger: 'trigger1' })
-            expect(cmd).toHaveBeenCalledWith({ name: 'trigger1', namespace: null })
-            expect(stdout.output).toMatch('')
-            resolve()
-          })
-      })
-    })
-
-    test('simple trigger delete with annotations - no feed(codecov)', () => {
-      return new Promise((resolve) => {
-        const cmd = rtLib.mockResolved(rtAction, '')
-        const cmdfeed = rtLib.mockResolved('feeds.delete', '')
-        rtLib.mockResolved('triggers.get', {
-          annotations: [
-            {
-              key: 'key1',
-              value: 'value1'
-            }
-          ],
-          name: 'trigger1'
-        })
-
-        command.argv = ['trigger1']
-        return command.run()
-          .then(() => {
-            expect(cmdfeed).not.toHaveBeenCalled()
             expect(cmd).toHaveBeenCalledWith({ name: 'trigger1', namespace: null })
             expect(stdout.output).toMatch('')
             resolve()
@@ -131,9 +81,10 @@ describe('instance methods', () => {
         const cmd = rtLib.mockResolved(rtAction, '')
         rtLib.mockResolved('triggers.get', {})
         command.argv = ['/MySpecifiedNamespace/trigger1']
+        rtUtils.parsePathPattern.mockReturnValue([null, 'MySpecifiedNamespaceRet', 'trigger1Ret'])
         return command.run()
           .then(() => {
-            expect(cmd).toHaveBeenCalledWith({ name: 'trigger1', namespace: 'MySpecifiedNamespace' })
+            expect(cmd).toHaveBeenCalledWith({ name: 'trigger1Ret', namespace: 'MySpecifiedNamespaceRet' })
             expect(stdout.output).toMatch('')
             resolve()
           })
@@ -143,14 +94,13 @@ describe('instance methods', () => {
     test('trigger delete, error', () => {
       return new Promise((resolve, reject) => {
         const err = new Error('an error')
-         rtLib.mockRejected(rtAction, err)
-        rtLib.mockResolved('triggers.get', {})
-
+        rtLib.mockRejected(rtAction, err)
         command.argv = ['trigger1']
+        rtUtils.parsePathPattern.mockReturnValue([null, 'MySpecifiedNamespaceRet', 'trigger1Ret'])
         return command.run()
           .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith("Unable to delete trigger 'trigger1'", new Error('an error'))
+          .catch(e => {
+            expect(e.message).toMatch("Unable to delete trigger 'trigger1': " + err.message)
             resolve()
           })
       })

@@ -75,9 +75,10 @@ describe('instance methods', () => {
         const cmd = rtLib.mockResolved(rtAction, obj)
 
         command.argv = ['trigger1']
+        rtUtils.parsePathPattern.mockReturnValue([null, null, 'trigger1Ret'])
         return command.run()
           .then(() => {
-            expect(cmd).toHaveBeenCalledWith({ name: 'trigger1', namespace: null })
+            expect(cmd).toHaveBeenCalledWith({ name: 'trigger1Ret', namespace: null })
             expect(JSON.parse(stdout.output)).toMatchObject(obj)
             resolve()
           })
@@ -98,9 +99,10 @@ describe('instance methods', () => {
         const cmd = rtLib.mockResolved(rtAction, obj)
 
         command.argv = ['/MySpecifiedNamespace/trigger1']
+        rtUtils.parsePathPattern.mockReturnValue([null, 'MySpecifiedNamespaceRet', 'trigger1Ret'])
         return command.run()
           .then(() => {
-            expect(cmd).toHaveBeenCalledWith({ name: 'trigger1', namespace: 'MySpecifiedNamespace' })
+            expect(cmd).toHaveBeenCalledWith({ name: 'trigger1Ret', namespace: 'MySpecifiedNamespaceRet' })
             expect(JSON.parse(stdout.output)).toMatchObject(obj)
             resolve()
           })
@@ -109,9 +111,9 @@ describe('instance methods', () => {
 
     test('trigger get, error', () => {
       return new Promise((resolve, reject) => {
-         rtLib.mockRejected(rtAction, new Error('an error'))
-
+        rtLib.mockRejected(rtAction, new Error('an error'))
         command.argv = ['trigger1']
+        rtUtils.parsePathPattern.mockReturnValue([null, null, 'trigger1Ret'])
         return command.run()
           .then(() => reject(new Error('does not throw error')))
           .catch(() => {
