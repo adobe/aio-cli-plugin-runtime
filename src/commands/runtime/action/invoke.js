@@ -12,7 +12,7 @@ governing permissions and limitations under the License.
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 const { flags } = require('@oclif/command')
-const { createKeyValueObjectFromFlag, createKeyValueObjectFromFile } = require('@adobe/aio-lib-runtime').utils
+const { getKeyValueObjectFromMergedParameters } = require('@adobe/aio-lib-runtime').utils
 
 class ActionInvoke extends RuntimeBaseCommand {
   async run () {
@@ -20,13 +20,8 @@ class ActionInvoke extends RuntimeBaseCommand {
     const name = args.actionName
     let paramsAction = {}
     try {
-      if (flags.param) {
-        // each --param flag expects two values ( a key and a value ). Multiple --parm flags can be passed
-        // For example : aio runtime:action:create --param name "foo" --param city "bar"
-        paramsAction = createKeyValueObjectFromFlag(flags.param)
-      } else if (flags['param-file']) {
-        paramsAction = createKeyValueObjectFromFile(flags['param-file'])
-      }
+      paramsAction = getKeyValueObjectFromMergedParameters(flags.param, flags['param-file'])
+
       const ow = await this.wsk()
       const result = await ow.actions.invoke({
         name,

@@ -11,7 +11,8 @@ governing permissions and limitations under the License.
 */
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
-const { createKeyValueArrayFromFlag, createKeyValueArrayFromFile, parsePackageName } = require('@adobe/aio-lib-runtime').utils
+const { parsePackageName } = require('@adobe/aio-lib-runtime').utils
+const { getKeyValueArrayFromMergedParameters } = require('@adobe/aio-lib-runtime').utils
 const { flags } = require('@oclif/command')
 
 class PackageBind extends RuntimeBaseCommand {
@@ -20,24 +21,8 @@ class PackageBind extends RuntimeBaseCommand {
     const name = args.bindPackageName
     try {
       const binding = parsePackageName(args.packageName)
-      let paramsPackage = []
-      if (flags.param) {
-        // each --param flag expects two values ( a key and a value ). Multiple --param flags can be passed
-        // For example : aio runtime:package:create --param name "foo" --param city "bar"
-        // parameters are expected to be passed as an array of key value pairs
-        // For example : [{key : 'Your key 1' , value: 'Your value 1'}, {key : 'Your key 2' , value: 'Your value 2'} ]
-        paramsPackage = createKeyValueArrayFromFlag(flags.param)
-      } else if (flags['param-file']) {
-        paramsPackage = createKeyValueArrayFromFile(flags['param-file'])
-      }
-      let annotationParams = []
-      if (flags.annotation) {
-        // Annotations that describe packages include : 'description' and 'parameters'
-        // TODO -- should we check if annotation keys match description or parameters ?
-        annotationParams = createKeyValueArrayFromFlag(flags.annotation)
-      } else if (flags['annotation-file']) {
-        annotationParams = createKeyValueArrayFromFile(flags['annotation-file'])
-      }
+      const paramsPackage = getKeyValueArrayFromMergedParameters(flags.param, flags['param-file']) || []
+      const annotationParams = getKeyValueArrayFromMergedParameters(flags.annotation, flags['annotation-file']) || []
 
       const options = {}
       options.name = name
