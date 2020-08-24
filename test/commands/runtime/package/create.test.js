@@ -76,10 +76,10 @@ describe('instance methods', () => {
     test('creates a package with package name param flag', () => {
       const cmd = rtLib.mockResolved(rtAction, { fake: 'res' })
       command.argv = ['packageName', '--param', 'a', 'b', '--param', 'c', 'd']
-      rtUtils.createKeyValueArrayFromFlag.mockReturnValue([{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }])
+      rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation(params => params && [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }])
       return command.run()
         .then(() => {
-          expect(rtUtils.createKeyValueArrayFromFlag).toHaveBeenCalledWith(['a', 'b', 'c', 'd'])
+          expect(rtUtils.getKeyValueArrayFromMergedParameters).toHaveBeenCalledWith(['a', 'b', 'c', 'd'], undefined)
           expect(cmd).toHaveBeenCalledWith({
             name: 'packageName',
             package: {
@@ -96,10 +96,10 @@ describe('instance methods', () => {
     test('creates a package with package name param flag --json', () => {
       const cmd = rtLib.mockResolved(rtAction, { fake: 'res' })
       command.argv = ['packageName', '--param', 'a', 'b', '--param', 'c', 'd', '--json']
-      rtUtils.createKeyValueArrayFromFlag.mockReturnValue([{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }])
+      rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation(params => params && [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }])
       return command.run()
         .then(() => {
-          expect(rtUtils.createKeyValueArrayFromFlag).toHaveBeenCalledWith(['a', 'b', 'c', 'd'])
+          expect(rtUtils.getKeyValueArrayFromMergedParameters).toHaveBeenCalledWith(['a', 'b', 'c', 'd'], undefined)
           expect(cmd).toHaveBeenCalledWith({
             name: 'packageName',
             package: {
@@ -128,10 +128,10 @@ describe('instance methods', () => {
     test('creates a package with package name and param-file flag', () => {
       const cmd = rtLib.mockResolved(rtAction, { fake: 'res' })
       command.argv = ['packageName', '--param-file', '/action/parameters.json']
-      rtUtils.createKeyValueArrayFromFile.mockReturnValue([{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }])
+      rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation((flag, file) => file && [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }])
       return command.run()
         .then(() => {
-          expect(rtUtils.createKeyValueArrayFromFile).toHaveBeenCalledWith('/action/parameters.json')
+          expect(rtUtils.getKeyValueArrayFromMergedParameters).toHaveBeenCalledWith(undefined, '/action/parameters.json')
           expect(cmd).toHaveBeenCalledWith({
             name: 'packageName',
             package: {
@@ -148,10 +148,10 @@ describe('instance methods', () => {
     test('creates a package with package name and annotation-file flag', () => {
       const cmd = rtLib.mockResolved(rtAction, { fake: 'res' })
       command.argv = ['packageName', '--annotation-file', '/action/parameters.json']
-      rtUtils.createKeyValueArrayFromFile.mockReturnValue([{ key: 'fakeAnnot', value: 'aaa' }, { key: 'fakeAnnot2', value: 'bbb' }])
+      rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation((flag, file) => file && [{ key: 'fakeAnnot', value: 'aaa' }, { key: 'fakeAnnot2', value: 'bbb' }])
       return command.run()
         .then(() => {
-          expect(rtUtils.createKeyValueArrayFromFile).toHaveBeenCalledWith('/action/parameters.json')
+          expect(rtUtils.getKeyValueArrayFromMergedParameters).toHaveBeenCalledWith(undefined, '/action/parameters.json')
           expect(cmd).toHaveBeenCalledWith({
             name: 'packageName',
             package: {
@@ -168,16 +168,16 @@ describe('instance methods', () => {
     test('creates a package with package name and annotation and param flags', () => {
       const cmd = rtLib.mockResolved(rtAction, { fake: 'res' })
       command.argv = ['packageName', '--annotation', 'a', 'b', '--annotation', 'c', 'd', '--param', 'p1', 'p2']
-      rtUtils.createKeyValueArrayFromFlag.mockImplementation(arr => {
-        if (arr.includes('p1')) {
+      rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation((flags, file) => {
+        if (flags.includes('p1')) {
           return [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }]
         }
         return [{ key: 'fakeAnnot', value: 'aaa' }, { key: 'fakeAnnot2', value: 'bbb' }]
       })
       return command.run()
         .then(() => {
-          expect(rtUtils.createKeyValueArrayFromFlag).toHaveBeenCalledWith(['a', 'b', 'c', 'd'])
-          expect(rtUtils.createKeyValueArrayFromFlag).toHaveBeenCalledWith(['p1', 'p2'])
+          expect(rtUtils.getKeyValueArrayFromMergedParameters).toHaveBeenCalledWith(['a', 'b', 'c', 'd'], undefined)
+          expect(rtUtils.getKeyValueArrayFromMergedParameters).toHaveBeenCalledWith(['p1', 'p2'], undefined)
           expect(cmd).toHaveBeenCalledWith({
             name: 'packageName',
             package: {
@@ -198,33 +198,30 @@ describe('instance methods', () => {
     test('creates a package with package name and annotation and param flags with shorter flag version', () => {
       const cmd = rtLib.mockResolved(rtAction, { fake: 'res' })
       command.argv = ['packageName', '-a', 'a', 'b', '-a', 'c', 'd', '-p', 'p1', 'p2']
+      rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation((flags, file) => {
+        if (flags.includes('p1')) {
+          return [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }]
+        }
+        return [{ key: 'fakeAnnot', value: 'aaa' }, { key: 'fakeAnnot2', value: 'bbb' }]
+      })
       return command.run()
         .then(() => {
-          rtUtils.createKeyValueArrayFromFlag.mockImplementation(arr => {
-            if (arr.includes('p1')) {
-              return [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }]
+          expect(rtUtils.getKeyValueArrayFromMergedParameters).toHaveBeenCalledWith(['a', 'b', 'c', 'd'], undefined)
+          expect(rtUtils.getKeyValueArrayFromMergedParameters).toHaveBeenCalledWith(['p1', 'p2'], undefined)
+          expect(cmd).toHaveBeenCalledWith({
+            name: 'packageName',
+            package: {
+              parameters: [
+                { key: 'fakeParam', value: 'aaa' },
+                { key: 'fakeParam2', value: 'bbb' }
+              ],
+              annotations: [
+                { key: 'fakeAnnot', value: 'aaa' },
+                { key: 'fakeAnnot2', value: 'bbb' }
+              ]
             }
-            return [{ key: 'fakeAnnot', value: 'aaa' }, { key: 'fakeAnnot2', value: 'bbb' }]
           })
-          return command.run()
-            .then(() => {
-              expect(rtUtils.createKeyValueArrayFromFlag).toHaveBeenCalledWith(['a', 'b', 'c', 'd'])
-              expect(rtUtils.createKeyValueArrayFromFlag).toHaveBeenCalledWith(['p1', 'p2'])
-              expect(cmd).toHaveBeenCalledWith({
-                name: 'packageName',
-                package: {
-                  parameters: [
-                    { key: 'fakeParam', value: 'aaa' },
-                    { key: 'fakeParam2', value: 'bbb' }
-                  ],
-                  annotations: [
-                    { key: 'fakeAnnot', value: 'aaa' },
-                    { key: 'fakeAnnot2', value: 'bbb' }
-                  ]
-                }
-              })
-              expect(stdout.output).toMatch('')
-            })
+          expect(stdout.output).toMatch('')
         })
     })
 
@@ -264,7 +261,7 @@ describe('instance methods', () => {
       return new Promise((resolve, reject) => {
         rtLib.mockRejected(rtAction, '')
         command.argv = ['packageName', '--param', 'a', 'b', 'c']
-        rtUtils.createKeyValueArrayFromFlag.mockImplementation(() => { throw new Error('parse error') })
+        rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation(() => { throw new Error('parse error') })
         return command.run()
           .then(() => reject(new Error('does not throw error')))
           .catch(() => {
@@ -278,7 +275,7 @@ describe('instance methods', () => {
       return new Promise((resolve, reject) => {
         rtLib.mockRejected(rtAction, '')
         command.argv = ['packageName', '--annotation', 'a', 'b', 'c']
-        rtUtils.createKeyValueArrayFromFlag.mockImplementation(() => { throw new Error('parse error') })
+        rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation(() => { throw new Error('parse error') })
         return command.run()
           .then(() => reject(new Error('does not throw error')))
           .catch(() => {
