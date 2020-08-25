@@ -80,15 +80,16 @@ const mockRtUtils = {
   findProjectHashonServer: jest.fn(),
   getProjectHash: jest.fn(),
   addManagedProjectAnnotations: jest.fn(),
-  printLogs: jest.fn(),
-  parsePathPattern: jest.fn()
+  printLogs: jest.fn()
 }
 
+const init = jest.fn().mockReturnValue(mockRtLibInstance)
 module.exports = {
   utils: mockRtUtils,
-  init: () => mockRtLibInstance,
+  init,
   mockReset: () => {
     Object.values(mockRtUtils).forEach(v => v.mockReset())
+    init.mockClear()
     // mock reset for instance too ?
   }
 }

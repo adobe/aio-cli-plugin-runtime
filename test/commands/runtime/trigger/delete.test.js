@@ -47,10 +47,9 @@ test('base flags included in command flags',
 )
 
 describe('instance methods', () => {
-  let command, handleError, rtLib
+  let command, rtLib
   beforeEach(async () => {
     command = new TheCommand([])
-    handleError = jest.spyOn(command, 'handleError')
     rtLib = await RuntimeLib.init({ apihost: 'fakehost', api_key: 'fakekey' })
     rtLib.mockResolved('actions.client.options', '')
     RuntimeLib.mockReset()

@@ -455,7 +455,7 @@ describe('instance methods', () => {
               parameters: [
                 { key: 'fakeParam', value: 'aaa' },
                 { key: 'fakeParam2', value: 'bbb' },
-                { key: 'fakeEnv', value: 'abc', init: true}
+                { key: 'fakeEnv', value: 'abc', init: true }
               ]
             }
           })

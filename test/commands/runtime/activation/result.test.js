@@ -14,7 +14,6 @@ const { stdout } = require('stdout-stderr')
 const TheCommand = require('../../../../src/commands/runtime/activation/result.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
 const RuntimeLib = require('@adobe/aio-lib-runtime')
-const rtUtils = RuntimeLib.utils
 const rtAction = 'activations.result'
 
 test('exports', async () => {

@@ -12,9 +12,9 @@ governing permissions and limitations under the License.
 
 const TheCommand = require('../../../../src/commands/runtime/deploy/export.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
-const ow = require('openwhisk')()
+const RuntimeLib = require('@adobe/aio-lib-runtime')
 const { stdout } = require('stdout-stderr')
-const owPackageList = 'packages.list'
+const rtPackageList = 'packages.list'
 const owRulesList = 'rules.list'
 const owTriggerList = 'triggers.list'
 const fs = require('fs')
@@ -410,7 +410,10 @@ describe('instance methods', () => {
     version: '0.0.2'
   }]
 
+  let rtLib
   beforeEach(() => {
+    RuntimeLib.mockReset()
+    rtLib = RuntimeLib.init({ fake: 'credentials' })
     command = new TheCommand([])
     handleError = jest.spyOn(command, 'handleError')
     const json = {
@@ -438,7 +441,7 @@ describe('instance methods', () => {
     })
 
     test('fetch list of packages to be exported from project name', () => {
-      const cmd = ow.mockResolved(owPackageList, '')
+      const cmd = rtLib.mockResolved(rtPackageList, '')
       command.argv = ['--projectname', 'proj', '-m', '/deploy/manifest.yaml']
       return command.run()
         .then(() => {
@@ -448,10 +451,10 @@ describe('instance methods', () => {
     })
 
     test('fetch list of actions to be exported from project name', () => {
-      const cmd = ow.mockResolved('packages.get', packageget)
+      const cmd = rtLib.mockResolved('packages.get', packageget)
       command.argv = ['--projectname', 'proj', '-m', '/deploy/manifest.yaml']
-      ow.mockResolved(owPackageList, packagelist)
-      ow.mockResolved('actions.get', actionGet)
+      rtLib.mockResolved(rtPackageList, packagelist)
+      rtLib.mockResolved('actions.get', actionGet)
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalled()
@@ -460,10 +463,10 @@ describe('instance methods', () => {
     })
 
     test('fetch list of packages (shared) to be exported from project name', () => {
-      const cmd = ow.mockResolved('packages.get', emptyPackage)
+      const cmd = rtLib.mockResolved('packages.get', emptyPackage)
       command.argv = ['--projectname', 'proj', '-m', '/deploy/manifest.yaml']
-      ow.mockResolved(owPackageList, sharedPackagelist)
-      ow.mockResolved('actions.get', '')
+      rtLib.mockResolved(rtPackageList, sharedPackagelist)
+      rtLib.mockResolved('actions.get', '')
       fs.writeFileSync = jest.fn()
       return command.run()
         .then(() => {
@@ -474,11 +477,11 @@ describe('instance methods', () => {
     })
 
     test('fetch list of triggers to be exported from project name', () => {
-      const cmd = ow.mockResolved(owTriggerList, '')
+      const cmd = rtLib.mockResolved(owTriggerList, '')
       command.argv = ['--projectname', 'proj', '-m', '/deploy/manifest.yaml']
-      ow.mockResolved(owPackageList, packagelist)
-      ow.mockResolved('packages.get', packageget)
-      ow.mockResolved('actions.get', actionGet)
+      rtLib.mockResolved(rtPackageList, packagelist)
+      rtLib.mockResolved('packages.get', packageget)
+      rtLib.mockResolved('actions.get', actionGet)
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalled()
@@ -487,12 +490,12 @@ describe('instance methods', () => {
     })
 
     test('fetch list of rules to be exported from project name', () => {
-      const cmd = ow.mockResolved(owRulesList, '')
+      const cmd = rtLib.mockResolved(owRulesList, '')
       command.argv = ['--projectname', 'proj', '-m', '/deploy/manifest.yaml']
-      ow.mockResolved(owPackageList, packagelist)
-      ow.mockResolved('packages.get', packageget)
-      ow.mockResolved('actions.get', actionGet)
-      ow.mockResolved(owTriggerList, '')
+      rtLib.mockResolved(rtPackageList, packagelist)
+      rtLib.mockResolved('packages.get', packageget)
+      rtLib.mockResolved('actions.get', actionGet)
+      rtLib.mockResolved(owTriggerList, '')
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalled()
@@ -501,9 +504,9 @@ describe('instance methods', () => {
     })
 
     test('write to manifest file when trigger has a feed', () => {
-      ow.mockResolved(owTriggerList, triggerWithFeed)
-      ow.mockResolved('triggers.get', triggerGetWithFeed)
-      ow.mockResolved(owRulesList, ruleslist)
+      rtLib.mockResolved(owTriggerList, triggerWithFeed)
+      rtLib.mockResolved('triggers.get', triggerGetWithFeed)
+      rtLib.mockResolved(owRulesList, ruleslist)
       fs.writeFileSync = jest.fn()
       command.argv = ['--projectname', 'proj', '-m', '/deploy/manifest.yaml']
       const yaml = fixtureFile('deploy/export_yaml_feed.yaml')
@@ -516,9 +519,9 @@ describe('instance methods', () => {
     })
 
     test('write action to js file', () => {
-      ow.mockResolved(owTriggerList, triggerlist)
-      ow.mockResolved('triggers.get', triggerGet)
-      ow.mockResolved(owRulesList, ruleslist)
+      rtLib.mockResolved(owTriggerList, triggerlist)
+      rtLib.mockResolved('triggers.get', triggerGet)
+      rtLib.mockResolved(owRulesList, ruleslist)
       fs.writeFileSync = jest.fn()
       command.argv = ['--projectname', 'proj', '-m', '/deploy/manifest.yaml']
       const yaml = fixtureFile('deploy/export_yaml.yaml')
@@ -531,10 +534,10 @@ describe('instance methods', () => {
     })
 
     test('write sequence to js file', () => {
-      ow.mockResolved('actions.get', sequenceGet)
-      ow.mockResolved(owTriggerList, triggerlist)
-      ow.mockResolved('triggers.get', triggerGet)
-      ow.mockResolved(owRulesList, ruleslist)
+      rtLib.mockResolved('actions.get', sequenceGet)
+      rtLib.mockResolved(owTriggerList, triggerlist)
+      rtLib.mockResolved('triggers.get', triggerGet)
+      rtLib.mockResolved(owRulesList, ruleslist)
       fs.writeFileSync = jest.fn()
       command.argv = ['--projectname', 'proj', '-m', '/deploy/manifest.yaml']
       const yaml = fixtureFile('deploy/export_yaml_Sequence.yaml')
@@ -546,10 +549,10 @@ describe('instance methods', () => {
 
     test('write binary of action to js file', () => {
       const bufferData = Buffer.from('code', 'base64')
-      ow.mockResolved('actions.get', actionBinaryGet)
-      ow.mockResolved(owTriggerList, triggerlist)
-      ow.mockResolved('triggers.get', triggerGet)
-      ow.mockResolved(owRulesList, ruleslist)
+      rtLib.mockResolved('actions.get', actionBinaryGet)
+      rtLib.mockResolved(owTriggerList, triggerlist)
+      rtLib.mockResolved('triggers.get', triggerGet)
+      rtLib.mockResolved(owRulesList, ruleslist)
       fs.writeFileSync = jest.fn()
       command.argv = ['--projectname', 'proj', '-m', '/deploy/manifest.yaml']
       return command.run()
@@ -559,9 +562,9 @@ describe('instance methods', () => {
     })
 
     test('write project name to manifest file if package has no annotations and there are no triggers and rules', () => {
-      ow.mockResolved(owPackageList, packageNoAnnotations)
-      ow.mockResolved(owTriggerList, '')
-      ow.mockResolved(owRulesList, '')
+      rtLib.mockResolved(rtPackageList, packageNoAnnotations)
+      rtLib.mockResolved(owTriggerList, '')
+      rtLib.mockResolved(owRulesList, '')
       fs.writeFileSync = jest.fn()
       command.argv = ['--projectname', 'proj', '-m', '/deploy/manifest.yaml']
       const yaml = fixtureFile('deploy/export_yaml_noAnnotations.yaml')
@@ -572,10 +575,10 @@ describe('instance methods', () => {
     })
 
     test('write project name to manifest file if package has no whisk managed project name and there are no triggers and rules', () => {
-      ow.mockResolved(owPackageList, packagelistNoProjectName)
+      rtLib.mockResolved(rtPackageList, packagelistNoProjectName)
       fs.writeFileSync = jest.fn()
-      ow.mockResolved(owTriggerList, '')
-      ow.mockResolved(owRulesList, '')
+      rtLib.mockResolved(owTriggerList, '')
+      rtLib.mockResolved(owRulesList, '')
       command.argv = ['--projectname', 'proj', '-m', '/deploy/manifest.yaml']
       const yaml = fixtureFile('deploy/export_yaml_noAnnotations.yaml')
       return command.run()
@@ -585,10 +588,10 @@ describe('instance methods', () => {
     })
 
     test('do not write trigger to js file if trigger has no whisk managed key', () => {
-      ow.mockResolved(owPackageList, '')
-      ow.mockResolved(owTriggerList, triggerNoProjectName)
-      ow.mockResolved(owRulesList, '')
-      const cmd = ow.mockResolved('triggers.get', '')
+      rtLib.mockResolved(rtPackageList, '')
+      rtLib.mockResolved(owTriggerList, triggerNoProjectName)
+      rtLib.mockResolved(owRulesList, '')
+      const cmd = rtLib.mockResolved('triggers.get', '')
       command.argv = ['--projectname', 'proj', '-m', '/deploy/manifest.yaml']
       return command.run()
         .then(() => {
@@ -597,10 +600,10 @@ describe('instance methods', () => {
     })
 
     test('do not write trigger to js file if trigger has no annotations', () => {
-      ow.mockResolved(owPackageList, '')
-      ow.mockResolved(owTriggerList, triggerNoAnnotation)
-      ow.mockResolved(owRulesList, '')
-      const cmd = ow.mockResolved('triggers.get', '')
+      rtLib.mockResolved(rtPackageList, '')
+      rtLib.mockResolved(owTriggerList, triggerNoAnnotation)
+      rtLib.mockResolved(owRulesList, '')
+      const cmd = rtLib.mockResolved('triggers.get', '')
       command.argv = ['--projectname', 'proj', '-m', '/deploy/manifest.yaml']
       return command.run()
         .then(() => {
@@ -609,10 +612,10 @@ describe('instance methods', () => {
     })
 
     test('write project name to manifest file if rule has no whisk managed project name', () => {
-      ow.mockResolved(owPackageList, '')
+      rtLib.mockResolved(rtPackageList, '')
       fs.writeFileSync = jest.fn()
-      ow.mockResolved(owTriggerList, '')
-      ow.mockResolved(owRulesList, rulesNoAnnotations)
+      rtLib.mockResolved(owTriggerList, '')
+      rtLib.mockResolved(owRulesList, rulesNoAnnotations)
       command.argv = ['--projectname', 'proj', '-m', '/deploy/manifest.yaml']
       const yaml = fixtureFile('deploy/export_yaml_noAnnotations.yaml')
       return command.run()
@@ -623,7 +626,7 @@ describe('instance methods', () => {
 
     test('errors out on api error', () => {
       return new Promise((resolve, reject) => {
-        ow.mockRejected(owPackageList, new Error('an error'))
+        rtLib.mockRejected(rtPackageList, new Error('an error'))
         command.argv = ['--projectname', 'proj', '-m', '/deploy/manifest.yaml']
         return command.run()
           .then(() => reject(new Error('does not throw error')))
