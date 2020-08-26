@@ -13,8 +13,8 @@ governing permissions and limitations under the License.
 const { stdout } = require('stdout-stderr')
 const TheCommand = require('../../../../src/commands/runtime/activation/result.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
-const ow = require('openwhisk')()
-const owAction = 'activations.result'
+const RuntimeLib = require('@adobe/aio-lib-runtime')
+const rtAction = 'activations.result'
 
 test('exports', async () => {
   expect(typeof TheCommand).toEqual('function')
@@ -45,11 +45,13 @@ test('flags', async () => {
 })
 
 describe('instance methods', () => {
-  let command, handleError
-
-  beforeEach(() => {
+  let command, handleError, rtLib
+  beforeEach(async () => {
     command = new TheCommand([])
     handleError = jest.spyOn(command, 'handleError')
+    rtLib = await RuntimeLib.init({ apihost: 'fakehost', api_key: 'fakekey' })
+    rtLib.mockResolved('actions.client.options', '')
+    RuntimeLib.mockReset()
   })
 
   describe('run', () => {
@@ -58,7 +60,7 @@ describe('instance methods', () => {
     })
 
     test('retrieve results of an activation', () => {
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, { res: 'fake' })
       command.argv = ['12345']
       return command.run()
         .then(() => {
@@ -68,8 +70,8 @@ describe('instance methods', () => {
     })
 
     test('retrieve last activation results --last', () => {
-      const axList = ow.mockResolved('activations.list', [{ activationId: '12345' }])
-      const axGet = ow.mockResolved(owAction, '')
+      const axList = rtLib.mockResolved('activations.list', [{ activationId: '12345' }])
+      const axGet = rtLib.mockResolved(rtAction, '')
       command.argv = ['--last']
       return command.run()
         .then(() => {
@@ -87,7 +89,7 @@ describe('instance methods', () => {
 
     test('errors out on api error', () => {
       return new Promise((resolve, reject) => {
-        ow.mockRejected(owAction, new Error('an error'))
+        rtLib.mockRejected(rtAction, new Error('an error'))
         command.argv = ['hello']
         return command.run()
           .then(() => reject(new Error('does not throw error')))

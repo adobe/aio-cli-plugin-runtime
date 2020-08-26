@@ -12,8 +12,8 @@ governing permissions and limitations under the License.
 
 const TheCommand = require('../../../../src/commands/runtime/route/list.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
-const owAction = 'routes.list'
-const ow = require('openwhisk')()
+const rtAction = 'routes.list'
+const RuntimeLib = require('@adobe/aio-lib-runtime')
 const { stdout } = require('stdout-stderr')
 
 test('exports', async () => {
@@ -73,11 +73,13 @@ test('flags', async () => {
 })
 
 describe('instance methods', () => {
-  let command, handleError
-
-  beforeEach(() => {
+  let command, handleError, rtLib
+  beforeEach(async () => {
     command = new TheCommand([])
     handleError = jest.spyOn(command, 'handleError')
+    rtLib = await RuntimeLib.init({ apihost: 'fakehost', api_key: 'fakekey' })
+    rtLib.mockResolved('actions.client.options', '')
+    RuntimeLib.mockReset()
   })
 
   describe('run', () => {
@@ -86,14 +88,14 @@ describe('instance methods', () => {
     })
 
     test('no required args (all are optional) - should not throw exception', () => {
-      ow.mockResolvedFixture(owAction, 'route/list.json')
+      rtLib.mockResolvedFixture(rtAction, 'route/list.json')
       return expect(() => {
         return command.run()
       }).not.toThrow()
     })
 
     test('no required args (all are optional) - should not throw exception, --json flag', () => {
-      ow.mockResolvedFixture(owAction, 'route/list.json')
+      rtLib.mockResolvedFixture(rtAction, 'route/list.json')
       command.argv = ['--json']
       return command.run()
         .then(() => {
@@ -104,7 +106,7 @@ describe('instance methods', () => {
 
     test('error, throws exception', () => {
       return new Promise((resolve, reject) => {
-        ow.mockRejected(owAction, new Error('an error'))
+        rtLib.mockRejected(rtAction, new Error('an error'))
         return command.run()
           .then(() => reject(new Error('should not succeed')))
           .catch(() => {

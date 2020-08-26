@@ -13,8 +13,9 @@ governing permissions and limitations under the License.
 const { stdout } = require('stdout-stderr')
 const TheCommand = require('../../../../src/commands/runtime/package/get.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
-const ow = require('openwhisk')()
-const owPackage = 'packages.get'
+const RuntimeLib = require('@adobe/aio-lib-runtime')
+const rtUtils = RuntimeLib.utils
+const rtAction = 'packages.get'
 
 test('exports', async () => {
   expect(typeof TheCommand).toEqual('function')
@@ -39,11 +40,13 @@ test('args', async () => {
 })
 
 describe('instance methods', () => {
-  let command, handleError
-
-  beforeEach(() => {
+  let command, handleError, rtLib
+  beforeEach(async () => {
     command = new TheCommand([])
     handleError = jest.spyOn(command, 'handleError')
+    rtLib = await RuntimeLib.init({ apihost: 'fakehost', api_key: 'fakekey' })
+    rtLib.mockResolved('actions.client.options', '')
+    RuntimeLib.mockReset()
   })
 
   describe('run', () => {
@@ -52,28 +55,30 @@ describe('instance methods', () => {
     })
 
     test('retrieve a package', () => {
-      const cmd = ow.mockResolved(owPackage, '')
+      const cmd = rtLib.mockResolved(rtAction, { res: 'fake' })
       command.argv = ['packageName']
+      rtUtils.parsePackageName.mockReturnValue({ name: 'fakeName', namespace: '-' })
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ namespace: '_', name: 'packageName' })
+          expect(cmd).toHaveBeenCalledWith({ namespace: '-', name: 'fakeName' })
           expect(stdout.output).toMatch('')
         })
     })
 
     test('retrieve a package in namespace', () => {
-      const cmd = ow.mockResolved(owPackage, '')
+      const cmd = rtLib.mockResolved(rtAction, { res: 'fake' })
       command.argv = ['ns/packageName']
+      rtUtils.parsePackageName.mockReturnValue({ name: 'fakeName', namespace: 'fakeNs' })
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ namespace: 'ns', name: 'packageName' })
+          expect(cmd).toHaveBeenCalledWith({ namespace: 'fakeNs', name: 'fakeName' })
           expect(stdout.output).toMatch('')
         })
     })
 
     test('errors out on api error', () => {
       return new Promise((resolve, reject) => {
-        ow.mockRejected(owPackage, new Error('an error'))
+        rtLib.mockRejected(rtAction, new Error('an error'))
         command.argv = ['packageName']
         return command.run()
           .then(() => reject(new Error('does not throw error')))

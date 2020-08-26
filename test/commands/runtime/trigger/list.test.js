@@ -12,9 +12,9 @@ governing permissions and limitations under the License.
 
 const TheCommand = require('../../../../src/commands/runtime/trigger/list.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
-const ow = require('openwhisk')()
+const RuntimeLib = require('@adobe/aio-lib-runtime')
 const { stdout } = require('stdout-stderr')
-const owAction = 'triggers.list'
+const rtAction = 'triggers.list'
 
 test('exports', async () => {
   expect(typeof TheCommand).toEqual('function')
@@ -57,11 +57,13 @@ test('flags', async () => {
 })
 
 describe('instance methods', () => {
-  let command, handleError
-
-  beforeEach(() => {
+  let command, handleError, rtLib
+  beforeEach(async () => {
     command = new TheCommand([])
     handleError = jest.spyOn(command, 'handleError')
+    rtLib = await RuntimeLib.init({ apihost: 'fakehost', api_key: 'fakekey' })
+    rtLib.mockResolved('actions.client.options', '')
+    RuntimeLib.mockReset()
   })
 
   describe('run', () => {
@@ -70,7 +72,7 @@ describe('instance methods', () => {
     })
 
     test('--limit flag (no triggers)', () => {
-      const cmd = ow.mockResolved('triggers.list', [])
+      const cmd = rtLib.mockResolved('triggers.list', [])
       command.argv = ['--limit', '10']
       return command.run()
         .then(() => {
@@ -82,7 +84,7 @@ describe('instance methods', () => {
     })
 
     test('--skip flag (no triggers)', () => {
-      const cmd = ow.mockResolved(owAction, [])
+      const cmd = rtLib.mockResolved(rtAction, [])
       command.argv = ['--skip', '5']
       return command.run()
         .then(() => {
@@ -92,7 +94,7 @@ describe('instance methods', () => {
     })
 
     test('simple trigger list', () => {
-      const cmd = ow.mockResolved(owAction, [
+      const cmd = rtLib.mockResolved(rtAction, [
         { name: 'trigger1', namespace: 'namespace1', publish: false },
         { name: 'trigger2', namespace: 'namespace1', publish: true }
       ])
@@ -111,7 +113,7 @@ describe('instance methods', () => {
         { name: 'trigger2', namespace: 'namespace1', publish: true }
       ]
 
-      const cmd = ow.mockResolved(owAction, json)
+      const cmd = rtLib.mockResolved(rtAction, json)
       command.argv = ['--json']
       return command.run()
         .then(() => {
@@ -124,7 +126,7 @@ describe('instance methods', () => {
 
     test('trigger list, error', () => {
       return new Promise((resolve, reject) => {
-        ow.mockRejected('triggers.list', new Error('an error'))
+        rtLib.mockRejected('triggers.list', new Error('an error'))
         return command.run()
           .then(() => reject(new Error('does not throw error')))
           .catch(() => {
@@ -134,7 +136,7 @@ describe('instance methods', () => {
       })
     })
     test('return list of triggers, --name-sort flag', () => {
-      const cmd = ow.mockResolvedFixture(owAction, 'trigger/list-name-sort.json')
+      const cmd = rtLib.mockResolvedFixture(rtAction, 'trigger/list-name-sort.json')
       command.argv = ['--name']
       return command.run()
         .then(() => {

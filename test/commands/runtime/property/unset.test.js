@@ -56,8 +56,7 @@ test('flags', async () => {
 
 describe('instance methods', () => {
   let command, handleError
-
-  beforeEach(() => {
+  beforeEach(async () => {
     command = new TheCommand([])
     handleError = jest.spyOn(command, 'handleError')
   })

@@ -12,10 +12,10 @@ governing permissions and limitations under the License.
 
 const TheCommand = require('../../../../src/commands/runtime/namespace/get.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
-const ow = require('openwhisk')()
 const { stdout } = require('stdout-stderr')
 
-const owAction = 'namespaces.get'
+const RuntimeLib = require('@adobe/aio-lib-runtime')
+const rtAction = 'namespaces.get'
 
 test('exports', async () => {
   expect(typeof TheCommand).toEqual('function')
@@ -42,11 +42,13 @@ test('base flags included in command flags',
 )
 
 describe('instance methods', () => {
-  let command, handleError
-
-  beforeEach(() => {
+  let command, handleError, rtLib
+  beforeEach(async () => {
     command = new TheCommand([])
     handleError = jest.spyOn(command, 'handleError')
+    rtLib = await RuntimeLib.init({ apihost: 'fakehost', api_key: 'fakekey' })
+    rtLib.mockResolved('actions.client.options', '')
+    RuntimeLib.mockReset()
   })
 
   describe('run', () => {
@@ -58,9 +60,9 @@ describe('instance methods', () => {
       return new Promise((resolve) => {
         const expectedJson = fixtureJson('namespace/get.json')
         expectedJson.actions[0].publish = true // coverage
-        const cmd = ow.mockResolved(owAction, expectedJson)
+        const cmd = rtLib.mockResolved(rtAction, expectedJson)
 
-        ow.mockFn('rules.get')
+        rtLib.mockFn('rules.get')
           .mockImplementationOnce(() => {
             return fixtureJson('namespace/rule1.json')
           })
@@ -80,9 +82,9 @@ describe('instance methods', () => {
     test('simple namespace get, --json flag', () => {
       return new Promise((resolve) => {
         const expectedJson = fixtureJson('namespace/get.json')
-        const cmd = ow.mockResolved(owAction, expectedJson)
+        const cmd = rtLib.mockResolved(rtAction, expectedJson)
 
-        ow.mockFn('rules.get')
+        rtLib.mockFn('rules.get')
           .mockImplementationOnce(() => {
             return fixtureJson('namespace/rule1.json')
           })
@@ -106,7 +108,7 @@ describe('instance methods', () => {
     test('namespace list, error', () => {
       return new Promise((resolve, reject) => {
         const namespaceError = new Error('an error')
-        ow.mockRejected(owAction, namespaceError)
+        rtLib.mockRejected(rtAction, namespaceError)
         return command.run()
           .then(() => reject(new Error('does not throw error')))
           .catch(() => {
@@ -119,8 +121,8 @@ describe('instance methods', () => {
     test('return list of actions, --name-sort flag', () => {
       return new Promise((resolve) => {
         const expectedJson = fixtureJson('namespace/get-name-sort.json')
-        const cmd = ow.mockResolved(owAction, expectedJson)
-        ow.mockFn('rules.get')
+        const cmd = rtLib.mockResolved(rtAction, expectedJson)
+        rtLib.mockFn('rules.get')
           .mockImplementationOnce(() => {
             return fixtureJson('namespace/rule1.json')
           })

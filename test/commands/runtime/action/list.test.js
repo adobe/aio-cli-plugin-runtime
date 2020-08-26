@@ -13,8 +13,9 @@ governing permissions and limitations under the License.
 const { stdout } = require('stdout-stderr')
 const TheCommand = require('../../../../src/commands/runtime/action/list.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
-const ow = require('openwhisk')()
-const owAction = 'actions.list'
+const RuntimeLib = require('@adobe/aio-lib-runtime')
+const rtUtils = RuntimeLib.utils
+const rtAction = 'actions.list'
 
 describe('List command meta', () => {
   test('exports', async () => {
@@ -51,11 +52,14 @@ describe('List command meta', () => {
 })
 
 describe('instance methods', () => {
-  let command, handleError
+  let command, handleError, rtLib
 
-  beforeEach(() => {
+  beforeEach(async () => {
     command = new TheCommand([])
     handleError = jest.spyOn(command, 'handleError')
+    rtLib = await RuntimeLib.init({ apihost: 'fakehost', api_key: 'fakekey' })
+    rtLib.mockResolved('actions.client.options', '')
+    RuntimeLib.mockReset()
   })
 
   describe('run', () => {
@@ -64,7 +68,7 @@ describe('instance methods', () => {
     })
 
     test('return list of actions with limits', () => {
-      const cmd = ow.mockResolvedFixture(owAction, 'action/list.json')
+      const cmd = rtLib.mockResolvedFixture(rtAction, 'action/list.json')
       command.argv = ['--limit', '1']
       return command.run()
         .then(() => {
@@ -74,7 +78,7 @@ describe('instance methods', () => {
     })
 
     test('return list of actions', () => {
-      const cmd = ow.mockResolvedFixture(owAction, 'action/list.json')
+      const cmd = rtLib.mockResolvedFixture(rtAction, 'action/list.json')
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalled()
@@ -83,21 +87,25 @@ describe('instance methods', () => {
     })
 
     test('return list of actions in a package', () => {
-      const cmd = ow.mockResolvedFixture(owAction, 'action/list.json')
+      const cmd = rtLib.mockResolvedFixture(rtAction, 'action/list.json')
       command.argv = ['somepackage']
+      rtUtils.parsePackageName.mockReturnValue({ name: 'hola', namespace: undefined })
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith(expect.objectContaining({ id: 'somepackage/' }))
+          expect(rtUtils.parsePackageName).toHaveBeenCalledWith('somepackage')
+          expect(cmd).toHaveBeenCalledWith(expect.objectContaining({ id: 'hola/' }))
           expect(stdout.output).toMatchFixture('action/list-output.txt')
         })
     })
 
-    test('return list of actions in a package in /ns', () => {
-      const cmd = ow.mockResolvedFixture(owAction, 'action/list.json')
-      command.argv = ['/ns/somepackage']
+    test('return list of actions in a /ns/pkg', () => {
+      const cmd = rtLib.mockResolvedFixture(rtAction, 'action/list.json')
+      command.argv = ['somepackage']
+      rtUtils.parsePackageName.mockReturnValue({ name: 'hola', namespace: 'bonjour' })
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith(expect.objectContaining({ namespace: 'ns', id: 'somepackage/' }))
+          expect(rtUtils.parsePackageName).toHaveBeenCalledWith('somepackage')
+          expect(cmd).toHaveBeenCalledWith(expect.objectContaining({ id: 'hola/', namespace: 'bonjour' }))
           expect(stdout.output).toMatchFixture('action/list-output.txt')
         })
     })
@@ -106,7 +114,7 @@ describe('instance methods', () => {
       const json = fixtureJson('action/list.json')
       json[0].publish = true
 
-      const cmd = ow.mockResolved(owAction, json)
+      const cmd = rtLib.mockResolved(rtAction, json)
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalled()
@@ -115,7 +123,7 @@ describe('instance methods', () => {
     })
 
     test('return list of actions, --json flag', () => {
-      const cmd = ow.mockResolvedFixture(owAction, 'action/list.json')
+      const cmd = rtLib.mockResolvedFixture(rtAction, 'action/list.json')
       command.argv = ['--json']
       return command.run()
         .then(() => {
@@ -125,7 +133,7 @@ describe('instance methods', () => {
     })
 
     test('return list of actions with skip (no actions)', () => {
-      const cmd = ow.mockResolved(owAction, [])
+      const cmd = rtLib.mockResolved(rtAction, [])
       command.argv = ['--skip', '3']
       return command.run()
         .then(() => {
@@ -134,33 +142,21 @@ describe('instance methods', () => {
         })
     })
 
-    test('reject invalid package name /', () => {
+    test('reject invalid package name', () => {
       return new Promise((resolve, reject) => {
         command.argv = ['/']
+        rtUtils.parsePackageName.mockImplementation(() => { throw new Error('parse error') })
         return command.run()
           .then(() => reject(new Error('does not throw error')))
           .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to list the actions', new Error('Package name is not valid'))
+            expect(handleError).toHaveBeenLastCalledWith('failed to list the actions', new Error('parse error'))
             resolve()
           })
       })
     })
-
-    test('reject invalid package name //', () => {
-      return new Promise((resolve, reject) => {
-        command.argv = ['//']
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to list the actions', new Error('Package name is not valid'))
-            resolve()
-          })
-      })
-    })
-
     test('errors out on api error', () => {
       return new Promise((resolve, reject) => {
-        ow.mockRejected(owAction, new Error('an error'))
+        rtLib.mockRejected(rtAction, new Error('an error'))
         return command.run()
           .then(() => reject(new Error('does not throw error')))
           .catch(() => {
@@ -171,7 +167,7 @@ describe('instance methods', () => {
     })
 
     test('return list of actions, --name-sort flag', () => {
-      const cmd = ow.mockResolvedFixture(owAction, 'action/list-name-sort.json')
+      const cmd = rtLib.mockResolvedFixture(rtAction, 'action/list-name-sort.json')
       command.argv = ['--name']
       return command.run()
         .then(() => {

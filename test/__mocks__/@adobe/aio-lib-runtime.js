@@ -1,12 +1,17 @@
-const mockOpenWhisk = {
+const mockRtLibInstance = {
   actions: {},
   activations: {},
   namespaces: {},
   packages: {
-    update: jest.fn()
+    update: jest.fn(),
+    list: jest.fn(() => '')
   },
-  rules: {},
-  triggers: {},
+  rules: {
+    list: jest.fn(() => '')
+  },
+  triggers: {
+    list: jest.fn(() => '')
+  },
   feeds: {},
   routes: {},
   mockFn: function (methodName) {
@@ -52,4 +57,39 @@ const mockOpenWhisk = {
   }
 }
 
-module.exports = jest.fn(() => mockOpenWhisk)
+const mockRtUtils = {
+  createKeyValueObjectFromArray: jest.fn(),
+  createKeyValueArrayFromObject: jest.fn(),
+  createKeyValueArrayFromFile: jest.fn(),
+  createKeyValueArrayFromFlag: jest.fn(),
+  createKeyValueObjectFromFlag: jest.fn(),
+  createKeyValueObjectFromFile: jest.fn(),
+  getKeyValueArrayFromMergedParameters: jest.fn(),
+  getKeyValueObjectFromMergedParameters: jest.fn(),
+  parsePathPattern: jest.fn(),
+  parsePackageName: jest.fn(),
+  createComponentsfromSequence: jest.fn(),
+  processInputs: jest.fn(),
+  returnUnion: jest.fn(),
+  deployPackage: jest.fn(),
+  undeployPackage: jest.fn(),
+  processPackage: jest.fn(),
+  setPaths: jest.fn(),
+  getProjectEntities: jest.fn(),
+  syncProject: jest.fn(),
+  findProjectHashonServer: jest.fn(),
+  getProjectHash: jest.fn(),
+  addManagedProjectAnnotations: jest.fn(),
+  printLogs: jest.fn()
+}
+
+const init = jest.fn().mockReturnValue(mockRtLibInstance)
+module.exports = {
+  utils: mockRtUtils,
+  init,
+  mockReset: () => {
+    Object.values(mockRtUtils).forEach(v => v.mockReset())
+    init.mockClear()
+    // mock reset for instance too ?
+  }
+}

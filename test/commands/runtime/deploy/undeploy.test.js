@@ -13,13 +13,8 @@ governing permissions and limitations under the License.
 const { stdout } = require('stdout-stderr')
 const TheCommand = require('../../../../src/commands/runtime/deploy/undeploy.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
-const ow = require('openwhisk')()
-const owAction = 'actions.delete'
-const owPackage = 'packages.delete'
-const owRules = 'rules.delete'
-const owTrigger = 'triggers.delete'
-const owApi = 'routes.delete'
-const owFeed = 'feeds.delete'
+const RuntimeLib = require('@adobe/aio-lib-runtime')
+const utils = RuntimeLib.utils
 
 test('exports', async () => {
   expect(typeof TheCommand).toEqual('function')
@@ -41,298 +36,102 @@ test('flags', async () => {
   expect(typeof TheCommand.flags.manifest).toBe('object')
   expect(typeof TheCommand.flags.projectname).toBe('object')
 })
+// some expected fake values
+const expectedEntities = { fake: 'entities' }
+const expectedEntitiesFromGet = { fakeGet: 'getentities' }
+const expectedOWOptions = { api_key: 'some-gibberish-not-a-real-key', apihost: 'some.host', apiversion: 'v1', namespace: 'some_namespace' }
+const expectedDepPackages = { fake: 'dep-packages' }
+const expectedDepTriggers = [{ fake: 'dep-triggers' }]
+const expectedPackages = { fake: 'packages' }
 
 describe('instance methods', () => {
-  let command, handleError
-  let cwdSpy
-  const packagelist = [{
-    annotations: [{
-      key: 'whisk-managed',
-      value: {
-        file: 'manifest.yaml',
-        projectDeps: [],
-        projectHash: '136a3e0db7b3c1abb09bcd43ad509b1f9ce2ee22',
-        projectName: 'proj'
-      }
-    }],
-    binding: false,
-    name: 'testSeq',
-    namespace: 'ns',
-    publish: false,
-    updated: 1555533204836,
-    version: '0.0.2'
-  }]
-
-  const packagelistNoAnnotation = [{
-    annotations: [],
-    binding: false,
-    name: 'testSeq',
-    namespace: 'ns',
-    publish: false,
-    updated: 1555533204836,
-    version: '0.0.2'
-  }]
-
-  const packagelistNoProjectName = [{
-    annotations: [{
-      key: 'whisk-managed',
-      value: 'key'
-    }],
-    binding: false,
-    name: 'testSeq1',
-    namespace: 'ns',
-    publish: false,
-    updated: 1555533204836,
-    version: '0.0.2'
-  }]
-
-  beforeAll(() => {
-    cwdSpy = jest.spyOn(process, 'cwd').mockImplementation(() => {
-      return ('/deploy')
-    })
-  })
-
-  afterAll(() => {
-    cwdSpy.mockRestore()
-  })
+  let command, handleError, rtLib
 
   beforeEach(() => {
     command = new TheCommand([])
     handleError = jest.spyOn(command, 'handleError')
-    const json = {
-      'deploy/manifest_triggersRules.yaml': fixtureFile('deploy/manifest_triggersRules.yaml'),
-      'deploy/manifest.yaml': fixtureFile('deploy/manifest.yaml'),
-      'deploy/manifest_dependencies.yaml': fixtureFile('deploy/manifest_dependencies.yaml'),
-      'deploy/manifest_report.yaml': fixtureFile('deploy/manifest_report.yaml'),
-      'deploy/api_manifest.yaml': fixtureFile('deploy/api_manifest.yaml'),
-      'deploy/manifest.yml': fixtureFile('deploy/manifest.yml'),
-      'deploy/hello.js': fixtureFile('deploy/hello.js'),
-      'deploy/hello_plus.js': fixtureFile('deploy/hello_plus.js')
-    }
-    fakeFileSystem.addJson(json)
-  })
-
-  afterEach(() => {
-    // reset back to normal
-    fakeFileSystem.reset()
+    RuntimeLib.mockReset()
+    rtLib = RuntimeLib.init({ fake: 1 })
+    utils.processPackage.mockReturnValue(expectedEntities)
+    utils.setPaths.mockReturnValue({
+      packages: expectedPackages,
+      deploymentTriggers: expectedDepTriggers, // not supported for now -> will always use {}
+      deploymentPackages: expectedDepPackages, // not supported for now
+      manifestPath: 'someFakePath',
+      manifestContent: { fake: 'not useful' },
+      projectName: 'fakeProjectName'
+    })
+    utils.getProjectEntities.mockReturnValue(expectedEntitiesFromGet)
   })
 
   describe('run', () => {
     test('exists', async () => {
-      ow.mockResolved(owPackage, '')
-      ow.mockResolved(owAction, '')
-      ow.mockResolved(owRules, '')
-      ow.mockResolved(owTrigger, '')
-      ow.mockResolved(owApi, '')
       expect(command.run).toBeInstanceOf(Function)
     })
 
-    test('undeploy a package without specifying manifest file', () => {
-      const cmd = ow.mockResolved(owPackage, '')
+    test('run with no flags', async () => {
       command.argv = []
-      return command.run()
-        .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ name: 'demo_package' })
-          expect(stdout.output).toMatch('')
-        })
+      await command.run()
+      expect(utils.setPaths).toHaveBeenCalledWith({ useragent: expect.any(String) })
+
+      expect(utils.processPackage).toHaveBeenCalledWith(expectedPackages, {}, {}, {}, true, expectedOWOptions)
+      expect(utils.getProjectEntities).not.toHaveBeenCalled()
+      expect(utils.undeployPackage).toHaveBeenCalledWith(expectedEntities, rtLib, command.log)
+      expect(stdout.output).toMatch('')
+      expect(handleError).not.toHaveBeenCalled()
     })
 
-    test('manifest.yaml missing', () => {
-      const toRemove = ['/deploy/manifest.yaml']
-      fakeFileSystem.removeKeys(toRemove)
-      const cmd = ow.mockResolved(owPackage, '')
+    test('run with manifest flag', async () => {
+      command.argv = ['-m', 'fake-manifest.yml']
+      await command.run()
+      expect(utils.setPaths).toHaveBeenCalledWith({ manifest: 'fake-manifest.yml', useragent: expect.any(String) })
+
+      expect(utils.processPackage).toHaveBeenCalledWith(expectedPackages, {}, {}, {}, true, expectedOWOptions)
+      expect(utils.getProjectEntities).not.toHaveBeenCalled()
+      expect(utils.undeployPackage).toHaveBeenCalledWith(expectedEntities, rtLib, command.log)
+      expect(stdout.output).toMatch('')
+      expect(handleError).not.toHaveBeenCalled()
+    })
+
+    test('run with project name flag', async () => {
+      command.argv = ['--projectname', 'thedudesproject']
+      await command.run()
+      expect(utils.setPaths).not.toHaveBeenCalled()
+
+      expect(utils.processPackage).not.toHaveBeenCalled()
+      expect(utils.getProjectEntities).toHaveBeenCalledWith('thedudesproject', false, rtLib)
+      expect(utils.undeployPackage).toHaveBeenCalledWith(expectedEntitiesFromGet, rtLib, command.log)
+      expect(stdout.output).toMatch('')
+      expect(handleError).not.toHaveBeenCalled()
+    })
+
+    test('run with project name and manifest flag', async () => {
+      // ignores the manifest flag
+      command.argv = ['-m', 'fake-manifest.yml', '--projectname', 'thedudesproject']
+      await command.run()
+      expect(utils.setPaths).not.toHaveBeenCalled()
+
+      expect(utils.processPackage).not.toHaveBeenCalled()
+      expect(utils.getProjectEntities).toHaveBeenCalledWith('thedudesproject', false, rtLib)
+      expect(utils.undeployPackage).toHaveBeenCalledWith(expectedEntitiesFromGet, rtLib, command.log)
+      expect(stdout.output).toMatch('')
+      expect(handleError).not.toHaveBeenCalled()
+    })
+
+    test('run with project name and error on getProjectEntities', async () => {
+      // ignores the manifest flag
+      command.argv = ['--projectname', 'thedudesproject']
+      utils.getProjectEntities.mockImplementation(() => { throw new Error('the get ERROR') })
+      await expect(command.run()).rejects.toThrow('the get ERROR')
+      expect(handleError).toHaveBeenCalled()
+    })
+
+    test('run with no flag and error on setPaths', async () => {
+      // ignores the manifest flag
       command.argv = []
-      return command.run()
-        .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ name: 'demo_package' })
-          expect(stdout.output).toMatch('')
-        })
-    })
-
-    test('manifest.yml missing', () => {
-      const toRemove = ['/deploy/manifest.yml']
-      fakeFileSystem.removeKeys(toRemove)
-      const cmd = ow.mockResolved(owPackage, '')
-      command.argv = []
-      return command.run()
-        .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ name: 'demo_package' })
-          expect(stdout.output).toMatch('')
-        })
-    })
-
-    test('undeploy a package with manifest file', () => {
-      const cmd = ow.mockResolved(owPackage, '')
-      ow.mockResolved('triggers.get', {})
-      command.argv = ['-m', '/deploy/manifest_triggersRules.yaml']
-      return command.run()
-        .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ name: 'testSeq' })
-          expect(stdout.output).toMatch('')
-        })
-    })
-
-    test('undeploy a package dependency with manifest file', () => {
-      const cmd = ow.mockResolved(owPackage, '')
-      command.argv = ['-m', '/deploy/manifest_dependencies.yaml']
-      return command.run()
-        .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ name: 'mypackage' })
-          expect(stdout.output).toMatch('')
-        })
-    })
-
-    test('package should be created if project is the root', () => {
-      const cmd = ow.mockResolved(owPackage, '')
-      ow.mockResolved('triggers.get', {})
-      command.argv = ['-m', '/deploy/manifest_report.yaml']
-      return command.run()
-        .then(() => {
-          expect(cmd).toHaveBeenCalled()
-          expect(stdout.output).toMatch('')
-        })
-    })
-
-    test('undeploy a trigger with manifest file', () => {
-      const cmd = ow.mockResolved(owTrigger, '')
-      ow.mockResolved('triggers.get', {})
-      command.argv = ['-m', '/deploy/manifest_triggersRules.yaml']
-      return command.run()
-        .then(() => {
-          expect(cmd).toHaveBeenCalled()
-          expect(stdout.output).toMatch('')
-        })
-    })
-
-    test('undeploy a trigger with manifest file - including feed', () => {
-      const cmd = ow.mockResolved(owTrigger, '')
-      const cmdfeed = ow.mockResolved(owFeed, '')
-      ow.mockResolved('triggers.get', {
-        annotations: [
-          {
-            key: 'feed',
-            value: '/whisk.system/alarms/alarm'
-          }
-        ],
-        name: 'trigger1'
-      })
-      command.argv = ['-m', '/deploy/manifest_triggersRules.yaml']
-      return command.run()
-        .then(() => {
-          expect(cmdfeed).toHaveBeenCalled()
-          expect(cmd).toHaveBeenCalled()
-          expect(stdout.output).toMatch('')
-        })
-    })
-
-    test('undeploy a trigger with manifest file - including feed - codecov', () => {
-      const cmd = ow.mockResolved(owTrigger, '')
-      const cmdfeed = ow.mockResolved(owFeed, '')
-      ow.mockResolved('triggers.get', {
-        annotations: [
-          {
-            key: 'key1',
-            value: 'value1'
-          }
-        ],
-        name: 'trigger1'
-      })
-      ow.mockResolved('feeds.delete', '')
-      command.argv = ['-m', '/deploy/manifest_triggersRules.yaml']
-      return command.run()
-        .then(() => {
-          expect(cmd).toHaveBeenCalled()
-          expect(cmdfeed).not.toHaveBeenCalled()
-          expect(stdout.output).toMatch('')
-        })
-    })
-
-    test('undeploy a rule with manifest file', () => {
-      const cmd = ow.mockResolved(owRules, '')
-      ow.mockResolved('triggers.get', {})
-      command.argv = ['-m', '/deploy/manifest_triggersRules.yaml']
-      return command.run()
-        .then(() => {
-          expect(cmd).toHaveBeenCalled()
-          expect(stdout.output).toMatch('')
-        })
-    })
-
-    test('undeploy an action with manifest file', () => {
-      const cmd = ow.mockResolved(owAction, '')
-      ow.mockResolved('triggers.get', {})
-      command.argv = ['-m', '/deploy/manifest_triggersRules.yaml']
-      return command.run()
-        .then(() => {
-          expect(cmd).toHaveBeenCalled()
-          expect(stdout.output).toMatch('')
-        })
-    })
-
-    test('undeploy entities of a certain project name', () => {
-      ow.mockResolved('packages.list', packagelist)
-      ow.mockResolved('actions.list', '')
-      ow.mockResolved('triggers.list', '')
-      ow.mockResolved('rules.list', '')
-      const cmd = ow.mockResolved(owPackage, '')
-      command.argv = ['--projectname', 'proj']
-      return command.run()
-        .then(() => {
-          expect(cmd).toHaveBeenCalled()
-        })
-    })
-
-    test('do not undeploy entities of a certain project name if no annotations', () => {
-      ow.mockResolved('packages.list', packagelistNoAnnotation)
-      ow.mockResolved('actions.list', '')
-      ow.mockResolved('triggers.list', '')
-      ow.mockResolved('rules.list', '')
-      const cmd = ow.mockResolved(owPackage, '')
-      command.argv = ['--projectname', 'proj']
-      return command.run()
-        .then(() => {
-          expect(cmd).not.toHaveBeenCalled()
-        })
-    })
-
-    test('do not undeploy entities of a certain project name if projectName does not match', () => {
-      ow.mockResolved('packages.list', packagelistNoProjectName)
-      ow.mockResolved('actions.list', '')
-      ow.mockResolved('triggers.list', '')
-      ow.mockResolved('rules.list', '')
-      const cmd = ow.mockResolved(owPackage, '')
-      command.argv = ['--projectname', 'proj']
-      return command.run()
-        .then(() => {
-          expect(cmd).not.toHaveBeenCalled()
-        })
-    })
-
-    test('undeploy an api with manifest file', () => {
-      const cmd = ow.mockResolved(owApi, '')
-      command.argv = ['-m', '/deploy/api_manifest.yaml']
-      return command.run()
-        .then(() => {
-          expect(cmd).toHaveBeenCalledWith(expect.objectContaining({ basepath: '/hello', relpath: '/world' }))
-          expect(cmd).toHaveBeenCalledTimes(2)
-          expect(stdout.output).toMatch('')
-        })
-    })
-
-    test('both manifest files not found', () => {
-      return new Promise((resolve, reject) => {
-        const toRemove = ['/deploy/manifest.yaml', '/deploy/manifest.yml']
-        fakeFileSystem.removeKeys(toRemove)
-
-        ow.mockRejected(owAction, new Error('an error'))
-        command.argv = []
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('Failed to undeploy', new Error('Manifest file not found'))
-            resolve()
-          })
-      })
+      utils.setPaths.mockImplementation(() => { throw new Error('the setPaths ERROR') })
+      await expect(command.run()).rejects.toThrow('the setPaths ERROR')
+      expect(handleError).toHaveBeenCalled()
     })
   })
 })

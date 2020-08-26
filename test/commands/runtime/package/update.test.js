@@ -13,8 +13,9 @@ governing permissions and limitations under the License.
 const { stdout } = require('stdout-stderr')
 const TheCommand = require('../../../../src/commands/runtime/package/update.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
-const ow = require('openwhisk')()
-const owAction = 'packages.update'
+const RuntimeLib = require('@adobe/aio-lib-runtime')
+const rtUtils = RuntimeLib.utils
+const rtAction = 'packages.update'
 
 test('exports', async () => {
   expect(typeof TheCommand).toEqual('function')
@@ -53,11 +54,13 @@ test('args', async () => {
 })
 
 describe('instance methods', () => {
-  let command, handleError
-
-  beforeEach(() => {
+  let command, handleError, rtLib
+  beforeEach(async () => {
     command = new TheCommand([])
     handleError = jest.spyOn(command, 'handleError')
+    rtLib = await RuntimeLib.init({ apihost: 'fakehost', api_key: 'fakekey' })
+    rtLib.mockResolved('actions.client.options', '')
+    RuntimeLib.mockReset()
   })
 
   afterAll(() => {
@@ -71,22 +74,18 @@ describe('instance methods', () => {
     })
 
     test('updates a package with package name param flag', () => {
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = ['packageName', '--param', 'a', 'b', '--param', 'c', 'd']
+      rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation(params => params && [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }])
       return command.run()
         .then(() => {
+          expect(rtUtils.getKeyValueArrayFromMergedParameters).toHaveBeenCalledWith(['a', 'b', 'c', 'd'], undefined)
           expect(cmd).toHaveBeenCalledWith({
             name: 'packageName',
             package: {
               parameters: [
-                {
-                  key: 'a',
-                  value: 'b'
-                },
-                {
-                  key: 'c',
-                  value: 'd'
-                }
+                { key: 'fakeParam', value: 'aaa' },
+                { key: 'fakeParam2', value: 'bbb' }
               ]
             }
           })
@@ -95,7 +94,7 @@ describe('instance methods', () => {
     })
 
     test('updates a package with only package name', () => {
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = ['packageName']
       return command.run()
         .then(() => {
@@ -107,7 +106,7 @@ describe('instance methods', () => {
     })
 
     test('updates a package with only package name --json', () => {
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = ['packageName', '--json']
       return command.run()
         .then(() => {
@@ -119,28 +118,18 @@ describe('instance methods', () => {
     })
 
     test('updates a package with package name and param-file flag', () => {
-      const json = {
-        'parameters.json': fixtureFile('trigger/parameters.json')
-      }
-      fakeFileSystem.addJson({
-        '/action': json
-      })
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = ['packageName', '--param-file', '/action/parameters.json']
+      rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation((flag, file) => file && [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }])
       return command.run()
         .then(() => {
+          expect(rtUtils.getKeyValueArrayFromMergedParameters).toHaveBeenCalledWith(undefined, '/action/parameters.json')
           expect(cmd).toHaveBeenCalledWith({
             name: 'packageName',
             package: {
               parameters: [
-                {
-                  key: 'param1',
-                  value: 'param1value'
-                },
-                {
-                  key: 'param2',
-                  value: 'param2value'
-                }
+                { key: 'fakeParam', value: 'aaa' },
+                { key: 'fakeParam2', value: 'bbb' }
               ]
             }
           })
@@ -149,28 +138,18 @@ describe('instance methods', () => {
     })
 
     test('update a package with package name and annotation-file flag', () => {
-      const json = {
-        'parameters.json': fixtureFile('trigger/parameters.json')
-      }
-      fakeFileSystem.addJson({
-        '/action': json
-      })
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = ['packageName', '--annotation-file', '/action/parameters.json']
+      rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation((flag, file) => file && [{ key: 'fakeAnnot', value: 'aaa' }, { key: 'fakeAnnot2', value: 'bbb' }])
       return command.run()
         .then(() => {
+          expect(rtUtils.getKeyValueArrayFromMergedParameters).toHaveBeenCalledWith(undefined, '/action/parameters.json')
           expect(cmd).toHaveBeenCalledWith({
             name: 'packageName',
             package: {
               annotations: [
-                {
-                  key: 'param1',
-                  value: 'param1value'
-                },
-                {
-                  key: 'param2',
-                  value: 'param2value'
-                }
+                { key: 'fakeAnnot', value: 'aaa' },
+                { key: 'fakeAnnot2', value: 'bbb' }
               ]
             }
           })
@@ -179,28 +158,28 @@ describe('instance methods', () => {
     })
 
     test('update a package with package name and annotation and param flags', () => {
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = ['packageName', '--annotation', 'a', 'b', '--annotation', 'c', 'd', '--param', 'p1', 'p2']
+      rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation((flags, file) => {
+        if (flags.includes('p1')) {
+          return [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }]
+        }
+        return [{ key: 'fakeAnnot', value: 'aaa' }, { key: 'fakeAnnot2', value: 'bbb' }]
+      })
       return command.run()
         .then(() => {
+          expect(rtUtils.getKeyValueArrayFromMergedParameters).toHaveBeenCalledWith(['a', 'b', 'c', 'd'], undefined)
+          expect(rtUtils.getKeyValueArrayFromMergedParameters).toHaveBeenCalledWith(['p1', 'p2'], undefined)
           expect(cmd).toHaveBeenCalledWith({
             name: 'packageName',
             package: {
               parameters: [
-                {
-                  key: 'p1',
-                  value: 'p2'
-                }
+                { key: 'fakeParam', value: 'aaa' },
+                { key: 'fakeParam2', value: 'bbb' }
               ],
               annotations: [
-                {
-                  key: 'a',
-                  value: 'b'
-                },
-                {
-                  key: 'c',
-                  value: 'd'
-                }
+                { key: 'fakeAnnot', value: 'aaa' },
+                { key: 'fakeAnnot2', value: 'bbb' }
               ]
             }
           })
@@ -209,28 +188,28 @@ describe('instance methods', () => {
     })
 
     test('update a package with package name and annotation and param flags with shorter flag version', () => {
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = ['packageName', '-a', 'a', 'b', '-a', 'c', 'd', '-p', 'p1', 'p2']
+      rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation((flags, file) => {
+        if (flags.includes('p1')) {
+          return [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }]
+        }
+        return [{ key: 'fakeAnnot', value: 'aaa' }, { key: 'fakeAnnot2', value: 'bbb' }]
+      })
       return command.run()
         .then(() => {
+          expect(rtUtils.getKeyValueArrayFromMergedParameters).toHaveBeenCalledWith(['a', 'b', 'c', 'd'], undefined)
+          expect(rtUtils.getKeyValueArrayFromMergedParameters).toHaveBeenCalledWith(['p1', 'p2'], undefined)
           expect(cmd).toHaveBeenCalledWith({
             name: 'packageName',
             package: {
               parameters: [
-                {
-                  key: 'p1',
-                  value: 'p2'
-                }
+                { key: 'fakeParam', value: 'aaa' },
+                { key: 'fakeParam2', value: 'bbb' }
               ],
               annotations: [
-                {
-                  key: 'a',
-                  value: 'b'
-                },
-                {
-                  key: 'c',
-                  value: 'd'
-                }
+                { key: 'fakeAnnot', value: 'aaa' },
+                { key: 'fakeAnnot2', value: 'bbb' }
               ]
             }
           })
@@ -239,7 +218,7 @@ describe('instance methods', () => {
     })
 
     test('update a package with package name and shared flag', () => {
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = ['packageName', '--shared', 'true']
       return command.run()
         .then(() => {
@@ -254,7 +233,7 @@ describe('instance methods', () => {
     })
 
     test('update a package with package name and shared flag as false', () => {
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = ['packageName', '--shared', 'false']
       return command.run()
         .then(() => {
@@ -268,27 +247,29 @@ describe('instance methods', () => {
         })
     })
 
-    test('tests for incorrect --param flags', () => {
+    test('error on params flag parsing', () => {
       return new Promise((resolve, reject) => {
-        ow.mockRejected(owAction, 'an error')
+        rtLib.mockRejected(rtAction, '')
         command.argv = ['packageName', '--param', 'a', 'b', 'c']
+        rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation(() => { throw new Error('parse error') })
         return command.run()
           .then(() => reject(new Error('does not throw error')))
           .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to update the package', new Error('Please provide correct values for flags'))
+            expect(handleError).toHaveBeenLastCalledWith('failed to update the package', new Error('parse error'))
             resolve()
           })
       })
     })
 
-    test('tests for incorrect --annotation flags', () => {
+    test('error on annotation flag parsing', () => {
       return new Promise((resolve, reject) => {
-        ow.mockRejected(owAction, 'an error')
+        rtLib.mockRejected(rtAction, '')
         command.argv = ['packageName', '--annotation', 'a', 'b', 'c']
+        rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation(() => { throw new Error('parse error') })
         return command.run()
           .then(() => reject(new Error('does not throw error')))
           .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to update the package', new Error('Please provide correct values for flags'))
+            expect(handleError).toHaveBeenLastCalledWith('failed to update the package', new Error('parse error'))
             resolve()
           })
       })
@@ -296,7 +277,7 @@ describe('instance methods', () => {
 
     test('errors out on api error', () => {
       return new Promise((resolve, reject) => {
-        ow.mockRejected(owAction, new Error('an error'))
+        rtLib.mockRejected(rtAction, new Error('an error'))
         command.argv = ['packageName']
         return command.run()
           .then(() => reject(new Error('does not throw error')))

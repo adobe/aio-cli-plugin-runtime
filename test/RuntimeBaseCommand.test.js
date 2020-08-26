@@ -13,7 +13,7 @@ governing permissions and limitations under the License.
 const TheCommand = require('../src/RuntimeBaseCommand.js')
 const { Command } = require('@oclif/command')
 const { PropertyEnv } = require('../src/properties')
-const ow = require('openwhisk')
+const RuntimeLib = require('@adobe/aio-lib-runtime')
 const OpenWhiskError = require('openwhisk/lib/openwhisk_error')
 
 beforeEach(() => {
@@ -60,7 +60,7 @@ describe('instance methods', () => {
       fakeFileSystem.addJson(files)
 
       return command.wsk().then(() => {
-        expect(ow).toHaveBeenLastCalledWith(
+        expect(RuntimeLib.init).toHaveBeenLastCalledWith(
           { apihost: 'https://adobeioruntime.net', api_key: 1234, apiversion: 'v1' }
         )
       })
@@ -116,7 +116,7 @@ describe('instance methods', () => {
       fakeFileSystem.addJson(files)
 
       return command.wsk().then(() => {
-        expect(ow).toHaveBeenLastCalledWith(
+        expect(RuntimeLib.init).toHaveBeenLastCalledWith(
           { api_key: 1234, apihost: 'https://adobeioruntime.net', apiversion: 'v1' }
         )
         delete process.env[PropertyEnv.APIHOST]
@@ -128,7 +128,7 @@ describe('instance methods', () => {
       process.env[PropertyEnv.APIHOST] = value
 
       return command.wsk().then(() => {
-        expect(ow).toHaveBeenLastCalledWith(
+        expect(RuntimeLib.init).toHaveBeenLastCalledWith(
           // the values are from the wsk.properties fixture
           {
             api_key: 'some-gibberish-not-a-real-key',
@@ -146,7 +146,7 @@ describe('instance methods', () => {
       process.env[PropertyEnv.AUTH] = value
 
       return command.wsk().then(() => {
-        expect(ow).toHaveBeenLastCalledWith(
+        expect(RuntimeLib.init).toHaveBeenLastCalledWith(
           // the values are from the wsk.properties fixture
           {
             api_key: value,
@@ -164,7 +164,7 @@ describe('instance methods', () => {
       process.env[PropertyEnv.APIVERSION] = value
 
       return command.wsk().then(() => {
-        expect(ow).toHaveBeenLastCalledWith(
+        expect(RuntimeLib.init).toHaveBeenLastCalledWith(
           // the values are from the wsk.properties fixture
           {
             api_key: 'some-gibberish-not-a-real-key',

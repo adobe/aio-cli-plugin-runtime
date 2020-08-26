@@ -12,9 +12,9 @@ governing permissions and limitations under the License.
 
 const TheCommand = require('../../../../src/commands/runtime/rule/delete.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
-const owAction = 'rules.delete'
+const rtAction = 'rules.delete'
 const { stdout } = require('stdout-stderr')
-const ow = require('openwhisk')()
+const RuntimeLib = require('@adobe/aio-lib-runtime')
 
 test('exports', async () => {
   expect(typeof TheCommand).toEqual('function')
@@ -52,11 +52,13 @@ test('flags', async () => {
 })
 
 describe('instance methods', () => {
-  let command, handleError
-
-  beforeEach(() => {
+  let command, handleError, rtLib
+  beforeEach(async () => {
     command = new TheCommand([])
     handleError = jest.spyOn(command, 'handleError')
+    rtLib = await RuntimeLib.init({ apihost: 'fakehost', api_key: 'fakekey' })
+    rtLib.mockResolved('actions.client.options', '')
+    RuntimeLib.mockReset()
   })
 
   describe('run', () => {
@@ -65,7 +67,7 @@ describe('instance methods', () => {
     })
 
     test('delete simple rule', () => {
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = ['nameFoo']
       return command.run()
         .then(() => {
@@ -77,7 +79,7 @@ describe('instance methods', () => {
     })
 
     test('delete simple rule with --json', () => {
-      const cmd = ow.mockResolvedFixture(owAction, 'rule/delete.json')
+      const cmd = rtLib.mockResolvedFixture(rtAction, 'rule/delete.json')
       command.argv = ['nameFoo', '--json']
       return command.run()
         .then(() => {
@@ -90,7 +92,7 @@ describe('instance methods', () => {
 
     test('errors out on api error', () => {
       return new Promise((resolve, reject) => {
-        ow.mockRejected('rules.delete', new Error('an error'))
+        rtLib.mockRejected('rules.delete', new Error('an error'))
         command.argv = ['nameFoo']
         return command.run()
           .then(() => reject(new Error('does not throw error')))

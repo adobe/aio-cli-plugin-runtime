@@ -12,9 +12,9 @@ governing permissions and limitations under the License.
 
 const TheCommand = require('../../../../src/commands/runtime/namespace/list.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
-const ow = require('openwhisk')()
 const { stdout } = require('stdout-stderr')
-const owAction = 'namespaces.list'
+const RuntimeLib = require('@adobe/aio-lib-runtime')
+const rtAction = 'namespaces.list'
 
 test('exports', async () => {
   expect(typeof TheCommand).toEqual('function')
@@ -41,11 +41,13 @@ test('base flags included in command flags',
 )
 
 describe('instance methods', () => {
-  let command, handleError
-
-  beforeEach(() => {
+  let command, handleError, rtLib
+  beforeEach(async () => {
     command = new TheCommand([])
     handleError = jest.spyOn(command, 'handleError')
+    rtLib = await RuntimeLib.init({ apihost: 'fakehost', api_key: 'fakekey' })
+    rtLib.mockResolved('actions.client.options', '')
+    RuntimeLib.mockReset()
   })
 
   describe('run', () => {
@@ -55,7 +57,7 @@ describe('instance methods', () => {
 
     test('simple namespace list', () => {
       return new Promise((resolve) => {
-        const cmd = ow.mockResolved(owAction, fixtureFile('namespace/list.json'))
+        const cmd = rtLib.mockResolved(rtAction, fixtureFile('namespace/list.json'))
 
         return command.run()
           .then(() => {
@@ -68,7 +70,7 @@ describe('instance methods', () => {
 
     test('simple namespace list, --json flag', () => {
       return new Promise((resolve) => {
-        const cmd = ow.mockResolved(owAction, fixtureFile('namespace/list.json'))
+        const cmd = rtLib.mockResolved(rtAction, fixtureFile('namespace/list.json'))
 
         command.argv = ['--json']
         return command.run()
@@ -84,7 +86,7 @@ describe('instance methods', () => {
       return new Promise((resolve, reject) => {
         const namespaceError = new Error('an error')
 
-        ow.mockRejected(owAction, namespaceError)
+        rtLib.mockRejected(rtAction, namespaceError)
         return command.run()
           .then(() => reject(new Error('does not throw error')))
           .catch(() => {

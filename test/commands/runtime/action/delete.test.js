@@ -13,8 +13,8 @@ governing permissions and limitations under the License.
 const { stdout } = require('stdout-stderr')
 const TheCommand = require('../../../../src/commands/runtime/action/delete.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
-const ow = require('openwhisk')()
-const owAction = 'actions.delete'
+const RuntimeLib = require('@adobe/aio-lib-runtime')
+const rtAction = 'actions.delete'
 
 test('exports', async () => {
   expect(typeof TheCommand).toEqual('function')
@@ -39,11 +39,14 @@ test('args', async () => {
 })
 
 describe('instance methods', () => {
-  let command, handleError
+  let command, handleError, rtLib
 
-  beforeEach(() => {
+  beforeEach(async () => {
     command = new TheCommand([])
     handleError = jest.spyOn(command, 'handleError')
+    rtLib = await RuntimeLib.init({ apihost: 'fakehost', api_key: 'fakekey' })
+    rtLib.mockResolved('actions.client.options', '')
+    RuntimeLib.mockReset()
   })
 
   describe('run', () => {
@@ -52,7 +55,7 @@ describe('instance methods', () => {
     })
 
     test('delete an action', () => {
-      const cmd = ow.mockResolvedFixture(owAction, 'action/list.json')
+      const cmd = rtLib.mockResolvedFixture(rtAction, 'action/list.json')
       command.argv = ['hello']
       return command.run()
         .then(() => {
@@ -62,18 +65,18 @@ describe('instance methods', () => {
     })
 
     test('delete an action --json', () => {
-      const cmd = ow.mockResolvedFixture(owAction, 'action/list.json')
+      const cmd = rtLib.mockResolvedFixture(rtAction, 'action/list.json')
       command.argv = ['hello', '--json']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalledWith('hello')
-          expect(stdout.output).toMatch('') // TODO: json text
+          expect(JSON.parse(stdout.output)).toEqual(expect.any(Object))
         })
     })
 
     test('errors out on api error', () => {
       return new Promise((resolve, reject) => {
-        ow.mockRejected(owAction, new Error('an error'))
+        rtLib.mockRejected(rtAction, new Error('an error'))
         command.argv = ['doesnotexist']
         return command.run()
           .then(() => reject(new Error('does not throw error')))

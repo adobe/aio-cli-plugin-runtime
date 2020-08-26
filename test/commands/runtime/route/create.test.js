@@ -12,9 +12,9 @@ governing permissions and limitations under the License.
 
 const TheCommand = require('../../../../src/commands/runtime/route/create.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
-const owAction = 'routes.create'
+const rtAction = 'routes.create'
 const { stdout } = require('stdout-stderr')
-const ow = require('openwhisk')()
+const RuntimeLib = require('@adobe/aio-lib-runtime')
 
 test('exports', async () => {
   expect(typeof TheCommand).toEqual('function')
@@ -75,11 +75,13 @@ test('flags', async () => {
 })
 
 describe('instance methods', () => {
-  let command, handleError
-
-  beforeEach(() => {
+  let command, handleError, rtLib
+  beforeEach(async () => {
     command = new TheCommand([])
     handleError = jest.spyOn(command, 'handleError')
+    rtLib = await RuntimeLib.init({ apihost: 'fakehost', api_key: 'fakekey' })
+    rtLib.mockResolved('actions.client.options', '')
+    RuntimeLib.mockReset()
   })
 
   describe('run', () => {
@@ -90,7 +92,7 @@ describe('instance methods', () => {
     test('create a simple api, no flags', () => {
       const basepath = '/mybase'
       const relpath = '/myapi'
-      const cmd = ow.mockResolved(owAction, { gwApiUrl: `http://myserver${basepath}` })
+      const cmd = rtLib.mockResolved(rtAction, { gwApiUrl: `http://myserver${basepath}` })
       command.argv = ['/mybase', '/myapi', 'get', 'myaction']
       return command.run()
         .then(() => {
@@ -108,7 +110,7 @@ describe('instance methods', () => {
     test('create a simple api with --response-type and --apiname flags', () => {
       const basepath = '/mybase'
       const relpath = '/myapi'
-      const cmd = ow.mockResolved(owAction, { gwApiUrl: `http://myserver${basepath}` })
+      const cmd = rtLib.mockResolved(rtAction, { gwApiUrl: `http://myserver${basepath}` })
       command.argv = ['/mybase', '/myapi', 'get', 'myaction', '--response-type', 'text', '--apiname', 'MyApiName']
       return command.run()
         .then(() => {
@@ -126,7 +128,7 @@ describe('instance methods', () => {
 
     test('create a simple api, error', () => {
       return new Promise((resolve, reject) => {
-        ow.mockRejected(owAction, new Error('an error'))
+        rtLib.mockRejected(rtAction, new Error('an error'))
         command.argv = ['/mybase', '/myapi', 'get', 'myaction']
         return command.run()
           .then(() => reject(new Error('does not throw error')))

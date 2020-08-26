@@ -13,8 +13,8 @@ governing permissions and limitations under the License.
 const { stdout } = require('stdout-stderr')
 const TheCommand = require('../../../../src/commands/runtime/package/list.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
-const ow = require('openwhisk')()
-const owAction = 'packages.list'
+const RuntimeLib = require('@adobe/aio-lib-runtime')
+const rtAction = 'packages.list'
 
 test('exports', async () => {
   expect(typeof TheCommand).toEqual('function')
@@ -45,11 +45,13 @@ test('args', async () => {
 })
 
 describe('instance methods', () => {
-  let command, handleError
-
-  beforeEach(() => {
+  let command, handleError, rtLib
+  beforeEach(async () => {
     command = new TheCommand([])
     handleError = jest.spyOn(command, 'handleError')
+    rtLib = await RuntimeLib.init({ apihost: 'fakehost', api_key: 'fakekey' })
+    rtLib.mockResolved('actions.client.options', '')
+    RuntimeLib.mockReset()
   })
 
   describe('run', () => {
@@ -58,7 +60,7 @@ describe('instance methods', () => {
     })
 
     test('return list of packages', () => {
-      const cmd = ow.mockResolvedFixture(owAction, 'package/list.json')
+      const cmd = rtLib.mockResolvedFixture(rtAction, 'package/list.json')
       command.argv = []
       return command.run()
         .then(() => {
@@ -69,7 +71,7 @@ describe('instance methods', () => {
 
     test('return list of packages - no data exception', () => {
       return new Promise((resolve, reject) => {
-        ow.mockResolved(owAction, '')
+        rtLib.mockResolved(rtAction, '')
         command.argv = []
         return command.run()
           .then(() => reject(new Error('does not throw error')))
@@ -81,7 +83,7 @@ describe('instance methods', () => {
     })
 
     test('return list of packages --json', () => {
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = ['--json']
       return command.run()
         .then(() => {
@@ -91,7 +93,7 @@ describe('instance methods', () => {
     })
 
     test('return list of packages with limits', () => {
-      const cmd = ow.mockResolvedFixture(owAction, 'package/list.json')
+      const cmd = rtLib.mockResolvedFixture(rtAction, 'package/list.json')
       command.argv = ['--limit', '1']
       return command.run()
         .then(() => {
@@ -101,7 +103,7 @@ describe('instance methods', () => {
     })
 
     test('return list of packages with namespace', () => {
-      const cmd = ow.mockResolvedFixture(owAction, 'package/list.json')
+      const cmd = rtLib.mockResolvedFixture(rtAction, 'package/list.json')
       command.argv = ['nameSpaceName']
       return command.run()
         .then(() => {
@@ -111,7 +113,7 @@ describe('instance methods', () => {
     })
 
     test('return list of packages with skip (no actions)', () => {
-      const cmd = ow.mockResolvedFixture(owAction, 'package/list.json')
+      const cmd = rtLib.mockResolvedFixture(rtAction, 'package/list.json')
       command.argv = ['--skip', '3']
       return command.run()
         .then(() => {
@@ -122,7 +124,7 @@ describe('instance methods', () => {
 
     test('errors out on api error', () => {
       return new Promise((resolve, reject) => {
-        ow.mockRejected(owAction, new Error('an error'))
+        rtLib.mockRejected(rtAction, new Error('an error'))
         return command.run()
           .then(() => reject(new Error('does not throw error')))
           .catch(() => {
@@ -132,7 +134,7 @@ describe('instance methods', () => {
       })
     })
     test('return list of packages, --name-sort flag', () => {
-      const cmd = ow.mockResolvedFixture(owAction, 'package/list-name-sort.json')
+      const cmd = rtLib.mockResolvedFixture(rtAction, 'package/list-name-sort.json')
       command.argv = ['--name-sort']
       return command.run()
         .then(() => {

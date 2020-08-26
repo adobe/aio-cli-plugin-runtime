@@ -13,8 +13,8 @@ governing permissions and limitations under the License.
 const TheCommand = require('../../../../src/commands/runtime/route/delete.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
 const { stdout } = require('stdout-stderr')
-const owAction = 'routes.delete'
-const ow = require('openwhisk')()
+const rtAction = 'routes.delete'
+const RuntimeLib = require('@adobe/aio-lib-runtime')
 
 test('exports', async () => {
   expect(typeof TheCommand).toEqual('function')
@@ -56,11 +56,13 @@ test('base flags included in command flags',
 )
 
 describe('instance methods', () => {
-  let command, handleError
-
-  beforeEach(() => {
+  let command, handleError, rtLib
+  beforeEach(async () => {
     command = new TheCommand([])
     handleError = jest.spyOn(command, 'handleError')
+    rtLib = await RuntimeLib.init({ apihost: 'fakehost', api_key: 'fakekey' })
+    rtLib.mockResolved('actions.client.options', '')
+    RuntimeLib.mockReset()
   })
 
   describe('run', () => {
@@ -71,7 +73,7 @@ describe('instance methods', () => {
 
   test('error, throws exception', () => {
     return new Promise((resolve, reject) => {
-      ow.mockRejected(owAction, new Error('an error'))
+      rtLib.mockRejected(rtAction, new Error('an error'))
       command.argv = ['/myapi']
       return command.run()
         .then(() => reject(new Error('should not succeed')))
@@ -83,7 +85,7 @@ describe('instance methods', () => {
   })
 
   test('simple delete call', () => {
-    const cmd = ow.mockResolved(owAction, '')
+    const cmd = rtLib.mockResolved(rtAction, '')
     command.argv = ['/myapi', '/mypath', 'get']
     return command.run()
       .then(() => {

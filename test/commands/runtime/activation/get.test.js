@@ -13,8 +13,9 @@ governing permissions and limitations under the License.
 const { stdout } = require('stdout-stderr')
 const TheCommand = require('../../../../src/commands/runtime/activation/get.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
-const ow = require('openwhisk')()
-const owAction = 'activations.get'
+const RuntimeLib = require('@adobe/aio-lib-runtime')
+const rtUtils = RuntimeLib.utils
+const rtAction = 'activations.get'
 
 test('exports', async () => {
   expect(typeof TheCommand).toEqual('function')
@@ -50,11 +51,13 @@ test('flags', async () => {
 })
 
 describe('instance methods', () => {
-  let command, handleError
-
-  beforeEach(() => {
+  let command, handleError, rtLib
+  beforeEach(async () => {
     command = new TheCommand([])
     handleError = jest.spyOn(command, 'handleError')
+    rtLib = await RuntimeLib.init({ apihost: 'fakehost', api_key: 'fakekey' })
+    rtLib.mockResolved('actions.client.options', '')
+    RuntimeLib.mockReset()
   })
 
   describe('run', () => {
@@ -63,7 +66,7 @@ describe('instance methods', () => {
     })
 
     test('retrieve an activation', () => {
-      const cmd = ow.mockResolved(owAction, '')
+      const cmd = rtLib.mockResolved(rtAction, { res: 'fake' })
       command.argv = ['12345']
       return command.run()
         .then(() => {
@@ -74,18 +77,18 @@ describe('instance methods', () => {
 
     test('retrieve logs for an activation --logs', () => {
       // note: when we call with an id, and --logs, we never call `get`, just activations.logs(id)
-      const cmd = ow.mockResolved('activations.logs', { logs: ['line1', 'line2', '2019-10-11T19:08:57.298Z  stdout: login-success'] })
+      const cmd = rtLib.mockResolved('activations.logs', { logs: ['line1', 'line2', '2019-10-11T19:08:57.298Z  stdout: login-success'] })
       command.argv = ['12345', '--logs']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalledWith('12345')
-          expect(stdout.output).toMatch('line1\nline2\nlogin-success')
+          expect(rtUtils.printLogs).toHaveBeenCalledWith({ logs: ['line1', 'line2', '2019-10-11T19:08:57.298Z  stdout: login-success'] }, true, command.log)
         })
     })
 
     test('retrieve last activation --last', () => {
-      const axList = ow.mockResolved('activations.list', [{ activationId: '12345' }])
-      const axGet = ow.mockResolved(owAction, '')
+      const axList = rtLib.mockResolved('activations.list', [{ activationId: '12345' }])
+      const axGet = rtLib.mockResolved(rtAction, '')
       command.argv = ['--last']
       return command.run()
         .then(() => {
@@ -96,19 +99,19 @@ describe('instance methods', () => {
     })
 
     test('retrieve last activation logs --last --logs', () => {
-      const axList = ow.mockResolved('activations.list', [{ activationId: '12345' }])
-      const axGet = ow.mockResolved('activations.logs', { logs: ['line1', 'line2', '2019-10-11T19:08:57.298Z   stdout: login-success'] })
+      const axList = rtLib.mockResolved('activations.list', [{ activationId: '12345' }])
+      const axGet = rtLib.mockResolved('activations.logs', { logs: ['line1', 'line2', '2019-10-11T19:08:57.298Z  stdout: login-success'] })
       command.argv = ['--last', '--logs']
       return command.run()
         .then(() => {
           expect(axList).toHaveBeenCalled()
           expect(axGet).toHaveBeenCalledWith('12345')
-          expect(stdout.output).toMatch('line1\nline2\nlogin-success')
+          expect(rtUtils.printLogs).toHaveBeenCalledWith({ logs: ['line1', 'line2', '2019-10-11T19:08:57.298Z  stdout: login-success'] }, true, command.log)
         })
     })
 
     test('retrieve last activation logs --last --logs : none returned', async () => {
-      ow.mockResolved('activations.list', [])
+      rtLib.mockResolved('activations.list', [])
       command.argv = ['--last', '--logs']
       const res = command.run()
       await expect(res).rejects.toThrow('no activations were returned')
@@ -122,7 +125,7 @@ describe('instance methods', () => {
 
     test('errors out on api error', () => {
       return new Promise((resolve, reject) => {
-        ow.mockRejected(owAction, new Error('an error'))
+        rtLib.mockRejected(rtAction, new Error('an error'))
         command.argv = ['12345']
         return command.run()
           .then(() => reject(new Error('does not throw error')))

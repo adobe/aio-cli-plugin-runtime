@@ -13,6 +13,8 @@ governing permissions and limitations under the License.
 const { stdout } = require('stdout-stderr')
 const TheCommand = require('../../../../src/commands/runtime/deploy/report.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
+const RuntimeLib = require('@adobe/aio-lib-runtime')
+const utils = RuntimeLib.utils
 
 test('exports', async () => {
   expect(typeof TheCommand).toEqual('function')
@@ -36,45 +38,199 @@ test('flags', async () => {
   expect(typeof TheCommand.flags.deployment).toBe('object')
 })
 
+const fakePackages = {
+  pkg1: {
+    version: '1.0',
+    license: 'Apache-2.0',
+    actions: {
+      one: {
+        function: 'actions/one.js',
+        inputs: {}
+      },
+      two: {
+        function: 'actions/two.js',
+        inputs: {
+          itwoname: {
+            type: 'string',
+            description: 'name of a person',
+            default: 'unknown'
+          },
+          itwoplace: {
+            type: 'string',
+            description: 'location of person',
+            default: 'unknown'
+          }
+        },
+        outputs: {
+          member: {
+            type: 'json',
+            description: 'member record'
+          }
+        }
+      }
+    },
+    triggers: {
+      firsttrigger: {
+        feed: 'fakefeed',
+        inputs: {
+          name: 'dude'
+        }
+      },
+      secondtrigger: {
+        feed: 'fakefeed'
+      }
+    }
+  },
+  pkg2: {
+    public: true,
+    sequences: {
+      seqone: {
+        actions: 'pkg1/one,pkg1/two'
+      }
+    },
+    actions: {
+      three: {
+        inputs: {
+          ione: {}
+        }
+      },
+      four: {
+        function: 'four.js'
+      }
+    },
+    triggers: {
+      triggerone: {
+        inputs: {
+          name: 'Sam',
+          place: 'string'
+        }
+      }
+    }
+  },
+  pkg3: {
+    public: false
+  }
+}
+
+const fakeDepPackages = {
+  pkg1: {
+    actions: {
+      notinthere: {
+        inputs: {
+          bad: 123
+        }
+      },
+      one: { }
+    }
+  },
+  pkg2: {
+    actions: {
+      stillnotinthere: {
+        inputs: {
+          bad: 155
+        }
+      },
+      three: {
+        inputs: {
+          ione: 'yo',
+          good2: 5
+        }
+      }
+    }
+  }
+}
+
+const fakeDepTriggers = {
+  triggerone: {
+    inputs: {}
+  },
+  firsttrigger: {
+    place: 'bowling',
+    name2: 'love'
+  },
+  notinthere: {
+    fake: 'should not be there'
+  }
+}
+
+const expectedOutput = `{
+  "name": "fakeProjectName",
+  "Inputs": {}
+}
+{
+  "name": "pkg1",
+  "Inputs": {}
+}
+{
+  "name": "pkg2",
+  "Inputs": {},
+  "public": true
+}
+{
+  "name": "pkg3",
+  "Inputs": {}
+}
+{
+  "name": "one",
+  "Inputs": {
+    "fakeinpts": "inputs"
+  }
+}
+{
+  "name": "two",
+  "Inputs": {
+    "fakeinpts": "inputs"
+  }
+}
+{
+  "name": "three",
+  "Inputs": {
+    "fakeinpts": "inputs"
+  }
+}
+{
+  "name": "four",
+  "Inputs": {
+    "fakeinpts": "inputs"
+  }
+}
+{
+  "name": "seqone",
+  "Inputs": {}
+}
+{
+  "name": "firsttrigger",
+  "feed": "fakefeed",
+  "Inputs": {
+    "fakeinpts": "inputs"
+  }
+}
+{
+  "name": "secondtrigger",
+  "feed": "fakefeed",
+  "Inputs": {
+    "fakeinpts": "inputs"
+  }
+}
+{
+  "name": "triggerone",
+  "Inputs": {
+    "fakeinpts": "inputs"
+  }
+}
+`
+
 describe('instance methods', () => {
   let command, handleError
-  let cwdSpy
 
-  beforeAll(() => {
-    cwdSpy = jest.spyOn(process, 'cwd').mockImplementation(() => {
-      return ('/deploy')
-    })
-  })
-
-  afterAll(() => {
-    cwdSpy.mockRestore()
-  })
-
+  const expectedProcessedInputs = { fakeinpts: 'inputs' }
+  const expectedUnionInputs = [{ allinpts: 'inputs' }]
   beforeEach(() => {
     command = new TheCommand([])
     handleError = jest.spyOn(command, 'handleError')
-    const json = {
-      'deploy/manifest_triggersRules.yaml': fixtureFile('deploy/manifest_triggersRules.yaml'),
-      'deploy/manifest_dep_Triggers_feeds.yaml': fixtureFile('deploy/manifest_dep_Triggers_feeds.yaml'),
-      'deploy/manifest.yaml': fixtureFile('deploy/manifest.yaml'),
-      'deploy/manifest_report.yaml': fixtureFile('deploy/manifest_report.yaml'),
-      'deploy/deployment_wrongpackage.yaml': fixtureFile('deploy/deployment_wrongpackage.yaml'),
-      'deploy/deployment_correctpackage.yaml': fixtureFile('deploy/deployment_correctpackage.yaml'),
-      'deploy/deployment_actionMissingInputs.yaml': fixtureFile('deploy/deployment_actionMissingInputs.yaml'),
-      'deploy/manifest_actionMissingInputs.yaml': fixtureFile('deploy/manifest_actionMissingInputs.yaml'),
-      'deploy/deployment_triggersMissingInputs.yaml': fixtureFile('deploy/deployment_triggersMissingInputs.yaml'),
-      'deploy/manifest.yml': fixtureFile('deploy/manifest.yml'),
-      'deploy/deployment_syncMissingAction.yaml': fixtureFile('deploy/deployment_syncMissingAction.yaml'),
-      'deploy/hello.js': fixtureFile('deploy/hello.js'),
-      'deploy/hello_plus.js': fixtureFile('deploy/hello_plus.js'),
-      'deploy/deployment-triggerError.yaml': fixtureFile('deploy/deployment-triggerError.yaml')
-    }
-    fakeFileSystem.addJson(json)
-  })
-
-  afterEach(() => {
-    // reset back to normal
-    fakeFileSystem.reset()
+    RuntimeLib.mockReset()
+    utils.processInputs.mockReturnValue(expectedProcessedInputs)
+    utils.returnUnion.mockReturnValue(expectedUnionInputs)
   })
 
   describe('run', () => {
@@ -82,87 +238,63 @@ describe('instance methods', () => {
       expect(command.run).toBeInstanceOf(Function)
     })
 
-    test('print entities listed in a manifest.yaml file', () => {
-      command.argv = ['-m', '/deploy/manifest_report.yaml']
-      return command.run()
-        .then(() => {
-          expect(stdout.output).toMatchFixture('deploy/reportPackage.txt')
-        })
+    test('print entities from manifest packages', async () => {
+      command.argv = ['-m', 'fake-manifest.yaml']
+
+      utils.setPaths.mockReturnValue({
+        packages: fakePackages,
+        deploymentTriggers: {},
+        deploymentPackages: {},
+        manifestPath: 'someFakePath',
+        manifestContent: { fake: 'not useful' },
+        projectName: 'fakeProjectName'
+      })
+
+      await command.run()
+      expect(utils.setPaths).toHaveBeenCalledWith({ manifest: 'fake-manifest.yaml', useragent: 'aio-cli-plugin-runtime@1.10.0' })
+      expect(utils.returnUnion).toHaveBeenCalledTimes(7)
+      expect(utils.returnUnion).toHaveBeenCalledWith(fakePackages.pkg1.actions.two.inputs, {})
+      expect(utils.returnUnion).toHaveBeenCalledWith(fakePackages.pkg2.triggers.triggerone.inputs, {})
+      expect(utils.returnUnion).toHaveBeenCalledWith(fakePackages.pkg2.actions.three.inputs, {})
+      expect(utils.returnUnion).toHaveBeenCalledWith(fakePackages.pkg1.triggers.firsttrigger.inputs, {})
+      expect(utils.returnUnion).toHaveBeenCalledWith({}, {})
+      expect(utils.processInputs).toHaveBeenCalledTimes(7)
+      expect(utils.processInputs).toHaveBeenCalledWith(expectedUnionInputs, {})
+
+      expect(stdout.output).toEqual(expectedOutput)
     })
 
-    test('print entities listed in a manifest file and a wrong deployment file', () => {
-      command.argv = ['-m', '/deploy/manifest_report.yaml', '--deployment', '/deploy/deployment_wrongpackage.yaml']
-      return command.run()
-        .then(() => {
-          expect(stdout.output).toMatchFixture('deploy/reportPackage_defaultDeployment.txt')
-        })
+    test('print entities from manifest packages and deployment packages and triggers', async () => {
+      command.argv = ['-m', 'fake-manifest.yaml', '-d', 'fake-dep.yml']
+
+      utils.setPaths.mockReturnValue({
+        packages: fakePackages,
+        deploymentTriggers: fakeDepTriggers,
+        deploymentPackages: fakeDepPackages,
+        manifestPath: 'someFakePath',
+        manifestContent: { fake: 'not useful' },
+        projectName: 'fakeProjectName'
+      })
+      await command.run()
+      expect(utils.setPaths).toHaveBeenCalledWith({ manifest: 'fake-manifest.yaml', deployment: 'fake-dep.yml', useragent: 'aio-cli-plugin-runtime@1.10.0' })
+      expect(utils.returnUnion).toHaveBeenCalledTimes(7)
+      expect(utils.returnUnion).toHaveBeenCalledWith(fakePackages.pkg1.actions.two.inputs, {})
+      expect(utils.returnUnion).toHaveBeenCalledWith(fakePackages.pkg2.triggers.triggerone.inputs, fakeDepTriggers.triggerone)
+      expect(utils.returnUnion).toHaveBeenCalledWith(fakePackages.pkg2.actions.three.inputs, fakeDepPackages.pkg2.actions.three.inputs)
+      expect(utils.returnUnion).toHaveBeenCalledWith(fakePackages.pkg1.triggers.firsttrigger.inputs, fakeDepTriggers.firsttrigger)
+      expect(utils.returnUnion).toHaveBeenCalledWith({}, {})
+      expect(utils.processInputs).toHaveBeenCalledTimes(7)
+      expect(utils.processInputs).toHaveBeenCalledWith(expectedUnionInputs, {})
+
+      // output doesn't change because of processInputs mock
+      expect(stdout.output).toEqual(expectedOutput)
     })
 
-    test('print entities listed in a manifest file with wrong action inputs in deployment file', () => {
-      command.argv = ['-m', '/deploy/manifest_report.yaml', '-d', '/deploy/deployment_actionMissingInputs.yaml']
-      return command.run()
-        .then(() => {
-          expect(stdout.output).toMatchFixture('deploy/reportPackage_defaultDeployment.txt')
-        })
-    })
-
-    test('print packages in default manifest file', () => {
+    test('error in setPaths', async () => {
+      utils.setPaths.mockImplementation(() => { throw new Error('the ERROR') })
       command.argv = []
-      return command.run()
-        .then(() => {
-          expect(stdout.output).toMatchFixture('deploy/report_packages.txt')
-        })
-    })
-
-    test('print action wihtout inputs manifest file', () => {
-      command.argv = ['-m', '/deploy/manifest_actionMissingInputs.yaml']
-      return command.run()
-        .then(() => {
-          expect(stdout.output).toMatchFixture('deploy/report_triggersMissingInputs.txt')
-        })
-    })
-
-    test('print triggers from manifest file when deployment file has trigger with no inputs', () => {
-      command.argv = ['-m', '/deploy/manifest_actionMissingInputs.yaml', '--deployment', '/deploy/deployment_triggersMissingInputs.yaml']
-      return command.run()
-        .then(() => {
-          expect(stdout.output).toMatchFixture('deploy/report_triggersMissingInputs.txt')
-        })
-    })
-
-    test('print triggers from manifest file when deployment file has trigger with feed', () => {
-      command.argv = ['-m', '/deploy/manifest_dep_Triggers_feeds.yaml']
-      return command.run()
-        .then(() => {
-          expect(stdout.output).toMatchFixture('deploy/report_triggersWithFeed.txt')
-        })
-    })
-
-    test('project name different in manifest and deployment file', () => {
-      return new Promise((resolve, reject) => {
-        command.argv = ['-m', '/deploy/deployment_syncMissingAction.yaml', '-d', '/deploy/deployment-triggerError.yaml']
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('Failed to report', new Error('The project name in the deployment file does not match the project name in the manifest file'))
-            resolve()
-          })
-      })
-    })
-
-    test('both manifest files not found', () => {
-      return new Promise((resolve, reject) => {
-        const toRemove = ['/deploy/manifest.yaml', '/deploy/manifest.yml']
-        fakeFileSystem.removeKeys(toRemove)
-
-        command.argv = []
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('Failed to report', new Error('Manifest file not found'))
-            resolve()
-          })
-      })
+      await expect(command.run()).rejects.toThrow('the ERROR')
+      expect(handleError).toHaveBeenCalled()
     })
   })
 })
