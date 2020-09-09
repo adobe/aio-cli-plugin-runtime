@@ -175,5 +175,32 @@ describe('instance methods', () => {
           expect(stdout.output).toMatchFixture('action/list-name-sort-output.txt')
         })
     })
+
+    test('return action count', () => {
+      rtLib.mockResolved(rtAction, Promise.resolve({ actions: 1 }))
+      command.argv = ['--count']
+      return command.run()
+        .then(() => {
+          expect(stdout.output).toEqual('You have 1 action in this namespace.\n')
+        })
+    })
+
+    test('return actions count', () => {
+      rtLib.mockResolved(rtAction, Promise.resolve({ actions: 2 }))
+      command.argv = ['--count']
+      return command.run()
+        .then(() => {
+          expect(stdout.output).toEqual('You have 2 actions in this namespace.\n')
+        })
+    })
+
+    test('return action count --json', () => {
+      rtLib.mockResolved(rtAction, Promise.resolve({ actions: 2 }))
+      command.argv = ['--count', '--json']
+      return command.run()
+        .then(() => {
+          expect(JSON.parse(stdout.output)).toEqual({ actions: 2 })
+        })
+    })
   })
 })

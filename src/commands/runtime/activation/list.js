@@ -21,32 +21,47 @@ class ActivationList extends RuntimeBaseCommand {
     try {
       const options = {}
       if (id) {
-        options['name'] = id
+        options.name = id
       }
       if (flags.limit) {
-        options['limit'] = flags.limit
+        options.limit = flags.limit
       }
       if (flags.skip) {
-        options['skip'] = flags.skip
+        options.skip = flags.skip
       }
       if (flags.since) {
-        options['since'] = flags.since
+        options.since = flags.since
       }
       if (flags.upto) {
-        options['upto'] = flags.upto
+        options.upto = flags.upto
       }
       if (flags.full) {
-        options['docs'] = flags.full
+        options.docs = flags.full
         // implies --json
         flags.json = true
       }
+      if (flags.count) {
+        options.count = true
+      }
 
       const ow = await this.wsk()
+
       let listActivation
       if (Object.entries(options).length === 0) {
         listActivation = await ow.activations.list()
       } else {
         listActivation = await ow.activations.list(options)
+      }
+
+      // if only showing the count, show the result and return
+      if (flags.count) {
+        const result = listActivation
+        if (flags.json) {
+          this.logJSON('', result)
+        } else {
+          this.log(`You have ${result.activations} ${result.activations === 1 ? 'activation' : 'activations'} in this namespace.`)
+        }
+        return
       }
 
       if (flags.json) {
@@ -149,6 +164,10 @@ ActivationList.flags = {
   }),
   upto: flags.integer({
     description: 'return activations with timestamps earlier than UPTO; measured in milliseconds since Th, 01, Jan 1970'
+  }),
+  count: flags.boolean({
+    char: 'c',
+    description: 'show only the total number of activations'
   }),
   json: flags.boolean({
     description: 'output raw json'

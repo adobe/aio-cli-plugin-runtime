@@ -202,6 +202,33 @@ describe('instance methods', () => {
         })
     })
 
+    test('return activation count', () => {
+      rtLib.mockResolved(rtAction, Promise.resolve({ activations: 1 }))
+      command.argv = ['--count']
+      return command.run()
+        .then(() => {
+          expect(stdout.output).toEqual('You have 1 activation in this namespace.\n')
+        })
+    })
+
+    test('return activations count', () => {
+      rtLib.mockResolved(rtAction, Promise.resolve({ activations: 2 }))
+      command.argv = ['--count']
+      return command.run()
+        .then(() => {
+          expect(stdout.output).toEqual('You have 2 activations in this namespace.\n')
+        })
+    })
+
+    test('return activation count --json', () => {
+      rtLib.mockResolved(rtAction, Promise.resolve({ activations: 2 }))
+      command.argv = ['--count', '--json']
+      return command.run()
+        .then(() => {
+          expect(JSON.parse(stdout.output)).toEqual({ activations: 2 })
+        })
+    })
+
     test('errors out on api error', () => {
       return new Promise((resolve, reject) => {
         rtLib.mockRejected(rtAction, new Error('an error'))

@@ -158,6 +158,43 @@ describe('instance methods', () => {
     //     })
     // })
 
+    test('return empty list of rules', () => {
+      const cmd = rtLib.mockResolved(rtAction, [])
+      command.argv = []
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalled()
+          expect(stdout.output).toMatch('')
+        })
+    })
+
+    test('return rule count', () => {
+      rtLib.mockResolved(rtAction, Promise.resolve({ rules: 1 }))
+      command.argv = ['--count']
+      return command.run()
+        .then(() => {
+          expect(stdout.output).toEqual('You have 1 rule in this namespace.\n')
+        })
+    })
+
+    test('return rules count', () => {
+      rtLib.mockResolved(rtAction, Promise.resolve({ rules: 2 }))
+      command.argv = ['--count']
+      return command.run()
+        .then(() => {
+          expect(stdout.output).toEqual('You have 2 rules in this namespace.\n')
+        })
+    })
+
+    test('return rule count --json', () => {
+      rtLib.mockResolved(rtAction, Promise.resolve({ rules: 2 }))
+      command.argv = ['--count', '--json']
+      return command.run()
+        .then(() => {
+          expect(JSON.parse(stdout.output)).toEqual({ rules: 2 })
+        })
+    })
+
     test('errors out on api error', () => {
       return new Promise((resolve, reject) => {
         rtLib.mockRejected('rules.list', new Error('an error'))
