@@ -471,7 +471,7 @@ describe('instance methods', () => {
         rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation((flags, file) => flags && [{ key: 'same', value: 'kv' }])
         rtUtils.createKeyValueArrayFromFlag.mockReturnValue([{ key: 'same', value: 'abc' }])
         return command.run()
-          .then(() => reject(new Error('does not thrrtLib error')))
+          .then(() => reject(new Error('does not throw error')))
           .catch(() => {
             expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error('Invalid argument(s). Environment variables and function parameters may not overlap'))
             resolve()
@@ -652,7 +652,7 @@ describe('instance methods', () => {
         rtLib.mockRejected(rtAction, '')
         command.argv = ['hello', '/action/fileWithNoExt']
         return command.run()
-          .then(() => reject(new Error('does not thrrtLib error')))
+          .then(() => reject(new Error('does not throw error')))
           .catch(() => {
             expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error('Cannot determine kind of action. Please use --kind to specifiy.'))
             resolve()
@@ -665,7 +665,7 @@ describe('instance methods', () => {
         rtLib.mockRejected(rtAction, '')
         command.argv = ['hello', '/action/actionFile.js', '--sequence', 'a,b,c']
         return command.run()
-          .then(() => reject(new Error('does not thrrtLib error')))
+          .then(() => reject(new Error('does not throw error')))
           .catch(() => {
             expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error('Cannot specify sequence and a code artifact at the same time'))
             resolve()
@@ -678,7 +678,7 @@ describe('instance methods', () => {
         rtLib.mockRejected(rtAction, '')
         command.argv = ['hello', '--main', 'maynard', '--sequence', 'a,b,c']
         return command.run()
-          .then(() => reject(new Error('does not thrrtLib error')))
+          .then(() => reject(new Error('does not throw error')))
           .catch(() => {
             expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error('The function handler can only be specified when you provide a code artifact'))
             resolve()
@@ -691,7 +691,7 @@ describe('instance methods', () => {
         rtLib.mockRejected(rtAction, '')
         command.argv = ['hello', '--docker', 'some-image', '--sequence', 'a,b,c']
         return command.run()
-          .then(() => reject(new Error('does not thrrtLib error')))
+          .then(() => reject(new Error('does not throw error')))
           .catch(() => {
             expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error('Cannot specify sequence and a container image at the same time'))
             resolve()
@@ -704,7 +704,7 @@ describe('instance methods', () => {
         rtLib.mockRejected(rtAction, '')
         command.argv = ['hello', '/action/actionFile.js', '--kind', 'nodejs:8', '--docker', 'some-image']
         return command.run()
-          .then(() => reject(new Error('does not thrrtLib error')))
+          .then(() => reject(new Error('does not throw error')))
           .catch(() => {
             expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error('Cannot specify a kind and a container image at the same time'))
             resolve()
@@ -717,7 +717,7 @@ describe('instance methods', () => {
         rtLib.mockRejected(rtAction, '')
         command.argv = ['hello']
         return command.run()
-          .then(() => reject(new Error('does not thrrtLib error')))
+          .then(() => reject(new Error('does not throw error')))
           .catch(() => {
             expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error('Must provide a code artifact, container image, or a sequence'))
             resolve()
@@ -730,7 +730,7 @@ describe('instance methods', () => {
         rtLib.mockRejected(rtAction, '')
         command.argv = ['hello', '--kind', 'nodejs:10', '--sequence', 'a,b,c']
         return command.run()
-          .then(() => reject(new Error('does not thrrtLib error')))
+          .then(() => reject(new Error('does not throw error')))
           .catch(() => {
             expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error('A kind may not be specified for a sequence'))
             resolve()
@@ -742,7 +742,7 @@ describe('instance methods', () => {
         rtLib.mockRejected(rtAction, '')
         command.argv = ['hello', '--sequence', ' ,a,b,c']
         return command.run()
-          .then(() => reject(new Error('does not thrrtLib error')))
+          .then(() => reject(new Error('does not throw error')))
           .catch(() => {
             expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error('Provide a valid sequence component'))
             resolve()
@@ -755,7 +755,7 @@ describe('instance methods', () => {
         rtLib.mockRejected(rtAction, '')
         command.argv = ['hello', '/action/file.js', '--kind', 'nodejs:10']
         return command.run()
-          .then(() => reject(new Error('does not thrrtLib error')))
+          .then(() => reject(new Error('does not throw error')))
           .catch(() => {
             expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error('Provide a valid path for ACTION'))
             resolve()
@@ -768,7 +768,7 @@ describe('instance methods', () => {
         rtLib.mockRejected(rtAction, '')
         command.argv = ['hello', '/action/file.zip', '--kind', 'nodejs:10']
         return command.run()
-          .then(() => reject(new Error('does not thrrtLib error')))
+          .then(() => reject(new Error('does not throw error')))
           .catch(() => {
             expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error('Provide a valid path for ACTION'))
             resolve()
@@ -780,7 +780,7 @@ describe('instance methods', () => {
         rtLib.mockRejected(rtAction, new Error('an error'))
         command.argv = ['hello', '/action/actionFile.js']
         return command.run()
-          .then(() => reject(new Error('does not thrrtLib error')))
+          .then(() => reject(new Error('does not throw error')))
           .catch(() => {
             expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error('an error'))
             resolve()

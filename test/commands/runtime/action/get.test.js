@@ -189,7 +189,7 @@ describe('instance methods', () => {
         rtLib.mockRejected(rtAction, new Error('an error'))
         command.argv = ['hello']
         return command.run()
-          .then(() => reject(new Error('does not thrrtLib error')))
+          .then(() => reject(new Error('does not throw error')))
           .catch(() => {
             expect(handleError).toHaveBeenLastCalledWith('failed to retrieve the action', new Error('an error'))
             resolve()
