@@ -647,7 +647,7 @@ describe('instance methods', () => {
         })
     })
 
-    test('creates an action with code of unknrtLibn kind', () => {
+    test('creates an action with code of unknown kind', () => {
       return new Promise((resolve, reject) => {
         rtLib.mockRejected(rtAction, '')
         command.argv = ['hello', '/action/fileWithNoExt']
