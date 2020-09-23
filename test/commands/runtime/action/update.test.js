@@ -745,7 +745,8 @@ describe('instance methods', () => {
               }],
               annotations: [
                 { key: 'web-export', value: true },
-                { key: 'raw-http', value: true }
+                { key: 'raw-http', value: true },
+                { key: 'final', value: true }
               ]
             }
           })
@@ -805,7 +806,8 @@ describe('instance methods', () => {
               }],
               annotations: [
                 { key: 'fake', value: 'abc' },
-                { key: 'web-export', value: true }
+                { key: 'web-export', value: true },
+                { key: 'final', value: true }
               ]
             }
           })

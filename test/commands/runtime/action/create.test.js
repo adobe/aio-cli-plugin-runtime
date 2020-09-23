@@ -588,7 +588,7 @@ describe('instance methods', () => {
                 key: 'fake',
                 value: 'abc'
               }],
-              annotations: [{ key: 'web-export', value: true }, { key: 'raw-http', value: true }]
+              annotations: [{ key: 'web-export', value: true }, { key: 'raw-http', value: true }, { key: 'final', value: true }]
             }
           })
           expect(stdout.output).toMatch('')
@@ -618,7 +618,8 @@ describe('instance methods', () => {
               }],
               annotations: [
                 { key: 'fake', value: 'abc' },
-                { key: 'web-export', value: true }
+                { key: 'web-export', value: true },
+                { key: 'final', value: true }
               ]
             }
           })

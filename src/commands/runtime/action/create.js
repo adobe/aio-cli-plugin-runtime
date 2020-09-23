@@ -133,10 +133,12 @@ class ActionCreate extends RuntimeBaseCommand {
           case 'true':
           case 'yes' :
             annotationParams.push({ key: 'web-export', value: true })
+            annotationParams.push({ key: 'final', value: true })
             break
           case 'raw' :
             annotationParams.push({ key: 'web-export', value: true })
             annotationParams.push({ key: 'raw-http', value: true })
+            annotationParams.push({ key: 'final', value: true })
             break
           case 'false':
           case 'no':
