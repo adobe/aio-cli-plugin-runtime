@@ -182,6 +182,46 @@ describe('instance methods', () => {
       })
     })
 
+    test('return list of actions with annotated kinds', () => {
+      const data = [
+        {
+          annotations: [
+            {
+              key: 'web-export',
+              value: true
+            },
+            {
+              key: 'raw-http',
+              value: true
+            },
+            {
+              key: 'exec',
+              value: 'nodejs:10-lambda'
+            }
+          ],
+          exec: {
+            binary: false
+          },
+          limits: {
+            concurrency: 1,
+            logs: 10,
+            memory: 256,
+            timeout: 60000
+          },
+          name: 'hello',
+          namespace: '53444_41603',
+          publish: false,
+          updated: 1549408742750,
+          version: '0.0.2'
+        }
+      ]
+      rtLib.mockResolved(rtAction, data)
+      return command.run()
+        .then(() => {
+          expect(stdout.output).toMatch(fixtureFileWithTimeZoneAdjustment('action/list-kind-output.txt', data[0].updated))
+        })
+    })
+
     test('return list of actions, --name-sort flag', () => {
       const cmd = rtLib.mockResolvedFixture(rtAction, 'action/list-name-sort.json')
       command.argv = ['--name']

@@ -67,7 +67,10 @@ class ActionList extends RuntimeBaseCommand {
           details: {
             header: 'Kind',
             minWidth: 9,
-            get: row => `${row.annotations.find(_ => _.key === 'exec').value.split(/[:-]/)[0]}`
+            get: (row) => {
+              const kind = row.annotations.find(_ => _.key === 'exec').value
+              return kind.includes('lambda') ? kind.replace('-lambda', '') + ' (λ)' : kind
+            }
           },
           version: {
             header: 'Version',
