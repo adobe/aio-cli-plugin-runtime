@@ -251,7 +251,7 @@ describe('instance methods', () => {
       })
 
       await command.run()
-      expect(utils.setPaths).toHaveBeenCalledWith({ manifest: 'fake-manifest.yaml', useragent: 'aio-cli-plugin-runtime@1.10.0' })
+      expect(utils.setPaths).toHaveBeenCalledWith({ manifest: 'fake-manifest.yaml', useragent: expect.any(String) })
       expect(utils.returnUnion).toHaveBeenCalledTimes(7)
       expect(utils.returnUnion).toHaveBeenCalledWith(fakePackages.pkg1.actions.two.inputs, {})
       expect(utils.returnUnion).toHaveBeenCalledWith(fakePackages.pkg2.triggers.triggerone.inputs, {})
@@ -276,7 +276,7 @@ describe('instance methods', () => {
         projectName: 'fakeProjectName'
       })
       await command.run()
-      expect(utils.setPaths).toHaveBeenCalledWith({ manifest: 'fake-manifest.yaml', deployment: 'fake-dep.yml', useragent: 'aio-cli-plugin-runtime@1.10.0' })
+      expect(utils.setPaths).toHaveBeenCalledWith({ manifest: 'fake-manifest.yaml', deployment: 'fake-dep.yml', useragent: expect.any(String) })
       expect(utils.returnUnion).toHaveBeenCalledTimes(7)
       expect(utils.returnUnion).toHaveBeenCalledWith(fakePackages.pkg1.actions.two.inputs, {})
       expect(utils.returnUnion).toHaveBeenCalledWith(fakePackages.pkg2.triggers.triggerone.inputs, fakeDepTriggers.triggerone)
