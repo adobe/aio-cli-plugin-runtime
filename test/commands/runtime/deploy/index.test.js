@@ -15,6 +15,8 @@ const TheCommand = require('../../../../src/commands/runtime/deploy/index.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
 const RuntimeLib = require('@adobe/aio-lib-runtime')
 
+const pkgNameVersion = 'aio-cli-plugin-runtime@' + require('../../../../package.json').version
+
 const utils = RuntimeLib.utils
 
 test('exports', async () => {
@@ -78,7 +80,7 @@ describe('instance methods', () => {
     test('run with no params', async () => {
       command.argv = []
       await command.run()
-      expect(utils.setPaths).toHaveBeenCalledWith({ useragent: expect.any(String) })
+      expect(utils.setPaths).toHaveBeenCalledWith({ useragent: pkgNameVersion })
       expect(utils.getKeyValueObjectFromMergedParameters).toHaveBeenCalledWith(undefined, undefined)
 
       expect(utils.processPackage).toHaveBeenCalledWith(expectedPackages, expectedDepPackages, expectedDepTriggers, {}, false, expectedOWOptions)
@@ -93,7 +95,7 @@ describe('instance methods', () => {
       utils.getKeyValueObjectFromMergedParameters.mockReturnValue({ fake: 'params', fake2: 'params2' })
       await command.run()
 
-      expect(utils.setPaths).toHaveBeenCalledWith({ param: ['key', 'value'], useragent: expect.any(String) })
+      expect(utils.setPaths).toHaveBeenCalledWith({ param: ['key', 'value'], useragent: pkgNameVersion })
       expect(utils.getKeyValueObjectFromMergedParameters).toHaveBeenCalledWith(['key', 'value'], undefined)
 
       expect(utils.processPackage).toHaveBeenCalledWith(expectedPackages, expectedDepPackages, expectedDepTriggers, { fake: 'params', fake2: 'params2' }, false, expectedOWOptions)
@@ -108,7 +110,7 @@ describe('instance methods', () => {
       utils.getKeyValueObjectFromMergedParameters.mockReturnValue({ fake: 'params', fake2: 'params2' })
       await command.run()
 
-      expect(utils.setPaths).toHaveBeenCalledWith({ param: ['key', 'value', 'key2', 'value2'], useragent: expect.any(String) })
+      expect(utils.setPaths).toHaveBeenCalledWith({ param: ['key', 'value', 'key2', 'value2'], useragent: pkgNameVersion })
       expect(utils.getKeyValueObjectFromMergedParameters).toHaveBeenCalledWith(['key', 'value', 'key2', 'value2'], undefined)
 
       expect(utils.processPackage).toHaveBeenCalledWith(expectedPackages, expectedDepPackages, expectedDepTriggers, { fake: 'params', fake2: 'params2' }, false, expectedOWOptions)
@@ -123,7 +125,7 @@ describe('instance methods', () => {
       utils.getKeyValueObjectFromMergedParameters.mockReturnValue({ fake: 'params', fake2: 'params2' })
       await command.run()
 
-      expect(utils.setPaths).toHaveBeenCalledWith({ 'param-file': 'param-file.json', useragent: expect.any(String) })
+      expect(utils.setPaths).toHaveBeenCalledWith({ 'param-file': 'param-file.json', useragent: pkgNameVersion })
       expect(utils.getKeyValueObjectFromMergedParameters).toHaveBeenCalledWith(undefined, 'param-file.json')
 
       expect(utils.processPackage).toHaveBeenCalledWith(expectedPackages, expectedDepPackages, expectedDepTriggers, { fake: 'params', fake2: 'params2' }, false, expectedOWOptions)
@@ -138,7 +140,7 @@ describe('instance methods', () => {
       utils.getKeyValueObjectFromMergedParameters.mockReturnValue({ fake: 'params', fake2: 'params2' })
       await command.run()
 
-      expect(utils.setPaths).toHaveBeenCalledWith({ 'param-file': 'param-file.json', param: ['key', 'value', 'key2', 'value2'], useragent: expect.any(String) })
+      expect(utils.setPaths).toHaveBeenCalledWith({ 'param-file': 'param-file.json', param: ['key', 'value', 'key2', 'value2'], useragent: pkgNameVersion })
       expect(utils.getKeyValueObjectFromMergedParameters).toHaveBeenCalledWith(['key', 'value', 'key2', 'value2'], 'param-file.json')
 
       expect(utils.processPackage).toHaveBeenCalledWith(expectedPackages, expectedDepPackages, expectedDepTriggers, { fake: 'params', fake2: 'params2' }, false, expectedOWOptions)

@@ -16,6 +16,8 @@ const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
 const RuntimeLib = require('@adobe/aio-lib-runtime')
 const utils = RuntimeLib.utils
 
+const pkgNameVersion = 'aio-cli-plugin-runtime@' + require('../../../../package.json').version
+
 test('exports', async () => {
   expect(typeof TheCommand).toEqual('function')
   expect(TheCommand.prototype instanceof RuntimeBaseCommand).toBeTruthy()
@@ -251,7 +253,7 @@ describe('instance methods', () => {
       })
 
       await command.run()
-      expect(utils.setPaths).toHaveBeenCalledWith({ manifest: 'fake-manifest.yaml', useragent: expect.any(String) })
+      expect(utils.setPaths).toHaveBeenCalledWith({ manifest: 'fake-manifest.yaml', useragent: pkgNameVersion })
       expect(utils.returnUnion).toHaveBeenCalledTimes(7)
       expect(utils.returnUnion).toHaveBeenCalledWith(fakePackages.pkg1.actions.two.inputs, {})
       expect(utils.returnUnion).toHaveBeenCalledWith(fakePackages.pkg2.triggers.triggerone.inputs, {})
@@ -276,7 +278,7 @@ describe('instance methods', () => {
         projectName: 'fakeProjectName'
       })
       await command.run()
-      expect(utils.setPaths).toHaveBeenCalledWith({ manifest: 'fake-manifest.yaml', deployment: 'fake-dep.yml', useragent: expect.any(String) })
+      expect(utils.setPaths).toHaveBeenCalledWith({ manifest: 'fake-manifest.yaml', deployment: 'fake-dep.yml', useragent: pkgNameVersion })
       expect(utils.returnUnion).toHaveBeenCalledTimes(7)
       expect(utils.returnUnion).toHaveBeenCalledWith(fakePackages.pkg1.actions.two.inputs, {})
       expect(utils.returnUnion).toHaveBeenCalledWith(fakePackages.pkg2.triggers.triggerone.inputs, fakeDepTriggers.triggerone)

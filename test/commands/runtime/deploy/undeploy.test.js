@@ -16,6 +16,8 @@ const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
 const RuntimeLib = require('@adobe/aio-lib-runtime')
 const utils = RuntimeLib.utils
 
+const pkgNameVersion = 'aio-cli-plugin-runtime@' + require('../../../../package.json').version
+
 test('exports', async () => {
   expect(typeof TheCommand).toEqual('function')
   expect(TheCommand.prototype instanceof RuntimeBaseCommand).toBeTruthy()
@@ -72,7 +74,7 @@ describe('instance methods', () => {
     test('run with no flags', async () => {
       command.argv = []
       await command.run()
-      expect(utils.setPaths).toHaveBeenCalledWith({ useragent: expect.any(String) })
+      expect(utils.setPaths).toHaveBeenCalledWith({ useragent: pkgNameVersion })
 
       expect(utils.processPackage).toHaveBeenCalledWith(expectedPackages, {}, {}, {}, true, expectedOWOptions)
       expect(utils.getProjectEntities).not.toHaveBeenCalled()
@@ -84,7 +86,7 @@ describe('instance methods', () => {
     test('run with manifest flag', async () => {
       command.argv = ['-m', 'fake-manifest.yml']
       await command.run()
-      expect(utils.setPaths).toHaveBeenCalledWith({ manifest: 'fake-manifest.yml', useragent: expect.any(String) })
+      expect(utils.setPaths).toHaveBeenCalledWith({ manifest: 'fake-manifest.yml', useragent: pkgNameVersion })
 
       expect(utils.processPackage).toHaveBeenCalledWith(expectedPackages, {}, {}, {}, true, expectedOWOptions)
       expect(utils.getProjectEntities).not.toHaveBeenCalled()
