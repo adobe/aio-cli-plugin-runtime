@@ -80,7 +80,7 @@ describe('instance methods', () => {
       return command.run()
         .then((res) => {
           expect(cmd).toHaveBeenCalledWith('12345')
-          expect(rtUtils.printLogs).toHaveBeenCalledWith({ logs: ['this is a log', 'so is this'] }, undefined, command.log)
+          expect(rtUtils.printLogs).toHaveBeenCalledWith({ logs: ['this is a log', 'so is this'] }, false, command.log)
         })
     })
 
@@ -97,7 +97,7 @@ describe('instance methods', () => {
     test('throws error retrieve logs of an activation', () => {
       rtLib.mockResolved('activations.list', [{ activationId: '12345' }])
       const cmd = rtLib.mockRejected(rtAction, new Error('Async error'))
-      command.argv = ['-l', '-c', '2']
+      command.argv = ['12345']
       return command.run()
         .catch(() => {
           expect(cmd).toHaveBeenCalledWith('12345')
@@ -105,64 +105,165 @@ describe('instance methods', () => {
         })
     })
 
+    test('retrieve last log (default)', () => {
+      command.argv = []
+      return command.run()
+        .then(() => {
+          expect(RuntimeLib.printActionLogs).toHaveBeenCalledWith(expect.anything(), expect.anything(), 1, expect.anything(), expect.anything(), expect.anything())
+        })
+    })
+
     test('retrieve last log -l', () => {
-      const listCmd = rtLib.mockResolved('activations.list', [{ activationId: '12345' }])
-      const logCmd = rtLib.mockResolved(rtAction, { logs: ['line1', 'line2', 'line3'] })
       command.argv = ['-l']
       return command.run()
         .then(() => {
-          expect(listCmd).toHaveBeenCalledWith(expect.objectContaining({ limit: 1 }))
-          expect(logCmd).toHaveBeenCalledWith('12345')
-          expect(rtUtils.printLogs).toHaveBeenCalledWith({ logs: ['line1', 'line2', 'line3'] }, undefined, command.log)
+          expect(RuntimeLib.printActionLogs).toHaveBeenCalledWith(expect.anything(), expect.anything(), 1, expect.anything(), expect.anything(), expect.anything())
         })
     })
 
     test('retrieve last logs - no-results', () => {
-      const cmd = rtLib.mockResolved('activations.list', [])
       command.argv = ['-l']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith(expect.objectContaining({ limit: 1 }))
+          expect(RuntimeLib.printActionLogs).toHaveBeenCalledWith(expect.anything(), expect.anything(), 1, expect.anything(), expect.anything(), expect.anything())
           expect(stdout.output).toMatch('')
         })
     })
 
     test('retrieve last log --last', () => {
-      const listCmd = rtLib.mockResolved('activations.list', [{ activationId: '12345' }])
-      const logCmd = rtLib.mockResolved(rtAction, { logs: ['line1', 'line2', 'line3'] })
       command.argv = ['--last']
       return command.run()
         .then(() => {
-          expect(listCmd).toHaveBeenCalledWith(expect.objectContaining({ limit: 1 }))
-          expect(logCmd).toHaveBeenCalledWith('12345')
-          expect(rtUtils.printLogs).toHaveBeenCalledWith({ logs: ['line1', 'line2', 'line3'] }, undefined, command.log)
+          expect(RuntimeLib.printActionLogs).toHaveBeenCalledWith(expect.anything(), expect.anything(), 1, expect.anything(), expect.anything(), expect.anything())
         })
     })
 
-    test('retrieve last -c logs', () => {
-      const listCmd = rtLib.mockResolved('activations.list', [{ activationId: '12345' }, { activationId: '12346' }])
-      const logCmd = rtLib.mockResolved(rtAction, { logs: ['line1', 'line2', 'line3'] })
-      command.argv = ['-l', '-c', '2']
+    test('retrieve last --limit logs', () => {
+      command.argv = ['--limit', '2']
       return command.run()
         .then(() => {
-          expect(listCmd).toHaveBeenCalledWith(expect.objectContaining({ limit: 2 }))
-          expect(logCmd).toHaveBeenCalledWith('12345')
-          expect(logCmd).toHaveBeenCalledWith('12346')
-          expect(rtUtils.printLogs).toHaveBeenCalledWith({ logs: ['line1', 'line2', 'line3'] }, undefined, command.log)
+          expect(RuntimeLib.printActionLogs).toHaveBeenLastCalledWith(expect.anything(), expect.anything(), 2, expect.anything(), expect.anything(), expect.anything())
         })
     })
 
-    test('errors if np axId or --last flag', () => {
-      return new Promise((resolve, reject) => {
-        command.argv = []
-        const error = jest.spyOn(command, 'error')
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(error).toHaveBeenLastCalledWith('Missing required arg: `activationId`')
-            resolve()
-          })
+    test('manifest logs', () => {
+      RuntimeLib.utils.setPaths.mockResolvedValue({
+        manifestContent: {
+          packages: {
+            pkg1: {
+              actions: {
+                hello: {}
+              }
+            },
+            pkg2: {
+              actions: {
+                hello2: {}
+              }
+            }
+          }
+        }
       })
+      command.argv = ['-m']
+      return command.run()
+        .then(() => {
+          expect(RuntimeLib.printActionLogs).toHaveBeenLastCalledWith(expect.anything(), expect.anything(), 1, ['pkg1/hello', 'pkg2/hello2'], expect.anything(), expect.anything())
+        })
+    })
+
+    test('package logs', () => {
+      RuntimeLib.utils.setPaths.mockResolvedValue({
+        manifestContent: {
+          packages: {
+            pkg1: {
+              actions: {
+                hello: {}
+              }
+            },
+            pkg2: {
+              actions: {
+                hello2: {}
+              }
+            }
+          }
+        }
+      })
+      command.argv = ['-p', 'pkg1']
+      return command.run()
+        .then(() => {
+          expect(RuntimeLib.printActionLogs).toHaveBeenLastCalledWith(expect.anything(), expect.anything(), 1, ['pkg1/hello'], expect.anything(), expect.anything())
+        })
+    })
+
+    test('package logs (package does not exist)', () => {
+      RuntimeLib.utils.setPaths.mockResolvedValue({
+        manifestContent: {
+          packages: {
+            pkg1: {
+              actions: {
+                hello: {}
+              }
+            },
+            pkg2: {
+              actions: {
+                hello2: {}
+              }
+            }
+          }
+        }
+      })
+      command.argv = ['-p', 'invalidpkg']
+      return command.run()
+        .catch(() => {
+          expect(handleError).toHaveBeenCalledWith('Could not find package invalidpkg in manifest')
+        })
+    })
+
+    test('package logs (--deployed)', () => {
+      RuntimeLib.utils.setPaths.mockResolvedValue({
+        manifestContent: {
+          packages: {
+            pkg1: {
+              actions: {
+                hello: {}
+              }
+            },
+            pkg2: {
+              actions: {
+                hello2: {}
+              }
+            }
+          }
+        }
+      })
+      command.argv = ['-p', 'pkg1', '--deployed']
+      return command.run()
+        .then(() => {
+          expect(RuntimeLib.printActionLogs).toHaveBeenLastCalledWith(expect.anything(), expect.anything(), 1, ['pkg1/'], expect.anything(), expect.anything())
+        })
+    })
+
+    test('action logs', () => {
+      RuntimeLib.utils.setPaths.mockResolvedValue({
+        manifestContent: {
+          packages: {
+            pkg1: {
+              actions: {
+                hello: {}
+              }
+            },
+            pkg2: {
+              actions: {
+                hello2: {}
+              }
+            }
+          }
+        }
+      })
+      command.argv = ['-a', 'hello']
+      return command.run()
+        .then(() => {
+          expect(RuntimeLib.printActionLogs).toHaveBeenLastCalledWith(expect.anything(), expect.anything(), 1, ['hello'], expect.anything(), expect.anything())
+        })
     })
   })
 })

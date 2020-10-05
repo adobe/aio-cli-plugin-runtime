@@ -12,38 +12,65 @@ governing permissions and limitations under the License.
 
 const { flags } = require('@oclif/command')
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
-const { printLogs } = require('@adobe/aio-lib-runtime').utils
+const rtLib = require('@adobe/aio-lib-runtime')
+const printLogs = rtLib.utils.printLogs
 const chalk = require('chalk')
 
 class ActivationLogs extends RuntimeBaseCommand {
   async run () {
     const { args, flags } = this.parse(ActivationLogs)
-    // note: could be null, but we wait to check
-    let activations = [{ activationId: args.activationId }]
     const ow = await this.wsk()
 
+    let limit = 1
     if (flags.last) {
-      const limit = Math.max(1, Math.min(flags.count, 5))
-      activations = await ow.activations.list({ limit: limit, skip: 0 })
-      if (!activations || activations.length < 1) {
-        this.log('No activations to log.')
-        return
-      }
-    }
-    if (!activations[0].activationId) {
-      // just a thought, but we could just return --last activation log when no id is present
-      this.error('Missing required arg: `activationId`')
+      limit = 1
+    } else if (flags.limit) {
+      limit = Math.min(flags.limit, 50)
     }
 
-    const logger = this.log
-    await Promise.all(activations.map((ax) => {
-      return ow.activations.logs(ax.activationId).then((result) => {
-        logger(chalk.dim('=== ') + chalk.bold('activation logs %s %s:%s'), ax.activationId, ax.name || '', ax.version || '')
+    if (!args.activationId) {
+      const owOptions = await this.getOptions()
+      owOptions.auth = owOptions.api_key
+      delete owOptions.api_key
+
+      const filterActions = []
+      if (flags.manifest || flags.package) {
+        const components = await rtLib.utils.setPaths()
+        Object.entries(components.manifestContent.packages).forEach((packageTuple) => {
+          if (flags.package) {
+            if (flags.deployed) {
+              if (!filterActions.includes(flags.package + '/')) {
+                filterActions.push(flags.package + '/')
+              }
+              return
+            } else if (flags.package !== packageTuple[0]) { // If reading from the manifest for package
+              return
+            }
+          }
+          Object.keys(packageTuple[1].actions).forEach((actionName) => {
+            // TODO: Following line is a temporary workaround till we figure out how to deal with __APP_PACKAGE__
+            packageTuple[0] = packageTuple[0].replace(/__APP_PACKAGE__/g, '')
+
+            filterActions.push(packageTuple[0] + '/' + actionName)
+          })
+        })
+      } else if (flags.action) {
+        filterActions.push(flags.action)
+      }
+
+      if (flags.package && filterActions.length === 0) {
+        this.handleError(`Could not find package ${flags.package} in manifest`)
+      }
+      rtLib.printActionLogs({ ow: owOptions }, this.log, limit, filterActions, flags.strip, flags.tail)
+    } else {
+      const logger = this.log
+      return ow.activations.logs(args.activationId).then((result) => {
+        logger(chalk.dim('=== ') + chalk.bold('activation logs %s %s:%s'), args.activationId)
         printLogs(result, flags.strip, logger)
       }, (err) => {
         this.handleError('failed to retrieve logs for activation', err)
       })
-    }))
+    }
   }
 }
 
@@ -55,18 +82,44 @@ ActivationLogs.args = [
 
 ActivationLogs.flags = {
   ...RuntimeBaseCommand.flags,
+  action: flags.string({
+    description: 'Fetch logs for a specific action',
+    default: '',
+    exclusive: ['manifest, package'],
+    char: 'a'
+  }),
+  manifest: flags.boolean({
+    description: 'Fetch logs for all actions in the manifest',
+    exclusive: ['package, action'],
+    char: 'm'
+  }),
+  package: flags.string({
+    description: 'Fetch logs for a specific package in the manifest',
+    exclusive: ['manifest, action'],
+    char: 'p'
+  }),
+  deployed: flags.boolean({
+    description: 'Fetch logs for all actions deployed under a specific package',
+    exclusive: ['manifest, action'],
+    char: 'd'
+  }),
   last: flags.boolean({
     char: 'l',
     description: 'retrieves the most recent activation logs'
   }),
   strip: flags.boolean({
     char: 'r',
-    description: 'strip timestamp information and output first line only'
+    description: 'strip timestamp information and output first line only',
+    default: false
   }),
-  count: flags.integer({
-    char: 'c',
-    description: 'used with --last, return the last `count` activation logs. Max 5',
-    default: 1
+  limit: flags.integer({
+    description: 'return the last `limit` activation logs. Max 50',
+    exclusive: ['last']
+  }),
+  tail: flags.boolean({
+    description: 'Fetch logs continuously',
+    default: false,
+    char: 't'
   })
 }
 
