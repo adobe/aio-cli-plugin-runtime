@@ -33,39 +33,40 @@ class ActivationLogs extends RuntimeBaseCommand {
       owOptions.auth = owOptions.api_key
       delete owOptions.api_key
 
+      const components = await rtLib.utils.setPaths()
       const filterActions = []
-      if (flags.manifest || flags.package) {
-        const components = await rtLib.utils.setPaths()
-        Object.entries(components.manifestContent.packages).forEach((packageTuple) => {
-          if (flags.package) {
-            if (flags.deployed) {
-              if (!filterActions.includes(flags.package + '/')) {
-                filterActions.push(flags.package + '/')
-              }
-              return
-            } else if (flags.package !== packageTuple[0]) { // If reading from the manifest for package
-              return
-            }
-          }
-          Object.keys(packageTuple[1].actions).forEach((actionName) => {
-            // TODO: Following line is a temporary workaround till we figure out how to deal with __APP_PACKAGE__
-            packageTuple[0] = packageTuple[0].replace(/__APP_PACKAGE__/g, '')
+      const filterPackageActions = (pkgName, actions) => {
+        // TODO: Following line is a temporary workaround till we figure out how to deal with __APP_PACKAGE__
+        pkgName = pkgName.replace(/__APP_PACKAGE__/g, '')
+        Object.keys(actions).forEach((actionName) => {
+          filterActions.push(pkgName + '/' + actionName)
+        })
+      }
 
-            filterActions.push(packageTuple[0] + '/' + actionName)
-          })
+      if (flags.package) {
+        if (flags.deployed) {
+          filterActions.push(flags.package + '/')
+        } else { // Check in the manifest
+          if (!Object.keys(components.manifestContent.packages).includes(flags.package)) {
+            this.handleError(`Could not find package ${flags.package} in manifest`)
+          }
+          filterPackageActions(flags.package, components.manifestContent.packages[flags.package].actions)
+        }
+      }
+
+      if (flags.manifest) {
+        Object.entries(components.manifestContent.packages).forEach((packageTuple) => {
+          filterPackageActions(packageTuple[0], packageTuple[1].actions)
         })
       } else if (flags.action) {
         filterActions.push(flags.action)
       }
 
-      if (flags.package && filterActions.length === 0) {
-        this.handleError(`Could not find package ${flags.package} in manifest`)
-      }
       rtLib.printActionLogs({ ow: owOptions }, this.log, limit, filterActions, flags.strip, flags.tail)
     } else {
       const logger = this.log
       return ow.activations.logs(args.activationId).then((result) => {
-        logger(chalk.dim('=== ') + chalk.bold('activation logs %s %s:%s'), args.activationId)
+        logger(chalk.dim('=== ') + chalk.bold('activation logs %s'), args.activationId)
         printLogs(result, flags.strip, logger)
       }, (err) => {
         this.handleError('failed to retrieve logs for activation', err)
