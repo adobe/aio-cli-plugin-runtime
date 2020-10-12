@@ -123,6 +123,19 @@ describe('instance methods', () => {
       })
     })
 
+    test('auth with inline commeent should trim the comment', async () => {
+      const files = {}
+      files[require('path').join(require('os').homedir(), '.wskprops')] = 'AUTH=123 #inline-comment'
+      fakeFileSystem.addJson(files)
+
+      return command.wsk().then(() => {
+        expect(RuntimeLib.init).toHaveBeenLastCalledWith(
+          { api_key: 123, apihost: 'https://adobeioruntime.net', apiversion: 'v1' }
+        )
+        delete process.env[PropertyEnv.APIHOST]
+      })
+    })
+
     test('apihost flag with env', async () => {
       const value = 'http://my-server'
       process.env[PropertyEnv.APIHOST] = value
