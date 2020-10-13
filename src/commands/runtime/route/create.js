@@ -11,6 +11,7 @@ governing permissions and limitations under the License.
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 const { flags } = require('@oclif/command')
+const fs = require('fs')
 
 class RouteCreate extends RuntimeBaseCommand {
   async run () {
@@ -18,17 +19,29 @@ class RouteCreate extends RuntimeBaseCommand {
 
     try {
       const ow = await this.wsk()
-      const options = {
-        basepath: args.basePath,
-        relpath: args.relPath,
-        operation: args.apiVerb,
-        action: args.action,
-        responsetype: flags['response-type'], // has a default
-        name: flags.apiname
+      let options = {}
+      if (flags['config-file']) {
+        options.swagger = fs.readFileSync(flags['config-file'], 'utf8')
+      } else {
+        if (!args.basePath || !args.relPath || !args.apiVerb || !args.action) {
+          throw new Error('either the config-file flag or the arguments basePath, relPath, apiVerb and action are required')
+        }
+        options = {
+          basepath: args.basePath,
+          relpath: args.relPath,
+          operation: args.apiVerb,
+          action: args.action,
+          responsetype: flags['response-type'], // has a default
+          name: flags.apiname
+        }
       }
 
       const result = await ow.routes.create(options)
-      this.log(`${result.gwApiUrl}${args.relPath}`)
+      if (flags['config-file']) {
+        this.log(`${result.gwApiUrl}`)
+      } else {
+        this.log(`${result.gwApiUrl}${args.relPath}`)
+      }
     } catch (err) {
       this.handleError('failed to create the api', err)
     }
@@ -38,23 +51,23 @@ class RouteCreate extends RuntimeBaseCommand {
 RouteCreate.args = [
   {
     name: 'basePath',
-    required: true,
+    required: false,
     description: 'The base path of the api'
   },
   {
     name: 'relPath',
-    required: true,
+    required: false,
     description: 'The path of the api relative to the base path'
   },
   {
     name: 'apiVerb',
-    required: true,
+    required: false,
     description: 'The http verb',
     options: ['get', 'post', 'put', 'patch', 'delete', 'head', 'options']
   },
   {
     name: 'action',
-    required: true,
+    required: false,
     description: 'The action to call'
   }
 ]
@@ -63,13 +76,19 @@ RouteCreate.flags = {
   ...RuntimeBaseCommand.flags,
   apiname: flags.string({
     char: 'n',
-    description: 'Friendly name of the API; ignored when CFG_FILE is specified (default BASE_PATH)'
+    description: 'Friendly name of the API; ignored when CFG_FILE is specified (default BASE_PATH)',
+    exclusive: ['config-file']
   }),
   'response-type': flags.string({
     char: 'r',
     description: 'Set the web action response TYPE.',
     default: 'json',
-    options: ['html', 'http', 'json', 'text', 'svg', 'json']
+    options: ['html', 'http', 'json', 'text', 'svg', 'json'],
+    exclusive: ['config-file']
+  }),
+  'config-file': flags.string({
+    char: 'c',
+    description: 'file containing API configuration in swagger JSON format'
   })
 }
 
