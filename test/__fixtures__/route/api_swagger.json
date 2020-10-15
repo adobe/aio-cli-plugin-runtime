@@ -1,0 +1,98 @@
+{
+    "swagger": "2.0",
+    "basePath": "/app-service",
+    "info": {
+      "title": "app-service",
+      "version": "1.0.0"
+    },
+    "paths": {
+      "/resource1": {
+        "get": {
+          "operationId": "fakens/aio-app-0.0.11/action1.http",
+          "responses": {
+            "default": {
+              "description": "Default response"
+            }
+          },
+          "x-openwhisk": {
+            "action": "action1.http",
+            "namespace": "fakens",
+            "package": "aio-app-0.0.11",
+            "url": "not-used"
+          }
+        },
+        "post": {
+          "operationId": "fakens/aio-app-0.0.11/action2.http",
+          "responses": {
+            "default": {
+              "description": "Default response"
+            }
+          },
+          "x-openwhisk": {
+            "action": "action2.http",
+            "namespace": "fakens",
+            "package": "aio-app-0.0.11",
+            "url": "not-used"
+          }
+        },
+        "options": {
+          "operationId": "fakens/aio-app-0.0.11/action3.http",
+          "responses": {
+            "default": {
+              "description": "Default response"
+            }
+          },
+          "x-openwhisk": {
+            "action": "action3.http",
+            "namespace": "fakens",
+            "package": "aio-app-0.0.11",
+            "url": "not-used"
+          }
+        }
+      },
+      "/resource10": {
+        "get": {
+          "operationId": "fakens/aio-app-0.0.11/action1.http",
+          "responses": {
+            "default": {
+              "description": "Default response"
+            }
+          },
+          "x-openwhisk": {
+            "action": "action1.http",
+            "namespace": "fakens",
+            "package": "aio-app-0.0.11",
+            "url": "not-used"
+          }
+        },
+        "delete": {
+          "operationId": "fakens/aio-app-0.0.11/action2.http",
+          "responses": {
+            "default": {
+              "description": "Default response"
+            }
+          },
+          "x-openwhisk": {
+            "action": "action2.http",
+            "namespace": "fakens",
+            "package": "aio-app-0.0.11",
+            "url": "not-used"
+          }
+        },
+        "options": {
+          "operationId": "fakens/aio-app-0.0.11/action3.http",
+          "responses": {
+            "default": {
+              "description": "Default response"
+            }
+          },
+          "x-openwhisk": {
+            "action": "action3.http",
+            "namespace": "fakens",
+            "package": "aio-app-0.0.11",
+            "url": "not-used"
+          }
+        }
+      }
+    }
+}
