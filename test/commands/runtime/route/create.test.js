@@ -37,20 +37,20 @@ test('args', async () => {
   expect(args.length).toEqual(4)
 
   expect(args[0].name).toEqual('basePath')
-  expect(args[0].required).toBeTruthy()
+  expect(args[0].required).not.toBeTruthy()
   expect(args[0].description).toBeDefined()
 
   expect(args[1].name).toEqual('relPath')
-  expect(args[1].required).toBeTruthy()
+  expect(args[1].required).not.toBeTruthy()
   expect(args[1].description).toBeDefined()
 
   expect(args[2].name).toEqual('apiVerb')
-  expect(args[2].required).toBeTruthy()
+  expect(args[2].required).not.toBeTruthy()
   expect(args[2].options).toMatchObject(['get', 'post', 'put', 'patch', 'delete', 'head', 'options'])
   expect(args[2].description).toBeDefined()
 
   expect(args[3].name).toEqual('action')
-  expect(args[3].required).toBeTruthy()
+  expect(args[3].required).not.toBeTruthy()
   expect(args[3].description).toBeDefined()
 })
 
@@ -83,6 +83,16 @@ describe('instance methods', () => {
     rtLib.mockResolved('actions.client.options', '')
     RuntimeLib.mockReset()
   })
+  beforeAll(() => {
+    const json = {
+      'route/api_swagger.json': fixtureFile('route/api_swagger.json')
+    }
+    fakeFileSystem.addJson(json)
+  })
+  afterAll(() => {
+    // reset back to normal
+    fakeFileSystem.reset()
+  })
 
   describe('run', () => {
     test('exists', async () => {
@@ -107,6 +117,19 @@ describe('instance methods', () => {
         })
     })
 
+    test('create api with --config-file', () => {
+      const apiSwagger = fixtureFile('route/api_swagger.json')
+      const cmd = rtLib.mockResolved(rtAction, { gwApiUrl: `http://myserver` })
+      command.argv = ['--config-file', '/route/api_swagger.json']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith({
+            swagger: apiSwagger
+          })
+          expect(stdout.output).toMatch(`http://myserver`)
+        })
+    })
+
     test('create a simple api with --response-type and --apiname flags', () => {
       const basepath = '/mybase'
       const relpath = '/myapi'
@@ -124,6 +147,18 @@ describe('instance methods', () => {
           })
           expect(stdout.output).toMatch(`http://myserver${basepath}${relpath}`)
         })
+    })
+
+    test('create a simple api, error (no flags or args)', () => {
+      return new Promise((resolve, reject) => {
+        command.argv = []
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('failed to create the api', new Error('either the config-file flag or the arguments basePath, relPath, apiVerb and action are required'))
+            resolve()
+          })
+      })
     })
 
     test('create a simple api, error', () => {
