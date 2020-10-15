@@ -123,7 +123,7 @@ describe('instance methods', () => {
       })
     })
 
-    test('auth with inline commeent should trim the comment', async () => {
+    test('auth with inline comment should trim the comment', async () => {
       const files = {}
       files[require('path').join(require('os').homedir(), '.wskprops')] = 'AUTH=123 #inline-comment'
       fakeFileSystem.addJson(files)
