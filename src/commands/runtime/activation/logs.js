@@ -33,7 +33,7 @@ class ActivationLogs extends RuntimeBaseCommand {
       owOptions.auth = owOptions.api_key
       delete owOptions.api_key
 
-      const components = await rtLib.utils.setPaths()
+      let components
       const filterActions = []
       const filterPackageActions = (pkgName, actions) => {
         // TODO: Following line is a temporary workaround till we figure out how to deal with __APP_PACKAGE__
@@ -47,6 +47,7 @@ class ActivationLogs extends RuntimeBaseCommand {
         if (flags.deployed) {
           filterActions.push(flags.package + '/')
         } else { // Check in the manifest
+          components = await rtLib.utils.setPaths()
           if (!Object.keys(components.manifestContent.packages).includes(flags.package)) {
             this.handleError(`Could not find package ${flags.package} in manifest`)
           }
@@ -55,6 +56,7 @@ class ActivationLogs extends RuntimeBaseCommand {
       }
 
       if (flags.manifest) {
+        components = await rtLib.utils.setPaths()
         Object.entries(components.manifestContent.packages).forEach((packageTuple) => {
           filterPackageActions(packageTuple[0], packageTuple[1].actions)
         })
@@ -62,7 +64,7 @@ class ActivationLogs extends RuntimeBaseCommand {
         filterActions.push(flags.action)
       }
 
-      rtLib.printActionLogs({ ow: owOptions }, this.log, limit, filterActions, flags.strip, flags.tail)
+      rtLib.printActionLogs({ ow: owOptions }, this.log, limit, filterActions, flags.strip, flags.poll || flags.tail || flags.watch)
     } else {
       const logger = this.log
       return ow.activations.logs(args.activationId).then((result) => {
@@ -85,23 +87,22 @@ ActivationLogs.flags = {
   ...RuntimeBaseCommand.flags,
   action: flags.string({
     description: 'Fetch logs for a specific action',
-    default: '',
-    exclusive: ['manifest, package'],
+    exclusive: ['manifest', 'package'],
     char: 'a'
   }),
   manifest: flags.boolean({
     description: 'Fetch logs for all actions in the manifest',
-    exclusive: ['package, action'],
+    exclusive: ['package', 'action'],
     char: 'm'
   }),
   package: flags.string({
     description: 'Fetch logs for a specific package in the manifest',
-    exclusive: ['manifest, action'],
+    exclusive: ['manifest', 'action'],
     char: 'p'
   }),
   deployed: flags.boolean({
     description: 'Fetch logs for all actions deployed under a specific package',
-    exclusive: ['manifest, action'],
+    exclusive: ['manifest', 'action'],
     char: 'd'
   }),
   last: flags.boolean({
@@ -120,7 +121,20 @@ ActivationLogs.flags = {
   tail: flags.boolean({
     description: 'Fetch logs continuously',
     default: false,
-    char: 't'
+    char: 't',
+    exclusive: ['watch', 'poll']
+  }),
+  watch: flags.boolean({
+    description: 'Fetch logs continuously',
+    default: false,
+    char: 'w',
+    exclusive: ['tail', 'poll']
+  }),
+  poll: flags.boolean({
+    description: 'Fetch logs continuously',
+    default: false,
+    char: 'o',
+    exclusive: ['watch', 'tail']
   })
 }
 
