@@ -84,9 +84,11 @@ const mockRtUtils = {
 }
 
 const init = jest.fn().mockReturnValue(mockRtLibInstance)
+const printActionLogs = jest.fn()
 module.exports = {
   utils: mockRtUtils,
   init,
+  printActionLogs,
   mockReset: () => {
     Object.values(mockRtUtils).forEach(v => v.mockReset())
     init.mockClear()
