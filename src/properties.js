@@ -50,6 +50,11 @@ function propertiesFile () {
     properties = PropertiesReader(wskConfigFile)
   }
 
+  if (properties.getAllProperties) {
+    Object.entries(properties.getAllProperties()).forEach((propTuple) => {
+      properties.set(propTuple[0], propTuple[1].toString().replace(/#.*/, ''))
+    })
+  }
   properties.save = function () {
     const saved = []
     this.each((key, val) => saved.push(`${key}=${val}`))
