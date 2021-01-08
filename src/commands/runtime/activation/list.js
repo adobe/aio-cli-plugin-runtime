@@ -17,7 +17,7 @@ const { cli } = require('cli-ux')
 class ActivationList extends RuntimeBaseCommand {
   async run () {
     const { args, flags } = this.parse(ActivationList)
-    const id = args.activationID
+    const id = args.activation_name
     try {
       const options = {}
       if (id) {
@@ -113,16 +113,20 @@ class ActivationList extends RuntimeBaseCommand {
 
 ActivationList.args = [
   {
-    name: 'activationID'
+    name: 'activation_name'
   }
 ]
+
+ActivationList.limits = {
+  max: 200
+}
 
 ActivationList.flags = {
   ...RuntimeBaseCommand.flags,
   // example usage:  aio runtime:activation:list --limit 10 --skip 2
   limit: flags.integer({
     char: 'l',
-    description: 'only return LIMIT number of activations from the collection with a maximum LIMIT of 200 activations (default 30)'
+    description: `only return LIMIT number of activations from the collection with a maximum LIMIT of ${ActivationList.limits.max} activations (default 30)`
   }),
   skip: flags.integer({
     char: 's',
