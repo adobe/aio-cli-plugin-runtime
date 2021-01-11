@@ -182,19 +182,23 @@ describe('instance methods', () => {
     })
 
     test('return list of trigger activations', () => {
+      const date = 1606487719405
       const data = [
         {
           activationId: 'a5e7fdaeaa2e4384a7fdaeaa2e438442',
           name: 'trigger',
           namespace: '8888_9999',
-          start: 1606487719405,
+          start: date,
           statusCode: 0,
           version: '0.0.1'
         }]
       rtLib.mockResolved(rtAction, data)
       return command.run()
         .then(() => {
-          expect(stdout.output).toMatchFixture('activation/list-triggers-output.txt')
+          const expDate = new Date(date)
+          let expOutput = fixtureFile('activation/list-triggers-output.txt')
+          expOutput = expOutput.replace('11/27/2020, 9:35:19 AM', expDate.toLocaleString())
+          expect(stdout.output).toMatch(expOutput)
         })
     })
 
