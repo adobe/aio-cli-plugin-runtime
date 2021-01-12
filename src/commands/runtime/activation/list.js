@@ -62,40 +62,52 @@ class ActivationList extends RuntimeBaseCommand {
           },
           Kind: {
             get: (row) => {
-              const { annotations } = row
-              if (!annotations || !annotations.length) return
-              return annotations.find((elem) => {
-                return (elem.key === 'kind')
-              }).value
+              if (row.duration !== undefined) {
+                const { annotations } = row
+                if (!annotations || !annotations.length) return
+                return annotations.find((elem) => {
+                  return (elem.key === 'kind')
+                }).value
+              } else {
+                // this is a trigger
+                return 'trigger'
+              }
             }
           },
           Start: {
             get: (row) => {
-              const { annotations } = row
-              if (!annotations || !annotations.length) return
-              const elem = annotations.find((elem) => {
-                return (elem.key === 'initTime')
-              })
-              return elem ? 'cold' : 'warm'
+              if (row.duration !== undefined) {
+                const { annotations } = row
+                if (!annotations || !annotations.length) return
+                const elem = annotations.find((elem) => {
+                  return (elem.key === 'initTime')
+                })
+                return elem ? 'cold' : 'warm'
+              } else {
+                return '--'
+              }
             }
           },
           Duration: {
-            get: row => `${row.duration}ms`
+            get: row => row.duration ? `${row.duration}ms` : '--'
           },
           Status: {
             get: (row) => {
               const statusStrings = ['success', 'application error', 'developer error', 'internal error']
-              return statusStrings[row.statusCode]
+              return statusStrings[row.statusCode || 0]
             }
           },
           Entity: {
             get: (row) => {
               const { annotations } = row
-              if (!annotations || !annotations.length) return
-              const path = annotations.find((elem) => {
-                return (elem.key === 'path')
-              }).value
-              return `${path}:${row.version}`
+              if (annotations && annotations.length) {
+                const path = annotations.find((elem) => {
+                  return (elem.key === 'path')
+                }).value
+                return `${path}:${row.version}`
+              } else {
+                return `${row.namespace}/${row.name}:${row.version}`
+              }
             }
           }
         }
