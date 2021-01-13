@@ -202,6 +202,15 @@ describe('instance methods', () => {
         })
     })
 
+    test('return activation count == 0', () => {
+      rtLib.mockResolved(rtAction, Promise.resolve({ activations: 0 }))
+      command.argv = ['--count']
+      return command.run()
+        .then(() => {
+          expect(stdout.output).toEqual('You have 0 activations in this namespace.\n')
+        })
+    })
+
     test('return activation count', () => {
       rtLib.mockResolved(rtAction, Promise.resolve({ activations: 1 }))
       command.argv = ['--count']

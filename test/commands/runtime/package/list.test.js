@@ -143,6 +143,15 @@ describe('instance methods', () => {
         })
     })
 
+    test('return packages count == 0', () => {
+      rtLib.mockResolved(rtAction, Promise.resolve({ packages: 0 }))
+      command.argv = ['--count']
+      return command.run()
+        .then(() => {
+          expect(stdout.output).toEqual('You have 0 packages in this namespace.\n')
+        })
+    })
+
     test('return package count', () => {
       rtLib.mockResolved(rtAction, Promise.resolve({ packages: 1 }))
       command.argv = ['--count']

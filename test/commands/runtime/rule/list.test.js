@@ -168,6 +168,15 @@ describe('instance methods', () => {
         })
     })
 
+    test('return rules count == 0', () => {
+      rtLib.mockResolved(rtAction, Promise.resolve({ rules: 0 }))
+      command.argv = ['--count']
+      return command.run()
+        .then(() => {
+          expect(stdout.output).toEqual('You have 0 rules in this namespace.\n')
+        })
+    })
+
     test('return rule count', () => {
       rtLib.mockResolved(rtAction, Promise.resolve({ rules: 1 }))
       command.argv = ['--count']

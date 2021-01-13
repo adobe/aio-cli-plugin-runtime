@@ -176,6 +176,15 @@ describe('instance methods', () => {
         })
     })
 
+    test('return action count == 0', () => {
+      rtLib.mockResolved(rtAction, Promise.resolve({ actions: 0 }))
+      command.argv = ['--count']
+      return command.run()
+        .then(() => {
+          expect(stdout.output).toEqual('You have 0 actions in this namespace.\n')
+        })
+    })
+
     test('return action count', () => {
       rtLib.mockResolved(rtAction, Promise.resolve({ actions: 1 }))
       command.argv = ['--count']
