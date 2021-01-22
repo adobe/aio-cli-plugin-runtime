@@ -27,7 +27,22 @@ class TriggerList extends RuntimeBaseCommand {
         options.skip = flags.skip
       }
 
+      if (flags.count) {
+        options.count = true
+      }
+
       const result = await ow.triggers.list(options)
+
+      // if only showing the count, show the result and return
+      if (flags.count) {
+        if (flags.json) {
+          this.logJSON('', result)
+        } else {
+          this.log(`You have ${result.triggers} ${result.triggers === 1 ? 'trigger' : 'triggers'} in this namespace.`)
+        }
+        return
+      }
+
       if (flags['name-sort'] || flags.name) {
         result.sort((a, b) => a.name.localeCompare(b.name))
       }
@@ -65,6 +80,10 @@ TriggerList.flags = {
   skip: flags.integer({
     char: 's',
     description: 'exclude the first SKIP number of triggers from the result'
+  }),
+  count: flags.boolean({
+    char: 'c',
+    description: 'show only the total number of triggers'
   }),
   json: flags.boolean({
     description: 'output raw json'

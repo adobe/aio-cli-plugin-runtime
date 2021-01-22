@@ -135,6 +135,7 @@ describe('instance methods', () => {
           })
       })
     })
+
     test('return list of triggers, --name-sort flag', () => {
       const cmd = rtLib.mockResolvedFixture(rtAction, 'trigger/list-name-sort.json')
       command.argv = ['--name']
@@ -142,6 +143,42 @@ describe('instance methods', () => {
         .then(() => {
           expect(cmd).toHaveBeenCalled()
           expect(stdout.output).toMatchFixture('trigger/list-name-sort-output.txt')
+        })
+    })
+
+    test('return triggers count == 0', () => {
+      rtLib.mockResolved(rtAction, Promise.resolve({ triggers: 0 }))
+      command.argv = ['--count']
+      return command.run()
+        .then(() => {
+          expect(stdout.output).toEqual('You have 0 triggers in this namespace.\n')
+        })
+    })
+
+    test('return trigger count', () => {
+      rtLib.mockResolved(rtAction, Promise.resolve({ triggers: 1 }))
+      command.argv = ['--count']
+      return command.run()
+        .then(() => {
+          expect(stdout.output).toEqual('You have 1 trigger in this namespace.\n')
+        })
+    })
+
+    test('return triggers count', () => {
+      rtLib.mockResolved(rtAction, Promise.resolve({ triggers: 2 }))
+      command.argv = ['--count']
+      return command.run()
+        .then(() => {
+          expect(stdout.output).toEqual('You have 2 triggers in this namespace.\n')
+        })
+    })
+
+    test('return trigger count --json', () => {
+      rtLib.mockResolved(rtAction, Promise.resolve({ triggers: 2 }))
+      command.argv = ['--count', '--json']
+      return command.run()
+        .then(() => {
+          expect(JSON.parse(stdout.output)).toEqual({ triggers: 2 })
         })
     })
   })

@@ -20,16 +20,32 @@ class PackageList extends RuntimeBaseCommand {
     try {
       const ow = await this.wsk()
       const options = {}
+
       if (args.namespace) {
-        options['namespace'] = args.namespace
+        options.namespace = args.namespace
       }
       if (flags.skip) {
-        options['skip'] = flags.skip
+        options.skip = flags.skip
       }
       if (flags.limit) {
-        options['limit'] = flags.limit
+        options.limit = flags.limit
       }
+      if (flags.count) {
+        options.count = true
+      }
+
       const result = await ow.packages.list(options)
+
+      // if only showing the count, show the result and return
+      if (flags.count) {
+        if (flags.json) {
+          this.logJSON('', result)
+        } else {
+          this.log(`You have ${result.packages} ${result.packages === 1 ? 'package' : 'packages'} in this namespace.`)
+        }
+        return
+      }
+
       if (flags['name-sort'] || flags.name) {
         result.sort((a, b) => a.name.localeCompare(b.name))
       }
@@ -67,6 +83,10 @@ PackageList.flags = {
   skip: flags.integer({
     char: 's',
     description: 'exclude the first SKIP number of packages from the result'
+  }),
+  count: flags.boolean({
+    char: 'c',
+    description: 'show only the total number of packages'
   }),
   json: flags.boolean({
     description: 'output raw json'
