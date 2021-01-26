@@ -18,11 +18,23 @@ class RuleList extends RuntimeBaseCommand {
     const { flags } = this.parse(RuleList)
     try {
       const ow = await this.wsk()
-      const RuleListObject = { ...flags }
-      const result = await ow.rules.list(RuleListObject)
+      const options = { ...flags }
+      const result = await ow.rules.list(options)
+
+      // if only showing the count, show the result and return
+      if (flags.count) {
+        if (flags.json) {
+          this.logJSON('', result)
+        } else {
+          this.log(`You have ${result.rules} ${result.rules === 1 ? 'rule' : 'rules'} in this namespace.`)
+        }
+        return
+      }
+
       if (flags['name-sort'] || flags.name) {
         result.sort((a, b) => a.name.localeCompare(b.name))
       }
+
       const p = Promise.all(
         result.map(item => {
           const res = ow.rules.get(item.name)
@@ -72,6 +84,10 @@ RuleList.flags = {
   skip: flags.integer({
     char: 's',
     description: 'Skip number of rules returned'
+  }),
+  count: flags.boolean({
+    char: 'c',
+    description: 'show only the total number of rules'
   }),
   json: flags.boolean({
     description: 'output raw json'

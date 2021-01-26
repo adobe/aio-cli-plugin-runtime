@@ -142,5 +142,41 @@ describe('instance methods', () => {
           expect(stdout.output).toMatchFixture('package/list-name-sort-output.txt')
         })
     })
+
+    test('return packages count == 0', () => {
+      rtLib.mockResolved(rtAction, Promise.resolve({ packages: 0 }))
+      command.argv = ['--count']
+      return command.run()
+        .then(() => {
+          expect(stdout.output).toEqual('You have 0 packages in this namespace.\n')
+        })
+    })
+
+    test('return package count', () => {
+      rtLib.mockResolved(rtAction, Promise.resolve({ packages: 1 }))
+      command.argv = ['--count']
+      return command.run()
+        .then(() => {
+          expect(stdout.output).toEqual('You have 1 package in this namespace.\n')
+        })
+    })
+
+    test('return packages count', () => {
+      rtLib.mockResolved(rtAction, Promise.resolve({ packages: 2 }))
+      command.argv = ['--count']
+      return command.run()
+        .then(() => {
+          expect(stdout.output).toEqual('You have 2 packages in this namespace.\n')
+        })
+    })
+
+    test('return package count --json', () => {
+      rtLib.mockResolved(rtAction, Promise.resolve({ packages: 2 }))
+      command.argv = ['--count', '--json']
+      return command.run()
+        .then(() => {
+          expect(JSON.parse(stdout.output)).toEqual({ packages: 2 })
+        })
+    })
   })
 })

@@ -34,6 +34,8 @@ class ActionList extends RuntimeBaseCommand {
       }
       if (flags.json) {
         this.logJSON('', result)
+      } else if (flags.count) {
+        this.log(`You have ${result.actions} ${result.actions === 1 ? 'action' : 'actions'} in this namespace.`)
       } else {
         const columns = {
           actions: {
@@ -77,6 +79,10 @@ ActionList.flags = {
   skip: flags.integer({
     char: 's',
     description: 'exclude the first SKIP number of actions from the result'
+  }),
+  count: flags.boolean({
+    char: 'c',
+    description: 'show only the total number of actions'
   }),
   json: flags.boolean({
     description: 'output raw json'

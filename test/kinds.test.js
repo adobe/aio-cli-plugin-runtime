@@ -24,6 +24,7 @@ describe('fileExtensionForKind', () => {
     expect(kinds.fileExtensionForKind('ruby:abc')).toEqual('.rb')
     expect(kinds.fileExtensionForKind('rust:abc')).toEqual('.rs')
     expect(kinds.fileExtensionForKind('swift:abc')).toEqual('.swift')
+    expect(kinds.fileExtensionForKind('typescript:abc')).toEqual('.ts')
 
     // all kinds are colon separated but test defensively anyway
     expect(kinds.fileExtensionForKind('swift')).toEqual('.swift')
@@ -48,6 +49,7 @@ describe('kindForFileExtension', () => {
     expect(kinds.kindForFileExtension('f.rb')).toEqual('ruby:default')
     expect(kinds.kindForFileExtension('f.rs')).toEqual('rust:default')
     expect(kinds.kindForFileExtension('f.swift')).toEqual('swift:default')
+    expect(kinds.kindForFileExtension('f.ts')).toEqual('typescript:default')
 
     expect(kinds.kindForFileExtension(undefined)).toEqual(undefined)
     expect(kinds.kindForFileExtension('')).toEqual(undefined)
