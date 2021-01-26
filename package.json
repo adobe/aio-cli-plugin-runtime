@@ -23,7 +23,7 @@
     "node-fetch": "^2.6.0",
     "openwhisk": "^3.21.2",
     "openwhisk-fqn": "^0.0.2",
-    "properties-reader": "2.0.0",
+    "properties-reader": "2.2.0",
     "sha1": "^1.1.1"
   },
   "devDependencies": {
