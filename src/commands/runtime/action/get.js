@@ -61,6 +61,14 @@ class ActionGet extends RuntimeBaseCommand {
             const saveFileName = bSaveFile ? flags['save-as'] : `${result.name}${extension}`
             fs.writeFileSync(saveFileName, result.exec.code)
           }
+        } else if (ActionGet.fullGet) {
+          this.logJSON('', result)
+        } else if (flags.code) {
+          if (!result.exec.binary) {
+            this.log(result.exec.code)
+          } else {
+            throw new Error(ActionGet.codeNotText)
+          }
         } else {
           // destructure getAction to remove the exec.code
           this.logJSON(`${result.name}\n`, { ...result,
@@ -71,7 +79,11 @@ class ActionGet extends RuntimeBaseCommand {
         }
       }
     } catch (err) {
-      this.handleError('failed to retrieve the action', err)
+      if (err.message === ActionGet.codeNotText) {
+        this.handleError(err.message)
+      } else {
+        this.handleError('failed to retrieve the action', err)
+      }
     }
   }
 }
@@ -89,6 +101,10 @@ ActionGet.flags = {
     char: 'r',
     description: 'get action url'
   }),
+  code: flags.boolean({
+    char: 'c',
+    description: 'show action code (only works if code is not a zip file)'
+  }),
   save: flags.boolean({
     description: 'save action code to file corresponding with action name'
   }),
@@ -96,6 +112,12 @@ ActionGet.flags = {
     description: 'file to save action code to'
   })
 }
+
+// global toggle to allow clients to retrieve the action code
+// and metadata at once
+ActionGet.fullGet = false
+
+ActionGet.codeNotText = 'Cannot display code because it is not plaintext.'
 
 ActionGet.description = 'Retrieves an Action'
 
