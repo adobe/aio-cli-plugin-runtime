@@ -731,7 +731,7 @@ describe('instance methods', () => {
         return command.run()
           .then(() => reject(new Error('does not throw error')))
           .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error('Cannot determine kind of action. Please use --kind to specifiy.'))
+            expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error('Cannot determine kind of action. Please use --kind to specify.'))
             resolve()
           })
       })
@@ -852,6 +852,7 @@ describe('instance methods', () => {
           })
       })
     })
+
     test('errors out on api error', () => {
       return new Promise((resolve, reject) => {
         rtLib.mockRejected(rtAction, new Error('an error'))
@@ -860,6 +861,19 @@ describe('instance methods', () => {
           .then(() => reject(new Error('does not throw error')))
           .catch(() => {
             expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error('an error'))
+            resolve()
+          })
+      })
+    })
+
+    test('errors on --web-secure with --web false flag', () => {
+      return new Promise((resolve, reject) => {
+        rtLib.mockRejected(rtAction, '')
+        command.argv = ['hello', '/action/fileWithNoExt', '--web-secure', 'true', '--web', 'false']
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error(TheCommand.errorMessages.websecure))
             resolve()
           })
       })
