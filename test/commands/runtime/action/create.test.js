@@ -598,7 +598,7 @@ describe('instance methods', () => {
     test('creates an action with action name, action path, --params flag, annotations and web flag as true', () => {
       const name = 'hello'
       const cmd = rtLib.mockResolved(rtAction, { res: 'fake' })
-      command.argv = [name, '/action/actionFile.js', '-p', 'a', 'b', '-p', 'c', 'd', '-a', 'desc', 'Description', '--web', 'true']
+      command.argv = [name, '/action/actionFile.js', '-p', 'a', 'b', '-p', 'c', 'd', '-a', 'desc', 'Description', '--web', 'true', '--web-secure', 'true']
       rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation((flags, file) => (flags && [{ key: 'fake', value: 'abc' }]))
       return command.run()
         .then(() => {
@@ -619,7 +619,83 @@ describe('instance methods', () => {
               annotations: [
                 { key: 'fake', value: 'abc' },
                 { key: 'web-export', value: true },
-                { key: 'final', value: true }
+                { key: 'final', value: true },
+                { key: 'require-whisk-auth', value: true }
+              ]
+            }
+          })
+          expect(stdout.output).toMatch('')
+        })
+    })
+
+    test('creates an action with action name with --web-secure true', () => {
+      const name = 'hello'
+      const cmd = rtLib.mockResolved(rtAction, '')
+      command.argv = [name, '/action/actionFile.js', '--web', 'true', '--web-secure', 'true']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith({
+            name,
+            action: {
+              name,
+              exec: {
+                code: jsFile,
+                kind: 'nodejs:default'
+              },
+              annotations: [
+                { key: 'web-export', value: true },
+                { key: 'final', value: true },
+                { key: 'require-whisk-auth', value: true }
+              ]
+            }
+          })
+          expect(stdout.output).toMatch('')
+        })
+    })
+
+    test('creates an action with action name with --web-secure false', () => {
+      const name = 'hello'
+      const cmd = rtLib.mockResolved(rtAction, '')
+      command.argv = [name, '/action/actionFile.js', '--web', 'true', '--web-secure', 'false']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith({
+            name,
+            action: {
+              name,
+              exec: {
+                code: jsFile,
+                kind: 'nodejs:default'
+              },
+              annotations: [
+                { key: 'web-export', value: true },
+                { key: 'final', value: true },
+                { key: 'require-whisk-auth', value: false }
+              ]
+            }
+          })
+          expect(stdout.output).toMatch('')
+        })
+    })
+
+    test('creates an action with action name with --web-secure abcxyz', () => {
+      const name = 'hello'
+      const cmd = rtLib.mockResolved(rtAction, '')
+      command.argv = [name, '/action/actionFile.js', '--web', 'true', '--web-secure', 'abcxyz']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith({
+            name,
+            action: {
+              name,
+              exec: {
+                code: jsFile,
+                kind: 'nodejs:default'
+              },
+              annotations: [
+                { key: 'web-export', value: true },
+                { key: 'final', value: true },
+                { key: 'require-whisk-auth', value: 'abcxyz' }
               ]
             }
           })
@@ -655,7 +731,7 @@ describe('instance methods', () => {
         return command.run()
           .then(() => reject(new Error('does not throw error')))
           .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error('Cannot determine kind of action. Please use --kind to specifiy.'))
+            expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error('Cannot determine kind of action. Please use --kind to specify.'))
             resolve()
           })
       })
@@ -776,6 +852,7 @@ describe('instance methods', () => {
           })
       })
     })
+
     test('errors out on api error', () => {
       return new Promise((resolve, reject) => {
         rtLib.mockRejected(rtAction, new Error('an error'))
@@ -784,6 +861,19 @@ describe('instance methods', () => {
           .then(() => reject(new Error('does not throw error')))
           .catch(() => {
             expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error('an error'))
+            resolve()
+          })
+      })
+    })
+
+    test('errors on --web-secure with --web false flag', () => {
+      return new Promise((resolve, reject) => {
+        rtLib.mockRejected(rtAction, '')
+        command.argv = ['hello', '/action/fileWithNoExt', '--web-secure', 'true', '--web', 'false']
+        return command.run()
+          .then(() => reject(new Error('does not throw error')))
+          .catch(() => {
+            expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error(TheCommand.errorMessages.websecure))
             resolve()
           })
       })

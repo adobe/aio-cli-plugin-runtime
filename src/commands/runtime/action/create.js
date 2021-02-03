@@ -26,29 +26,35 @@ class ActionCreate extends RuntimeBaseCommand {
     let paramsAction
     let envParams
     let annotationParams
+    const webAction = flags.web ? flags.web.toLowerCase() : false
+    const webSecure = flags['web-secure'] ? flags['web-secure'].toLowerCase() : false
 
     try {
+      // sanity check web secure must have web truthy
+      if ((webSecure && webSecure !== 'false') && (!webAction || ['false', 'no'].includes(webAction))) {
+        throw (new Error(ActionCreate.errorMessages.websecure))
+      }
       // sanity check must either be a sequence or a file but permit neither in case of an update
       if (args.actionPath && flags.sequence) {
-        throw (new Error('Cannot specify sequence and a code artifact at the same time'))
+        throw (new Error(ActionCreate.errorMessages.sequenceWithAction))
       } else if (flags.docker && flags.sequence) {
-        throw (new Error('Cannot specify sequence and a container image at the same time'))
+        throw (new Error(ActionCreate.errorMessages.sequenceWithDocker))
       } else if (flags.docker && flags.kind) {
-        throw (new Error('Cannot specify a kind and a container image at the same time'))
+        throw (new Error(ActionCreate.errorMessages.kindWithDocker))
       } else if (!args.actionPath && !flags.sequence && !flags.docker && !this.isUpdate()) {
-        throw (new Error('Must provide a code artifact, container image, or a sequence'))
+        throw (new Error(ActionCreate.errorMessages.missingKind))
       }
 
       // can only specify main handler when also providing a file
       if (flags.main && !args.actionPath) {
-        throw new Error('The function handler can only be specified when you provide a code artifact')
+        throw new Error(ActionCreate.errorMessages.mainWithoutAction)
       }
 
       // a sequence is a system/internal function
       if (flags.kind && flags.sequence) {
-        throw new Error('A kind may not be specified for a sequence')
+        throw new Error(ActionCreate.errorMessages.kindWithSequence)
       } else if (flags.kind && !args.actionPath) {
-        throw new Error('A kind can only be specified when you provide a code artifact')
+        throw new Error(ActionCreate.errorMessages.kindWithoutAction)
       }
 
       if (args.actionPath) {
@@ -57,7 +63,7 @@ class ActionCreate extends RuntimeBaseCommand {
 
           if (args.actionPath.endsWith('.zip') || flags.binary) {
             if (!flags.kind && !flags.docker) {
-              throw (new Error('Invalid argument(s). creating an action from a zip/binary artifact requires specifying the action kind explicitly'))
+              throw (new Error(ActionCreate.errorMessages.missingKindForZip))
             }
             exec.code = fs.readFileSync(args.actionPath).toString('base64')
           } else {
@@ -75,16 +81,16 @@ class ActionCreate extends RuntimeBaseCommand {
             if (kind !== undefined) {
               exec.kind = kind
             } else {
-              throw new Error('Cannot determine kind of action. Please use --kind to specifiy.')
+              throw new Error(ActionCreate.errorMessages.unknownKind)
             }
           }
         } else {
-          throw new Error('Provide a valid path for ACTION')
+          throw new Error(ActionCreate.errorMessages.missingAction)
         }
       } else if (flags.sequence) {
         const sequenceAction = flags.sequence.trim().split(',')
         if (sequenceAction[0].length === 0) {
-          throw new Error('Provide a valid sequence component')
+          throw new Error(ActionCreate.errorMessages.invalidSequence)
         } else {
           exec = createComponentsfromSequence(sequenceAction)
         }
@@ -116,7 +122,7 @@ class ActionCreate extends RuntimeBaseCommand {
           if (overlap.length === 0) {
             paramsAction = paramsAction.concat(envParams)
           } else {
-            throw (new Error(`Invalid argument(s). Environment variables and function parameters may not overlap`))
+            throw (new Error(ActionCreate.errorMessages.invalidParams))
           }
         } else {
           paramsAction = envParams
@@ -125,17 +131,17 @@ class ActionCreate extends RuntimeBaseCommand {
 
       annotationParams = getKeyValueArrayFromMergedParameters(flags.annotation, flags['annotation-file'])
 
-      if (flags.web) {
+      if (webAction) {
         annotationParams = annotationParams || []
         // use: --web true or --web yes to make it a web action and --web raw to make it raw HTTP web action
         // TODO : Implement require-whisk-auth flag
-        switch (flags.web) {
+        switch (webAction) {
           case 'true':
-          case 'yes' :
+          case 'yes':
             annotationParams.push({ key: 'web-export', value: true })
             annotationParams.push({ key: 'final', value: true })
             break
-          case 'raw' :
+          case 'raw':
             annotationParams.push({ key: 'web-export', value: true })
             annotationParams.push({ key: 'raw-http', value: true })
             annotationParams.push({ key: 'final', value: true })
@@ -143,6 +149,17 @@ class ActionCreate extends RuntimeBaseCommand {
           case 'false':
           case 'no':
             annotationParams.push({ key: 'web-export', value: false })
+        }
+
+        if (webSecure) {
+          if (webSecure === 'true') {
+            annotationParams.push({ key: 'require-whisk-auth', value: true })
+          } else if (webSecure === 'false') {
+            annotationParams.push({ key: 'require-whisk-auth', value: false })
+          } else {
+            // here use flag as is, it is case sensitive
+            annotationParams.push({ key: 'require-whisk-auth', value: flags['web-secure'] })
+          }
         }
       }
 
@@ -205,6 +222,10 @@ ActionCreate.flags = {
     description: 'treat ACTION as a web action or as a raw HTTP web action', // help description for flag
     options: ['true', 'yes', 'false', 'no', 'raw']
   }),
+  'web-secure': flags.string({
+    description: 'secure the web action (valid values are true, false, or any string)', // help description for flag
+    dependsOn: ['web']
+  }),
   'param-file': flags.string({
     char: 'P',
     description: 'FILE containing parameter values in JSON format' // help description for flag
@@ -255,6 +276,21 @@ ActionCreate.flags = {
 }
 
 ActionCreate.description = 'Creates an Action'
+ActionCreate.errorMessages = {
+  websecure: 'Cannot specify --web-secure without also specifying --web [true|raw]',
+  sequenceWithAction: 'Cannot specify sequence and a code artifact at the same time',
+  sequenceWithDocker: 'Cannot specify sequence and a container image at the same time',
+  kindWithDocker: 'Cannot specify a kind and a container image at the same time',
+  kindWithSequence: 'A kind may not be specified for a sequence',
+  kindWithoutAction: 'A kind can only be specified when you provide a code artifact',
+  mainWithoutAction: 'The function handler can only be specified when you provide a code artifact',
+  missingKind: 'Must provide a code artifact, container image, or a sequence',
+  missingKindForZip: 'Invalid argument(s). Creating an action from a zip/binary artifact requires specifying the action kind explicitly',
+  missingAction: 'Provide a valid path for ACTION',
+  unknownKind: 'Cannot determine kind of action. Please use --kind to specify.',
+  invalidSequence: 'Provide a valid sequence component',
+  invalidParams: 'Invalid argument(s). Environment variables and function parameters may not overlap'
+}
 
 ActionCreate.aliases = ['rt:action:create']
 

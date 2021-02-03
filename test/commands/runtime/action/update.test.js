@@ -874,7 +874,7 @@ describe('instance methods', () => {
         return command.run()
           .then(() => reject(new Error('does not throw error')))
           .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to update the action', new Error('Invalid argument(s). creating an action from a zip/binary artifact requires specifying the action kind explicitly'))
+            expect(handleError).toHaveBeenLastCalledWith('failed to update the action', new Error('Invalid argument(s). Creating an action from a zip/binary artifact requires specifying the action kind explicitly'))
             resolve()
           })
       })
