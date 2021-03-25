@@ -32,7 +32,7 @@ Adobe I/O Runtime plugin for the Adobe I/O CLI
 
 # Usage
 ```sh-session
-$ aio plugins:install -g @adobe/aio-cli-plugin-runtime
+$ aio plugins:install @adobe/aio-cli-plugin-runtime
 $ # OR
 $ aio discover -i
 $ aio runtime --help
