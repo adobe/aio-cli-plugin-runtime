@@ -1786,10 +1786,10 @@ _See code: [src/commands/runtime/trigger/create.js](https://github.com/adobe/aio
 
 ## `aio runtime:trigger:delete TRIGGERPATH`
 
-Get a trigger for Adobe I/O Runtime
+Delete a trigger for Adobe I/O Runtime
 
 ```
-Get a trigger for Adobe I/O Runtime
+Delete a trigger for Adobe I/O Runtime
 
 USAGE
   $ aio runtime:trigger:delete TRIGGERPATH

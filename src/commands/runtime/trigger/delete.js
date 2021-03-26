@@ -41,7 +41,7 @@ TriggerDelete.flags = {
   ...RuntimeBaseCommand.flags
 }
 
-TriggerDelete.description = 'Get a trigger for Adobe I/O Runtime'
+TriggerDelete.description = 'Delete a trigger for Adobe I/O Runtime'
 
 TriggerDelete.aliases = [
   'rt:trigger:delete'
