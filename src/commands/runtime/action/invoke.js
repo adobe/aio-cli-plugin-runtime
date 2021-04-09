@@ -18,9 +18,8 @@ class ActionInvoke extends RuntimeBaseCommand {
   async run () {
     const { args, flags } = this.parse(ActionInvoke)
     const name = args.actionName
-    let paramsAction = {}
     try {
-      paramsAction = getKeyValueObjectFromMergedParameters(flags.param, flags['param-file'])
+      const paramsAction = getKeyValueObjectFromMergedParameters(flags.param, flags['param-file'])
 
       const ow = await this.wsk()
       const result = await ow.actions.invoke({
