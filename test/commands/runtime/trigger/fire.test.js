@@ -79,6 +79,7 @@ describe('instance methods', () => {
 
     test('fire a simple trigger', () => {
       const cmd = rtLib.mockResolved(rtAction, '')
+      rtUtils.getKeyValueObjectFromMergedParameters.mockReturnValue({})
       command.argv = ['trigger1']
       return command.run()
         .then(() => {
@@ -103,14 +104,14 @@ describe('instance methods', () => {
     test('fire a simple trigger, use param flag', () => {
       const cmd = rtLib.mockResolved(rtAction, '')
       command.argv = ['trigger1', '--param', 'a', 'b', '--param', 'c', 'd']
-      rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation(params => params && [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }])
+      rtUtils.getKeyValueObjectFromMergedParameters.mockReturnValue({ a: 'b', c: 'd' })
       return command.run()
         .then(() => {
-          expect(rtUtils.getKeyValueArrayFromMergedParameters).toHaveBeenCalledWith(['a', 'b', 'c', 'd'], undefined)
-          expect(cmd).toHaveBeenCalledWith({ name: 'trigger1',
-            params: {
-              parameters: [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }]
-            } })
+          expect(rtUtils.getKeyValueObjectFromMergedParameters).toHaveBeenCalledWith(['a', 'b', 'c', 'd'], undefined)
+          expect(cmd).toHaveBeenCalledWith({
+            name: 'trigger1',
+            params: { a: 'b', c: 'd' }
+          })
           expect(stdout.output).toMatch('')
         })
     })
@@ -119,14 +120,14 @@ describe('instance methods', () => {
       const cmd = rtLib.mockResolved(rtAction, '')
 
       command.argv = ['trigger1', '--param-file', '/trigger/parameters.json']
-      rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation((p, file) => file === '/trigger/parameters.json' && [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }])
+      rtUtils.getKeyValueObjectFromMergedParameters.mockReturnValue({ a: 'b', c: 'd' })
       return command.run()
         .then(() => {
-          expect(rtUtils.getKeyValueArrayFromMergedParameters).toHaveBeenCalledWith(undefined, '/trigger/parameters.json')
-          expect(cmd).toHaveBeenCalledWith({ name: 'trigger1',
-            params: {
-              parameters: [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }]
-            } })
+          expect(rtUtils.getKeyValueObjectFromMergedParameters).toHaveBeenCalledWith(undefined, '/trigger/parameters.json')
+          expect(cmd).toHaveBeenCalledWith({
+            name: 'trigger1',
+            params: { a: 'b', c: 'd' }
+          })
           expect(stdout.output).toMatch('')
         })
     })

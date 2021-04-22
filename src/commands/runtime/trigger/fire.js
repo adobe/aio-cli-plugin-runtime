@@ -11,7 +11,7 @@ governing permissions and limitations under the License.
 */
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
-const { getKeyValueArrayFromMergedParameters } = require('@adobe/aio-lib-runtime').utils
+const { getKeyValueObjectFromMergedParameters } = require('@adobe/aio-lib-runtime').utils
 const { flags } = require('@oclif/command')
 
 class TriggerFire extends RuntimeBaseCommand {
@@ -19,15 +19,7 @@ class TriggerFire extends RuntimeBaseCommand {
     const { args, flags } = this.parse(TriggerFire)
 
     try {
-      const triggerPackage = getKeyValueArrayFromMergedParameters(flags.param, flags['param-file']) || []
-
-      // triggerParams.parameters is expected to be passed as an array of key value pairs
-      // For example : [{key : 'Your key 1' , value: 'Your value 1'}, {key : 'Your key 2' , value: 'Your value 2'} ]
-      const triggerParams = {}
-      if (triggerPackage.length) {
-        triggerParams.parameters = triggerPackage
-      }
-
+      const triggerParams = getKeyValueObjectFromMergedParameters(flags.param, flags['param-file'])
       const options = {
         name: args.triggerName,
         params: triggerParams
