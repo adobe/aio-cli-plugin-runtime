@@ -43,7 +43,7 @@ global.fixtureFile = (output) => {
 
 // helper for fixtures, with regex replacement of place holders
 global.fixtureFileWithTimeZoneAdjustment = (() => {
-  const moment = require('moment')
+  const moment = require('dayjs')
 
   const dateFormatForList = { // only need to replace up to minutes, seconds are the same across timezones
     month: '2-digit',
