@@ -254,6 +254,48 @@ describe('instance methods', () => {
           start: 1558507178861,
           statusCode: 2,
           version: '0.0.1'
+        },
+        {
+          activationId: '12347',
+          annotations: [
+            { key: 'path', value: '8888_9999/foo' },
+            { key: 'kind', value: 'nodejs:10' },
+            { key: 'timeout', value: true }
+          ],
+          duration: 23,
+          name: 'foo',
+          namespace: '8888_9999',
+          start: 1558507178861,
+          statusCode: 1,
+          version: '0.0.1'
+        },
+        {
+          activationId: '12348',
+          annotations: [
+            { key: 'path', value: '8888_9999/foo' },
+            { key: 'kind', value: 'nodejs:10' },
+            { key: 'timeout', value: true }
+          ],
+          duration: 23,
+          name: 'foo',
+          namespace: '8888_9999',
+          start: 1558507178861,
+          statusCode: 0,
+          version: '0.0.1'
+        },
+        {
+          activationId: '12349',
+          annotations: [
+            { key: 'path', value: '8888_9999/foo' },
+            { key: 'kind', value: 'nodejs:10' },
+            { key: 'timeout', value: true }
+          ],
+          duration: 23,
+          name: 'foo',
+          namespace: '8888_9999',
+          start: 1558507178861,
+          statusCode: 3,
+          version: '0.0.1'
         }]
       rtLib.mockResolved(rtAction, data)
       return command.run()
