@@ -1,2 +1,2 @@
-Datetime               Activation ID                    Kind    Start Duration Status  Entity                  
-11/27/2020, 9:35:19 AM a5e7fdaeaa2e4384a7fdaeaa2e438442 trigger --    --       success 8888_9999/trigger:0.0.1 
+Datetime        Status   Kind     Version    Activation ID                    Start Wait Init Duration Entity  
+11/27 09:35:19  success  trigger  0.0.1      a5e7fdaeaa2e4384a7fdaeaa2e438442 --    --   --   --       trigger 

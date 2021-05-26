@@ -1,4 +1,4 @@
-rules                                                  
-/53444_41603/bsdf                       private active 
-/53444_41603/csdf                       private active 
-/53444_41603/xsdf                       private active 
+Datetime        Status            Version  Rules                                             
+02/05 18:19:02  active            0.0.1    bsdf                                              
+02/05 18:19:03  active            0.0.1    csdf                                              
+02/05 18:19:04  active            0.0.1    xsdf                                              

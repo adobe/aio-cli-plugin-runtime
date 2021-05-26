@@ -1,0 +1,62 @@
+[
+  {
+    "annotations": [
+      {
+        "key": "web-export",
+        "value": true
+      },
+      {
+        "key": "require-whisk-auth",
+        "value": true
+      },
+      {
+        "key": "exec",
+        "value": "nodejs:10-fat"
+      }
+    ],
+    "exec": {
+      "binary": false
+    },
+    "limits": {
+      "concurrency": 1,
+      "logs": 10,
+      "memory": 256,
+      "timeout": 60000
+    },
+    "name": "hello1",
+    "namespace": "53444_41603",
+    "publish": false,
+    "updated": 1549408742750,
+    "version": "0.0.2"
+  },
+  {
+    "annotations": [
+      {
+        "key": "web-export",
+        "value": true
+      },
+      {
+        "key": "require-whisk-auth",
+        "value": "abcdef"
+      },
+      {
+        "key": "exec",
+        "value": "nodejs:10-fat"
+      }
+    ],
+    "exec": {
+      "binary": false
+    },
+    "limits": {
+      "concurrency": 1,
+      "logs": 10,
+      "memory": 256,
+      "timeout": 60000
+    },
+    "name": "hello2",
+    "namespace": "53444_41603",
+    "publish": false,
+    "updated": 1549408842750,
+    "version": "0.0.2"
+  }
+]
