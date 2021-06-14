@@ -85,8 +85,7 @@ RuleList.flags = {
   ...RuntimeBaseCommand.flags,
   limit: flags.integer({
     char: 'l',
-    description: 'Limit number of rules returned. Default 30',
-    default: 30
+    description: 'Limit number of rules returned'
   }),
   skip: flags.integer({
     char: 's',

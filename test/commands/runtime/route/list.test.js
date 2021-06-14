@@ -61,7 +61,6 @@ test('flags', async () => {
 
   expect(flags.limit).toBeDefined()
   expect(flags.limit.char).toEqual('l')
-  expect(flags.limit.default).toEqual(30)
   expect(flags.limit.description).toBeDefined()
 
   expect(flags.skip).toBeDefined()

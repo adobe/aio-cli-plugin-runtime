@@ -93,7 +93,7 @@ PackageList.flags = {
   // aio runtime:package:list --count true OR  aio runtime:package:list --count yes
   limit: flags.integer({
     char: 'l',
-    description: 'only return LIMIT number of packages from the collection (default 30)'
+    description: 'only return LIMIT number of packages'
   }),
   skip: flags.integer({
     char: 's',
