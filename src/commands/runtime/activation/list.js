@@ -214,7 +214,7 @@ ActivationList.flags = {
   // example usage:  aio runtime:activation:list --limit 10 --skip 2
   limit: flags.integer({
     char: 'l',
-    description: `only return LIMIT number of activations (maximum ${ActivationList.limits.max}). Note that the maximum set for Adobe I/O Runtime is 50`
+    description: 'only return LIMIT number of activations'
   }),
   skip: flags.integer({
     char: 's',

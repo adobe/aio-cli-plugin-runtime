@@ -97,7 +97,7 @@ describe('instance methods', () => {
       command.argv = ['--skip', '3', '--json']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith(expect.objectContaining({ limit: 30, skip: 3, json: true }))
+          expect(cmd).toHaveBeenCalledWith(expect.objectContaining({ skip: 3, json: true }))
           expect(stdout.output).toMatch('[]')
         })
     })

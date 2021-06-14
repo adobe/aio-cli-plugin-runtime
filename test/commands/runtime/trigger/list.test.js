@@ -46,7 +46,6 @@ test('flags', async () => {
 
   expect(flags.limit).toBeDefined()
   expect(flags.limit.char).toEqual('l')
-  expect(flags.limit.default).toEqual(30)
   expect(flags.limit.type).toEqual('option')
   expect(flags.limit.description).toBeDefined()
 
@@ -123,7 +122,7 @@ describe('instance methods', () => {
       command.argv = ['--skip', '5']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ skip: 5, limit: 30 })
+          expect(cmd).toHaveBeenCalledWith({ skip: 5 })
           expect(stdout.output).toMatch('')
         })
     })
@@ -137,7 +136,6 @@ describe('instance methods', () => {
       return command.run()
         .then(() => {
           const cmdArg0 = cmd.mock.calls[0][0]
-          expect(cmdArg0).toHaveProperty('limit', 30)
           expect(cmdArg0).not.toHaveProperty('skip')
           expect(stdout.output).toMatch(fixtureFileWithTimeZoneAdjustment('trigger/list.txt', triggerDate))
         })
@@ -154,7 +152,6 @@ describe('instance methods', () => {
       return command.run()
         .then(() => {
           const cmdArg0 = cmd.mock.calls[0][0]
-          expect(cmdArg0).toHaveProperty('limit', 30)
           expect(cmdArg0).not.toHaveProperty('skip')
           expect(JSON.parse(stdout.output)).toMatchObject([{
             annotations: [],
