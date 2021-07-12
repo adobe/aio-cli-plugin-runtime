@@ -25,7 +25,7 @@ class ActivationLogs extends RuntimeBaseCommand {
     if (flags.last) {
       limit = 1
     } else if (flags.limit) {
-      limit = Math.min(flags.limit, 50)
+      limit = flags.limit
     }
 
     if (!args.activationId) {
@@ -115,7 +115,7 @@ ActivationLogs.flags = {
     default: false
   }),
   limit: flags.integer({
-    description: 'return the last `limit` activation logs. Max 50',
+    description: 'return the logs only from last LIMIT number of activations',
     exclusive: ['last']
   }),
   tail: flags.boolean({
