@@ -1,10 +1,11 @@
-Property                Value                      
-whisk auth                                         
-whisk API host          https://adobeioruntime.net 
-whisk API version       v1                         
-client cert                                        
-client key                                         
-whisk namespace         _                          
-whisk CLI version       1.0                        
-whisk API build version 2019-02-26                 
-whisk API build number  A                          
+ Property                Value                      
+ ─────────────────────── ────────────────────────── 
+ whisk auth                                         
+ whisk API host          https://adobeioruntime.net 
+ whisk API version       v1                         
+ client cert                                        
+ client key                                         
+ whisk namespace         _                          
+ whisk CLI version       1.0                        
+ whisk API build version 2019-02-26                 
+ whisk API build number  A                          

@@ -140,8 +140,9 @@ describe('instance methods', () => {
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalled()
-          const dates = JSON.parse(fixtureFile('package/list.json')).map(_ => _.updated)
-          expect(stdout.output).toMatch(fixtureFileWithTimeZoneAdjustment('package/list-name-sort-output.txt', dates))
+          expect(stdout.output).toEqual(expect.stringContaining('private  package  0.0.5    demo_package'))
+          expect(stdout.output).toEqual(expect.stringContaining('public   package  0.0.5    demo_package2'))
+          expect(stdout.output).toEqual(expect.stringContaining('private  binding  0.0.1    demo_package3'))
         })
     })
 

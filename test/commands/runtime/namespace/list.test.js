@@ -62,7 +62,10 @@ describe('instance methods', () => {
         return command.run()
           .then(() => {
             expect(cmd).toHaveBeenCalled()
-            expect(stdout.output).toMatchFixture('namespace/list.txt')
+            expect(stdout.output).toEqual(expect.stringContaining('Namespaces'))
+            expect(stdout.output).toEqual(expect.stringContaining('12345_67890'))
+            expect(stdout.output).toEqual(expect.stringContaining('99999_11111'))
+            expect(stdout.output).toEqual(expect.stringContaining('88888_22222'))
             resolve()
           })
       })
