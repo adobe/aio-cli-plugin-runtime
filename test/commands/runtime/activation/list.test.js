@@ -198,7 +198,8 @@ describe('instance methods', () => {
       rtLib.mockResolved(rtAction, data)
       return command.run()
         .then(() => {
-          expect(stdout.output).toEqual(expect.stringContaining('success  nodejs:10 0.0.1    ◡ 12345         warm  --   0    23ms     foo'))
+          expect(stdout.output).toEqual(expect.stringContaining('success  nodejs:10 0.0.1'))
+          expect(stdout.output).toEqual(expect.stringContaining('12345         warm  --   0    23ms     foo'))
         })
     })
 
@@ -221,7 +222,8 @@ describe('instance methods', () => {
       rtLib.mockResolved(rtAction, data)
       return command.run()
         .then(() => {
-          expect(stdout.output).toEqual(expect.stringContaining('success  nodejs:10 0.0.1    ․ 12345         warm  --   0    23ms     foo'))
+          expect(stdout.output).toEqual(expect.stringContaining('success  nodejs:10 0.0.1'))
+          expect(stdout.output).toEqual(expect.stringContaining('12345         warm  --   0    23ms     foo'))
         })
     })
 
