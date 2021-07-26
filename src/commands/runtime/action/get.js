@@ -34,6 +34,7 @@ class ActionGet extends RuntimeBaseCommand {
         const opts = ow.actions.client.options
         const webFlag = result.annotations.find(elem => elem.key === 'web-export')
         const webAction = webFlag !== undefined && webFlag.value === true
+        const namespaceAsSubdomainSupported = opts.api.includes('https://adobeioruntime.net/api')
 
         let [namespace, packageName] = result.namespace.split('/')
         const actionPartOfPackage = !!packageName
@@ -41,7 +42,9 @@ class ActionGet extends RuntimeBaseCommand {
         if (webAction) {
           const web = 'web'
           packageName = actionPartOfPackage ? packageName : 'default'
-          this.log(`${opts.api}${web}/${namespace}/${packageName}/${result.name}`)
+          namespaceAsSubdomainSupported
+            ? this.log(`https://${namespace}.adobeioruntime.net/api/${opts.version}/${web}/${packageName}/${result.name}`)
+            : this.log(`${opts.api}${web}/${namespace}/${packageName}/${result.name}`)
         } else {
           const nsPrefix = 'namespaces'
           const actionPrefix = 'actions'
