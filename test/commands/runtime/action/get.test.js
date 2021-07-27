@@ -162,6 +162,19 @@ describe('instance methods', () => {
         })
     })
 
+    test('retrieve an action --url with adobeioruntime.net apihost for a web action', () => {
+      const cmd = rtLib.mockResolvedFixture(rtAction, 'action/get.json')
+      rtLib.mockResolved('actions.client.options', '')
+      rtLib.actions.client.options = { api: 'https://adobeioruntime.net/api/v1/', version: 'v1' }
+      command.argv = ['hello', '--url']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalled()
+
+          expect(stdout.output).toMatch('https://53444_41603.adobeioruntime.net/api/v1/web/default/hello')
+        })
+    })
+
     test('retrieve an action --url when annotation array is absent', () => {
       const cmd = rtLib.mockResolvedFixture(rtAction, 'action/get_NoWebFlag.json')
       rtLib.mockResolved('actions.client.options', '')
