@@ -137,7 +137,9 @@ describe('instance methods', () => {
         .then(() => {
           const cmdArg0 = cmd.mock.calls[0][0]
           expect(cmdArg0).not.toHaveProperty('skip')
-          expect(stdout.output).toMatch(fixtureFileWithTimeZoneAdjustment('trigger/list.txt', triggerDate))
+          expect(stdout.output).toEqual(expect.stringContaining('2 active          0.0.1    trigger1'))
+          expect(stdout.output).toEqual(expect.stringContaining('inactive          0.0.1    trigger2'))
+          expect(stdout.output).toEqual(expect.stringContaining('inactive          0.0.1    trigger3'))
         })
     })
 
@@ -220,7 +222,10 @@ describe('instance methods', () => {
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalled()
-          expect(stdout.output).toMatch(fixtureFileWithTimeZoneAdjustment('trigger/list-name-sort-output.txt', triggerDate))
+          expect(stdout.output).toEqual(expect.stringContaining('inactive          0.0.1    a-hello'))
+          expect(stdout.output).toEqual(expect.stringContaining('inactive          0.0.1    b-hello'))
+          expect(stdout.output).toEqual(expect.stringContaining('inactive          0.0.1    b-hello'))
+          expect(stdout.output).toEqual(expect.stringContaining('inactive          0.0.1    c-hello'))
         })
     })
 

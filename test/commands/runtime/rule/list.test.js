@@ -110,8 +110,7 @@ describe('instance methods', () => {
         .then(() => {
           expect(cmd).toHaveBeenCalledWith(expect.objectContaining({ limit: 2 }))
           expect(cmd2).toHaveBeenCalled()
-          const dates = JSON.parse(fixtureFile('rule/list.json')).map(_ => _.updated)
-          expect(stdout.output).toMatch(fixtureFileWithTimeZoneAdjustment('rule/list-output.txt', dates))
+          expect(stdout.output).toEqual(expect.stringContaining('active            0.0.1    asdf'))
         })
     })
 
@@ -123,8 +122,7 @@ describe('instance methods', () => {
         .then(() => {
           expect(cmd).toHaveBeenCalledWith(expect.objectContaining({ limit: 2 }))
           expect(cmd2).toHaveBeenCalled()
-          const dates = JSON.parse(fixtureFile('rule/list.json')).map(_ => _.updated)
-          expect(stdout.output).toMatch(fixtureFileWithTimeZoneAdjustment('rule/list-output.txt', dates))
+          expect(stdout.output).toEqual(expect.stringContaining('active            0.0.1    asdf'))
         })
     })
 
@@ -146,8 +144,9 @@ describe('instance methods', () => {
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalled()
-          const dates = JSON.parse(fixtureFile('rule/get-name-sort.json')).map(_ => _.updated)
-          expect(stdout.output).toMatch(fixtureFileWithTimeZoneAdjustment('rule/list-name-sort-output.txt', dates))
+          expect(stdout.output).toEqual(expect.stringContaining('active            0.0.1    bsdf'))
+          expect(stdout.output).toEqual(expect.stringContaining('active            0.0.1    csdf'))
+          expect(stdout.output).toEqual(expect.stringContaining('active            0.0.1    xsdf'))
         })
     })
 

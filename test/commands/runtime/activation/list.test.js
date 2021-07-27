@@ -152,7 +152,7 @@ describe('instance methods', () => {
       rtLib.mockResolved(rtAction, data)
       return command.run()
         .then(() => {
-          expect(stdout.output).toMatch(fixtureFileWithTimeZoneAdjustment('activation/list-activation-cold-output.txt', data[0].start))
+          expect(stdout.output).toEqual(expect.stringContaining('success  nodejs:10 0.0.1      12345         cold  10   20   23ms     foo'))
         })
     })
 
@@ -175,7 +175,7 @@ describe('instance methods', () => {
       rtLib.mockResolved(rtAction, data)
       return command.run()
         .then(() => {
-          expect(stdout.output).toMatch(fixtureFileWithTimeZoneAdjustment('activation/list-activation-warm-output.txt', data[0].start))
+          expect(stdout.output).toEqual(expect.stringContaining('success  nodejs:10 0.0.1      12345         warm  --   0    23ms     foo'))
         })
     })
 
@@ -198,8 +198,8 @@ describe('instance methods', () => {
       rtLib.mockResolved(rtAction, data)
       return command.run()
         .then(() => {
-          const fixtureFileName = process.platform !== 'win32' ? 'activation/list-activation-topmost-output.txt' : 'activation/list-activation-topmost-output-win.txt'
-          expect(stdout.output).toMatch(fixtureFileWithTimeZoneAdjustment(fixtureFileName, data[0].start))
+          expect(stdout.output).toEqual(expect.stringContaining('success  nodejs:10 0.0.1'))
+          expect(stdout.output).toEqual(expect.stringContaining('12345         warm  --   0    23ms     foo'))
         })
     })
 
@@ -222,8 +222,8 @@ describe('instance methods', () => {
       rtLib.mockResolved(rtAction, data)
       return command.run()
         .then(() => {
-          const fixtureFileName = process.platform !== 'win32' ? 'activation/list-activation-sequence-output.txt' : 'activation/list-activation-sequence-output-win.txt'
-          expect(stdout.output).toMatch(fixtureFileWithTimeZoneAdjustment(fixtureFileName, data[0].start))
+          expect(stdout.output).toEqual(expect.stringContaining('success  nodejs:10 0.0.1'))
+          expect(stdout.output).toEqual(expect.stringContaining('12345         warm  --   0    23ms     foo'))
         })
     })
 
@@ -300,8 +300,11 @@ describe('instance methods', () => {
       rtLib.mockResolved(rtAction, data)
       return command.run()
         .then(() => {
-          const fixtureFileName = process.platform !== 'win32' ? 'activation/list-activation-timeout-output.txt' : 'activation/list-activation-timeout-output-win.txt'
-          expect(stdout.output).toMatch(fixtureFileWithTimeZoneAdjustment(fixtureFileName, data[0].start))
+          expect(stdout.output).toEqual(expect.stringContaining('timeout   nodejs:10 0.0.1      12345         warm  --   0    23ms     foo'))
+          expect(stdout.output).toEqual(expect.stringContaining('dev error nodejs:10 0.0.1      12346         warm  --   0    23ms     foo'))
+          expect(stdout.output).toEqual(expect.stringContaining('app error nodejs:10 0.0.1      12347         warm  --   0    23ms     foo'))
+          expect(stdout.output).toEqual(expect.stringContaining('success   nodejs:10 0.0.1      12348         warm  --   0    23ms     foo'))
+          expect(stdout.output).toEqual(expect.stringContaining('sys error nodejs:10 0.0.1      12349         warm  --   0    23ms     foo'))
         })
     })
 
@@ -324,7 +327,7 @@ describe('instance methods', () => {
       rtLib.mockResolved(rtAction, data)
       return command.run()
         .then(() => {
-          expect(stdout.output).toMatch(fixtureFileWithTimeZoneAdjustment('activation/list-activation-kind-output.txt', data[0].start))
+          expect(stdout.output).toEqual(expect.stringContaining('timeout  nodejs:10 (λ) 0.0.1      12345         warm  --   0    23ms     foo'))
         })
     })
 
@@ -341,7 +344,7 @@ describe('instance methods', () => {
       rtLib.mockResolved(rtAction, data)
       return command.run()
         .then(() => {
-          expect(stdout.output).toMatch(fixtureFileWithTimeZoneAdjustment('activation/list-triggers-output.txt', data[0].start))
+          expect(stdout.output).toEqual(expect.stringContaining('success  trigger  0.0.1      a5e7fdaeaa2e4384a7fdaeaa2e438442'))
         })
     })
 
