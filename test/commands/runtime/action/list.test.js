@@ -74,8 +74,7 @@ describe('instance methods', () => {
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalledWith(expect.objectContaining({ limit: 1 }))
-          const dates = JSON.parse(fixtureFile('action/list.json')).map(_ => _.updated)
-          expect(stdout.output).toMatch(fixtureFileWithTimeZoneAdjustment('action/list-output.txt', dates))
+          expect(stdout.output).toEqual(expect.stringContaining('web      nodejs:10-fat 0.0.2    hello'))
         })
     })
 
@@ -84,8 +83,7 @@ describe('instance methods', () => {
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalled()
-          const dates = JSON.parse(fixtureFile('action/list.json')).map(_ => _.updated)
-          expect(stdout.output).toMatch(fixtureFileWithTimeZoneAdjustment('action/list-output.txt', dates))
+          expect(stdout.output).toEqual(expect.stringContaining('web      nodejs:10-fat 0.0.2    hello'))
         })
     })
 
@@ -94,9 +92,8 @@ describe('instance methods', () => {
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalled()
-          const dates = JSON.parse(fixtureFile('action/list3.json')).map(_ => _.updated)
-          const fixtureFileName = process.platform !== 'win32' ? 'action/list-output-3.txt' : 'action/list-output-3-win.txt'
-          expect(stdout.output).toMatch(fixtureFileWithTimeZoneAdjustment(fixtureFileName, dates))
+          expect(stdout.output).toEqual(expect.stringContaining('web'))
+          expect(stdout.output).toEqual(expect.stringContaining('nodejs:10-fat 0.0.2    hello'))
         })
     })
 
@@ -108,8 +105,7 @@ describe('instance methods', () => {
         .then(() => {
           expect(rtUtils.parsePackageName).toHaveBeenCalledWith('somepackage')
           expect(cmd).toHaveBeenCalledWith(expect.objectContaining({ id: 'hola/' }))
-          const dates = JSON.parse(fixtureFile('action/list.json')).map(_ => _.updated)
-          expect(stdout.output).toMatch(fixtureFileWithTimeZoneAdjustment('action/list-output.txt', dates))
+          expect(stdout.output).toEqual(expect.stringContaining('web      nodejs:10-fat 0.0.2    hello'))
         })
     })
 
@@ -121,8 +117,7 @@ describe('instance methods', () => {
         .then(() => {
           expect(rtUtils.parsePackageName).toHaveBeenCalledWith('somepackage')
           expect(cmd).toHaveBeenCalledWith(expect.objectContaining({ id: 'hola/', namespace: 'bonjour' }))
-          const dates = JSON.parse(fixtureFile('action/list.json')).map(_ => _.updated)
-          expect(stdout.output).toMatch(fixtureFileWithTimeZoneAdjustment('action/list-output.txt', dates))
+          expect(stdout.output).toEqual(expect.stringContaining('web      nodejs:10-fat 0.0.2    hello'))
         })
     })
 
@@ -134,8 +129,7 @@ describe('instance methods', () => {
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalled()
-          const dates = JSON.parse(fixtureFile('action/list2.json')).map(_ => _.updated)
-          expect(stdout.output).toMatch(fixtureFileWithTimeZoneAdjustment('action/list-output-2.txt', dates))
+          expect(stdout.output).toEqual(expect.stringContaining('private  nodejs:10-fat 0.0.2    hello'))
         })
     })
 
@@ -219,7 +213,7 @@ describe('instance methods', () => {
       rtLib.mockResolved(rtAction, data)
       return command.run()
         .then(() => {
-          expect(stdout.output).toMatch(fixtureFileWithTimeZoneAdjustment('action/list-kind-output.txt', data[0].updated))
+          expect(stdout.output).toEqual(expect.stringContaining('web      nodejs:10 (λ) 0.0.2    hello'))
         })
     })
 
@@ -229,8 +223,9 @@ describe('instance methods', () => {
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalled()
-          const dates = JSON.parse(fixtureFile('action/list-name-sort.json')).map(_ => _.updated)
-          expect(stdout.output).toMatch(fixtureFileWithTimeZoneAdjustment('action/list-name-sort-output.txt', dates))
+          expect(stdout.output).toEqual(expect.stringContaining('private  nodejs:10 0.0.1    a-hello'))
+          expect(stdout.output).toEqual(expect.stringContaining('private  nodejs:10 0.0.1    b-hello'))
+          expect(stdout.output).toEqual(expect.stringContaining('private  nodejs:10 0.0.1    53444_70361/c-hello'))
         })
     })
 

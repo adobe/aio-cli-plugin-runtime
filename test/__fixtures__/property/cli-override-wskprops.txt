@@ -1,10 +1,11 @@
-Property                Value               
-whisk auth              foobar              
-whisk API host          https://google.com  
-whisk API version       v12.4               
-client cert                                 
-client key                                  
-whisk namespace         1234_5678           
-whisk CLI version       1.0                 
-whisk API build version 2019-02-26          
-whisk API build number  A                   
+ Property                Value               
+ ─────────────────────── ─────────────────── 
+ whisk auth              foobar              
+ whisk API host          https://google.com  
+ whisk API version       v12.4               
+ client cert                                 
+ client key                                  
+ whisk namespace         1234_5678           
+ whisk CLI version       1.0                 
+ whisk API build version 2019-02-26          
+ whisk API build number  A                   

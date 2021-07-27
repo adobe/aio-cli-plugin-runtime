@@ -126,7 +126,7 @@ describe('instance methods', () => {
       command.argv = ['--namespace']
       return command.run()
         .then(() => {
-          expect(stdout.output).toMatchFixture('property/namespace.txt')
+          expect(stdout.output).toEqual(expect.stringContaining('whisk namespace some_namespace'))
         })
     })
 
@@ -137,7 +137,7 @@ describe('instance methods', () => {
       command.argv = ['--auth']
       return command.run()
         .then(() => {
-          expect(stdout.output).toMatchFixture('property/auth.txt')
+          expect(stdout.output).toEqual(expect.stringContaining('whisk auth some-gibberish-not-a-real-key'))
         })
     })
 
@@ -148,7 +148,7 @@ describe('instance methods', () => {
       command.argv = ['--apihost']
       return command.run()
         .then(() => {
-          expect(stdout.output).toMatchFixture('property/apihost.txt')
+          expect(stdout.output).toEqual(expect.stringContaining('whisk API host some.host'))
         })
     })
 
@@ -159,7 +159,7 @@ describe('instance methods', () => {
       command.argv = ['--apiversion']
       return command.run()
         .then(() => {
-          expect(stdout.output).toMatchFixture('property/apiversion.txt')
+          expect(stdout.output).toEqual(expect.stringContaining('whisk API version v1'))
         })
     })
 
@@ -170,7 +170,7 @@ describe('instance methods', () => {
       command.argv = ['--cliversion']
       return command.run()
         .then(() => {
-          expect(stdout.output).toMatchFixture('property/cliversion.txt')
+          expect(stdout.output).toEqual(expect.stringContaining('whisk CLI version 1.0'))
         })
     })
 
@@ -181,7 +181,8 @@ describe('instance methods', () => {
       command.argv = ['--apibuild']
       return command.run()
         .then(() => {
-          expect(stdout.output).toMatchFixture('property/apibuild.txt')
+          expect(stdout.output).toEqual(expect.stringContaining('whisk API build version'))
+          expect(stdout.output).toEqual(expect.stringContaining('2019-02-26'))
         })
     })
 
@@ -192,7 +193,7 @@ describe('instance methods', () => {
       command.argv = ['--apibuildno']
       return command.run()
         .then(() => {
-          expect(stdout.output).toMatchFixture('property/apibuildno.txt')
+          expect(stdout.output).toEqual(expect.stringContaining('whisk API build number'))
         })
     })
 
