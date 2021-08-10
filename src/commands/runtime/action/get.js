@@ -43,7 +43,7 @@ class ActionGet extends RuntimeBaseCommand {
           const web = 'web'
           packageName = actionPartOfPackage ? packageName : 'default'
           namespaceAsSubdomainSupported
-            ? this.log(`https://${namespace}.adobeioruntime.net/api/${opts.version}/${web}/${packageName}/${result.name}`)
+            ? this.log(`https://${namespace}.adobeioruntime.net/api/${opts.apiVersion}/${web}/${packageName}/${result.name}`)
             : this.log(`${opts.api}${web}/${namespace}/${packageName}/${result.name}`)
         } else {
           const nsPrefix = 'namespaces'
