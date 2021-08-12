@@ -85,10 +85,19 @@ const mockRtUtils = {
 
 const init = jest.fn().mockReturnValue(mockRtLibInstance)
 const printActionLogs = jest.fn()
+const LogForwarding = jest.fn(() => {
+  return {
+    get: jest.fn(),
+    setAdobeIoRuntime: jest.fn(),
+    setAzureLogAnalytics: jest.fn(),
+    setSplunkHec: jest.fn()
+  }
+})
 module.exports = {
   utils: mockRtUtils,
   init,
   printActionLogs,
+  LogForwarding,
   mockReset: () => {
     Object.values(mockRtUtils).forEach(v => v.mockReset())
     init.mockClear()

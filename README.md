@@ -62,6 +62,11 @@ $ aio runtime --help
 * [`aio runtime:namespace`](#aio-runtimenamespace)
 * [`aio runtime:namespace:get`](#aio-runtimenamespaceget)
 * [`aio runtime:namespace:list`](#aio-runtimenamespacelist)
+* [`aio runtime:namespace:log-forwarding:get`](#aio-runtimenamespacelog-forwardingget)
+* [`aio runtime:namespace:log-forwarding:set`](#aio-runtimenamespacelog-forwardingset)
+* [`aio runtime:namespace:log-forwarding:set:adobe-io-runtime`](#aio-runtimenamespacelog-forwardingsetadobe-io-runtime)
+* [`aio runtime:namespace:log-forwarding:set:azure-log-analytics`](#aio-runtimenamespacelog-forwardingsetazure-log-analytics)
+* [`aio runtime:namespace:log-forwarding:set:splunk-hec`](#aio-runtimenamespacelog-forwardingsetsplunk-hec)
 * [`aio runtime:package`](#aio-runtimepackage)
 * [`aio runtime:package:bind PACKAGENAME BINDPACKAGENAME`](#aio-runtimepackagebind-packagename-bindpackagename)
 * [`aio runtime:package:create PACKAGENAME`](#aio-runtimepackagecreate-packagename)
@@ -874,6 +879,183 @@ ALIASES
 ```
 
 _See code: [src/commands/runtime/namespace/list.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.0.0/src/commands/runtime/namespace/list.js)_
+
+## `aio runtime:namespace:log-forwarding:get`
+
+Get log forwarding destination configuration
+
+```
+Get log forwarding destination configuration
+
+USAGE
+  $ aio runtime:namespace:log-forwarding:get
+
+OPTIONS
+  -i, --insecure  bypass certificate check
+  -u, --auth      whisk auth
+  -v, --verbose   Verbose output
+  --apihost       whisk API host
+  --apiversion    whisk API version
+  --cert          client cert
+  --debug=debug   Debug level output
+  --help          Show help
+  --key           client key
+  --version       Show version
+
+ALIASES
+  $ aio runtime:ns:log-forwarding:get
+  $ aio runtime:ns:lf:get
+  $ aio runtime:namespace:lf:get
+  $ aio rt:namespace:log-forwarding:get
+  $ aio rt:namespace:lf:get
+  $ aio rt:ns:log-forwarding:get
+  $ aio rt:ns:lf:get
+```
+
+_See code: [src/commands/runtime/namespace/log-forwarding/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.0.0/src/commands/runtime/namespace/log-forwarding/get.js)_
+
+## `aio runtime:namespace:log-forwarding:set`
+
+Configure log forwarding destination
+
+```
+Configure log forwarding destination
+
+USAGE
+  $ aio runtime:namespace:log-forwarding:set
+
+OPTIONS
+  -i, --insecure  bypass certificate check
+  -u, --auth      whisk auth
+  -v, --verbose   Verbose output
+  --apihost       whisk API host
+  --apiversion    whisk API version
+  --cert          client cert
+  --debug=debug   Debug level output
+  --help          Show help
+  --key           client key
+  --version       Show version
+
+ALIASES
+  $ aio runtime:ns:log-forwarding:set
+  $ aio runtime:ns:lf:set
+  $ aio runtime:namespace:lf:set
+  $ aio rt:namespace:log-forwarding:set
+  $ aio rt:namespace:lf:set
+  $ aio rt:ns:log-forwarding:set
+  $ aio rt:ns:lf:set
+```
+
+_See code: [src/commands/runtime/namespace/log-forwarding/set.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.0.0/src/commands/runtime/namespace/log-forwarding/set.js)_
+
+## `aio runtime:namespace:log-forwarding:set:adobe-io-runtime`
+
+Set log forwarding destination to Adobe I/O Runtime (Logs will be accessible via aio CLI)
+
+```
+Set log forwarding destination to Adobe I/O Runtime (Logs will be accessible via aio CLI)
+
+USAGE
+  $ aio runtime:namespace:log-forwarding:set:adobe-io-runtime
+
+OPTIONS
+  -i, --insecure  bypass certificate check
+  -u, --auth      whisk auth
+  -v, --verbose   Verbose output
+  --apihost       whisk API host
+  --apiversion    whisk API version
+  --cert          client cert
+  --debug=debug   Debug level output
+  --help          Show help
+  --key           client key
+  --version       Show version
+
+ALIASES
+  $ aio runtime:ns:log-forwarding:set:adobe-io-runtime
+  $ aio runtime:ns:lf:set:adobe-io-runtime
+  $ aio runtime:namespace:lf:set:adobe-io-runtime
+  $ aio rt:namespace:log-forwarding:set:adobe-io-runtime
+  $ aio rt:namespace:lf:set:adobe-io-runtime
+  $ aio rt:ns:log-forwarding:set:adobe-io-runtime
+  $ aio rt:ns:lf:set:adobe-io-runtime
+```
+
+_See code: [src/commands/runtime/namespace/log-forwarding/set/adobe-io-runtime.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.0.0/src/commands/runtime/namespace/log-forwarding/set/adobe-io-runtime.js)_
+
+## `aio runtime:namespace:log-forwarding:set:azure-log-analytics`
+
+Set log forwarding destination to Azure Log Analytics
+
+```
+Set log forwarding destination to Azure Log Analytics
+
+USAGE
+  $ aio runtime:namespace:log-forwarding:set:azure-log-analytics
+
+OPTIONS
+  -i, --insecure             bypass certificate check
+  -u, --auth                 whisk auth
+  -v, --verbose              Verbose output
+  --apihost                  whisk API host
+  --apiversion               whisk API version
+  --cert                     client cert
+  --customer-id=customer-id  (required) Customer ID
+  --debug=debug              Debug level output
+  --help                     Show help
+  --key                      client key
+  --log-type=log-type        (required) Log type
+  --shared-key=shared-key    (required) Shared key
+  --version                  Show version
+
+ALIASES
+  $ aio runtime:ns:log-forwarding:set:azure-log-analytics
+  $ aio runtime:ns:lf:set:azure-log-analytics
+  $ aio runtime:namespace:lf:set:azure-log-analytics
+  $ aio rt:namespace:log-forwarding:set:azure-log-analytics
+  $ aio rt:namespace:lf:set:azure-log-analytics
+  $ aio rt:ns:log-forwarding:set:azure-log-analytics
+  $ aio rt:ns:lf:set:azure-log-analytics
+```
+
+_See code: [src/commands/runtime/namespace/log-forwarding/set/azure-log-analytics.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.0.0/src/commands/runtime/namespace/log-forwarding/set/azure-log-analytics.js)_
+
+## `aio runtime:namespace:log-forwarding:set:splunk-hec`
+
+Set log forwarding destination to Splunk HEC
+
+```
+Set log forwarding destination to Splunk HEC
+
+USAGE
+  $ aio runtime:namespace:log-forwarding:set:splunk-hec
+
+OPTIONS
+  -i, --insecure         bypass certificate check
+  -u, --auth             whisk auth
+  -v, --verbose          Verbose output
+  --apihost              whisk API host
+  --apiversion           whisk API version
+  --cert                 client cert
+  --debug=debug          Debug level output
+  --hec-token=hec-token  (required) HEC token
+  --help                 Show help
+  --host=host            (required) Host
+  --index=index          (required) Index
+  --key                  client key
+  --port=port            (required) Port
+  --version              Show version
+
+ALIASES
+  $ aio runtime:ns:log-forwarding:set:splunk-hec
+  $ aio runtime:ns:lf:set:splunk-hec
+  $ aio runtime:namespace:lf:set:splunk-hec
+  $ aio rt:namespace:log-forwarding:set:splunk-hec
+  $ aio rt:namespace:lf:set:splunk-hec
+  $ aio rt:ns:log-forwarding:set:splunk-hec
+  $ aio rt:ns:lf:set:splunk-hec
+```
+
+_See code: [src/commands/runtime/namespace/log-forwarding/set/splunk-hec.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.0.0/src/commands/runtime/namespace/log-forwarding/set/splunk-hec.js)_
 
 ## `aio runtime:package`
 
