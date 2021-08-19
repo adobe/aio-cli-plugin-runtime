@@ -63,8 +63,10 @@ class ActivationLogs extends RuntimeBaseCommand {
       } else if (flags.action) {
         filterActions.push(flags.action)
       }
+      const tail = flags.poll || flags.tail || flags.watch
+      const startTime = tail ? Date.now() : 0
 
-      await rtLib.printActionLogs({ ow: owOptions }, this.log, limit, filterActions, flags.strip, flags.poll || flags.tail || flags.watch)
+      await rtLib.printActionLogs({ ow: owOptions }, this.log, limit, filterActions, flags.strip, tail, undefined, startTime)
     } else {
       const logger = this.log
       return ow.activations.logs(args.activationId).then((result) => {

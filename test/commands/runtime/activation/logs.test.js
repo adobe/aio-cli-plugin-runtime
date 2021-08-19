@@ -109,7 +109,7 @@ describe('instance methods', () => {
       command.argv = []
       return command.run()
         .then(() => {
-          expect(RuntimeLib.printActionLogs).toHaveBeenCalledWith(expect.anything(), expect.anything(), 1, expect.anything(), expect.anything(), expect.anything())
+          expect(RuntimeLib.printActionLogs).toHaveBeenCalledWith(expect.anything(), expect.anything(), 1, expect.anything(), expect.anything(), expect.anything(), undefined, expect.anything())
         })
     })
 
@@ -117,7 +117,7 @@ describe('instance methods', () => {
       command.argv = ['-l']
       return command.run()
         .then(() => {
-          expect(RuntimeLib.printActionLogs).toHaveBeenCalledWith(expect.anything(), expect.anything(), 1, expect.anything(), expect.anything(), expect.anything())
+          expect(RuntimeLib.printActionLogs).toHaveBeenCalledWith(expect.anything(), expect.anything(), 1, expect.anything(), expect.anything(), expect.anything(), undefined, expect.anything())
         })
     })
 
@@ -125,7 +125,7 @@ describe('instance methods', () => {
       command.argv = ['-l']
       return command.run()
         .then(() => {
-          expect(RuntimeLib.printActionLogs).toHaveBeenCalledWith(expect.anything(), expect.anything(), 1, expect.anything(), expect.anything(), expect.anything())
+          expect(RuntimeLib.printActionLogs).toHaveBeenCalledWith(expect.anything(), expect.anything(), 1, expect.anything(), expect.anything(), expect.anything(), undefined, expect.anything())
           expect(stdout.output).toMatch('')
         })
     })
@@ -134,7 +134,7 @@ describe('instance methods', () => {
       command.argv = ['--last']
       return command.run()
         .then(() => {
-          expect(RuntimeLib.printActionLogs).toHaveBeenCalledWith(expect.anything(), expect.anything(), 1, expect.anything(), expect.anything(), expect.anything())
+          expect(RuntimeLib.printActionLogs).toHaveBeenCalledWith(expect.anything(), expect.anything(), 1, expect.anything(), expect.anything(), expect.anything(), undefined, expect.anything())
         })
     })
 
@@ -142,7 +142,7 @@ describe('instance methods', () => {
       command.argv = ['--limit', '2']
       return command.run()
         .then(() => {
-          expect(RuntimeLib.printActionLogs).toHaveBeenLastCalledWith(expect.anything(), expect.anything(), 2, expect.anything(), expect.anything(), expect.anything())
+          expect(RuntimeLib.printActionLogs).toHaveBeenLastCalledWith(expect.anything(), expect.anything(), 2, expect.anything(), expect.anything(), expect.anything(), undefined, expect.anything())
         })
     })
 
@@ -166,7 +166,7 @@ describe('instance methods', () => {
       command.argv = ['-m']
       return command.run()
         .then(() => {
-          expect(RuntimeLib.printActionLogs).toHaveBeenLastCalledWith(expect.anything(), expect.anything(), 1, ['pkg1/hello', 'pkg2/hello2'], expect.anything(), expect.anything())
+          expect(RuntimeLib.printActionLogs).toHaveBeenLastCalledWith(expect.anything(), expect.anything(), 1, ['pkg1/hello', 'pkg2/hello2'], expect.anything(), expect.anything(), undefined, expect.anything())
         })
     })
 
@@ -190,7 +190,7 @@ describe('instance methods', () => {
       command.argv = ['-p', 'pkg1']
       return command.run()
         .then(() => {
-          expect(RuntimeLib.printActionLogs).toHaveBeenLastCalledWith(expect.anything(), expect.anything(), 1, ['pkg1/hello'], expect.anything(), expect.anything())
+          expect(RuntimeLib.printActionLogs).toHaveBeenLastCalledWith(expect.anything(), expect.anything(), 1, ['pkg1/hello'], expect.anything(), expect.anything(), undefined, expect.anything())
         })
     })
 
@@ -238,7 +238,7 @@ describe('instance methods', () => {
       command.argv = ['-p', 'pkg1', '--deployed']
       return command.run()
         .then(() => {
-          expect(RuntimeLib.printActionLogs).toHaveBeenLastCalledWith(expect.anything(), expect.anything(), 1, ['pkg1/'], expect.anything(), expect.anything())
+          expect(RuntimeLib.printActionLogs).toHaveBeenLastCalledWith(expect.anything(), expect.anything(), 1, ['pkg1/'], expect.anything(), expect.anything(), undefined, expect.anything())
         })
     })
 
@@ -262,7 +262,16 @@ describe('instance methods', () => {
       command.argv = ['-a', 'hello']
       return command.run()
         .then(() => {
-          expect(RuntimeLib.printActionLogs).toHaveBeenLastCalledWith(expect.anything(), expect.anything(), 1, ['hello'], expect.anything(), expect.anything())
+          expect(RuntimeLib.printActionLogs).toHaveBeenLastCalledWith(expect.anything(), expect.anything(), 1, ['hello'], expect.anything(), expect.anything(), undefined, expect.anything())
+        })
+    })
+    test('startTime is now when fetching continuously', () => {
+      const mockedNow = 1487076708000
+      Date.now = jest.fn(() => mockedNow)
+      command.argv = ['-t']
+      return command.run()
+        .then(() => {
+          expect(RuntimeLib.printActionLogs).toHaveBeenLastCalledWith(expect.anything(), expect.anything(), 1, [], expect.anything(), expect.anything(), undefined, 1487076708000)
         })
     })
   })
