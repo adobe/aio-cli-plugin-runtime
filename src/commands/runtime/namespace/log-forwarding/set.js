@@ -30,10 +30,12 @@ class SetCommand extends RuntimeBaseCommand {
     this.log(`Log forwarding was set to ${type} for this namespace`)
   }
 
+  // eslint-disable-next-line camelcase
   async set_adobe_io_runtime (logForwarding) {
     await logForwarding.setAdobeIoRuntime()
   }
 
+  // eslint-disable-next-line camelcase
   async set_azure_log_analytics (logForwarding) {
     const responses = await inquirer.prompt([
       {
@@ -58,6 +60,7 @@ class SetCommand extends RuntimeBaseCommand {
     )
   }
 
+  // eslint-disable-next-line camelcase
   async set_splunk_hec (logForwarding) {
     const responses = await inquirer.prompt([
       {
