@@ -10,22 +10,19 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const { LogForwarding } = require('@adobe/aio-lib-runtime')
+const RuntimeLib = require('@adobe/aio-lib-runtime')
 const TheCommand = require('../../../../../src/commands/runtime/namespace/log-forwarding/get')
 const { stdout } = require('stdout-stderr')
 
-let command
+let command, rtLib
 beforeEach(async () => {
   command = new TheCommand([])
+  rtLib = await RuntimeLib.init({ apihost: 'fakehost', api_key: 'fakekey' })
 })
 
 test('get log forwarding settings', () => {
   return new Promise(resolve => {
-    LogForwarding.mockImplementation(() => {
-      return {
-        get: jest.fn().mockReturnValue(fixtureJson('namespace/log-forwarding/get-remote.json'))
-      }
-    })
+    rtLib.logForwarding.get = jest.fn().mockReturnValue(fixtureJson('namespace/log-forwarding/get-remote.json'))
     return command.run()
       .then(() => {
         expect(stdout.output).toMatchFixtureIgnoreWhite('namespace/log-forwarding/get-result.txt')
@@ -35,10 +32,6 @@ test('get log forwarding settings', () => {
 })
 
 test('failed to get log forwarding settings', async () => {
-  LogForwarding.mockImplementation(() => {
-    return {
-      get: jest.fn().mockRejectedValue(new Error('mocked error'))
-    }
-  })
+  rtLib.logForwarding.get = jest.fn().mockRejectedValue(new Error('mocked error'))
   await expect(command.run()).rejects.toThrow('mocked error')
 })

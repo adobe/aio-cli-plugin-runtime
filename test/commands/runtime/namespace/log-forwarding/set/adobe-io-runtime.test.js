@@ -10,26 +10,23 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const { LogForwarding } = require('@adobe/aio-lib-runtime')
+const RuntimeLib = require('@adobe/aio-lib-runtime')
 const TheCommand = require('../../../../../../src/commands/runtime/namespace/log-forwarding/set/adobe-io-runtime')
 const { stdout } = require('stdout-stderr')
 
-let command
+let command, rtLib
 beforeEach(async () => {
   command = new TheCommand([])
+  rtLib = await RuntimeLib.init({ apihost: 'fakehost', api_key: 'fakekey' })
 })
 
 test('set log forwarding settings to adobe_io_runtime', () => {
   return new Promise(resolve => {
     const setCall = jest.fn()
-    LogForwarding.mockImplementation(() => {
-      return {
-        setAdobeIoRuntime: setCall
-      }
-    })
+    rtLib.logForwarding.setAdobeIoRuntime = setCall
     return command.run()
       .then(() => {
-        expect(stdout.output).toMatch(/Log forwarding was set to adobe_io_runtime for namespace 'some_namespace'/)
+        expect(stdout.output).toMatch(/Log forwarding was set to adobe_io_runtime for this namespace/)
         expect(setCall).toBeCalledTimes(1)
         resolve()
       })

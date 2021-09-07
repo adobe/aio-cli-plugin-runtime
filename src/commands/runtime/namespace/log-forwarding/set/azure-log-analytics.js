@@ -11,20 +11,18 @@ governing permissions and limitations under the License.
 */
 
 const { flags } = require('@oclif/command')
-const { LogForwarding } = require('@adobe/aio-lib-runtime')
 const RuntimeBaseCommand = require('../../../../../RuntimeBaseCommand')
 
 class AzureLogAnalyticsCommand extends RuntimeBaseCommand {
   async run () {
     const { flags } = this.parse(AzureLogAnalyticsCommand)
-    const options = await this.getOptions()
-    const logForwarding = new LogForwarding(options.namespace, options.apihost, options.api_key)
-    await logForwarding.setAzureLogAnalytics(
+    const ow = await this.wsk()
+    await ow.logForwarding.setAzureLogAnalytics(
       flags['customer-id'],
       flags['shared-key'],
       flags['log-type']
     )
-    this.log(`Log forwarding was set to azure_log_analytics for namespace '${options.namespace}'`)
+    this.log(`Log forwarding was set to azure_log_analytics for this namespace`)
   }
 }
 

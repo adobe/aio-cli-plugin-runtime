@@ -11,7 +11,7 @@ governing permissions and limitations under the License.
 */
 
 const inquirer = require('inquirer')
-const { LogForwarding } = require('@adobe/aio-lib-runtime')
+const RuntimeLib = require('@adobe/aio-lib-runtime')
 const TheCommand = require('../../../../../src/commands/runtime/namespace/log-forwarding/set')
 const { stdout } = require('stdout-stderr')
 
@@ -32,13 +32,14 @@ const dataFixtures = [
   }]
 ]
 
-let command, setCall, prompt
+let command, setCall, prompt, rtLib
 
 beforeEach(async () => {
   command = new TheCommand([])
   setCall = jest.fn()
   prompt = jest.fn()
   inquirer.prompt = prompt
+  rtLib = await RuntimeLib.init({ apihost: 'fakehost', api_key: 'fakekey' })
 })
 
 test('choices contain all supported log destinations', () => {
@@ -58,7 +59,7 @@ test('choices contain all supported log destinations', () => {
   })
 })
 
-test.each(dataFixtures)('set log forwarding settings to %s', async (destination, fnName, input) => {
+test.each(dataFixtures)('set log forwarding settings to %s (interactive)', async (destination, fnName, input) => {
   return new Promise(resolve => {
     mockSelectedDestination(destination, fnName, setCall)
     if (input !== undefined) {
@@ -66,7 +67,7 @@ test.each(dataFixtures)('set log forwarding settings to %s', async (destination,
     }
     return command.run()
       .then(() => {
-        expect(stdout.output).toMatch(`Log forwarding was set to ${destination} for namespace 'some_namespace'`)
+        expect(stdout.output).toMatch(`Log forwarding was set to ${destination} for this namespace`)
         expect(setCall).toBeCalledTimes(1)
         if (input !== undefined) {
           expect(setCall).toHaveBeenCalledWith(...Object.values(input))
@@ -76,7 +77,7 @@ test.each(dataFixtures)('set log forwarding settings to %s', async (destination,
   })
 })
 
-test.each(dataFixtures)('failed to set log forwarding settings to %s', async (destination, fnName, input) => {
+test.each(dataFixtures)('failed to set log forwarding settings to %s (interactive)', async (destination, fnName, input) => {
   mockSelectedDestination(destination, fnName, jest.fn().mockRejectedValue(new Error(`mocked error for ${destination}`)))
   if (input !== undefined) {
     mockDestinationConfig(input)
@@ -86,11 +87,7 @@ test.each(dataFixtures)('failed to set log forwarding settings to %s', async (de
 
 function mockSelectedDestination (dstName, fnName, fnCallback) {
   prompt.mockResolvedValueOnce({ type: dstName })
-  LogForwarding.mockImplementation(() => {
-    return {
-      [fnName]: fnCallback
-    }
-  })
+  rtLib.logForwarding[fnName] = fnCallback
 }
 
 function mockDestinationConfig (config) {

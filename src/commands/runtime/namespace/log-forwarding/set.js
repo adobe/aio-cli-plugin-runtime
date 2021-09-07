@@ -11,7 +11,6 @@ governing permissions and limitations under the License.
 */
 
 const inquirer = require('inquirer')
-const { LogForwarding } = require('@adobe/aio-lib-runtime')
 const RuntimeBaseCommand = require('../../../../RuntimeBaseCommand')
 
 class SetCommand extends RuntimeBaseCommand {
@@ -26,10 +25,9 @@ class SetCommand extends RuntimeBaseCommand {
     if (this['set_' + type] === undefined) {
       throw new Error(`Unsupported destination type: '${type}'`)
     }
-    const options = await this.getOptions()
-    const logForwarding = new LogForwarding(options.namespace, options.apihost, options.api_key)
-    await this['set_' + type](logForwarding)
-    this.log(`Log forwarding was set to ${type} for namespace '${options.namespace}'`)
+    const ow = await this.wsk()
+    await this['set_' + type](ow.logForwarding)
+    this.log(`Log forwarding was set to ${type} for this namespace`)
   }
 
   async set_adobe_io_runtime (logForwarding) {
@@ -89,7 +87,7 @@ class SetCommand extends RuntimeBaseCommand {
   }
 }
 
-SetCommand.description = `Configure log forwarding destination`
+SetCommand.description = `Configure log forwarding destination (interactive)`
 
 SetCommand.flags = {
   ...RuntimeBaseCommand.flags

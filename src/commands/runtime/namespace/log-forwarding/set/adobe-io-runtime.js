@@ -10,15 +10,13 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const { LogForwarding } = require('@adobe/aio-lib-runtime')
 const RuntimeBaseCommand = require('../../../../../RuntimeBaseCommand')
 
 class AdobeIoRuntimeCommand extends RuntimeBaseCommand {
   async run () {
-    const options = await this.getOptions()
-    const logForwarding = new LogForwarding(options.namespace, options.apihost, options.api_key)
-    await logForwarding.setAdobeIoRuntime()
-    this.log(`Log forwarding was set to adobe_io_runtime for namespace '${options.namespace}'`)
+    const ow = await this.wsk()
+    await ow.logForwarding.setAdobeIoRuntime()
+    this.log(`Log forwarding was set to adobe_io_runtime for this namespace`)
   }
 }
 

@@ -11,21 +11,19 @@ governing permissions and limitations under the License.
 */
 
 const { flags } = require('@oclif/command')
-const { LogForwarding } = require('@adobe/aio-lib-runtime')
 const RuntimeBaseCommand = require('../../../../../RuntimeBaseCommand')
 
 class SplunkHecCommand extends RuntimeBaseCommand {
   async run () {
     const { flags } = this.parse(SplunkHecCommand)
-    const options = await this.getOptions()
-    const logForwarding = new LogForwarding(options.namespace, options.apihost, options.api_key)
-    await logForwarding.setSplunkHec(
+    const ow = await this.wsk()
+    await ow.logForwarding.setSplunkHec(
       flags.host,
       flags.port,
       flags.index,
       flags['hec-token']
     )
-    this.log(`Log forwarding was set to splunk_hec for namespace '${options.namespace}'`)
+    this.log(`Log forwarding was set to splunk_hec for this namespace`)
   }
 }
 

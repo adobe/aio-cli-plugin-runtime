@@ -10,27 +10,24 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const { LogForwarding } = require('@adobe/aio-lib-runtime')
+const RuntimeLib = require('@adobe/aio-lib-runtime')
 const TheCommand = require('../../../../../../src/commands/runtime/namespace/log-forwarding/set/azure-log-analytics')
 const { stdout } = require('stdout-stderr')
 
-let command
+let command, rtLib
 beforeEach(async () => {
   command = new TheCommand([])
+  rtLib = await RuntimeLib.init({ apihost: 'fakehost', api_key: 'fakekey' })
 })
 
 test('set log forwarding settings to azure_log_analytics', () => {
   return new Promise(resolve => {
     const setCall = jest.fn()
-    LogForwarding.mockImplementation(() => {
-      return {
-        setAzureLogAnalytics: setCall
-      }
-    })
+    rtLib.logForwarding.setAzureLogAnalytics = setCall
     command.argv = ['--customer-id', 'customer1', '--shared-key', 'key1', '--log-type', 'mylog']
     return command.run()
       .then(() => {
-        expect(stdout.output).toMatch(/Log forwarding was set to azure_log_analytics for namespace 'some_namespace'/)
+        expect(stdout.output).toMatch(/Log forwarding was set to azure_log_analytics for this namespace/)
         expect(setCall).toBeCalledTimes(1)
         expect(setCall).toHaveBeenCalledWith('customer1', 'key1', 'mylog')
         resolve()
