@@ -62,6 +62,7 @@ $ aio runtime --help
 * [`aio runtime:namespace`](#aio-runtimenamespace)
 * [`aio runtime:namespace:get`](#aio-runtimenamespaceget)
 * [`aio runtime:namespace:list`](#aio-runtimenamespacelist)
+* [`aio runtime:namespace:log-forwarding`](#aio-runtimenamespacelog-forwarding)
 * [`aio runtime:namespace:log-forwarding:get`](#aio-runtimenamespacelog-forwardingget)
 * [`aio runtime:namespace:log-forwarding:set`](#aio-runtimenamespacelog-forwardingset)
 * [`aio runtime:namespace:log-forwarding:set:adobe-io-runtime`](#aio-runtimenamespacelog-forwardingsetadobe-io-runtime)
@@ -880,6 +881,36 @@ ALIASES
 
 _See code: [src/commands/runtime/namespace/list.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.0.0/src/commands/runtime/namespace/list.js)_
 
+## `aio runtime:namespace:log-forwarding`
+
+Manage log forwarding settings
+
+```
+Manage log forwarding settings
+
+USAGE
+  $ aio runtime:namespace:log-forwarding
+
+OPTIONS
+  -i, --insecure  bypass certificate check
+  -u, --auth      whisk auth
+  -v, --verbose   Verbose output
+  --apihost       whisk API host
+  --apiversion    whisk API version
+  --cert          client cert
+  --debug=debug   Debug level output
+  --help          Show help
+  --key           client key
+  --version       Show version
+
+ALIASES
+  $ aio runtime:lf
+  $ aio rt:log-forwarding
+  $ aio rt:lf
+```
+
+_See code: [src/commands/runtime/namespace/log-forwarding/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.0.0/src/commands/runtime/namespace/log-forwarding/index.js)_
+
 ## `aio runtime:namespace:log-forwarding:get`
 
 Get log forwarding destination configuration
@@ -916,10 +947,10 @@ _See code: [src/commands/runtime/namespace/log-forwarding/get.js](https://github
 
 ## `aio runtime:namespace:log-forwarding:set`
 
-Configure log forwarding destination
+Configure log forwarding destination (interactive)
 
 ```
-Configure log forwarding destination
+Configure log forwarding destination (interactive)
 
 USAGE
   $ aio runtime:namespace:log-forwarding:set
