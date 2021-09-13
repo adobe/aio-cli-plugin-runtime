@@ -26,8 +26,12 @@ class SetCommand extends RuntimeBaseCommand {
       throw new Error(`Unsupported destination type: '${type}'`)
     }
     const ow = await this.wsk()
-    await this['set_' + type](ow.logForwarding)
-    this.log(`Log forwarding was set to ${type} for this namespace`)
+    try {
+      await this['set_' + type](ow.logForwarding)
+      this.log(`Log forwarding was set to ${type} for this namespace`)
+    } catch (e) {
+      this.handleError('failed to update log forwarding configuration', e)
+    }
   }
 
   // eslint-disable-next-line camelcase

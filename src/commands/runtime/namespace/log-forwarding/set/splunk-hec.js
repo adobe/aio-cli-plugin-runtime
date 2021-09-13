@@ -17,13 +17,17 @@ class SplunkHecCommand extends RuntimeBaseCommand {
   async run () {
     const { flags } = this.parse(SplunkHecCommand)
     const ow = await this.wsk()
-    await ow.logForwarding.setSplunkHec(
-      flags.host,
-      flags.port,
-      flags.index,
-      flags['hec-token']
-    )
-    this.log(`Log forwarding was set to splunk_hec for this namespace`)
+    try {
+      await ow.logForwarding.setSplunkHec(
+        flags.host,
+        flags.port,
+        flags.index,
+        flags['hec-token']
+      )
+      this.log(`Log forwarding was set to splunk_hec for this namespace`)
+    } catch (e) {
+      this.handleError('failed to update log forwarding configuration', e)
+    }
   }
 }
 

@@ -82,7 +82,7 @@ test.each(dataFixtures)('failed to set log forwarding settings to %s (interactiv
   if (input !== undefined) {
     mockDestinationConfig(input)
   }
-  await expect(command.run()).rejects.toThrow(`mocked error for ${destination}`)
+  await expect(command.run()).rejects.toThrow(`failed to update log forwarding configuration: mocked error for ${destination}`)
 })
 
 function mockSelectedDestination (dstName, fnName, fnCallback) {

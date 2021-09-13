@@ -33,5 +33,5 @@ test('get log forwarding settings', () => {
 
 test('failed to get log forwarding settings', async () => {
   rtLib.logForwarding.get = jest.fn().mockRejectedValue(new Error('mocked error'))
-  await expect(command.run()).rejects.toThrow('mocked error')
+  await expect(command.run()).rejects.toThrow('failed to get log forwarding configuration: mocked error')
 })
