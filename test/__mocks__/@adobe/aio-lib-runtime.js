@@ -12,6 +12,12 @@ const mockRtLibInstance = {
   triggers: {
     list: jest.fn(() => '')
   },
+  logForwarding: {
+    get: jest.fn(),
+    setAdobeIoRuntime: jest.fn(),
+    setAzureLogAnalytics: jest.fn(),
+    setSplunkHec: jest.fn()
+  },
   feeds: {},
   routes: {},
   mockFn: function (methodName) {
