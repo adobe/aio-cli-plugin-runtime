@@ -12,7 +12,7 @@ governing permissions and limitations under the License.
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 const { flags } = require('@oclif/command')
 const { cli } = require('cli-ux')
-const fetch = require('node-fetch')
+const { createFetch } = require('@adobe/aio-lib-core-networking')
 const { PropertyKey, PropertyDefault, propertiesFile, PropertyEnv } = require('../../../properties')
 const debug = require('debug')('aio-cli-plugin-runtime/property')
 const config = require('@adobe/aio-lib-core-config')
@@ -75,6 +75,7 @@ class PropertyGet extends RuntimeBaseCommand {
 
       try {
         debug(`Getting data from url ${uri} ...\n`)
+        const fetch = createFetch()
         const response = await fetch(uri)
         result = await response.json()
         debug(JSON.stringify(result, null, 2))
