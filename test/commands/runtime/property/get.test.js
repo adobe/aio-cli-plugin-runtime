@@ -15,7 +15,10 @@ const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
 const { stdout } = require('stdout-stderr')
 const { PropertyEnv } = require('../../../../src/properties')
 
-jest.mock('node-fetch')
+const mockFetch = jest.fn()
+jest.mock('@adobe/aio-lib-core-networking', () => ({
+  createFetch: jest.fn(() => mockFetch)
+}))
 
 test('exports', async () => {
   expect(typeof TheCommand).toEqual('function')
@@ -72,11 +75,10 @@ test('flags', async () => {
 
 describe('instance methods', () => {
   let command
-  let rp
 
   beforeEach(() => {
-    rp = require('node-fetch')
-    rp.mockImplementation(() => { return { json: () => fixtureJson('property/api.json') } })
+    mockFetch.mockReset()
+    mockFetch.mockResolvedValue({ json: () => fixtureJson('property/api.json') })
     command = new TheCommand([])
   })
 
@@ -96,9 +98,7 @@ describe('instance methods', () => {
 
     test('no flags, api server unreachable', () => {
       // apibuild and apibuildno
-      rp.mockImplementation(() => {
-        throw new Error('no connection')
-      })
+      mockFetch.mockRejectedValue(new Error('no connection'))
 
       // cli version
       command.config = fixtureJson('property/config.json')
