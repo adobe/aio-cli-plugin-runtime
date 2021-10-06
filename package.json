@@ -10,7 +10,7 @@
   "dependencies": {
     "@adobe/aio-lib-core-config": "^2.0.0",
     "@adobe/aio-lib-core-networking": "^2.0.0",
-    "@adobe/aio-lib-runtime": "github:adobe/aio-lib-runtime#proxy-support",
+    "@adobe/aio-lib-runtime": "^3.1.0",
     "@oclif/command": "^1.5.6",
     "@oclif/config": "^1.9.0",
     "@oclif/errors": "^1.1.2",
