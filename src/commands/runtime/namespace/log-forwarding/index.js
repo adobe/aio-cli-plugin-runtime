@@ -29,6 +29,6 @@ IndexCommand.aliases = [
   'rt:namespace:log-forwarding',
   'rt:namespace:lf',
   'rt:ns:log-forwarding',
-  'rt:ns:lf' ]
+  'rt:ns:lf']
 
 module.exports = IndexCommand
