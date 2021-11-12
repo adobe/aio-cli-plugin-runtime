@@ -23,20 +23,20 @@ beforeEach(async () => {
 test('set log forwarding settings to azure_log_analytics', () => {
   return new Promise(resolve => {
     const setCall = jest.fn()
-    rtLib.logForwarding.setAzureLogAnalytics = setCall
+    rtLib.logForwarding.setDestination = setCall
     command.argv = ['--customer-id', 'customer1', '--shared-key', 'key1', '--log-type', 'mylog']
     return command.run()
       .then(() => {
         expect(stdout.output).toMatch(/Log forwarding was set to azure_log_analytics for this namespace/)
         expect(setCall).toBeCalledTimes(1)
-        expect(setCall).toHaveBeenCalledWith('customer1', 'key1', 'mylog')
+        expect(setCall).toHaveBeenCalledWith('azure_log_analytics', { customer_id: 'customer1', shared_key: 'key1', log_type: 'mylog' })
         resolve()
       })
   })
 })
 
 test('failed to set log forwarding settings to azure_log_analytics', async () => {
-  rtLib.logForwarding.setAzureLogAnalytics = jest.fn().mockRejectedValue(new Error('mocked error'))
+  rtLib.logForwarding.setDestination = jest.fn().mockRejectedValue(new Error('mocked error'))
   command.argv = ['--customer-id', 'customer1', '--shared-key', 'key1', '--log-type', 'mylog']
   await expect(command.run()).rejects.toThrow(`failed to update log forwarding configuration: mocked error`)
 })

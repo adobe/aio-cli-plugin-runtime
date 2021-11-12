@@ -16,7 +16,7 @@ class AdobeIoRuntimeCommand extends RuntimeBaseCommand {
   async run () {
     const ow = await this.wsk()
     try {
-      await ow.logForwarding.setAdobeIoRuntime()
+      await ow.logForwarding.setDestination('adobe_io_runtime', {})
       this.log(`Log forwarding was set to adobe_io_runtime for this namespace`)
     } catch (e) {
       this.handleError('failed to update log forwarding configuration', e)

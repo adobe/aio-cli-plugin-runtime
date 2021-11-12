@@ -18,11 +18,11 @@ class AzureLogAnalyticsCommand extends RuntimeBaseCommand {
     const { flags } = this.parse(AzureLogAnalyticsCommand)
     const ow = await this.wsk()
     try {
-      await ow.logForwarding.setAzureLogAnalytics(
-        flags['customer-id'],
-        flags['shared-key'],
-        flags['log-type']
-      )
+      await ow.logForwarding.setDestination('azure_log_analytics', {
+        customer_id: flags['customer-id'],
+        shared_key: flags['shared-key'],
+        log_type: flags['log-type']
+      })
       this.log(`Log forwarding was set to azure_log_analytics for this namespace`)
     } catch (e) {
       this.handleError('failed to update log forwarding configuration', e)
