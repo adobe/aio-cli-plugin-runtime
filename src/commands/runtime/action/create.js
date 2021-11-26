@@ -28,6 +28,7 @@ class ActionCreate extends RuntimeBaseCommand {
     let annotationParams
     const webAction = flags.web ? flags.web.toLowerCase() : false
     const webSecure = flags['web-secure'] ? flags['web-secure'].toLowerCase() : false
+    const method = this.isUpdate() ? 'update' : 'create'
 
     try {
       // sanity check web secure must have web truthy
@@ -41,7 +42,7 @@ class ActionCreate extends RuntimeBaseCommand {
         throw (new Error(ActionCreate.errorMessages.sequenceWithDocker))
       } else if (flags.docker && flags.kind) {
         throw (new Error(ActionCreate.errorMessages.kindWithDocker))
-      } else if (!args.actionPath && !flags.sequence && !flags.docker && !this.isUpdate()) {
+      } else if (!flags.copy && !args.actionPath && !flags.sequence && !flags.docker && !this.isUpdate()) {
         throw (new Error(ActionCreate.errorMessages.missingKind))
       }
 
@@ -94,6 +95,9 @@ class ActionCreate extends RuntimeBaseCommand {
         } else {
           exec = createComponentsfromSequence(sequenceAction)
         }
+      } else if (flags.copy) {
+        const ow = await this.wsk()
+        return await this.syncAction(ow, name, null, flags, method, super.logJSON.bind(this))
       }
 
       if (flags.docker) {
@@ -112,7 +116,7 @@ class ActionCreate extends RuntimeBaseCommand {
         envParams = createKeyValueArrayFromFile(flags['env-file'])
       }
 
-      // merge parametes and environemtn variables
+      // merge parameters and environment variables
       if (envParams) {
         envParams = envParams.map(e => ({ ...e, init: true }))
         if (paramsAction) {
@@ -182,16 +186,30 @@ class ActionCreate extends RuntimeBaseCommand {
       if (limits) options.limits = limits
       if (paramsAction) options.parameters = paramsAction
       if (annotationParams) options.annotations = annotationParams
-
       const ow = await this.wsk()
-      const method = this.isUpdate() ? 'update' : 'create'
-      const result = await ow.actions[method]({ name, action: options })
-      if (flags.json) {
-        this.logJSON('', result)
-      }
+      await this.syncAction(ow, name, options, flags, method, super.logJSON.bind(this))
     } catch (err) {
-      const method = this.isUpdate() ? 'update' : 'create'
       this.handleError(`failed to ${method} the action`, err)
+    }
+  }
+
+  /** @private
+   * @param {OpenwhiskClient} ow
+   * @param {string} actionName
+   * @param {object} actionData
+   * @param {'update' | 'create'} method
+   * @param {object} flags
+   * @param {function} logger
+   *
+   * */
+  async syncAction (ow, actionName, actionData, flags, method, logger) {
+    let action = actionData
+    if (flags.copy) {
+      action = await ow.actions.get(flags.copy)
+    }
+    const result = await ow.actions[method]({ name: actionName, action })
+    if (flags.json) {
+      logger('', result)
     }
   }
 }
@@ -212,6 +230,9 @@ ActionCreate.flags = {
     char: 'p',
     description: 'parameter values in KEY VALUE format', // help description for flag
     multiple: true // allow setting this flag multiple times
+  }),
+  copy: flags.string({
+    description: 'treat ACTION as the name of an existing action' // help description for flag
   }),
   env: flags.string({
     char: 'e',
