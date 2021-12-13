@@ -32,11 +32,10 @@ const dataFixtures = [
   }]
 ]
 
-let command, setCall, prompt, rtLib
+let command, prompt, rtLib
 
 beforeEach(async () => {
   command = new TheCommand([])
-  setCall = jest.fn()
   prompt = jest.fn()
   inquirer.prompt = prompt
   rtLib = await RuntimeLib.init({ apihost: 'fakehost', api_key: 'fakekey' })
@@ -62,6 +61,7 @@ test('choices contain all supported log destinations', () => {
 
 test.each(dataFixtures)('set log forwarding settings to %s (interactive)', async (destination, input) => {
   return new Promise(resolve => {
+    const setCall = jest.fn()
     mockSelectedDestination(destination, setCall)
     if (input !== undefined) {
       mockDestinationConfig(input)
