@@ -1,0 +1,7 @@
+{
+  "destination": "destination",
+  "errors": [
+    "error1",
+    "error2"
+  ]
+}

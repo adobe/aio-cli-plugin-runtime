@@ -63,6 +63,7 @@ $ aio runtime --help
 * [`aio runtime:namespace:get`](#aio-runtimenamespaceget)
 * [`aio runtime:namespace:list`](#aio-runtimenamespacelist)
 * [`aio runtime:namespace:log-forwarding`](#aio-runtimenamespacelog-forwarding)
+* [`aio runtime:namespace:log-forwarding:errors`](#aio-runtimenamespacelog-forwardingerrors)
 * [`aio runtime:namespace:log-forwarding:get`](#aio-runtimenamespacelog-forwardingget)
 * [`aio runtime:namespace:log-forwarding:set`](#aio-runtimenamespacelog-forwardingset)
 * [`aio runtime:namespace:log-forwarding:set:adobe-io-runtime`](#aio-runtimenamespacelog-forwardingsetadobe-io-runtime)
@@ -914,6 +915,40 @@ ALIASES
 ```
 
 _See code: [src/commands/runtime/namespace/log-forwarding/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.1.0/src/commands/runtime/namespace/log-forwarding/index.js)_
+
+## `aio runtime:namespace:log-forwarding:errors`
+
+Get log forwarding errors
+
+```
+Get log forwarding errors
+
+USAGE
+  $ aio runtime:namespace:log-forwarding:errors
+
+OPTIONS
+  -i, --insecure  bypass certificate check
+  -u, --auth      whisk auth
+  -v, --verbose   Verbose output
+  --apihost       whisk API host
+  --apiversion    whisk API version
+  --cert          client cert
+  --debug=debug   Debug level output
+  --help          Show help
+  --key           client key
+  --version       Show version
+
+ALIASES
+  $ aio runtime:ns:log-forwarding:errors
+  $ aio runtime:ns:lf:errors
+  $ aio runtime:namespace:lf:errors
+  $ aio rt:namespace:log-forwarding:errors
+  $ aio rt:namespace:lf:errors
+  $ aio rt:ns:log-forwarding:errors
+  $ aio rt:ns:lf:errors
+```
+
+_See code: [src/commands/runtime/namespace/log-forwarding/errors.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.1.0/src/commands/runtime/namespace/log-forwarding/errors.js)_
 
 ## `aio runtime:namespace:log-forwarding:get`
 
