@@ -23,20 +23,20 @@ beforeEach(async () => {
 test('set log forwarding settings to splunk_hec', () => {
   return new Promise(resolve => {
     const setCall = jest.fn()
-    rtLib.logForwarding.setSplunkHec = setCall
+    rtLib.logForwarding.setDestination = setCall
     command.argv = ['--host', 'host1', '--port', 'port1', '--index', 'index1', '--hec-token', 'token1']
     return command.run()
       .then(() => {
         expect(stdout.output).toMatch(/Log forwarding was set to splunk_hec for this namespace/)
         expect(setCall).toBeCalledTimes(1)
-        expect(setCall).toHaveBeenCalledWith('host1', 'port1', 'index1', 'token1')
+        expect(setCall).toHaveBeenCalledWith('splunk_hec', { host: 'host1', port: 'port1', index: 'index1', hec_token: 'token1' })
         resolve()
       })
   })
 })
 
 test('failed to set log forwarding settings to splunk_hec', async () => {
-  rtLib.logForwarding.setSplunkHec = jest.fn().mockRejectedValue(new Error('mocked error'))
+  rtLib.logForwarding.setDestination = jest.fn().mockRejectedValue(new Error('mocked error'))
   command.argv = ['--host', 'host1', '--port', 'port1', '--index', 'index1', '--hec-token', 'token1']
   await expect(command.run()).rejects.toThrow(`failed to update log forwarding configuration: mocked error`)
 })
