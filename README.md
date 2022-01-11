@@ -904,9 +904,13 @@ OPTIONS
   --version       Show version
 
 ALIASES
-  $ aio runtime:lf
-  $ aio rt:log-forwarding
-  $ aio rt:lf
+  $ aio runtime:ns:log-forwarding
+  $ aio runtime:ns:lf
+  $ aio runtime:namespace:lf
+  $ aio rt:namespace:log-forwarding
+  $ aio rt:namespace:lf
+  $ aio rt:ns:log-forwarding
+  $ aio rt:ns:lf
 ```
 
 _See code: [src/commands/runtime/namespace/log-forwarding/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.1.0/src/commands/runtime/namespace/log-forwarding/index.js)_

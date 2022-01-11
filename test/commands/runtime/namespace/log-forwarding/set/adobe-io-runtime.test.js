@@ -23,17 +23,18 @@ beforeEach(async () => {
 test('set log forwarding settings to adobe_io_runtime', () => {
   return new Promise(resolve => {
     const setCall = jest.fn()
-    rtLib.logForwarding.setAdobeIoRuntime = setCall
+    rtLib.logForwarding.setDestination = setCall
     return command.run()
       .then(() => {
         expect(stdout.output).toMatch(/Log forwarding was set to adobe_io_runtime for this namespace/)
         expect(setCall).toBeCalledTimes(1)
+        expect(setCall).toBeCalledWith('adobe_io_runtime', {})
         resolve()
       })
   })
 })
 
 test('failed to set log forwarding settings to adobe_io_runtime', async () => {
-  rtLib.logForwarding.setAdobeIoRuntime = jest.fn().mockRejectedValue(new Error('mocked error'))
+  rtLib.logForwarding.setDestination = jest.fn().mockRejectedValue(new Error('mocked error'))
   await expect(command.run()).rejects.toThrow(`failed to update log forwarding configuration: mocked error`)
 })

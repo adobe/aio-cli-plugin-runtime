@@ -18,13 +18,13 @@ const { stdout } = require('stdout-stderr')
 jest.mock('inquirer')
 
 const dataFixtures = [
-  ['adobe_io_runtime', 'setAdobeIoRuntime', undefined],
-  ['azure_log_analytics', 'setAzureLogAnalytics', {
+  ['adobe_io_runtime', undefined],
+  ['azure_log_analytics', {
     customer_id: 'customer1',
     shared_key: 'key1',
     log_type: 'mylog'
   }],
-  ['splunk_hec', 'setSplunkHec', {
+  ['splunk_hec', {
     host: 'host1',
     port: 'port1',
     index: 'index1',
@@ -40,6 +40,8 @@ beforeEach(async () => {
   prompt = jest.fn()
   inquirer.prompt = prompt
   rtLib = await RuntimeLib.init({ apihost: 'fakehost', api_key: 'fakekey' })
+  rtLib.logForwarding.getSupportedDestinations = jest.fn().mockReturnValue([{ value: 'destination', name: 'Destination' }])
+  rtLib.logForwarding.getDestinationSettings = jest.fn().mockReturnValue({ key: 'value' })
 })
 
 test('choices contain all supported log destinations', () => {
@@ -47,21 +49,20 @@ test('choices contain all supported log destinations', () => {
     prompt.mockResolvedValueOnce({ type: 'something' })
     return command.run()
       .catch((e) => {
-        expect(e.message).toMatch("Unsupported destination type: 'something'")
         expect(prompt).toHaveBeenNthCalledWith(1, [{
           name: 'type',
           message: 'select log forwarding destination',
           type: 'list',
-          choices: [{ name: 'Adobe I/O Runtime', value: 'adobe_io_runtime' }, { name: 'Azure Log Analytics', value: 'azure_log_analytics' }, { name: 'Splunk HEC', value: 'splunk_hec' }]
+          choices: [{ name: 'Destination', value: 'destination' }]
         }])
         resolve()
       })
   })
 })
 
-test.each(dataFixtures)('set log forwarding settings to %s (interactive)', async (destination, fnName, input) => {
+test.each(dataFixtures)('set log forwarding settings to %s (interactive)', async (destination, input) => {
   return new Promise(resolve => {
-    mockSelectedDestination(destination, fnName, setCall)
+    mockSelectedDestination(destination, setCall)
     if (input !== undefined) {
       mockDestinationConfig(input)
     }
@@ -70,24 +71,24 @@ test.each(dataFixtures)('set log forwarding settings to %s (interactive)', async
         expect(stdout.output).toMatch(`Log forwarding was set to ${destination} for this namespace`)
         expect(setCall).toBeCalledTimes(1)
         if (input !== undefined) {
-          expect(setCall).toHaveBeenCalledWith(...Object.values(input))
+          expect(setCall).toHaveBeenCalledWith(destination, input)
         }
         resolve()
       })
   })
 })
 
-test.each(dataFixtures)('failed to set log forwarding settings to %s (interactive)', async (destination, fnName, input) => {
-  mockSelectedDestination(destination, fnName, jest.fn().mockRejectedValue(new Error(`mocked error for ${destination}`)))
+test.each(dataFixtures)('failed to set log forwarding settings to %s (interactive)', async (destination, input) => {
+  mockSelectedDestination(destination, jest.fn().mockRejectedValue(new Error(`mocked error for ${destination}`)))
   if (input !== undefined) {
     mockDestinationConfig(input)
   }
-  await expect(command.run()).rejects.toThrow(`failed to update log forwarding configuration: mocked error for ${destination}`)
+  await expect(command.run()).rejects.toThrow(`Failed to update log forwarding configuration: mocked error for ${destination}`)
 })
 
-function mockSelectedDestination (dstName, fnName, fnCallback) {
+function mockSelectedDestination (dstName, fnCallback) {
   prompt.mockResolvedValueOnce({ type: dstName })
-  rtLib.logForwarding[fnName] = fnCallback
+  rtLib.logForwarding.setDestination = fnCallback
 }
 
 function mockDestinationConfig (config) {

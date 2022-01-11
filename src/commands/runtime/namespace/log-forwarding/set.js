@@ -15,82 +15,26 @@ const RuntimeBaseCommand = require('../../../../RuntimeBaseCommand')
 
 class SetCommand extends RuntimeBaseCommand {
   async run () {
+    const ow = await this.wsk()
+    const logForwarding = ow.logForwarding
+    const destination = await this.promptDestination(logForwarding.getSupportedDestinations())
+    const settings = await inquirer.prompt(logForwarding.getDestinationSettings(destination))
+    try {
+      await logForwarding.setDestination(destination, settings)
+      this.log(`Log forwarding was set to ${destination} for this namespace`)
+    } catch (e) {
+      this.handleError('Failed to update log forwarding configuration', e)
+    }
+  }
+
+  async promptDestination (supportedDestinations) {
     const responses = await inquirer.prompt([{
       name: 'type',
       message: 'select log forwarding destination',
       type: 'list',
-      choices: [{ name: 'Adobe I/O Runtime', value: 'adobe_io_runtime' }, { name: 'Azure Log Analytics', value: 'azure_log_analytics' }, { name: 'Splunk HEC', value: 'splunk_hec' }]
+      choices: supportedDestinations
     }])
-    const type = responses.type
-    if (this['set_' + type] === undefined) {
-      throw new Error(`Unsupported destination type: '${type}'`)
-    }
-    const ow = await this.wsk()
-    try {
-      await this['set_' + type](ow.logForwarding)
-      this.log(`Log forwarding was set to ${type} for this namespace`)
-    } catch (e) {
-      this.handleError('failed to update log forwarding configuration', e)
-    }
-  }
-
-  // eslint-disable-next-line camelcase
-  async set_adobe_io_runtime (logForwarding) {
-    await logForwarding.setAdobeIoRuntime()
-  }
-
-  // eslint-disable-next-line camelcase
-  async set_azure_log_analytics (logForwarding) {
-    const responses = await inquirer.prompt([
-      {
-        name: 'customer_id',
-        message: 'customer ID'
-      },
-      {
-        name: 'shared_key',
-        message: 'shared key',
-        type: 'password'
-      },
-      {
-        name: 'log_type',
-        message: 'log type'
-      }
-    ])
-
-    await logForwarding.setAzureLogAnalytics(
-      responses.customer_id,
-      responses.shared_key,
-      responses.log_type
-    )
-  }
-
-  // eslint-disable-next-line camelcase
-  async set_splunk_hec (logForwarding) {
-    const responses = await inquirer.prompt([
-      {
-        name: 'host',
-        message: 'host'
-      },
-      {
-        name: 'port',
-        message: 'port'
-      },
-      {
-        name: 'index',
-        message: 'index'
-      },
-      {
-        name: 'hec_token',
-        message: 'hec_token',
-        type: 'password'
-      }
-    ])
-    await logForwarding.setSplunkHec(
-      responses.host,
-      responses.port,
-      responses.index,
-      responses.hec_token
-    )
+    return responses.type
   }
 }
 
