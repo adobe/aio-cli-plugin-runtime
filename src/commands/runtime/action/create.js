@@ -232,7 +232,7 @@ ActionCreate.flags = {
     multiple: true // allow setting this flag multiple times
   }),
   copy: flags.string({
-    description: 'treat ACTION as the name of an existing action' // help description for flag
+    description: 'copy an existing action' // help description for flag
   }),
   env: flags.string({
     char: 'e',
