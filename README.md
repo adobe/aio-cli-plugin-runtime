@@ -104,8 +104,6 @@ $ aio runtime --help
 
 ## `aio runtime`
 
-Execute runtime commands
-
 ```
 Execute runtime commands
 
@@ -132,8 +130,6 @@ _See code: [src/commands/runtime/index.js](https://github.com/adobe/aio-cli-plug
 
 ## `aio runtime:action`
 
-Manage your actions
-
 ```
 Manage your actions
 
@@ -159,8 +155,6 @@ ALIASES
 _See code: [src/commands/runtime/action/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.1.0/src/commands/runtime/action/index.js)_
 
 ## `aio runtime:action:create ACTIONNAME [ACTIONPATH]`
-
-Creates an Action
 
 ```
 Creates an Action
@@ -226,8 +220,6 @@ _See code: [src/commands/runtime/action/create.js](https://github.com/adobe/aio-
 
 ## `aio runtime:action:delete ACTIONNAME`
 
-Deletes an Action
-
 ```
 Deletes an Action
 
@@ -256,8 +248,6 @@ ALIASES
 _See code: [src/commands/runtime/action/delete.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.1.0/src/commands/runtime/action/delete.js)_
 
 ## `aio runtime:action:get ACTIONNAME`
-
-Retrieves an Action
 
 ```
 Retrieves an Action
@@ -289,8 +279,6 @@ _See code: [src/commands/runtime/action/get.js](https://github.com/adobe/aio-cli
 
 ## `aio runtime:action:invoke ACTIONNAME`
 
-Invokes an Action
-
 ```
 Invokes an Action
 
@@ -320,8 +308,6 @@ ALIASES
 _See code: [src/commands/runtime/action/invoke.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.1.0/src/commands/runtime/action/invoke.js)_
 
 ## `aio runtime:action:list [PACKAGENAME]`
-
-Lists all the Actions
 
 ```
 Lists all the Actions
@@ -360,8 +346,6 @@ ALIASES
 _See code: [src/commands/runtime/action/list.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.1.0/src/commands/runtime/action/list.js)_
 
 ## `aio runtime:action:update ACTIONNAME [ACTIONPATH]`
-
-Updates an Action
 
 ```
 Updates an Action
@@ -427,8 +411,6 @@ _See code: [src/commands/runtime/action/update.js](https://github.com/adobe/aio-
 
 ## `aio runtime:activation`
 
-Manage your activations
-
 ```
 Manage your activations
 
@@ -454,8 +436,6 @@ ALIASES
 _See code: [src/commands/runtime/activation/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.1.0/src/commands/runtime/activation/index.js)_
 
 ## `aio runtime:activation:get [ACTIVATIONID]`
-
-Retrieves an Activation
 
 ```
 Retrieves an Activation
@@ -484,8 +464,6 @@ ALIASES
 _See code: [src/commands/runtime/activation/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.1.0/src/commands/runtime/activation/get.js)_
 
 ## `aio runtime:activation:list [ACTIVATION_NAME]`
-
-Lists all the Activations
 
 ```
 Lists all the Activations
@@ -531,8 +509,6 @@ _See code: [src/commands/runtime/activation/list.js](https://github.com/adobe/ai
 
 ## `aio runtime:activation:logs [ACTIVATIONID]`
 
-Retrieves the Logs for an Activation
-
 ```
 Retrieves the Logs for an Activation
 
@@ -575,8 +551,6 @@ _See code: [src/commands/runtime/activation/logs.js](https://github.com/adobe/ai
 
 ## `aio runtime:activation:result [ACTIVATIONID]`
 
-Retrieves the Results for an Activation
-
 ```
 Retrieves the Results for an Activation
 
@@ -603,8 +577,6 @@ ALIASES
 _See code: [src/commands/runtime/activation/result.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.1.0/src/commands/runtime/activation/result.js)_
 
 ## `aio runtime:deploy`
-
-The Runtime Deployment Tool
 
 ```
 The Runtime Deployment Tool
@@ -636,8 +608,6 @@ _See code: [src/commands/runtime/deploy/index.js](https://github.com/adobe/aio-c
 
 ## `aio runtime:deploy:export`
 
-Exports managed project assets from Runtime to manifest and function files
-
 ```
 Exports managed project assets from Runtime to manifest and function files
 
@@ -665,8 +635,6 @@ ALIASES
 _See code: [src/commands/runtime/deploy/export.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.1.0/src/commands/runtime/deploy/export.js)_
 
 ## `aio runtime:deploy:report`
-
-Provides a summary report of Runtime assets being deployed/undeployed based on manifest/deployment YAML
 
 ```
 Provides a summary report of Runtime assets being deployed/undeployed based on manifest/deployment YAML
@@ -696,8 +664,6 @@ _See code: [src/commands/runtime/deploy/report.js](https://github.com/adobe/aio-
 
 ## `aio runtime:deploy:sync`
 
-A tool to sync deployment and undeployment of Runtime packages using a manifest and optional deployment files using YAML
-
 ```
 A tool to sync deployment and undeployment of Runtime packages using a manifest and optional deployment files using YAML
 
@@ -725,8 +691,6 @@ ALIASES
 _See code: [src/commands/runtime/deploy/sync.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.1.0/src/commands/runtime/deploy/sync.js)_
 
 ## `aio runtime:deploy:undeploy`
-
-Undeploy removes Runtime assets which were deployed from the manifest and deployment YAML
 
 ```
 Undeploy removes Runtime assets which were deployed from the manifest and deployment YAML
@@ -756,8 +720,6 @@ _See code: [src/commands/runtime/deploy/undeploy.js](https://github.com/adobe/ai
 
 ## `aio runtime:deploy:version`
 
-Prints the version number of aio runtime deploy
-
 ```
 Prints the version number of aio runtime deploy
 
@@ -783,8 +745,6 @@ ALIASES
 _See code: [src/commands/runtime/deploy/version.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.1.0/src/commands/runtime/deploy/version.js)_
 
 ## `aio runtime:namespace`
-
-Manage your namespaces
 
 ```
 Manage your namespaces
@@ -813,8 +773,6 @@ ALIASES
 _See code: [src/commands/runtime/namespace/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.1.0/src/commands/runtime/namespace/index.js)_
 
 ## `aio runtime:namespace:get`
-
-Get triggers, actions, and rules in the registry for namespace
 
 ```
 Get triggers, actions, and rules in the registry for namespace
@@ -849,8 +807,6 @@ _See code: [src/commands/runtime/namespace/get.js](https://github.com/adobe/aio-
 
 ## `aio runtime:namespace:list`
 
-Lists all of your namespaces for Adobe I/O Runtime
-
 ```
 Lists all of your namespaces for Adobe I/O Runtime
 
@@ -884,8 +840,6 @@ _See code: [src/commands/runtime/namespace/list.js](https://github.com/adobe/aio
 
 ## `aio runtime:namespace:log-forwarding`
 
-Manage log forwarding settings
-
 ```
 Manage log forwarding settings
 
@@ -917,8 +871,6 @@ ALIASES
 _See code: [src/commands/runtime/namespace/log-forwarding/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.1.0/src/commands/runtime/namespace/log-forwarding/index.js)_
 
 ## `aio runtime:namespace:log-forwarding:errors`
-
-Get log forwarding errors
 
 ```
 Get log forwarding errors
@@ -952,8 +904,6 @@ _See code: [src/commands/runtime/namespace/log-forwarding/errors.js](https://git
 
 ## `aio runtime:namespace:log-forwarding:get`
 
-Get log forwarding destination configuration
-
 ```
 Get log forwarding destination configuration
 
@@ -985,8 +935,6 @@ ALIASES
 _See code: [src/commands/runtime/namespace/log-forwarding/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.1.0/src/commands/runtime/namespace/log-forwarding/get.js)_
 
 ## `aio runtime:namespace:log-forwarding:set`
-
-Configure log forwarding destination (interactive)
 
 ```
 Configure log forwarding destination (interactive)
@@ -1020,8 +968,6 @@ _See code: [src/commands/runtime/namespace/log-forwarding/set.js](https://github
 
 ## `aio runtime:namespace:log-forwarding:set:adobe-io-runtime`
 
-Set log forwarding destination to Adobe I/O Runtime (Logs will be accessible via aio CLI)
-
 ```
 Set log forwarding destination to Adobe I/O Runtime (Logs will be accessible via aio CLI)
 
@@ -1053,8 +999,6 @@ ALIASES
 _See code: [src/commands/runtime/namespace/log-forwarding/set/adobe-io-runtime.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.1.0/src/commands/runtime/namespace/log-forwarding/set/adobe-io-runtime.js)_
 
 ## `aio runtime:namespace:log-forwarding:set:azure-log-analytics`
-
-Set log forwarding destination to Azure Log Analytics
 
 ```
 Set log forwarding destination to Azure Log Analytics
@@ -1090,8 +1034,6 @@ ALIASES
 _See code: [src/commands/runtime/namespace/log-forwarding/set/azure-log-analytics.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.1.0/src/commands/runtime/namespace/log-forwarding/set/azure-log-analytics.js)_
 
 ## `aio runtime:namespace:log-forwarding:set:splunk-hec`
-
-Set log forwarding destination to Splunk HEC
 
 ```
 Set log forwarding destination to Splunk HEC
@@ -1129,8 +1071,6 @@ _See code: [src/commands/runtime/namespace/log-forwarding/set/splunk-hec.js](htt
 
 ## `aio runtime:package`
 
-Manage your packages
-
 ```
 Manage your packages
 
@@ -1158,8 +1098,6 @@ ALIASES
 _See code: [src/commands/runtime/package/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.1.0/src/commands/runtime/package/index.js)_
 
 ## `aio runtime:package:bind PACKAGENAME BINDPACKAGENAME`
-
-Bind parameters to a package
 
 ```
 Bind parameters to a package
@@ -1193,8 +1131,6 @@ ALIASES
 _See code: [src/commands/runtime/package/bind.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.1.0/src/commands/runtime/package/bind.js)_
 
 ## `aio runtime:package:create PACKAGENAME`
-
-Creates a Package
 
 ```
 Creates a Package
@@ -1230,8 +1166,6 @@ _See code: [src/commands/runtime/package/create.js](https://github.com/adobe/aio
 
 ## `aio runtime:package:delete PACKAGENAME`
 
-Deletes a Package
-
 ```
 Deletes a Package
 
@@ -1250,8 +1184,6 @@ ALIASES
 _See code: [src/commands/runtime/package/delete.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.1.0/src/commands/runtime/package/delete.js)_
 
 ## `aio runtime:package:get PACKAGENAME`
-
-Retrieves a Package
 
 ```
 Retrieves a Package
@@ -1280,8 +1212,6 @@ ALIASES
 _See code: [src/commands/runtime/package/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.1.0/src/commands/runtime/package/get.js)_
 
 ## `aio runtime:package:list [NAMESPACE]`
-
-Lists all the Packages
 
 ```
 Lists all the Packages
@@ -1321,8 +1251,6 @@ _See code: [src/commands/runtime/package/list.js](https://github.com/adobe/aio-c
 
 ## `aio runtime:package:update PACKAGENAME`
 
-Updates a Package
-
 ```
 Updates a Package
 
@@ -1357,8 +1285,6 @@ _See code: [src/commands/runtime/package/update.js](https://github.com/adobe/aio
 
 ## `aio runtime:property`
 
-Execute property commands
-
 ```
 Execute property commands
 
@@ -1386,8 +1312,6 @@ ALIASES
 _See code: [src/commands/runtime/property/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.1.0/src/commands/runtime/property/index.js)_
 
 ## `aio runtime:property:get`
-
-get property
 
 ```
 get property
@@ -1422,8 +1346,6 @@ _See code: [src/commands/runtime/property/get.js](https://github.com/adobe/aio-c
 
 ## `aio runtime:property:set`
 
-set property
-
 ```
 set property
 
@@ -1452,8 +1374,6 @@ ALIASES
 _See code: [src/commands/runtime/property/set.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.1.0/src/commands/runtime/property/set.js)_
 
 ## `aio runtime:property:unset`
-
-unset property
 
 ```
 unset property
@@ -1484,8 +1404,6 @@ _See code: [src/commands/runtime/property/unset.js](https://github.com/adobe/aio
 
 ## `aio runtime:route`
 
-Manage your routes
-
 ```
 Manage your routes
 
@@ -1512,8 +1430,6 @@ ALIASES
 _See code: [src/commands/runtime/route/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.1.0/src/commands/runtime/route/index.js)_
 
 ## `aio runtime:route:create [BASEPATH] [RELPATH] [APIVERB] [ACTION]`
-
-create a new api route
 
 ```
 create a new api route
@@ -1564,8 +1480,6 @@ _See code: [src/commands/runtime/route/create.js](https://github.com/adobe/aio-c
 
 ## `aio runtime:route:delete BASEPATHORAPINAME [RELPATH] [APIVERB]`
 
-delete an API
-
 ```
 delete an API
 
@@ -1599,8 +1513,6 @@ _See code: [src/commands/runtime/route/delete.js](https://github.com/adobe/aio-c
 
 ## `aio runtime:route:get BASEPATHORAPINAME`
 
-get API details
-
 ```
 get API details
 
@@ -1631,8 +1543,6 @@ ALIASES
 _See code: [src/commands/runtime/route/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.1.0/src/commands/runtime/route/get.js)_
 
 ## `aio runtime:route:list [BASEPATH] [RELPATH] [APIVERB]`
-
-list route/apis for Adobe I/O Runtime
 
 ```
 list route/apis for Adobe I/O Runtime
@@ -1674,8 +1584,6 @@ _See code: [src/commands/runtime/route/list.js](https://github.com/adobe/aio-cli
 
 ## `aio runtime:rule`
 
-Manage your rules
-
 ```
 Manage your rules
 
@@ -1701,8 +1609,6 @@ ALIASES
 _See code: [src/commands/runtime/rule/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.1.0/src/commands/runtime/rule/index.js)_
 
 ## `aio runtime:rule:create NAME TRIGGER ACTION`
-
-Create a Rule
 
 ```
 Create a Rule
@@ -1736,8 +1642,6 @@ _See code: [src/commands/runtime/rule/create.js](https://github.com/adobe/aio-cl
 
 ## `aio runtime:rule:delete NAME`
 
-Delete a Rule
-
 ```
 Delete a Rule
 
@@ -1768,8 +1672,6 @@ _See code: [src/commands/runtime/rule/delete.js](https://github.com/adobe/aio-cl
 
 ## `aio runtime:rule:disable NAME`
 
-Disable a Rule
-
 ```
 Disable a Rule
 
@@ -1798,8 +1700,6 @@ ALIASES
 _See code: [src/commands/runtime/rule/disable.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.1.0/src/commands/runtime/rule/disable.js)_
 
 ## `aio runtime:rule:enable NAME`
-
-Enable a Rule
 
 ```
 Enable a Rule
@@ -1830,8 +1730,6 @@ _See code: [src/commands/runtime/rule/enable.js](https://github.com/adobe/aio-cl
 
 ## `aio runtime:rule:get NAME`
 
-Retrieves a Rule
-
 ```
 Retrieves a Rule
 
@@ -1860,8 +1758,6 @@ ALIASES
 _See code: [src/commands/runtime/rule/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.1.0/src/commands/runtime/rule/get.js)_
 
 ## `aio runtime:rule:list`
-
-Retrieves a list of Rules
 
 ```
 Retrieves a list of Rules
@@ -1897,8 +1793,6 @@ _See code: [src/commands/runtime/rule/list.js](https://github.com/adobe/aio-cli-
 
 ## `aio runtime:rule:status NAME`
 
-Gets the status of a rule
-
 ```
 Gets the status of a rule
 
@@ -1927,8 +1821,6 @@ ALIASES
 _See code: [src/commands/runtime/rule/status.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.1.0/src/commands/runtime/rule/status.js)_
 
 ## `aio runtime:rule:update NAME TRIGGER ACTION`
-
-Update a Rule
 
 ```
 Update a Rule
@@ -1962,8 +1854,6 @@ _See code: [src/commands/runtime/rule/update.js](https://github.com/adobe/aio-cl
 
 ## `aio runtime:trigger`
 
-Manage your triggers
-
 ```
 Manage your triggers
 
@@ -1989,8 +1879,6 @@ ALIASES
 _See code: [src/commands/runtime/trigger/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.1.0/src/commands/runtime/trigger/index.js)_
 
 ## `aio runtime:trigger:create TRIGGERNAME`
-
-Create a trigger for Adobe I/O Runtime
 
 ```
 Create a trigger for Adobe I/O Runtime
@@ -2026,8 +1914,6 @@ _See code: [src/commands/runtime/trigger/create.js](https://github.com/adobe/aio
 
 ## `aio runtime:trigger:delete TRIGGERPATH`
 
-Delete a trigger for Adobe I/O Runtime
-
 ```
 Delete a trigger for Adobe I/O Runtime
 
@@ -2056,8 +1942,6 @@ ALIASES
 _See code: [src/commands/runtime/trigger/delete.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.1.0/src/commands/runtime/trigger/delete.js)_
 
 ## `aio runtime:trigger:fire TRIGGERNAME`
-
-Fire a trigger for Adobe I/O Runtime
 
 ```
 Fire a trigger for Adobe I/O Runtime
@@ -2090,8 +1974,6 @@ _See code: [src/commands/runtime/trigger/fire.js](https://github.com/adobe/aio-c
 
 ## `aio runtime:trigger:get TRIGGERPATH`
 
-Get a trigger for Adobe I/O Runtime
-
 ```
 Get a trigger for Adobe I/O Runtime
 
@@ -2120,8 +2002,6 @@ ALIASES
 _See code: [src/commands/runtime/trigger/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.1.0/src/commands/runtime/trigger/get.js)_
 
 ## `aio runtime:trigger:list`
-
-Lists all of your triggers for Adobe I/O Runtime
 
 ```
 Lists all of your triggers for Adobe I/O Runtime
@@ -2156,8 +2036,6 @@ ALIASES
 _See code: [src/commands/runtime/trigger/list.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.1.0/src/commands/runtime/trigger/list.js)_
 
 ## `aio runtime:trigger:update TRIGGERNAME`
-
-Update or create a trigger for Adobe I/O Runtime
 
 ```
 Update or create a trigger for Adobe I/O Runtime
