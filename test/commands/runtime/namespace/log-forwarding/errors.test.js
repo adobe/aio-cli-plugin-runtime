@@ -34,7 +34,7 @@ test('get log forwarding errors', () => {
 test.each([
   [
     'no errors',
-    { destination: 'destination', errors: [] },
+    { configured_forwarder: 'destination', errors: [] },
     "No log forwarding errors for the last configured destination 'destination'\n"
   ],
   [

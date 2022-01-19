@@ -17,10 +17,11 @@ class ErrorsCommand extends RuntimeBaseCommand {
     const ow = await this.wsk()
     try {
       const res = await ow.logForwarding.getErrors()
+      const destinationMessage = res.configured_forwarder !== undefined ? ` for the last configured destination '${res.configured_forwarder}'` : ''
       if (res.errors && res.errors.length > 0) {
-        this.logJSON(`Log forwarding errors for the last configured destination '${res.destination}':\n`, res.errors)
+        this.logJSON(`Log forwarding errors${destinationMessage}:\n`, res.errors)
       } else {
-        this.log('No log forwarding errors' + (res.destination !== undefined ? ` for the last configured destination '${res.destination}'` : ''))
+        this.log(`No log forwarding errors${destinationMessage}`)
       }
     } catch (e) {
       this.handleError('Failed to get log forwarding errors', e)
