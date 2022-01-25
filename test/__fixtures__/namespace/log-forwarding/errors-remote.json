@@ -1,0 +1,7 @@
+{
+  "configured_forwarder": "destination",
+  "errors": [
+    "error1",
+    "error2"
+  ]
+}

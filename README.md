@@ -63,6 +63,7 @@ $ aio runtime --help
 * [`aio runtime:namespace:get`](#aio-runtimenamespaceget)
 * [`aio runtime:namespace:list`](#aio-runtimenamespacelist)
 * [`aio runtime:namespace:log-forwarding`](#aio-runtimenamespacelog-forwarding)
+* [`aio runtime:namespace:log-forwarding:errors`](#aio-runtimenamespacelog-forwardingerrors)
 * [`aio runtime:namespace:log-forwarding:get`](#aio-runtimenamespacelog-forwardingget)
 * [`aio runtime:namespace:log-forwarding:set`](#aio-runtimenamespacelog-forwardingset)
 * [`aio runtime:namespace:log-forwarding:set:adobe-io-runtime`](#aio-runtimenamespacelog-forwardingsetadobe-io-runtime)
@@ -125,7 +126,7 @@ ALIASES
   $ aio rt
 ```
 
-_See code: [src/commands/runtime/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.2.0/src/commands/runtime/index.js)_
+_See code: [src/commands/runtime/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/index.js)_
 
 ## `aio runtime:action`
 
@@ -151,7 +152,7 @@ ALIASES
   $ aio rt:action
 ```
 
-_See code: [src/commands/runtime/action/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.2.0/src/commands/runtime/action/index.js)_
+_See code: [src/commands/runtime/action/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/action/index.js)_
 
 ## `aio runtime:action:create ACTIONNAME [ACTIONPATH]`
 
@@ -215,7 +216,7 @@ ALIASES
   $ aio rt:action:create
 ```
 
-_See code: [src/commands/runtime/action/create.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.2.0/src/commands/runtime/action/create.js)_
+_See code: [src/commands/runtime/action/create.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/action/create.js)_
 
 ## `aio runtime:action:delete ACTIONNAME`
 
@@ -244,7 +245,7 @@ ALIASES
   $ aio rt:action:del
 ```
 
-_See code: [src/commands/runtime/action/delete.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.2.0/src/commands/runtime/action/delete.js)_
+_See code: [src/commands/runtime/action/delete.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/action/delete.js)_
 
 ## `aio runtime:action:get ACTIONNAME`
 
@@ -274,7 +275,7 @@ ALIASES
   $ aio rt:action:get
 ```
 
-_See code: [src/commands/runtime/action/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.2.0/src/commands/runtime/action/get.js)_
+_See code: [src/commands/runtime/action/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/action/get.js)_
 
 ## `aio runtime:action:invoke ACTIONNAME`
 
@@ -304,7 +305,7 @@ ALIASES
   $ aio rt:action:invoke
 ```
 
-_See code: [src/commands/runtime/action/invoke.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.2.0/src/commands/runtime/action/invoke.js)_
+_See code: [src/commands/runtime/action/invoke.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/action/invoke.js)_
 
 ## `aio runtime:action:list [PACKAGENAME]`
 
@@ -342,7 +343,7 @@ ALIASES
   $ aio rt:actions:ls
 ```
 
-_See code: [src/commands/runtime/action/list.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.2.0/src/commands/runtime/action/list.js)_
+_See code: [src/commands/runtime/action/list.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/action/list.js)_
 
 ## `aio runtime:action:update ACTIONNAME [ACTIONPATH]`
 
@@ -406,7 +407,7 @@ ALIASES
   $ aio rt:action:update
 ```
 
-_See code: [src/commands/runtime/action/update.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.2.0/src/commands/runtime/action/update.js)_
+_See code: [src/commands/runtime/action/update.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/action/update.js)_
 
 ## `aio runtime:activation`
 
@@ -432,7 +433,7 @@ ALIASES
   $ aio rt:activation
 ```
 
-_See code: [src/commands/runtime/activation/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.2.0/src/commands/runtime/activation/index.js)_
+_See code: [src/commands/runtime/activation/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/activation/index.js)_
 
 ## `aio runtime:activation:get [ACTIVATIONID]`
 
@@ -460,7 +461,7 @@ ALIASES
   $ aio rt:activation:get
 ```
 
-_See code: [src/commands/runtime/activation/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.2.0/src/commands/runtime/activation/get.js)_
+_See code: [src/commands/runtime/activation/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/activation/get.js)_
 
 ## `aio runtime:activation:list [ACTIVATION_NAME]`
 
@@ -504,7 +505,7 @@ ALIASES
   $ aio rt:activations:ls
 ```
 
-_See code: [src/commands/runtime/activation/list.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.2.0/src/commands/runtime/activation/list.js)_
+_See code: [src/commands/runtime/activation/list.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/activation/list.js)_
 
 ## `aio runtime:activation:logs [ACTIVATIONID]`
 
@@ -546,7 +547,7 @@ ALIASES
   $ aio rt:logs
 ```
 
-_See code: [src/commands/runtime/activation/logs.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.2.0/src/commands/runtime/activation/logs.js)_
+_See code: [src/commands/runtime/activation/logs.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/activation/logs.js)_
 
 ## `aio runtime:activation:result [ACTIVATIONID]`
 
@@ -573,7 +574,7 @@ ALIASES
   $ aio rt:activation:result
 ```
 
-_See code: [src/commands/runtime/activation/result.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.2.0/src/commands/runtime/activation/result.js)_
+_See code: [src/commands/runtime/activation/result.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/activation/result.js)_
 
 ## `aio runtime:deploy`
 
@@ -603,7 +604,7 @@ ALIASES
   $ aio rt:deploy
 ```
 
-_See code: [src/commands/runtime/deploy/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.2.0/src/commands/runtime/deploy/index.js)_
+_See code: [src/commands/runtime/deploy/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/deploy/index.js)_
 
 ## `aio runtime:deploy:export`
 
@@ -631,7 +632,7 @@ ALIASES
   $ aio rt:deploy:export
 ```
 
-_See code: [src/commands/runtime/deploy/export.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.2.0/src/commands/runtime/deploy/export.js)_
+_See code: [src/commands/runtime/deploy/export.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/deploy/export.js)_
 
 ## `aio runtime:deploy:report`
 
@@ -659,7 +660,7 @@ ALIASES
   $ aio rt:deploy:report
 ```
 
-_See code: [src/commands/runtime/deploy/report.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.2.0/src/commands/runtime/deploy/report.js)_
+_See code: [src/commands/runtime/deploy/report.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/deploy/report.js)_
 
 ## `aio runtime:deploy:sync`
 
@@ -687,7 +688,7 @@ ALIASES
   $ aio rt:deploy:sync
 ```
 
-_See code: [src/commands/runtime/deploy/sync.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.2.0/src/commands/runtime/deploy/sync.js)_
+_See code: [src/commands/runtime/deploy/sync.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/deploy/sync.js)_
 
 ## `aio runtime:deploy:undeploy`
 
@@ -715,7 +716,7 @@ ALIASES
   $ aio rt:deploy:undeploy
 ```
 
-_See code: [src/commands/runtime/deploy/undeploy.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.2.0/src/commands/runtime/deploy/undeploy.js)_
+_See code: [src/commands/runtime/deploy/undeploy.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/deploy/undeploy.js)_
 
 ## `aio runtime:deploy:version`
 
@@ -741,7 +742,7 @@ ALIASES
   $ aio rt:deploy:version
 ```
 
-_See code: [src/commands/runtime/deploy/version.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.2.0/src/commands/runtime/deploy/version.js)_
+_See code: [src/commands/runtime/deploy/version.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/deploy/version.js)_
 
 ## `aio runtime:namespace`
 
@@ -769,7 +770,7 @@ ALIASES
   $ aio rt:ns
 ```
 
-_See code: [src/commands/runtime/namespace/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.2.0/src/commands/runtime/namespace/index.js)_
+_See code: [src/commands/runtime/namespace/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/namespace/index.js)_
 
 ## `aio runtime:namespace:get`
 
@@ -802,7 +803,7 @@ ALIASES
   $ aio rt:ls
 ```
 
-_See code: [src/commands/runtime/namespace/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.2.0/src/commands/runtime/namespace/get.js)_
+_See code: [src/commands/runtime/namespace/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/namespace/get.js)_
 
 ## `aio runtime:namespace:list`
 
@@ -835,7 +836,7 @@ ALIASES
   $ aio rt:ns:ls
 ```
 
-_See code: [src/commands/runtime/namespace/list.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.2.0/src/commands/runtime/namespace/list.js)_
+_See code: [src/commands/runtime/namespace/list.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/namespace/list.js)_
 
 ## `aio runtime:namespace:log-forwarding`
 
@@ -867,7 +868,39 @@ ALIASES
   $ aio rt:ns:lf
 ```
 
-_See code: [src/commands/runtime/namespace/log-forwarding/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.2.0/src/commands/runtime/namespace/log-forwarding/index.js)_
+_See code: [src/commands/runtime/namespace/log-forwarding/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/namespace/log-forwarding/index.js)_
+
+## `aio runtime:namespace:log-forwarding:errors`
+
+Get log forwarding errors
+
+```
+USAGE
+  $ aio runtime:namespace:log-forwarding:errors
+
+OPTIONS
+  -i, --insecure  bypass certificate check
+  -u, --auth      whisk auth
+  -v, --verbose   Verbose output
+  --apihost       whisk API host
+  --apiversion    whisk API version
+  --cert          client cert
+  --debug=debug   Debug level output
+  --help          Show help
+  --key           client key
+  --version       Show version
+
+ALIASES
+  $ aio runtime:ns:log-forwarding:errors
+  $ aio runtime:ns:lf:errors
+  $ aio runtime:namespace:lf:errors
+  $ aio rt:namespace:log-forwarding:errors
+  $ aio rt:namespace:lf:errors
+  $ aio rt:ns:log-forwarding:errors
+  $ aio rt:ns:lf:errors
+```
+
+_See code: [src/commands/runtime/namespace/log-forwarding/errors.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/namespace/log-forwarding/errors.js)_
 
 ## `aio runtime:namespace:log-forwarding:get`
 
@@ -899,7 +932,7 @@ ALIASES
   $ aio rt:ns:lf:get
 ```
 
-_See code: [src/commands/runtime/namespace/log-forwarding/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.2.0/src/commands/runtime/namespace/log-forwarding/get.js)_
+_See code: [src/commands/runtime/namespace/log-forwarding/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/namespace/log-forwarding/get.js)_
 
 ## `aio runtime:namespace:log-forwarding:set`
 
@@ -931,7 +964,7 @@ ALIASES
   $ aio rt:ns:lf:set
 ```
 
-_See code: [src/commands/runtime/namespace/log-forwarding/set.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.2.0/src/commands/runtime/namespace/log-forwarding/set.js)_
+_See code: [src/commands/runtime/namespace/log-forwarding/set.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/namespace/log-forwarding/set.js)_
 
 ## `aio runtime:namespace:log-forwarding:set:adobe-io-runtime`
 
@@ -963,7 +996,7 @@ ALIASES
   $ aio rt:ns:lf:set:adobe-io-runtime
 ```
 
-_See code: [src/commands/runtime/namespace/log-forwarding/set/adobe-io-runtime.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.2.0/src/commands/runtime/namespace/log-forwarding/set/adobe-io-runtime.js)_
+_See code: [src/commands/runtime/namespace/log-forwarding/set/adobe-io-runtime.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/namespace/log-forwarding/set/adobe-io-runtime.js)_
 
 ## `aio runtime:namespace:log-forwarding:set:azure-log-analytics`
 
@@ -998,7 +1031,7 @@ ALIASES
   $ aio rt:ns:lf:set:azure-log-analytics
 ```
 
-_See code: [src/commands/runtime/namespace/log-forwarding/set/azure-log-analytics.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.2.0/src/commands/runtime/namespace/log-forwarding/set/azure-log-analytics.js)_
+_See code: [src/commands/runtime/namespace/log-forwarding/set/azure-log-analytics.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/namespace/log-forwarding/set/azure-log-analytics.js)_
 
 ## `aio runtime:namespace:log-forwarding:set:splunk-hec`
 
@@ -1034,7 +1067,7 @@ ALIASES
   $ aio rt:ns:lf:set:splunk-hec
 ```
 
-_See code: [src/commands/runtime/namespace/log-forwarding/set/splunk-hec.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.2.0/src/commands/runtime/namespace/log-forwarding/set/splunk-hec.js)_
+_See code: [src/commands/runtime/namespace/log-forwarding/set/splunk-hec.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/namespace/log-forwarding/set/splunk-hec.js)_
 
 ## `aio runtime:package`
 
@@ -1062,7 +1095,7 @@ ALIASES
   $ aio rt:pkg
 ```
 
-_See code: [src/commands/runtime/package/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.2.0/src/commands/runtime/package/index.js)_
+_See code: [src/commands/runtime/package/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/package/index.js)_
 
 ## `aio runtime:package:bind PACKAGENAME BINDPACKAGENAME`
 
@@ -1095,7 +1128,7 @@ ALIASES
   $ aio rt:pkg:bind
 ```
 
-_See code: [src/commands/runtime/package/bind.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.2.0/src/commands/runtime/package/bind.js)_
+_See code: [src/commands/runtime/package/bind.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/package/bind.js)_
 
 ## `aio runtime:package:create PACKAGENAME`
 
@@ -1129,7 +1162,7 @@ ALIASES
   $ aio rt:pkg:create
 ```
 
-_See code: [src/commands/runtime/package/create.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.2.0/src/commands/runtime/package/create.js)_
+_See code: [src/commands/runtime/package/create.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/package/create.js)_
 
 ## `aio runtime:package:delete PACKAGENAME`
 
@@ -1148,7 +1181,7 @@ ALIASES
   $ aio rt:pkg:delete
 ```
 
-_See code: [src/commands/runtime/package/delete.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.2.0/src/commands/runtime/package/delete.js)_
+_See code: [src/commands/runtime/package/delete.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/package/delete.js)_
 
 ## `aio runtime:package:get PACKAGENAME`
 
@@ -1176,7 +1209,7 @@ ALIASES
   $ aio rt:pkg:get
 ```
 
-_See code: [src/commands/runtime/package/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.2.0/src/commands/runtime/package/get.js)_
+_See code: [src/commands/runtime/package/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/package/get.js)_
 
 ## `aio runtime:package:list [NAMESPACE]`
 
@@ -1214,7 +1247,7 @@ ALIASES
   $ aio rt:pkg:ls
 ```
 
-_See code: [src/commands/runtime/package/list.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.2.0/src/commands/runtime/package/list.js)_
+_See code: [src/commands/runtime/package/list.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/package/list.js)_
 
 ## `aio runtime:package:update PACKAGENAME`
 
@@ -1248,7 +1281,7 @@ ALIASES
   $ aio rt:pkg:update
 ```
 
-_See code: [src/commands/runtime/package/update.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.2.0/src/commands/runtime/package/update.js)_
+_See code: [src/commands/runtime/package/update.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/package/update.js)_
 
 ## `aio runtime:property`
 
@@ -1276,7 +1309,7 @@ ALIASES
   $ aio rt:property
 ```
 
-_See code: [src/commands/runtime/property/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.2.0/src/commands/runtime/property/index.js)_
+_See code: [src/commands/runtime/property/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/property/index.js)_
 
 ## `aio runtime:property:get`
 
@@ -1309,7 +1342,7 @@ ALIASES
   $ aio rt:prop:get
 ```
 
-_See code: [src/commands/runtime/property/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.2.0/src/commands/runtime/property/get.js)_
+_See code: [src/commands/runtime/property/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/property/get.js)_
 
 ## `aio runtime:property:set`
 
@@ -1338,7 +1371,7 @@ ALIASES
   $ aio rt:prop:set
 ```
 
-_See code: [src/commands/runtime/property/set.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.2.0/src/commands/runtime/property/set.js)_
+_See code: [src/commands/runtime/property/set.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/property/set.js)_
 
 ## `aio runtime:property:unset`
 
@@ -1367,7 +1400,7 @@ ALIASES
   $ aio rt:prop:unset
 ```
 
-_See code: [src/commands/runtime/property/unset.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.2.0/src/commands/runtime/property/unset.js)_
+_See code: [src/commands/runtime/property/unset.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/property/unset.js)_
 
 ## `aio runtime:route`
 
@@ -1394,7 +1427,7 @@ ALIASES
   $ aio rt:api
 ```
 
-_See code: [src/commands/runtime/route/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.2.0/src/commands/runtime/route/index.js)_
+_See code: [src/commands/runtime/route/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/route/index.js)_
 
 ## `aio runtime:route:create [BASEPATH] [RELPATH] [APIVERB] [ACTION]`
 
@@ -1443,7 +1476,7 @@ ALIASES
   $ aio rt:api:create
 ```
 
-_See code: [src/commands/runtime/route/create.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.2.0/src/commands/runtime/route/create.js)_
+_See code: [src/commands/runtime/route/create.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/route/create.js)_
 
 ## `aio runtime:route:delete BASEPATHORAPINAME [RELPATH] [APIVERB]`
 
@@ -1476,7 +1509,7 @@ ALIASES
   $ aio rt:api:delete
 ```
 
-_See code: [src/commands/runtime/route/delete.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.2.0/src/commands/runtime/route/delete.js)_
+_See code: [src/commands/runtime/route/delete.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/route/delete.js)_
 
 ## `aio runtime:route:get BASEPATHORAPINAME`
 
@@ -1507,7 +1540,7 @@ ALIASES
   $ aio rt:api:get
 ```
 
-_See code: [src/commands/runtime/route/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.2.0/src/commands/runtime/route/get.js)_
+_See code: [src/commands/runtime/route/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/route/get.js)_
 
 ## `aio runtime:route:list [BASEPATH] [RELPATH] [APIVERB]`
 
@@ -1547,7 +1580,7 @@ ALIASES
   $ aio rt:api:ls
 ```
 
-_See code: [src/commands/runtime/route/list.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.2.0/src/commands/runtime/route/list.js)_
+_See code: [src/commands/runtime/route/list.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/route/list.js)_
 
 ## `aio runtime:rule`
 
@@ -1573,7 +1606,7 @@ ALIASES
   $ aio rt:rule
 ```
 
-_See code: [src/commands/runtime/rule/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.2.0/src/commands/runtime/rule/index.js)_
+_See code: [src/commands/runtime/rule/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/rule/index.js)_
 
 ## `aio runtime:rule:create NAME TRIGGER ACTION`
 
@@ -1605,7 +1638,7 @@ ALIASES
   $ aio rt:rule:create
 ```
 
-_See code: [src/commands/runtime/rule/create.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.2.0/src/commands/runtime/rule/create.js)_
+_See code: [src/commands/runtime/rule/create.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/rule/create.js)_
 
 ## `aio runtime:rule:delete NAME`
 
@@ -1635,7 +1668,7 @@ ALIASES
   $ aio rt:rule:delete
 ```
 
-_See code: [src/commands/runtime/rule/delete.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.2.0/src/commands/runtime/rule/delete.js)_
+_See code: [src/commands/runtime/rule/delete.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/rule/delete.js)_
 
 ## `aio runtime:rule:disable NAME`
 
@@ -1664,7 +1697,7 @@ ALIASES
   $ aio rt:rule:disable
 ```
 
-_See code: [src/commands/runtime/rule/disable.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.2.0/src/commands/runtime/rule/disable.js)_
+_See code: [src/commands/runtime/rule/disable.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/rule/disable.js)_
 
 ## `aio runtime:rule:enable NAME`
 
@@ -1693,7 +1726,7 @@ ALIASES
   $ aio rt:rule:enable
 ```
 
-_See code: [src/commands/runtime/rule/enable.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.2.0/src/commands/runtime/rule/enable.js)_
+_See code: [src/commands/runtime/rule/enable.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/rule/enable.js)_
 
 ## `aio runtime:rule:get NAME`
 
@@ -1722,7 +1755,7 @@ ALIASES
   $ aio rt:rule:get
 ```
 
-_See code: [src/commands/runtime/rule/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.2.0/src/commands/runtime/rule/get.js)_
+_See code: [src/commands/runtime/rule/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/rule/get.js)_
 
 ## `aio runtime:rule:list`
 
@@ -1756,7 +1789,7 @@ ALIASES
   $ aio rt:rule:ls
 ```
 
-_See code: [src/commands/runtime/rule/list.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.2.0/src/commands/runtime/rule/list.js)_
+_See code: [src/commands/runtime/rule/list.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/rule/list.js)_
 
 ## `aio runtime:rule:status NAME`
 
@@ -1785,7 +1818,7 @@ ALIASES
   $ aio rt:rule:status
 ```
 
-_See code: [src/commands/runtime/rule/status.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.2.0/src/commands/runtime/rule/status.js)_
+_See code: [src/commands/runtime/rule/status.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/rule/status.js)_
 
 ## `aio runtime:rule:update NAME TRIGGER ACTION`
 
@@ -1817,7 +1850,7 @@ ALIASES
   $ aio rt:rule:update
 ```
 
-_See code: [src/commands/runtime/rule/update.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.2.0/src/commands/runtime/rule/update.js)_
+_See code: [src/commands/runtime/rule/update.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/rule/update.js)_
 
 ## `aio runtime:trigger`
 
@@ -1843,7 +1876,7 @@ ALIASES
   $ aio rt:trigger
 ```
 
-_See code: [src/commands/runtime/trigger/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.2.0/src/commands/runtime/trigger/index.js)_
+_See code: [src/commands/runtime/trigger/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/trigger/index.js)_
 
 ## `aio runtime:trigger:create TRIGGERNAME`
 
@@ -1877,7 +1910,7 @@ ALIASES
   $ aio rt:trigger:create
 ```
 
-_See code: [src/commands/runtime/trigger/create.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.2.0/src/commands/runtime/trigger/create.js)_
+_See code: [src/commands/runtime/trigger/create.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/trigger/create.js)_
 
 ## `aio runtime:trigger:delete TRIGGERPATH`
 
@@ -1906,7 +1939,7 @@ ALIASES
   $ aio rt:trigger:delete
 ```
 
-_See code: [src/commands/runtime/trigger/delete.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.2.0/src/commands/runtime/trigger/delete.js)_
+_See code: [src/commands/runtime/trigger/delete.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/trigger/delete.js)_
 
 ## `aio runtime:trigger:fire TRIGGERNAME`
 
@@ -1937,7 +1970,7 @@ ALIASES
   $ aio rt:trigger:fire
 ```
 
-_See code: [src/commands/runtime/trigger/fire.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.2.0/src/commands/runtime/trigger/fire.js)_
+_See code: [src/commands/runtime/trigger/fire.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/trigger/fire.js)_
 
 ## `aio runtime:trigger:get TRIGGERPATH`
 
@@ -1966,7 +1999,7 @@ ALIASES
   $ aio rt:trigger:get
 ```
 
-_See code: [src/commands/runtime/trigger/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.2.0/src/commands/runtime/trigger/get.js)_
+_See code: [src/commands/runtime/trigger/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/trigger/get.js)_
 
 ## `aio runtime:trigger:list`
 
@@ -2000,7 +2033,7 @@ ALIASES
   $ aio rt:trigger:ls
 ```
 
-_See code: [src/commands/runtime/trigger/list.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.2.0/src/commands/runtime/trigger/list.js)_
+_See code: [src/commands/runtime/trigger/list.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/trigger/list.js)_
 
 ## `aio runtime:trigger:update TRIGGERNAME`
 
@@ -2033,7 +2066,7 @@ ALIASES
   $ aio rt:trigger:update
 ```
 
-_See code: [src/commands/runtime/trigger/update.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.2.0/src/commands/runtime/trigger/update.js)_
+_See code: [src/commands/runtime/trigger/update.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/5.3.0/src/commands/runtime/trigger/update.js)_
 <!-- commandsstop -->
 
 
