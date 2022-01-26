@@ -97,7 +97,7 @@ class ActionCreate extends RuntimeBaseCommand {
         }
       } else if (flags.copy) {
         const ow = await this.wsk()
-        return await this.syncAction(ow, name, null, flags, method, super.logJSON.bind(this))
+        return await this.syncAction(ow, name, null, flags, method)
       }
 
       if (flags.docker) {
@@ -182,12 +182,20 @@ class ActionCreate extends RuntimeBaseCommand {
       }
 
       const options = { name }
-      if (exec) options.exec = exec
-      if (limits) options.limits = limits
-      if (paramsAction) options.parameters = paramsAction
-      if (annotationParams) options.annotations = annotationParams
+      if (exec) {
+        options.exec = exec
+      }
+      if (limits) {
+        options.limits = limits
+      }
+      if (paramsAction) {
+        options.parameters = paramsAction
+      }
+      if (annotationParams) {
+        options.annotations = annotationParams
+      }
       const ow = await this.wsk()
-      await this.syncAction(ow, name, options, flags, method, super.logJSON.bind(this))
+      await this.syncAction(ow, name, options, flags, method)
     } catch (err) {
       this.handleError(`failed to ${method} the action`, err)
     }
@@ -197,19 +205,17 @@ class ActionCreate extends RuntimeBaseCommand {
    * @param {OpenwhiskClient} ow
    * @param {string} actionName
    * @param {object} actionData
-   * @param {'update' | 'create'} method
    * @param {object} flags
-   * @param {function} logger
-   *
+   * @param {'update' | 'create'} method
    * */
-  async syncAction (ow, actionName, actionData, flags, method, logger) {
+  async syncAction (ow, actionName, actionData, flags, method) {
     let action = actionData
     if (flags.copy) {
       action = await ow.actions.get(flags.copy)
     }
     const result = await ow.actions[method]({ name: actionName, action })
     if (flags.json) {
-      logger('', result)
+      this.logJSON('', result)
     }
   }
 }
