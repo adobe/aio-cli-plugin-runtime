@@ -17,30 +17,59 @@ const { flags } = require('@oclif/command')
 class PackageDelete extends RuntimeBaseCommand {
   async run () {
     const { args, flags } = this.parse(PackageDelete)
+    let result
     try {
       const ow = await this.wsk()
-      const options = parsePackageName(args.packageName)
-      // Packages can be deleted only when there are no actions inside the packages
-      const result = await ow.packages.delete(options)
+      if (flags.recursive) {
+        result = await recursivelyDeletePackages(ow)
+      } else {
+        const options = parsePackageName(args.packageName)
+        // Packages can be deleted only when there are no actions inside the packages
+        result = await ow.packages.delete(options)
+      }
       if (flags.json) {
         this.logJSON('', result)
       }
     } catch (err) {
+      if (!args.packageName) {
+        err.message = 'Missing 1 required arg: packageName'
+      }
       this.handleError('failed to delete the package', err)
     }
   }
 }
 
+async function recursivelyDeletePackages (ow) {
+  const packages = await ow.packages.list()
+  const actions = await ow.actions.list()
+  const deleteEntitiesPromises = []
+  const packagesNamespaces = Array.isArray(packages) &&
+      packages.map(pkg => pkg.namespace + '/' + pkg.name)
+  for (const action of actions) {
+    if (packagesNamespaces.indexOf(action.namespace) > -1) {
+      deleteEntitiesPromises.push(ow.actions.delete(action))
+    }
+  }
+  if (deleteEntitiesPromises.length > 0) {
+    await Promise.all(deleteEntitiesPromises)
+  }
+  return ow.packages.delete(packages)
+}
+
 PackageDelete.args = [
   {
     name: 'packageName',
-    required: true
+    required: false
   }
 ]
 
 PackageDelete.flags = {
   json: flags.boolean({
     description: 'output raw json'
+  }),
+  recursive: flags.boolean({
+    description: 'Deletes all associates actions',
+    default: false
   })
 }
 
