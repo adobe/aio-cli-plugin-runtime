@@ -20,46 +20,63 @@ class PackageDelete extends RuntimeBaseCommand {
     let result
     try {
       const ow = await this.wsk()
+      const options = parsePackageName(args.packageName)
       if (flags.recursive) {
-        result = await recursivelyDeletePackages(ow)
+        // Packages can be deleted only when there are no actions inside the packagess
+        result = await recursivelyDeletePackage(ow, options)
       } else {
-        const options = parsePackageName(args.packageName)
-        // Packages can be deleted only when there are no actions inside the packages
         result = await ow.packages.delete(options)
       }
       if (flags.json) {
         this.logJSON('', result)
       }
     } catch (err) {
-      if (!args.packageName) {
-        err.message = 'Missing 1 required arg: packageName'
-      }
       this.handleError('failed to delete the package', err)
     }
   }
 }
 
-async function recursivelyDeletePackages (ow) {
-  const packages = await ow.packages.list()
+async function recursivelyDeletePackage (ow, pkg) {
+  const mapRulesToActionName = (rules) => {
+    let ruleMap = new Map()
+    if (Array.isArray(rules)) {
+      ruleMap = rules.reduce((rulesMap, rule) => {
+        const ruleData = {
+          ruleName: rule.name,
+          trigger: {
+            namespace: rule.trigger.path,
+            triggerName: rule.trigger.name
+          }
+        }
+        rulesMap.set(rule.action.name, ruleData)
+        return rulesMap
+      }, new Map())
+    }
+    return ruleMap
+  }
   const actions = await ow.actions.list()
+  const mappedRules = mapRulesToActionName(await ow.rules.list())
   const deleteEntitiesPromises = []
-  const packagesNamespaces = Array.isArray(packages) &&
-      packages.map(pkg => pkg.namespace + '/' + pkg.name)
   for (const action of actions) {
-    if (packagesNamespaces.indexOf(action.namespace) > -1) {
+    if (action.namespace.split('/').includes(pkg.name)) {
+      if (mappedRules.has(action.name)) {
+        const actionRule = mappedRules.get(action.name)
+        deleteEntitiesPromises.push(ow.triggers.delete(actionRule.trigger),
+          ow.rules.delete(actionRule.ruleName))
+      }
       deleteEntitiesPromises.push(ow.actions.delete(action))
     }
   }
   if (deleteEntitiesPromises.length > 0) {
     await Promise.all(deleteEntitiesPromises)
   }
-  return ow.packages.delete(packages)
+  return ow.packages.delete(pkg)
 }
 
 PackageDelete.args = [
   {
     name: 'packageName',
-    required: false
+    required: true
   }
 ]
 

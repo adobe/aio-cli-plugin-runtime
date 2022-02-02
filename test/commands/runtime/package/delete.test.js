@@ -36,7 +36,7 @@ test('args', async () => {
   const deleteName = TheCommand.args[0]
   expect(deleteName.name).toBeDefined()
   expect(deleteName.name).toEqual('packageName')
-  expect(deleteName.required).toEqual(false)
+  expect(deleteName.required).toEqual(true)
 })
 
 describe('instance methods', () => {
@@ -73,22 +73,41 @@ describe('instance methods', () => {
       const mockPackageList = [
         { namespace: 'namespace', name: 'package1' }
       ]
+      const mockRulesList = [{
+        name: 'rule1',
+        action: {
+          name: 'action1'
+        },
+        trigger: {
+          name: 'trigger1',
+          path: 'triggerPath'
+        }
+      }]
+      rtUtils.parsePackageName.mockReturnValue({ name: 'package1', namespace: 'namespace' })
       const deleteAction = rtLib.mockResolved('actions.delete', 'Deleted Item')
       const deletePackage = rtLib.mockResolved('packages.delete', 'Deleted Item')
+      const deleteRule = rtLib.mockResolved('rules.delete', 'Deleted Item')
+      const deleteTrigger = rtLib.mockResolved('triggers.delete', 'Deleted Item')
+
       rtLib.mockResolved('actions.list', mockActionList)
       rtLib.mockResolved('packages.list', mockPackageList)
+      rtLib.mockResolved('rules.list', mockRulesList)
 
-      command.argv = ['--recursive']
+      command.argv = ['packageName', '--recursive']
       return command.run()
         .then(() => {
           expect(deleteAction).toHaveBeenCalledWith(mockActionList[0])
-          expect(deletePackage).toHaveBeenCalledWith([mockPackageList[0]])
-          expect(rtUtils.parsePackageName).not.toHaveBeenCalled()
+          expect(deletePackage).toHaveBeenCalledWith(mockPackageList[0])
+          expect(deleteRule).toHaveBeenCalledWith(mockRulesList[0].name)
+          expect(deleteTrigger).toHaveBeenCalledWith({
+            triggerName: mockRulesList[0].trigger.name,
+            namespace: mockRulesList[0].trigger.path
+          })
           expect(stdout.output).toMatch('')
         })
     })
 
-    test('delete packages, --recursive, skip deleting actions (else coverage)', () => {
+    test('delete package, --recursive, no actions', () => {
       const mockActionList = [
         { name: 'action1', namespace: 'namespace/somepackage' },
         { name: 'action2', namespace: 'namespace2/notmypackage' }
@@ -96,32 +115,49 @@ describe('instance methods', () => {
       const mockPackageList = [
         { namespace: 'namespace', name: 'package1' }
       ]
+      rtUtils.parsePackageName.mockReturnValue({ name: 'package1', namespace: 'namespace' })
       const deleteAction = rtLib.mockResolved('actions.delete', 'Deleted Item')
       const deletePackage = rtLib.mockResolved('packages.delete', 'Deleted Item')
       rtLib.mockResolved('actions.list', mockActionList)
       rtLib.mockResolved('packages.list', mockPackageList)
 
-      command.argv = ['--recursive']
+      command.argv = ['packageName', '--recursive']
       return command.run()
         .then(() => {
           expect(deleteAction).not.toHaveBeenCalled()
-          expect(deletePackage).toHaveBeenCalledWith([mockPackageList[0]])
-          expect(rtUtils.parsePackageName).not.toHaveBeenCalled()
+          expect(deletePackage).toHaveBeenCalledWith(mockPackageList[0])
           expect(stdout.output).toMatch('')
         })
     })
 
-    test('custom error message, no packageName provided', () => {
-      return new Promise((resolve, reject) => {
-        rtLib.mockRejected(rtAction, new Error('an error'))
-        command.argv = ['']
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to delete the package', new Error('Missing 1 required arg: packageName'))
-            resolve()
-          })
-      })
+    test('delete package, --recursive, no rules', () => {
+      const mockActionList = [
+        { name: 'action1', namespace: 'namespace/package1' },
+        { name: 'action2', namespace: 'namespace2' }
+      ]
+      const mockPackageList = [
+        { namespace: 'namespace', name: 'package1' }
+      ]
+      const mockRulesList = null
+      rtUtils.parsePackageName.mockReturnValue({ name: 'package1', namespace: 'namespace' })
+      const deleteAction = rtLib.mockResolved('actions.delete', 'Deleted Item')
+      const deletePackage = rtLib.mockResolved('packages.delete', 'Deleted Item')
+      const deleteRule = rtLib.mockResolved('rules.delete', 'Deleted Item')
+      const deleteTrigger = rtLib.mockResolved('triggers.delete', 'Deleted Item')
+
+      rtLib.mockResolved('actions.list', mockActionList)
+      rtLib.mockResolved('packages.list', mockPackageList)
+      rtLib.mockResolved('rules.list', mockRulesList)
+
+      command.argv = ['packageName', '--recursive']
+      return command.run()
+        .then(() => {
+          expect(deleteAction).toHaveBeenCalledWith(mockActionList[0])
+          expect(deletePackage).toHaveBeenCalledWith(mockPackageList[0])
+          expect(deleteRule).not.toHaveBeenCalled()
+          expect(deleteTrigger).not.toHaveBeenCalled()
+          expect(stdout.output).toMatch('')
+        })
     })
 
     test('delete a package /ns', () => {
