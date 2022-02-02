@@ -56,7 +56,9 @@ describe('instance methods', () => {
     handleError = jest.spyOn(command, 'handleError')
     rtLib = await RuntimeLib.init({ apihost: 'fakehost', api_key: 'fakekey' })
     rtLib.mockResolved('actions.client.options', '')
+    rtLib.mockResolved('logForwarding.get', { adobe_io_runtime: { } })
     RuntimeLib.mockReset()
+    RuntimeLib.printActionLogs.mockReset()
   })
 
   describe('run', () => {
@@ -263,6 +265,49 @@ describe('instance methods', () => {
       return command.run()
         .then(() => {
           expect(RuntimeLib.printActionLogs).toHaveBeenLastCalledWith(expect.anything(), expect.anything(), 1, ['hello'], expect.anything(), expect.anything())
+        })
+    })
+
+    test('retrieve last log - custom log forwarding setup', () => {
+      rtLib.mockResolved('logForwarding.get', { custom_destination: { field: 'value' } })
+      command.argv = []
+      return command.run()
+        .then(() => {
+          expect(RuntimeLib.printActionLogs).not.toHaveBeenCalled()
+          expect(stdout.output).toEqual(
+            "Namespace is configured with custom log forwarding destination: 'custom_destination'. " +
+            'Please use corresponding logging platform to view logs.\n'
+          )
+        })
+    })
+
+    test.each([
+      [
+        'multiple destinations',
+        { custom_destination1: { field: 'value' }, custom_destination2: { field: 'value' } }
+      ],
+      [
+        'empty',
+        { }
+      ],
+      [
+        'null',
+        null
+      ],
+      [
+        'array',
+        []
+      ],
+      [
+        'string',
+        'result'
+      ]
+    ])('retrieve last log - wrong response (%s) for custom log forwarding', (test, serverResponse) => {
+      rtLib.mockResolved('logForwarding.get', serverResponse)
+      command.argv = []
+      return command.run()
+        .then(() => {
+          expect(RuntimeLib.printActionLogs).toHaveBeenCalledTimes(1)
         })
     })
   })

@@ -21,6 +21,16 @@ class ActivationLogs extends RuntimeBaseCommand {
     const { args, flags } = this.parse(ActivationLogs)
     const ow = await this.wsk()
 
+    const configuredLogForwarding = await ow.logForwarding.get()
+    if (configuredLogForwarding !== undefined && configuredLogForwarding !== null && !Array.isArray(configuredLogForwarding) && typeof configuredLogForwarding === 'object') {
+      const destinations = Object.keys(configuredLogForwarding)
+      if (destinations.length === 1 && destinations[0] !== 'adobe_io_runtime') {
+        this.log(`Namespace is configured with custom log forwarding destination: '${destinations[0]}'. ` +
+            'Please use corresponding logging platform to view logs.')
+        return
+      }
+    }
+
     let limit = 1
     if (flags.last) {
       limit = 1

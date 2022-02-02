@@ -16,6 +16,7 @@ const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
 const RuntimeLib = require('@adobe/aio-lib-runtime')
 const rtUtils = RuntimeLib.utils
 const rtAction = 'actions.create'
+const rtActionGet = 'actions.get'
 
 test('exports', async () => {
   expect(typeof TheCommand).toEqual('function')
@@ -47,6 +48,7 @@ test('flags', async () => {
   expect(TheCommand.flags['annotation-file'].char).toBe('A')
   expect(typeof TheCommand.flags['annotation-file']).toBe('object')
   expect(typeof TheCommand.flags.sequence).toBe('object')
+  expect(typeof TheCommand.flags.copy).toBe('object')
 })
 
 test('args', async () => {
@@ -877,6 +879,21 @@ describe('instance methods', () => {
             resolve()
           })
       })
+    })
+
+    test('aio runtime:action:create newAction --copy oldAction', () => {
+      const oldActionJson = require('../../../__fixtures__/action/get.json')
+      const cmdGet = rtLib.mockResolvedFixture(rtActionGet, 'action/get.json')
+      const cmdCreate = rtLib.mockResolved(rtAction, { fake: '' })
+      const name = 'oldAction'
+      const newAction = 'newAction'
+      command.argv = [newAction, '--copy', name]
+      return command.run()
+        .then(() => {
+          expect(cmdGet).toHaveBeenCalledWith(name)
+          expect(cmdCreate).toHaveBeenCalledWith({ name: newAction, action: oldActionJson })
+          expect(stdout.output).toMatch('')
+        })
     })
   })
 })
