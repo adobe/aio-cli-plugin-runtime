@@ -85,7 +85,8 @@ PackageDelete.flags = {
     description: 'output raw json'
   }),
   recursive: flags.boolean({
-    description: 'Deletes all associates actions',
+    description: 'Deletes all associated actions',
+    char: 'r',
     default: false
   })
 }
