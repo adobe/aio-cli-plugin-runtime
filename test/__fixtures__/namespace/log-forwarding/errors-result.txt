@@ -1,0 +1,5 @@
+Log forwarding errors for the last configured destination 'destination':
+[
+"error1",
+"error2"
+]
