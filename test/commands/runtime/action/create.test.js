@@ -67,6 +67,11 @@ test('aliases', async () => {
   expect(TheCommand.aliases.length).toBeGreaterThan(0)
 })
 
+const rejectWithError = async (command, error, handleError) => {
+  await expect(command.run()).rejects.toThrow(...error)
+  return expect(handleError).toHaveBeenLastCalledWith(...error)
+}
+
 describe('instance methods', () => {
   let command, handleError, rtLib
   beforeEach(async () => {
@@ -120,8 +125,10 @@ describe('instance methods', () => {
           expect(cmd).toHaveBeenCalledWith({
             action: {
               exec: { fake: 'value' },
-              name },
-            name })
+              name
+            },
+            name
+          })
           expect(stdout.output).toMatch('')
         })
     })
@@ -239,11 +246,12 @@ describe('instance methods', () => {
           expect(rtUtils.getKeyValueArrayFromMergedParameters).toHaveBeenCalledWith(['a', 'b', 'c', 'd'], undefined)
           expect(cmd).toHaveBeenCalledWith({
             action: {
-              exec: {
-                code: jsFile, kind: 'nodejs:default' },
+              exec: { code: jsFile, kind: 'nodejs:default' },
               name,
-              parameters: [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }] },
-            name })
+              parameters: [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }]
+            },
+            name
+          })
           expect(stdout.output).toMatch('')
         })
     })
@@ -258,11 +266,12 @@ describe('instance methods', () => {
           expect(rtUtils.getKeyValueArrayFromMergedParameters).toHaveBeenCalledWith(undefined, '/action/parameters.json')
           expect(cmd).toHaveBeenCalledWith({
             action: {
-              exec: {
-                code: jsFile, kind: 'nodejs:default' },
+              exec: { code: jsFile, kind: 'nodejs:default' },
               name,
-              parameters: [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }] },
-            name })
+              parameters: [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }]
+            },
+            name
+          })
           expect(stdout.output).toMatch('')
         })
     })
@@ -465,20 +474,14 @@ describe('instance methods', () => {
         })
     })
 
-    test('creates an action with action name, action path and overlapping --env and --param keys', () => {
-      return new Promise((resolve, reject) => {
-        rtLib.mockRejected(rtAction, '')
-        const name = 'hello'
-        command.argv = [name, '/action/actionFile.js', '--env', 'a', 'b', '--param', 'a', 'd']
-        rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation((flags, file) => flags && [{ key: 'same', value: 'kv' }])
-        rtUtils.createKeyValueArrayFromFlag.mockReturnValue([{ key: 'same', value: 'abc' }])
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error('Invalid argument(s). Environment variables and function parameters may not overlap'))
-            resolve()
-          })
-      })
+    test('creates an action with action name, action path and overlapping --env and --param keys', async () => {
+      rtLib.mockRejected(rtAction, '')
+      const name = 'hello'
+      command.argv = [name, '/action/actionFile.js', '--env', 'a', 'b', '--param', 'a', 'd']
+      rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation((flags, file) => flags && [{ key: 'same', value: 'kv' }])
+      rtUtils.createKeyValueArrayFromFlag.mockReturnValue([{ key: 'same', value: 'abc' }])
+      const error = ['failed to create the action', new Error('Invalid argument(s). Environment variables and function parameters may not overlap')]
+      await rejectWithError(command, error, handleError)
     })
 
     test('creates an action with action name, action path and --env-file flag', () => {
@@ -726,159 +729,87 @@ describe('instance methods', () => {
         })
     })
 
-    test('creates an action with code of unknown kind', () => {
-      return new Promise((resolve, reject) => {
-        rtLib.mockRejected(rtAction, '')
-        command.argv = ['hello', '/action/fileWithNoExt']
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error('Cannot determine kind of action. Please use --kind to specify.'))
-            resolve()
-          })
-      })
+    test('creates an action with code of unknown kind', async () => {
+      rtLib.mockRejected(rtAction, '')
+      command.argv = ['hello', '/action/fileWithNoExt']
+      const error = ['failed to create the action', new Error('Cannot determine kind of action. Please use --kind to specify.')]
+      await rejectWithError(command, error, handleError)
     })
 
-    test('creates an action with code and --sequence', () => {
-      return new Promise((resolve, reject) => {
-        rtLib.mockRejected(rtAction, '')
-        command.argv = ['hello', '/action/actionFile.js', '--sequence', 'a,b,c']
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error('Cannot specify sequence and a code artifact at the same time'))
-            resolve()
-          })
-      })
+    test('creates an action with code and --sequence', async () => {
+      rtLib.mockRejected(rtAction, '')
+      command.argv = ['hello', '/action/actionFile.js', '--sequence', 'a,b,c']
+      const error = ['failed to create the action', new Error('Cannot specify sequence and a code artifact at the same time')]
+      await rejectWithError(command, error, handleError)
     })
 
-    test('tests for incorrect action with --main flag and --sequence', () => {
-      return new Promise((resolve, reject) => {
-        rtLib.mockRejected(rtAction, '')
-        command.argv = ['hello', '--main', 'maynard', '--sequence', 'a,b,c']
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error('The function handler can only be specified when you provide a code artifact'))
-            resolve()
-          })
-      })
+    test('tests for incorrect action with --main flag and --sequence', async () => {
+      rtLib.mockRejected(rtAction, '')
+      command.argv = ['hello', '--main', 'maynard', '--sequence', 'a,b,c']
+      const error = ['failed to create the action', new Error('The function handler can only be specified when you provide a code artifact')]
+      await rejectWithError(command, error, handleError)
     })
 
-    test('creates an action with --docker and --sequence', () => {
-      return new Promise((resolve, reject) => {
-        rtLib.mockRejected(rtAction, '')
-        command.argv = ['hello', '--docker', 'some-image', '--sequence', 'a,b,c']
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error('Cannot specify sequence and a container image at the same time'))
-            resolve()
-          })
-      })
+    test('creates an action with --docker and --sequence', async () => {
+      rtLib.mockRejected(rtAction, '')
+      command.argv = ['hello', '--docker', 'some-image', '--sequence', 'a,b,c']
+      const error = ['failed to create the action', new Error('Cannot specify sequence and a container image at the same time')]
+      await rejectWithError(command, error, handleError)
     })
 
-    test('creates an action with --docker and --kind', () => {
-      return new Promise((resolve, reject) => {
-        rtLib.mockRejected(rtAction, '')
-        command.argv = ['hello', '/action/actionFile.js', '--kind', 'nodejs:8', '--docker', 'some-image']
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error('Cannot specify a kind and a container image at the same time'))
-            resolve()
-          })
-      })
+    test('creates an action with --docker and --kind', async () => {
+      rtLib.mockRejected(rtAction, '')
+      command.argv = ['hello', '/action/actionFile.js', '--kind', 'nodejs:8', '--docker', 'some-image']
+      const error = ['failed to create the action', new Error('Cannot specify a kind and a container image at the same time')]
+      await rejectWithError(command, error, handleError)
     })
 
-    test('tests for incorrect action create missing code and sequence', () => {
-      return new Promise((resolve, reject) => {
-        rtLib.mockRejected(rtAction, '')
-        command.argv = ['hello']
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error('Must provide a code artifact, container image, or a sequence'))
-            resolve()
-          })
-      })
+    test('tests for incorrect action create missing code and sequence', async () => {
+      rtLib.mockRejected(rtAction, '')
+      command.argv = ['hello']
+      const error = ['failed to create the action', new Error('Must provide a code artifact, container image, or a sequence')]
+      await rejectWithError(command, error, handleError)
     })
 
-    test('tests for incorrect action with --kind flag and --sequence', () => {
-      return new Promise((resolve, reject) => {
-        rtLib.mockRejected(rtAction, '')
-        command.argv = ['hello', '--kind', 'nodejs:10', '--sequence', 'a,b,c']
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error('A kind may not be specified for a sequence'))
-            resolve()
-          })
-      })
+    test('tests for incorrect action with --kind flag and --sequence', async () => {
+      rtLib.mockRejected(rtAction, '')
+      command.argv = ['hello', '--kind', 'nodejs:10', '--sequence', 'a,b,c']
+      const error = ['failed to create the action', new Error('A kind may not be specified for a sequence')]
+      await rejectWithError(command, error, handleError)
     })
-    test('tests for incorrect --sequence flags', () => {
-      return new Promise((resolve, reject) => {
-        rtLib.mockRejected(rtAction, '')
-        command.argv = ['hello', '--sequence', ' ,a,b,c']
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error('Provide a valid sequence component'))
-            resolve()
-          })
-      })
+    test('tests for incorrect --sequence flags', async () => {
+      rtLib.mockRejected(rtAction, '')
+      command.argv = ['hello', '--sequence', ' ,a,b,c']
+      const error = ['failed to create the action', new Error('Provide a valid sequence component')]
+      await rejectWithError(command, error, handleError)
     })
 
-    test('tests for incorrect action path', () => {
-      return new Promise((resolve, reject) => {
-        rtLib.mockRejected(rtAction, '')
-        command.argv = ['hello', '/action/file.js', '--kind', 'nodejs:10']
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error('Provide a valid path for ACTION'))
-            resolve()
-          })
-      })
+    test('tests for incorrect action path', async () => {
+      rtLib.mockRejected(rtAction, '')
+      command.argv = ['hello', '/action/file.js', '--kind', 'nodejs:10']
+      const error = ['failed to create the action', new Error('Provide a valid path for ACTION')]
+      await rejectWithError(command, error, handleError)
     })
 
-    test('tests for incorrect action zip path', () => {
-      return new Promise((resolve, reject) => {
-        rtLib.mockRejected(rtAction, '')
-        command.argv = ['hello', '/action/file.zip', '--kind', 'nodejs:10']
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error('Provide a valid path for ACTION'))
-            resolve()
-          })
-      })
+    test('tests for incorrect action zip path', async () => {
+      rtLib.mockRejected(rtAction, '')
+      command.argv = ['hello', '/action/file.zip', '--kind', 'nodejs:10']
+      const error = ['failed to create the action', new Error('Provide a valid path for ACTION')]
+      await rejectWithError(command, error, handleError)
     })
 
-    test('errors out on api error', () => {
-      return new Promise((resolve, reject) => {
-        rtLib.mockRejected(rtAction, new Error('an error'))
-        command.argv = ['hello', '/action/actionFile.js']
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error('an error'))
-            resolve()
-          })
-      })
+    test('errors out on api error', async () => {
+      rtLib.mockRejected(rtAction, new Error('an error'))
+      command.argv = ['hello', '/action/actionFile.js']
+      const error = ['failed to create the action', new Error('an error')]
+      await rejectWithError(command, error, handleError)
     })
 
-    test('errors on --web-secure with --web false flag', () => {
-      return new Promise((resolve, reject) => {
-        rtLib.mockRejected(rtAction, '')
-        command.argv = ['hello', '/action/fileWithNoExt', '--web-secure', 'true', '--web', 'false']
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to create the action', new Error(TheCommand.errorMessages.websecure))
-            resolve()
-          })
-      })
+    test('errors on --web-secure with --web false flag', async () => {
+      rtLib.mockRejected(rtAction, '')
+      command.argv = ['hello', '/action/fileWithNoExt', '--web-secure', 'true', '--web', 'false']
+      const error = ['failed to create the action', new Error(TheCommand.errorMessages.websecure)]
+      await rejectWithError(command, error, handleError)
     })
 
     test('aio runtime:action:create newAction --copy oldAction', () => {

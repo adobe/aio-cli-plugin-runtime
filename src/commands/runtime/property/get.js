@@ -11,7 +11,7 @@ governing permissions and limitations under the License.
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 const { flags } = require('@oclif/command')
-const { cli } = require('cli-ux')
+const { CliUx: cli } = require('@oclif/core')
 const { createFetch } = require('@adobe/aio-lib-core-networking')
 const { PropertyKey, PropertyDefault, propertiesFile, PropertyEnv } = require('../../../properties')
 const debug = require('debug')('aio-cli-plugin-runtime/property')
@@ -92,7 +92,7 @@ class PropertyGet extends RuntimeBaseCommand {
       }
     }
 
-    cli.table(data,
+    cli.ux.table(data,
       {
         Property: { minWidth: 10 },
         Value: { minWidth: 20 }

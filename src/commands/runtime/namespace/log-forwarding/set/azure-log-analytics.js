@@ -23,14 +23,14 @@ class AzureLogAnalyticsCommand extends RuntimeBaseCommand {
         shared_key: flags['shared-key'],
         log_type: flags['log-type']
       })
-      this.log(`Log forwarding was set to azure_log_analytics for this namespace`)
+      this.log('Log forwarding was set to azure_log_analytics for this namespace')
     } catch (e) {
       this.handleError('failed to update log forwarding configuration', e)
     }
   }
 }
 
-AzureLogAnalyticsCommand.description = `Set log forwarding destination to Azure Log Analytics`
+AzureLogAnalyticsCommand.description = 'Set log forwarding destination to Azure Log Analytics'
 
 AzureLogAnalyticsCommand.flags = {
   ...RuntimeBaseCommand.flags,

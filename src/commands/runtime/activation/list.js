@@ -13,9 +13,9 @@ governing permissions and limitations under the License.
 const moment = require('dayjs')
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 const { flags } = require('@oclif/command')
-const { cli } = require('cli-ux')
+const { CliUx: cli } = require('@oclif/core')
 const decorators = require('../../../decorators').decorators()
-const statusStrings = ['success', 'app error', `dev error`, 'sys error']
+const statusStrings = ['success', 'app error', 'dev error', 'sys error']
 
 class ActivationList extends RuntimeBaseCommand {
   async run () {
@@ -84,7 +84,7 @@ class ActivationList extends RuntimeBaseCommand {
               if (row.statusCode === 2) {
                 const timeout = row.annotations.find(_ => _.key === 'timeout')
                 if (timeout && timeout.value) {
-                  return `timeout`
+                  return 'timeout'
                 }
               }
               return code
@@ -188,7 +188,7 @@ class ActivationList extends RuntimeBaseCommand {
           }
         }
         if (listActivation) {
-          cli.table(listActivation, columns, {
+          cli.ux.table(listActivation, columns, {
             'no-truncate': true
           })
         }

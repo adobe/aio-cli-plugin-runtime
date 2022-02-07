@@ -119,14 +119,14 @@ describe('instance methods', () => {
 
     test('create api with --config-file', () => {
       const apiSwagger = fixtureFile('route/api_swagger.json')
-      const cmd = rtLib.mockResolved(rtAction, { gwApiUrl: `http://myserver` })
+      const cmd = rtLib.mockResolved(rtAction, { gwApiUrl: 'http://myserver' })
       command.argv = ['--config-file', '/route/api_swagger.json']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalledWith({
             swagger: apiSwagger
           })
-          expect(stdout.output).toMatch(`http://myserver`)
+          expect(stdout.output).toMatch('http://myserver')
         })
     })
 

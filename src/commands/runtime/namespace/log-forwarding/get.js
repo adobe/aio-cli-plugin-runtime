@@ -17,14 +17,14 @@ class GetCommand extends RuntimeBaseCommand {
     const ow = await this.wsk()
     try {
       const res = await ow.logForwarding.get()
-      this.logJSON(`Log forwarding configuration for this namespace:\n`, res)
+      this.logJSON('Log forwarding configuration for this namespace:\n', res)
     } catch (e) {
       this.handleError('failed to get log forwarding configuration', e)
     }
   }
 }
 
-GetCommand.description = `Get log forwarding destination configuration`
+GetCommand.description = 'Get log forwarding destination configuration'
 
 GetCommand.flags = {
   ...RuntimeBaseCommand.flags

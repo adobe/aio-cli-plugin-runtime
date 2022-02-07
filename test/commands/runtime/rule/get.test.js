@@ -78,17 +78,12 @@ describe('instance methods', () => {
         })
     })
 
-    test('errors out on api error', () => {
-      return new Promise((resolve, reject) => {
-        rtLib.mockRejected('rules.get', new Error('an error'))
-        command.argv = ['nameFoo']
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to retrieve rule', new Error('an error'))
-            resolve()
-          })
-      })
+    test('errors out on api error', async () => {
+      rtLib.mockRejected('rules.get', new Error('an error'))
+      const error = ['failed to retrieve rule', new Error('an error')]
+      command.argv = ['nameFoo']
+      await expect(command.run()).rejects.toThrow(...error)
+      expect(handleError).toHaveBeenLastCalledWith(...error)
     })
   })
 })

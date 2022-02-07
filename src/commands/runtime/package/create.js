@@ -33,18 +33,18 @@ class PackageCreate extends RuntimeBaseCommand {
       switch (flags.shared) {
         case 'true' :
         case 'yes' :
-          packageParams['publish'] = true
+          packageParams.publish = true
           break
         case 'false' :
         case 'no' :
-          packageParams['publish'] = false
+          packageParams.publish = false
           break
       }
       const options = {}
-      options['name'] = args.packageName
+      options.name = args.packageName
       // only provide 'pacakge' property if it's not empty
       if (Object.entries(packageParams).filter(([_, v]) => v !== undefined).length > 0) {
-        options['package'] = packageParams
+        options.package = packageParams
       }
       const ow = await this.wsk()
       const method = this.isUpdate() ? 'update' : 'create'

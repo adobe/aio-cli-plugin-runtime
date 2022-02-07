@@ -55,8 +55,8 @@ class RuntimeBaseCommand extends Command {
 
     // .env var is given priority, then the flag, which has a default value
     // of aio-cli-plugin-runtime@VERSION
-    if (!process.env['__OW_USER_AGENT']) {
-      process.env['__OW_USER_AGENT'] = flags.useragent
+    if (!process.env.__OW_USER_AGENT) {
+      process.env.__OW_USER_AGENT = flags.useragent
     }
 
     return options

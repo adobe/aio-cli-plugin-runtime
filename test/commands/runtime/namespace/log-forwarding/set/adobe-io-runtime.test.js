@@ -36,5 +36,5 @@ test('set log forwarding settings to adobe_io_runtime', () => {
 
 test('failed to set log forwarding settings to adobe_io_runtime', async () => {
   rtLib.logForwarding.setDestination = jest.fn().mockRejectedValue(new Error('mocked error'))
-  await expect(command.run()).rejects.toThrow(`failed to update log forwarding configuration: mocked error`)
+  await expect(command.run()).rejects.toThrow('failed to update log forwarding configuration: mocked error')
 })

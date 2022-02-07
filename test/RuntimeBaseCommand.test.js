@@ -67,47 +67,23 @@ describe('instance methods', () => {
     })
 
     test('empty APIHOST should throw', async () => {
-      await new Promise((resolve, reject) => {
-        process.env[PropertyEnv.APIHOST] = '    '
-
-        return command.wsk()
-          .then(() => reject(new Error('should have thrown')))
-          .catch((e) => {
-            expect(e).toEqual(new Error('An API host must be specified'))
-            resolve()
-          })
-      })
+      process.env[PropertyEnv.APIHOST] = '    '
+      await expect(command.wsk()).rejects.toThrow(new Error('An API host must be specified'))
     })
 
     test('null AUTH should throw', async () => {
-      await new Promise((resolve, reject) => {
-        delete process.env[PropertyEnv.APIHOST]
-        delete process.env[PropertyEnv.AUTH]
-        const files = {}
-        files[require('path').join(require('os').homedir(), '.wskprops')] = ''
-        fakeFileSystem.addJson(files)
-
-        return command.wsk()
-          .then(() => reject(new Error('should have thrown')))
-          .catch((e) => {
-            expect(e).toEqual(new Error('An AUTH key must be specified'))
-            resolve()
-          })
-      })
+      delete process.env[PropertyEnv.APIHOST]
+      delete process.env[PropertyEnv.AUTH]
+      const files = {}
+      files[require('path').join(require('os').homedir(), '.wskprops')] = ''
+      fakeFileSystem.addJson(files)
+      await expect(command.wsk()).rejects.toThrow(new Error('An AUTH key must be specified'))
     })
 
     test('empty AUTH should throw', async () => {
-      await new Promise((resolve, reject) => {
-        process.env[PropertyEnv.AUTH] = '    '
-
-        return command.wsk()
-          .then(() => reject(new Error('should have thrown')))
-          .catch((e) => {
-            expect(e).toEqual(new Error('An AUTH key must be specified'))
-            delete process.env[PropertyEnv.AUTH]
-            resolve()
-          })
-      })
+      process.env[PropertyEnv.AUTH] = '    '
+      await expect(command.wsk()).rejects.toThrow(new Error('An AUTH key must be specified'))
+      delete process.env[PropertyEnv.AUTH]
     })
 
     test('not string AUTH should not throw', async () => {

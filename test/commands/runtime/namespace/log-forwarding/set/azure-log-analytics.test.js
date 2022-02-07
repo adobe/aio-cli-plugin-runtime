@@ -38,5 +38,5 @@ test('set log forwarding settings to azure_log_analytics', () => {
 test('failed to set log forwarding settings to azure_log_analytics', async () => {
   rtLib.logForwarding.setDestination = jest.fn().mockRejectedValue(new Error('mocked error'))
   command.argv = ['--customer-id', 'customer1', '--shared-key', 'key1', '--log-type', 'mylog']
-  await expect(command.run()).rejects.toThrow(`failed to update log forwarding configuration: mocked error`)
+  await expect(command.run()).rejects.toThrow('failed to update log forwarding configuration: mocked error')
 })

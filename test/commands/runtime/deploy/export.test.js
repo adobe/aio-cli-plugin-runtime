@@ -152,12 +152,13 @@ describe('instance methods', () => {
       }
     ],
     exec:
-    { components: [
-      '/53444_51981/testSeq/zero',
-      '/53444_51981/testSeq/one',
-      '/53444_51981/testSeq/two'
-    ],
-    kind: 'sequence'
+    {
+      components: [
+        '/53444_51981/testSeq/zero',
+        '/53444_51981/testSeq/one',
+        '/53444_51981/testSeq/two'
+      ],
+      kind: 'sequence'
     },
     name: 'four',
     namespace: '53444_51981/testSeq',
@@ -185,10 +186,12 @@ describe('instance methods', () => {
       }
     ],
     exec:
-    { kind: 'nodejs:10',
-      code: `code`,
+    {
+      kind: 'nodejs:10',
+      code: 'code',
       binary: false,
-      main: 'split' },
+      main: 'split'
+    },
     limits: { concurrency: 1, logs: 10, memory: 256, timeout: 60000 },
     name: 'helloAction1',
     namespace: '53444_51981/testSeq',
@@ -221,7 +224,8 @@ describe('instance methods', () => {
       }
     ],
     exec:
-    { kind: 'nodejs:10',
+    {
+      kind: 'nodejs:10',
       binary: true,
       code: 'code'
     },
@@ -325,10 +329,12 @@ describe('instance methods', () => {
     parameters: [{
       key: 'name', value: 'Sam'
     },
-    { key: 'place',
+    {
+      key: 'place',
       value: ''
     },
-    { key: 'children',
+    {
+      key: 'children',
       value: 0
     }],
     publish: false,
@@ -362,10 +368,12 @@ describe('instance methods', () => {
     parameters: [{
       key: 'name', value: 'Sam'
     },
-    { key: 'place',
+    {
+      key: 'place',
       value: ''
     },
-    { key: 'children',
+    {
+      key: 'children',
       value: 0
     }],
     publish: false,

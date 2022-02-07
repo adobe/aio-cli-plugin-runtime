@@ -38,7 +38,7 @@ class SetCommand extends RuntimeBaseCommand {
   }
 }
 
-SetCommand.description = `Configure log forwarding destination (interactive)`
+SetCommand.description = 'Configure log forwarding destination (interactive)'
 
 SetCommand.flags = {
   ...RuntimeBaseCommand.flags

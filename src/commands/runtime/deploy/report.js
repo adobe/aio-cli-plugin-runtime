@@ -32,17 +32,17 @@ class DeployReport extends RuntimeBaseCommand {
       const triggers = []
       Object.keys(packages).forEach((key) => {
         const objPkg = { name: key, Inputs: {} }
-        if (packages[key]['public']) {
-          objPkg.public = packages[key]['public']
+        if (packages[key].public) {
+          objPkg.public = packages[key].public
         }
         pkg.push(objPkg)
-        if (packages[key]['actions']) {
-          Object.keys(packages[key]['actions']).forEach((action) => {
+        if (packages[key].actions) {
+          Object.keys(packages[key].actions).forEach((action) => {
             const objAction = { name: action, Inputs: {} }
-            const packageInputs = packages[key]['actions'][action]['inputs'] || {}
+            const packageInputs = packages[key].actions[action].inputs || {}
             let deploymentInputs = {}
-            if (deploymentPackages[key] && deploymentPackages[key]['actions'] && deploymentPackages[key]['actions'][action]) {
-              deploymentInputs = deploymentPackages[key]['actions'][action]['inputs'] || {}
+            if (deploymentPackages[key] && deploymentPackages[key].actions && deploymentPackages[key].actions[action]) {
+              deploymentInputs = deploymentPackages[key].actions[action].inputs || {}
             }
             const allInputs = returnUnion(packageInputs, deploymentInputs)
             objAction.Inputs = processInputs(allInputs, {})
@@ -50,20 +50,20 @@ class DeployReport extends RuntimeBaseCommand {
           })
         }
 
-        if (packages[key]['sequences']) {
-          Object.keys(packages[key]['sequences']).forEach((sequence) => {
+        if (packages[key].sequences) {
+          Object.keys(packages[key].sequences).forEach((sequence) => {
             const objSequence = { name: sequence, Inputs: {} }
             actions.push(objSequence)
           })
         }
 
-        if (packages[key]['triggers']) {
-          Object.keys(packages[key]['triggers']).forEach((trigger) => {
+        if (packages[key].triggers) {
+          Object.keys(packages[key].triggers).forEach((trigger) => {
             const objTrigger = { name: trigger }
-            if (packages[key]['triggers'][trigger]['feed']) {
-              objTrigger.feed = packages[key]['triggers'][trigger]['feed']
+            if (packages[key].triggers[trigger].feed) {
+              objTrigger.feed = packages[key].triggers[trigger].feed
             }
-            const packageInputs = packages[key]['triggers'][trigger]['inputs'] || {}
+            const packageInputs = packages[key].triggers[trigger].inputs || {}
             let deploymentInputs = {}
             if (trigger in deploymentTriggers) {
               deploymentInputs = deploymentTriggers[trigger]

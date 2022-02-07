@@ -149,11 +149,12 @@ describe('instance methods', () => {
           expect(rtUtils.getKeyValueArrayFromMergedParameters).toHaveBeenCalledWith(['a', 'b', 'c', 'd'], undefined)
           expect(cmd).toHaveBeenCalledWith({
             action: {
-              exec: {
-                code: jsFile, kind: 'nodejs:default' },
+              exec: { code: jsFile, kind: 'nodejs:default' },
               name,
-              parameters: [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }] },
-            name })
+              parameters: [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }]
+            },
+            name
+          })
           expect(stdout.output).toMatch('')
         })
     })
@@ -169,8 +170,10 @@ describe('instance methods', () => {
           expect(cmd).toHaveBeenCalledWith({
             action: {
               name,
-              parameters: [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }] },
-            name })
+              parameters: [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }]
+            },
+            name
+          })
           expect(stdout.output).toMatch('')
         })
     })
@@ -204,11 +207,12 @@ describe('instance methods', () => {
           expect(rtUtils.getKeyValueArrayFromMergedParameters).toHaveBeenCalledWith(undefined, '/action/parameters.json')
           expect(cmd).toHaveBeenCalledWith({
             action: {
-              exec: {
-                code: jsFile, kind: 'nodejs:default' },
+              exec: { code: jsFile, kind: 'nodejs:default' },
               name,
-              parameters: [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }] },
-            name })
+              parameters: [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }]
+            },
+            name
+          })
           expect(stdout.output).toMatch('')
         })
     })
@@ -224,8 +228,10 @@ describe('instance methods', () => {
           expect(cmd).toHaveBeenCalledWith({
             action: {
               name,
-              parameters: [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }] },
-            name })
+              parameters: [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }]
+            },
+            name
+          })
           expect(stdout.output).toMatch('')
         })
     })

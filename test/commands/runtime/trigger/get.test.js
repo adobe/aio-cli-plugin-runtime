@@ -109,18 +109,13 @@ describe('instance methods', () => {
       })
     })
 
-    test('trigger get, error', () => {
-      return new Promise((resolve, reject) => {
-        rtLib.mockRejected(rtAction, new Error('an error'))
-        command.argv = ['trigger1']
-        rtUtils.parsePathPattern.mockReturnValue([null, null, 'trigger1Ret'])
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('Unable to get trigger \'trigger1\'', new Error('an error'))
-            resolve()
-          })
-      })
+    test('trigger get, error', async () => {
+      rtLib.mockRejected(rtAction, new Error('an error'))
+      command.argv = ['trigger1']
+      const error = ['Unable to get trigger \'trigger1\'', new Error('an error')]
+      rtUtils.parsePathPattern.mockReturnValue([null, null, 'trigger1Ret'])
+      await expect(command.run()).rejects.toThrow(...error)
+      expect(handleError).toHaveBeenLastCalledWith(...error)
     })
   })
 })

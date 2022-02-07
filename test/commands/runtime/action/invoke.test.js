@@ -218,7 +218,7 @@ describe('instance methods', () => {
             result: false
           }))
 
-          expect(stdout.output).toMatch(`activation took too long, use activation id 123456 to check for completion.`)
+          expect(stdout.output).toMatch('activation took too long, use activation id 123456 to check for completion.')
         })
     })
 
@@ -237,7 +237,7 @@ describe('instance methods', () => {
             result: true
           }))
 
-          expect(stdout.output).toMatch(`activation took too long, use activation id 123456 to check for completion.`)
+          expect(stdout.output).toMatch('activation took too long, use activation id 123456 to check for completion.')
         })
     })
 

@@ -29,7 +29,7 @@ class ErrorsCommand extends RuntimeBaseCommand {
   }
 }
 
-ErrorsCommand.description = `Get log forwarding errors`
+ErrorsCommand.description = 'Get log forwarding errors'
 
 ErrorsCommand.flags = {
   ...RuntimeBaseCommand.flags

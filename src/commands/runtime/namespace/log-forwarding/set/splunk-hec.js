@@ -24,14 +24,14 @@ class SplunkHecCommand extends RuntimeBaseCommand {
         index: flags.index,
         hec_token: flags['hec-token']
       })
-      this.log(`Log forwarding was set to splunk_hec for this namespace`)
+      this.log('Log forwarding was set to splunk_hec for this namespace')
     } catch (e) {
       this.handleError('failed to update log forwarding configuration', e)
     }
   }
 }
 
-SplunkHecCommand.description = `Set log forwarding destination to Splunk HEC`
+SplunkHecCommand.description = 'Set log forwarding destination to Splunk HEC'
 
 SplunkHecCommand.flags = {
   ...RuntimeBaseCommand.flags,

@@ -97,17 +97,11 @@ describe('instance methods', () => {
         })
     })
 
-    test('update a simple trigger, error', () => {
-      return new Promise((resolve, reject) => {
-        rtLib.mockRejected(rtAction, new Error('an error'))
-        command.argv = ['trigger1']
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to update the trigger', new Error('an error'))
-            resolve()
-          })
-      })
+    test('update a simple trigger, error', async () => {
+      rtLib.mockRejected(rtAction, new Error('an error'))
+      command.argv = ['trigger1']
+      await expect(command.run()).rejects.toThrow(Error)
+      expect(handleError).toHaveBeenLastCalledWith('failed to update the trigger', new Error('an error'))
     })
 
     test('update a simple trigger, use param flag', () => {
@@ -117,10 +111,12 @@ describe('instance methods', () => {
       return command.run()
         .then(() => {
           expect(rtUtils.getKeyValueArrayFromMergedParameters).toHaveBeenCalledWith(['a', 'b', 'c', 'd'], undefined)
-          expect(cmd).toHaveBeenCalledWith({ name: 'trigger1',
+          expect(cmd).toHaveBeenCalledWith({
+            name: 'trigger1',
             trigger: {
               parameters: [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }]
-            } })
+            }
+          })
           expect(stdout.output).toMatch('')
         })
     })
@@ -137,10 +133,12 @@ describe('instance methods', () => {
       return command.run()
         .then(() => {
           expect(rtUtils.getKeyValueArrayFromMergedParameters).toHaveBeenCalledWith(undefined, '/trigger/parameters.json')
-          expect(cmd).toHaveBeenCalledWith({ name: 'trigger1',
+          expect(cmd).toHaveBeenCalledWith({
+            name: 'trigger1',
             trigger: {
               parameters: [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }]
-            } })
+            }
+          })
           expect(stdout.output).toMatch('')
         })
     })
@@ -152,10 +150,12 @@ describe('instance methods', () => {
       return command.run()
         .then(() => {
           expect(rtUtils.getKeyValueArrayFromMergedParameters).toHaveBeenCalledWith(['a', 'b', 'c', 'd'], undefined)
-          expect(cmd).toHaveBeenCalledWith({ name: 'trigger1',
+          expect(cmd).toHaveBeenCalledWith({
+            name: 'trigger1',
             trigger: {
               annotations: [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }]
-            } })
+            }
+          })
           expect(stdout.output).toMatch('')
         })
     })
@@ -172,10 +172,12 @@ describe('instance methods', () => {
       return command.run()
         .then(() => {
           expect(rtUtils.getKeyValueArrayFromMergedParameters).toHaveBeenCalledWith(undefined, '/trigger/annotations.json')
-          expect(cmd).toHaveBeenCalledWith({ name: 'trigger1',
+          expect(cmd).toHaveBeenCalledWith({
+            name: 'trigger1',
             trigger: {
               annotations: [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }]
-            } })
+            }
+          })
           expect(stdout.output).toMatch('')
         })
     })
