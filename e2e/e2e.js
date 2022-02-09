@@ -22,6 +22,6 @@ test('aio-cli-plugin-runtime test', async () => {
   console.log(chalk.blue(`> e2e tests for ${chalk.bold(name)}`))
 
   console.log(chalk.bold('    - listing actions'))
-  expect(execa.sync('./bin/run', ['runtime:action:list'], { stderr: 'inherit' })).not.toThrow()
+  expect(() => { execa.sync('./bin/run', ['runtime:action:list'], { stderr: 'inherit' }) }).not.toThrow()
   console.log(chalk.green(`    - done for ${chalk.bold(name)}`))
 })
