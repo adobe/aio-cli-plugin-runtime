@@ -96,15 +96,13 @@ describe('instance methods', () => {
         })
     })
 
-    test('throws error retrieve logs of an activation', () => {
+    test('throws error retrieve logs of an activation', async () => {
       rtLib.mockResolved('activations.list', [{ activationId: '12345' }])
       const cmd = rtLib.mockRejected(rtAction, new Error('Async error'))
       command.argv = ['12345']
-      return command.run()
-        .catch(() => {
-          expect(cmd).toHaveBeenCalledWith('12345')
-          expect(handleError).toHaveBeenCalledWith('failed to retrieve logs for activation', expect.any(Error))
-        })
+      await expect(command.run()).rejects.toThrow()
+      expect(cmd).toHaveBeenCalledWith('12345')
+      expect(handleError).toHaveBeenCalledWith('failed to retrieve logs for activation', expect.any(Error))
     })
 
     test('retrieve last log (default)', () => {
@@ -196,7 +194,7 @@ describe('instance methods', () => {
         })
     })
 
-    test('package logs (package does not exist)', () => {
+    test('package logs (package does not exist)', async () => {
       RuntimeLib.utils.setPaths.mockResolvedValue({
         manifestContent: {
           packages: {
@@ -214,10 +212,8 @@ describe('instance methods', () => {
         }
       })
       command.argv = ['-p', 'invalidpkg']
-      return command.run()
-        .catch(() => {
-          expect(handleError).toHaveBeenCalledWith('Could not find package invalidpkg in manifest')
-        })
+      await expect(command.run()).rejects.toThrow()
+      expect(handleError).toHaveBeenCalledWith('Could not find package invalidpkg in manifest')
     })
 
     test('package logs (--deployed)', () => {

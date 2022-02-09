@@ -61,27 +61,19 @@ describe('instance methods', () => {
       expect(command.run).toBeInstanceOf(Function)
     })
 
-    test('error, throws exception', () => {
-      return new Promise((resolve, reject) => {
-        rtLib.mockRejected(rtAction, new Error('an error'))
-        command.argv = ['/myapi']
-        return command.run()
-          .then(() => reject(new Error('should not succeed')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to get the api', new Error('an error'))
-            resolve()
-          })
-      })
+    test('error, throws exception', async () => {
+      rtLib.mockRejected(rtAction, new Error('an error'))
+      command.argv = ['/myapi']
+      await expect(command.run()).rejects.toThrow()
+      expect(handleError).toHaveBeenLastCalledWith('failed to get the api', new Error('an error'))
     })
 
-    test('simple get call', () => {
+    test('simple get call', async () => {
       const cmd = rtLib.mockResolvedFixture(rtAction, 'route/get.json')
       command.argv = ['/myapi']
-      return command.run()
-        .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ basepath: '/myapi' })
-          expect(stdout.output).toMatchFixture('route/get.txt')
-        })
+      await command.run()
+      expect(cmd).toHaveBeenCalledWith({ basepath: '/myapi' })
+      expect(stdout.output).toMatchFixture('route/get.txt')
     })
   })
 })

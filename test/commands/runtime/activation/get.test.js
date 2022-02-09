@@ -123,17 +123,11 @@ describe('instance methods', () => {
       await expect(runResult).rejects.toThrow('failed to retrieve the activation')
     })
 
-    test('errors out on api error', () => {
-      return new Promise((resolve, reject) => {
-        rtLib.mockRejected(rtAction, new Error('an error'))
-        command.argv = ['12345']
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to retrieve the activation', new Error('an error'))
-            resolve()
-          })
-      })
+    test('errors out on api error', async () => {
+      rtLib.mockRejected(rtAction, new Error('an error'))
+      command.argv = ['12345']
+      await expect(command.run()).rejects.toThrow()
+      expect(handleError).toHaveBeenLastCalledWith('failed to retrieve the activation', new Error('an error'))
     })
   })
 })

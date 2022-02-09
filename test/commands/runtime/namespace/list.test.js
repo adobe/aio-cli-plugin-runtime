@@ -85,18 +85,13 @@ describe('instance methods', () => {
       })
     })
 
-    test('namespace list, error', () => {
-      return new Promise((resolve, reject) => {
-        const namespaceError = new Error('an error')
+    test('namespace list, error', async () => {
+      const namespaceError = new Error('an error')
 
-        rtLib.mockRejected(rtAction, namespaceError)
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to list namespaces', new Error('an error'))
-            resolve()
-          })
-      })
+      rtLib.mockRejected(rtAction, namespaceError)
+
+      await expect(command.run()).rejects.toThrow()
+      expect(handleError).toHaveBeenLastCalledWith('failed to list namespaces', new Error('an error'))
     })
   })
 })

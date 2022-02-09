@@ -316,31 +316,19 @@ describe('instance methods', () => {
         })
     })
 
-    test('tests for incorrect parameters', () => {
-      return new Promise((resolve, reject) => {
-        rtLib.mockRejected(rtAction, 'not that one')
-        rtUtils.getKeyValueObjectFromMergedParameters.mockImplementation(() => { throw new Error('that is a parsing error') })
-        command.argv = ['hello', '--param', 'a', 'b', 'c', '--blocking']
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to invoke the action', new Error('that is a parsing error'))
-            resolve()
-          })
-      })
+    test('tests for incorrect parameters', async () => {
+      rtLib.mockRejected(rtAction, 'not that one')
+      rtUtils.getKeyValueObjectFromMergedParameters.mockImplementation(() => { throw new Error('that is a parsing error') })
+      command.argv = ['hello', '--param', 'a', 'b', 'c', '--blocking']
+      await expect(command.run()).rejects.toThrow()
+      expect(handleError).toHaveBeenLastCalledWith('failed to invoke the action', new Error('that is a parsing error'))
     })
 
-    test('errors out on api error', () => {
-      return new Promise((resolve, reject) => {
-        rtLib.mockRejected(rtAction, new Error('an error'))
-        command.argv = ['hello']
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to invoke the action', new Error('an error'))
-            resolve()
-          })
-      })
+    test('errors out on api error', async () => {
+      rtLib.mockRejected(rtAction, new Error('an error'))
+      command.argv = ['hello']
+      await expect(command.run()).rejects.toThrow()
+      expect(handleError).toHaveBeenLastCalledWith('failed to invoke the action', new Error('an error'))
     })
   })
 })

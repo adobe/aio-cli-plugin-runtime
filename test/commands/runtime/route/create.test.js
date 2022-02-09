@@ -149,29 +149,17 @@ describe('instance methods', () => {
         })
     })
 
-    test('create a simple api, error (no flags or args)', () => {
-      return new Promise((resolve, reject) => {
-        command.argv = []
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to create the api', new Error('either the config-file flag or the arguments basePath, relPath, apiVerb and action are required'))
-            resolve()
-          })
-      })
+    test('create a simple api, error (no flags or args)', async () => {
+      command.argv = []
+      await expect(command.run()).rejects.toThrow()
+      expect(handleError).toHaveBeenLastCalledWith('failed to create the api', new Error('either the config-file flag or the arguments basePath, relPath, apiVerb and action are required'))
     })
 
-    test('create a simple api, error', () => {
-      return new Promise((resolve, reject) => {
-        rtLib.mockRejected(rtAction, new Error('an error'))
-        command.argv = ['/mybase', '/myapi', 'get', 'myaction']
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to create the api', new Error('an error'))
-            resolve()
-          })
-      })
+    test('create a simple api, error', async () => {
+      rtLib.mockRejected(rtAction, new Error('an error'))
+      command.argv = ['/mybase', '/myapi', 'get', 'myaction']
+      await expect(command.run()).rejects.toThrow()
+      expect(handleError).toHaveBeenLastCalledWith('failed to create the api', new Error('an error'))
     })
   })
 })

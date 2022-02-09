@@ -80,7 +80,10 @@ describe('instance methods', () => {
       const cmd = rtLib.mockResolved(rtAction, { res: 'fake' })
       command.argv = ['packageName', 'bindPackageName', '--param', 'a', 'b', '--param', 'c', 'd']
       rtUtils.parsePackageName.mockReturnValue({ name: 'fakeName', namespace: '-' })
-      rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation(params => params && [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }])
+      rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation(params => params && [{
+        key: 'fakeParam',
+        value: 'aaa'
+      }, { key: 'fakeParam2', value: 'bbb' }])
       return command.run()
         .then(() => {
           expect(rtUtils.getKeyValueArrayFromMergedParameters).toHaveBeenCalledWith(['a', 'b', 'c', 'd'], undefined)
@@ -100,7 +103,10 @@ describe('instance methods', () => {
     test('binds a package with package name /ns param flag', () => {
       const cmd = rtLib.mockResolved(rtAction, { fake: 'res' })
       command.argv = ['/ns/packageName', 'bindPackageName', '--param', 'a', 'b', '--param', 'c', 'd']
-      rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation(params => params && [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }])
+      rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation(params => params && [{
+        key: 'fakeParam',
+        value: 'aaa'
+      }, { key: 'fakeParam2', value: 'bbb' }])
       rtUtils.parsePackageName.mockReturnValue({ name: 'fakeName', namespace: 'fakeNs' })
       return command.run()
         .then(() => {
@@ -121,7 +127,10 @@ describe('instance methods', () => {
     test('binds a package with package name param flag --json', () => {
       const cmd = rtLib.mockResolved(rtAction, { fake: 'res' })
       command.argv = ['packageName', 'bindPackageName', '--param', 'a', 'b', '--param', 'c', 'd', '--json']
-      rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation(params => params && [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }])
+      rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation(params => params && [{
+        key: 'fakeParam',
+        value: 'aaa'
+      }, { key: 'fakeParam2', value: 'bbb' }])
       rtUtils.parsePackageName.mockReturnValue({ name: 'fakeName', namespace: '-' })
       return command.run()
         .then(() => {
@@ -161,7 +170,10 @@ describe('instance methods', () => {
     test('binds a package with packageName, bindPackageName and param-file flag', () => {
       const cmd = rtLib.mockResolved(rtAction, { res: 'fake' })
       command.argv = ['ns/packageName', 'bindPackageName', '--param-file', '/action/parameters.json']
-      rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation((flags, file) => file && [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }])
+      rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation((flags, file) => file && [{
+        key: 'fakeParam',
+        value: 'aaa'
+      }, { key: 'fakeParam2', value: 'bbb' }])
       rtUtils.parsePackageName.mockReturnValue({ name: 'fakeName', namespace: 'fakeNs' })
       return command.run()
         .then(() => {
@@ -185,7 +197,10 @@ describe('instance methods', () => {
     test('binds a package with packageName, bindPackageName and annotation-file flag', () => {
       const cmd = rtLib.mockResolved(rtAction, { res: 'fake' })
       command.argv = ['ns/packageName', 'bindPackageName', '--annotation-file', '/action/parameters.json']
-      rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation((flags, file) => file && [{ key: 'fakeAnnot', value: 'aaa' }])
+      rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation((flags, file) => file && [{
+        key: 'fakeAnnot',
+        value: 'aaa'
+      }])
       rtUtils.parsePackageName.mockReturnValue({ name: 'fakeName', namespace: 'fakeNs' })
       return command.run()
         .then(() => {
@@ -265,45 +280,31 @@ describe('instance methods', () => {
         })
     })
 
-    test('error on params flag parsing', () => {
-      return new Promise((resolve, reject) => {
-        rtLib.mockRejected(rtAction, '')
-        command.argv = ['packageName', 'bindPackageName', '--param', 'a', 'b', 'c']
-        rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation(() => { throw new Error('parse error') })
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to bind the package', new Error('parse error'))
-            resolve()
-          })
+    test('error on params flag parsing', async () => {
+      rtLib.mockRejected(rtAction, '')
+      command.argv = ['packageName', 'bindPackageName', '--param', 'a', 'b', 'c']
+      rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation(() => {
+        throw new Error('parse error')
       })
+      await expect(command.run()).rejects.toThrow()
+      expect(handleError).toHaveBeenLastCalledWith('failed to bind the package', new Error('parse error'))
     })
 
-    test('error on annotation flag parsing', () => {
-      return new Promise((resolve, reject) => {
-        rtLib.mockRejected(rtAction, '')
-        command.argv = ['packageName', 'bindPackageName', '--annotation', 'a', 'b', 'c']
-        rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation(() => { throw new Error('parse error') })
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to bind the package', new Error('parse error'))
-            resolve()
-          })
+    test('error on annotation flag parsing', async () => {
+      rtLib.mockRejected(rtAction, '')
+      command.argv = ['packageName', 'bindPackageName', '--annotation', 'a', 'b', 'c']
+      rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation(() => {
+        throw new Error('parse error')
       })
+      await expect(command.run()).rejects.toThrow()
+      expect(handleError).toHaveBeenLastCalledWith('failed to bind the package', new Error('parse error'))
     })
 
-    test('errors out on api error', () => {
-      return new Promise((resolve, reject) => {
-        rtLib.mockRejected(rtAction, new Error('an error'))
-        command.argv = ['packageName', 'bindPackageName']
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to bind the package', new Error('an error'))
-            resolve()
-          })
-      })
+    test('errors out on api error', async () => {
+      rtLib.mockRejected(rtAction, new Error('an error'))
+      command.argv = ['packageName', 'bindPackageName']
+      await expect(command.run()).rejects.toThrow()
+      expect(handleError).toHaveBeenLastCalledWith('failed to bind the package', new Error('an error'))
     })
   })
 })

@@ -74,49 +74,37 @@ describe('instance methods', () => {
         })
     })
 
-    test('sync with error', () => {
-      return new Promise((resolve, reject) => {
-        command.argv = ['-m', '/deploy/deployment_actionMissingInputs.yaml']
-        rtUtils.setPaths.mockReturnValue({
-          packages: {},
-          deploymentTriggers: { fake: 'dTriggers' },
-          deploymentPackages: { fake: 'dPackages' },
-          projectName: 'hello',
-          manifestPath: 'fakePath',
-          manifestContent: 'fakeContent'
-        })
-        rtUtils.processPackage.mockReturnValue({ fake: 'entities' })
-        config.get.mockReturnValue('fakeIMSOrg')
-        rtUtils.syncProject.mockRejectedValue(new Error('broken!'))
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('Failed to sync', new Error('broken!'))
-            resolve()
-          })
+    test('sync with error', async () => {
+      command.argv = ['-m', '/deploy/deployment_actionMissingInputs.yaml']
+      rtUtils.setPaths.mockReturnValue({
+        packages: {},
+        deploymentTriggers: { fake: 'dTriggers' },
+        deploymentPackages: { fake: 'dPackages' },
+        projectName: 'hello',
+        manifestPath: 'fakePath',
+        manifestContent: 'fakeContent'
       })
+      rtUtils.processPackage.mockReturnValue({ fake: 'entities' })
+      config.get.mockReturnValue('fakeIMSOrg')
+      rtUtils.syncProject.mockRejectedValue(new Error('broken!'))
+      await expect(command.run()).rejects.toThrow()
+      expect(handleError).toHaveBeenLastCalledWith('Failed to sync', new Error('broken!'))
     })
 
-    test('sync with projectName=""', () => {
-      return new Promise((resolve, reject) => {
-        command.argv = ['-m', '/deploy/deployment_actionMissingInputs.yaml']
-        rtUtils.setPaths.mockReturnValue({
-          packages: {},
-          deploymentTriggers: { fake: 'dTriggers' },
-          deploymentPackages: { fake: 'dPackages' },
-          projectName: '',
-          manifestPath: 'fakePath',
-          manifestContent: 'fakeContent'
-        })
-        rtUtils.processPackage.mockReturnValue({ fake: 'entities' })
-        config.get.mockReturnValue('fakeIMSOrg')
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('Failed to sync', new Error('The mandatory key [project name] is missing'))
-            resolve()
-          })
+    test('sync with projectName=""', async () => {
+      command.argv = ['-m', '/deploy/deployment_actionMissingInputs.yaml']
+      rtUtils.setPaths.mockReturnValue({
+        packages: {},
+        deploymentTriggers: { fake: 'dTriggers' },
+        deploymentPackages: { fake: 'dPackages' },
+        projectName: '',
+        manifestPath: 'fakePath',
+        manifestContent: 'fakeContent'
       })
+      rtUtils.processPackage.mockReturnValue({ fake: 'entities' })
+      config.get.mockReturnValue('fakeIMSOrg')
+      await expect(command.run()).rejects.toThrow()
+      expect(handleError).toHaveBeenLastCalledWith('Failed to sync', new Error('The mandatory key [project name] is missing'))
     })
   })
 })

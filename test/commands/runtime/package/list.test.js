@@ -69,17 +69,10 @@ describe('instance methods', () => {
         })
     })
 
-    test('return list of packages - no data exception', () => {
-      return new Promise((resolve, reject) => {
-        rtLib.mockResolved(rtAction, '')
-        command.argv = []
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch((err) => {
-            expect(err).toBeDefined()
-            resolve()
-          })
-      })
+    test('return list of packages - no data exception', async () => {
+      rtLib.mockResolved(rtAction, '')
+      command.argv = []
+      await expect(command.run()).rejects.toThrow()
     })
 
     test('return list of packages --json', () => {
@@ -122,16 +115,10 @@ describe('instance methods', () => {
         })
     })
 
-    test('errors out on api error', () => {
-      return new Promise((resolve, reject) => {
-        rtLib.mockRejected(rtAction, new Error('an error'))
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to list the packages', new Error('an error'))
-            resolve()
-          })
-      })
+    test('errors out on api error', async () => {
+      rtLib.mockRejected(rtAction, new Error('an error'))
+      await expect(command.run()).rejects.toThrow()
+      expect(handleError).toHaveBeenLastCalledWith('failed to list the packages', new Error('an error'))
     })
 
     test('return list of packages, --name-sort flag', () => {
