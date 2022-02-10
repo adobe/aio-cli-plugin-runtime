@@ -45,13 +45,12 @@ describe('instance methods', () => {
       expect(command.run).toBeInstanceOf(Function)
     })
 
-    test('returns help file for runtime command', () => {
-      const spy = jest.spyOn(Help.prototype, 'showHelp')
+    test('returns help file for runtime command', async () => {
+      const spy = jest.spyOn(Help.prototype, 'showHelp').mockReturnValue(true)
       command.config = {}
       command.id = 'pgb'
-      return command.run().then(() => {
-        expect(spy).toHaveBeenCalledWith(['runtime:action', '--help'])
-      })
+      await command.run()
+      expect(spy).toHaveBeenCalledWith(['runtime:action', '--help'])
     })
   })
 })
