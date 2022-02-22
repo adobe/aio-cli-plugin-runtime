@@ -72,7 +72,7 @@ class RouteList extends RuntimeBaseCommand {
           URL: { minWidth: 15, 'no-truncate': true }
         },
         {
-          printLine: this.log,
+          printLine: this.log.bind(this),
           ...flags // parsed flags
         })
       }
