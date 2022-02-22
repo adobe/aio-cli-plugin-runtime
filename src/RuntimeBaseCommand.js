@@ -10,7 +10,7 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const { Command, flags } = require('@oclif/command')
+const { Command, Flags } = require('@oclif/core')
 
 const { propertiesFile, PropertyEnv, PropertyDefault } = require('./properties')
 const createDebug = require('debug')
@@ -21,7 +21,7 @@ const config = require('@adobe/aio-lib-core-config')
 
 class RuntimeBaseCommand extends Command {
   async getOptions () {
-    const { flags } = this.parse(this.constructor)
+    const { flags } = await this.parse(this.constructor)
     const properties = propertiesFile()
 
     const options = {
@@ -74,7 +74,7 @@ class RuntimeBaseCommand extends Command {
   }
 
   async init () {
-    const { flags } = this.parse(this.constructor)
+    const { flags } = await this.parse(this.constructor)
 
     // See https://www.npmjs.com/package/debug for usage in commands
     if (flags.verbose) {
@@ -85,8 +85,8 @@ class RuntimeBaseCommand extends Command {
     }
   }
 
-  handleError (msg, err) {
-    this.parse(this.constructor)
+  async handleError (msg, err) {
+    await this.parse(this.constructor)
 
     msg = msg || 'unknown error'
 
@@ -136,19 +136,19 @@ RuntimeBaseCommand.propertyFlags = ({ asBoolean = false } = {}) => {
   Object
     .keys(propData)
     .forEach((key) => {
-      newData[key] = (asBoolean ? flags.boolean(propData[key]) : flags.string(propData[key]))
+      newData[key] = (asBoolean ? Flags.boolean(propData[key]) : Flags.string(propData[key]))
     })
   return newData
 }
 
 RuntimeBaseCommand.flags = {
   ...RuntimeBaseCommand.propertyFlags(),
-  insecure: flags.boolean({ char: 'i', description: 'bypass certificate check' }),
-  debug: flags.string({ description: 'Debug level output' }),
-  verbose: flags.boolean({ char: 'v', description: 'Verbose output' }),
-  version: flags.boolean({ description: 'Show version' }),
-  help: flags.boolean({ description: 'Show help' }),
-  useragent: flags.string({
+  insecure: Flags.boolean({ char: 'i', description: 'bypass certificate check' }),
+  debug: Flags.string({ description: 'Debug level output' }),
+  verbose: Flags.boolean({ char: 'v', description: 'Verbose output' }),
+  version: Flags.boolean({ description: 'Show version' }),
+  help: Flags.boolean({ description: 'Show help' }),
+  useragent: Flags.string({
     hidden: true,
     description: 'Use custom user-agent string',
     default: 'aio-cli-plugin-runtime@' + require('../package.json').version

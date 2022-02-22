@@ -11,7 +11,7 @@ governing permissions and limitations under the License.
 */
 
 const TheCommand = require('../src/RuntimeBaseCommand.js')
-const { Command } = require('@oclif/command')
+const { Command } = require('@oclif/core')
 const { PropertyEnv } = require('../src/properties')
 const RuntimeLib = require('@adobe/aio-lib-runtime')
 const OpenWhiskError = require('openwhisk/lib/openwhisk_error')
@@ -240,75 +240,75 @@ describe('instance methods', () => {
       expect(command.handleError).toBeInstanceOf(Function)
     })
 
-    test('calls error', () => {
+    test('calls error', async () => {
       command.error = jest.fn()
       command.argv = ['--verbose']
-      command.handleError('msg', new Error('an error'))
+      await command.handleError('msg', new Error('an error'))
       expect(command.error).toHaveBeenCalledWith('msg: an error' + suffix)
     })
 
-    test('optional error object', () => {
+    test('optional error object', async () => {
       command.error = jest.fn()
-      command.handleError('msg')
+      await command.handleError('msg')
       expect(command.error).toHaveBeenCalledWith('msg')
     })
 
-    test('with no arguments', () => {
+    test('with no arguments', async () => {
       command.error = jest.fn()
-      command.handleError()
+      await command.handleError()
       expect(command.error).toHaveBeenCalledWith('unknown error')
     })
 
-    test('openwhisk error', () => {
+    test('openwhisk error', async () => {
       command.error = jest.fn()
-      command.handleError('msg', new OpenWhiskError('an error'))
+      await command.handleError('msg', new OpenWhiskError('an error'))
       expect(command.error).toHaveBeenCalledWith('msg: an error' + suffix)
     })
 
-    test('openwhisk error, with internal error', () => {
+    test('openwhisk error, with internal error', async () => {
       command.error = jest.fn()
       const err = new Error('is')
       err.error = 'The real error'
-      command.handleError('msg', new OpenWhiskError('what', err))
+      await command.handleError('msg', new OpenWhiskError('what', err))
       expect(command.error).toHaveBeenCalledWith('msg: the real error' + suffix)
     })
 
-    test('openwhisk error, with internal error and statusCode', () => {
+    test('openwhisk error, with internal error and statusCode', async () => {
       command.error = jest.fn()
       const err = new Error('is')
       err.error = 'The real error'
-      command.handleError('msg', new OpenWhiskError('what', err, 404))
+      await command.handleError('msg', new OpenWhiskError('what', err, 404))
       expect(command.error).toHaveBeenCalledWith('msg: the real error (404 Not Found)' + suffix)
     })
 
-    test('openwhisk error, with internal error and code', () => {
+    test('openwhisk error, with internal error and code', async () => {
       command.error = jest.fn()
       const err = new Error('is')
       err.error = 'The real error'
       err.code = 12
-      command.handleError('msg', new OpenWhiskError('what', err))
+      await command.handleError('msg', new OpenWhiskError('what', err))
       expect(command.error).toHaveBeenCalledWith('msg: the real error (12)' + suffix)
     })
 
-    test('openwhisk error, with status code', () => {
+    test('openwhisk error, with status code', async () => {
       command.error = jest.fn()
       const err = new Error('is')
       err.error = 'The real error'
-      command.handleError('msg', new OpenWhiskError('what', null, 401))
+      await command.handleError('msg', new OpenWhiskError('what', null, 401))
       expect(command.error).toHaveBeenCalledWith('msg: 401 Unauthorized' + suffix)
     })
 
-    test('openwhisk error, with weird status code', () => {
+    test('openwhisk error, with weird status code', async () => {
       command.error = jest.fn()
       const err = new Error('is')
       err.error = 'The real error'
-      command.handleError('msg', new OpenWhiskError('what', null, 999999))
+      await command.handleError('msg', new OpenWhiskError('what', null, 999999))
       expect(command.error).toHaveBeenCalledWith('msg: 999999' + suffix)
     })
 
-    test('with no message', () => {
+    test('with no message', async () => {
       command.error = jest.fn()
-      command.handleError('msg', new Error(''))
+      await command.handleError('msg', new Error(''))
       expect(command.error).toHaveBeenCalledWith('msg' + suffix)
     })
   })

@@ -11,14 +11,14 @@ governing permissions and limitations under the License.
 */
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
-const { flags } = require('@oclif/command')
+const { Flags } = require('@oclif/core')
 const fs = require('fs')
 const yaml = require('js-yaml')
 const path = require('path')
 
 class DeployExport extends RuntimeBaseCommand {
   async run () {
-    const { flags } = this.parse(DeployExport)
+    const { flags } = await this.parse(DeployExport)
     try {
       const ow = await this.wsk()
       const projectEntities = await findProjectEntities(ow, flags.projectname)
@@ -26,9 +26,9 @@ class DeployExport extends RuntimeBaseCommand {
       const fileDirectory = path.dirname(manifest)
       const projectJSON = await createProjectJSON(projectEntities, flags.projectname, ow, fileDirectory)
       const yamlObject = { project: projectJSON }
-      fs.writeFileSync(manifest, yaml.safeDump(yamlObject))
+      fs.writeFileSync(manifest, yaml.safeDump(yamlObject, {}))
     } catch (err) {
-      this.handleError('Failed to export', err)
+      await this.handleError('Failed to export', err)
     }
   }
 }
@@ -203,13 +203,13 @@ function returninputsfromKeyValue (inputs) {
 
 DeployExport.flags = {
   ...RuntimeBaseCommand.flags,
-  manifest: flags.string({
+  manifest: Flags.string({
     char: 'm',
     description: 'the manifest file location', // help description for flag
     required: true
   }),
 
-  projectname: flags.string({
+  projectname: Flags.string({
     description: 'the name of the project to be undeployed', // help description for flag
     required: true
   })

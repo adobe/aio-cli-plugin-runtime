@@ -19,7 +19,7 @@ class GetCommand extends RuntimeBaseCommand {
       const res = await ow.logForwarding.get()
       this.logJSON('Log forwarding configuration for this namespace:\n', res)
     } catch (e) {
-      this.handleError('failed to get log forwarding configuration', e)
+      await this.handleError('failed to get log forwarding configuration', e)
     }
   }
 }

@@ -11,12 +11,11 @@ governing permissions and limitations under the License.
 
 const moment = require('dayjs')
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
-const { flags } = require('@oclif/command')
-const { CliUx: cli } = require('@oclif/core')
+const { Flags, CliUx: cli } = require('@oclif/core')
 
 class RuleList extends RuntimeBaseCommand {
   async run () {
-    const { flags } = this.parse(RuleList)
+    const { flags } = await this.parse(RuleList)
     try {
       const ow = await this.wsk()
       const options = { ...flags }
@@ -74,7 +73,7 @@ class RuleList extends RuntimeBaseCommand {
       })
       return p
     } catch (err) {
-      this.handleError('failed to list the rules', err)
+      await this.handleError('failed to list the rules', err)
     }
   }
 }
@@ -83,25 +82,25 @@ RuleList.description = 'Retrieves a list of Rules'
 
 RuleList.flags = {
   ...RuntimeBaseCommand.flags,
-  limit: flags.integer({
+  limit: Flags.integer({
     char: 'l',
     description: 'Limit number of rules returned'
   }),
-  skip: flags.integer({
+  skip: Flags.integer({
     char: 's',
     description: 'Skip number of rules returned'
   }),
-  count: flags.boolean({
+  count: Flags.boolean({
     char: 'c',
     description: 'show only the total number of rules'
   }),
-  json: flags.boolean({
+  json: Flags.boolean({
     description: 'output raw json'
   }),
-  'name-sort': flags.boolean({
+  'name-sort': Flags.boolean({
     description: 'sort results by name'
   }),
-  name: flags.boolean({
+  name: Flags.boolean({
     char: 'n',
     description: 'sort results by name'
   })

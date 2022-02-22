@@ -24,7 +24,7 @@ class ErrorsCommand extends RuntimeBaseCommand {
         this.log(`No log forwarding errors${destinationMessage}`)
       }
     } catch (e) {
-      this.handleError('Failed to get log forwarding errors', e)
+      await this.handleError('Failed to get log forwarding errors', e)
     }
   }
 }

@@ -12,11 +12,11 @@ governing permissions and limitations under the License.
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 const { deployPackage, setPaths, processPackage, getKeyValueObjectFromMergedParameters } = require('@adobe/aio-lib-runtime').utils
-const { flags } = require('@oclif/command')
+const { Flags } = require('@oclif/core')
 
 class IndexCommand extends RuntimeBaseCommand {
   async run () {
-    const { flags } = this.parse(IndexCommand)
+    const { flags } = await this.parse(IndexCommand)
 
     try {
       // in case of 'aio runtime:deploy' (without the path to the manifest file) the program looks for the manifest file in the current directory.
@@ -32,26 +32,26 @@ class IndexCommand extends RuntimeBaseCommand {
       const logger = this.log
       await deployPackage(entities, ow, logger, this.getImsOrgId())
     } catch (err) {
-      this.handleError('Failed to deploy', err)
+      await this.handleError('Failed to deploy', err)
     }
   }
 }
 
 IndexCommand.flags = {
   ...RuntimeBaseCommand.flags,
-  manifest: flags.string({
+  manifest: Flags.string({
     char: 'm',
     description: 'the manifest file location' // help description for flag
   }),
-  deployment: flags.string({
+  deployment: Flags.string({
     char: 'd',
     description: 'the path to the deployment file'
   }),
-  param: flags.string({
+  param: Flags.string({
     description: 'parameter values in KEY VALUE format', // help description for flag
     multiple: true // allow setting this flag multiple times
   }),
-  'param-file': flags.string({
+  'param-file': Flags.string({
     char: 'P',
     description: 'FILE containing parameter values in JSON format' // help description for flag
   })

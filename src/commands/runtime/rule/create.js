@@ -10,13 +10,13 @@ governing permissions and limitations under the License.
 */
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
-const { flags } = require('@oclif/command')
+const { Flags } = require('@oclif/core')
 
 class RuleCreate extends RuntimeBaseCommand {
   isUpdate () { return false }
 
   async run () {
-    const { args, flags } = this.parse(RuleCreate)
+    const { args, flags } = await this.parse(RuleCreate)
     try {
       const ow = await this.wsk()
       const RuleCreateObject = { ...args }
@@ -27,7 +27,7 @@ class RuleCreate extends RuntimeBaseCommand {
       }
     } catch (err) {
       const method = this.isUpdate() ? 'update' : 'create'
-      this.handleError(`failed to ${method} rule`, err)
+      await this.handleError(`failed to ${method} rule`, err)
     }
   }
 }
@@ -54,7 +54,7 @@ RuleCreate.args = [
 
 RuleCreate.flags = {
   ...RuntimeBaseCommand.flags,
-  json: flags.boolean({
+  json: Flags.boolean({
     description: 'output raw json'
   })
 }

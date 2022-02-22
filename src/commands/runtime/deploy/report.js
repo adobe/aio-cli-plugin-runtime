@@ -12,11 +12,11 @@ governing permissions and limitations under the License.
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 const { processInputs, returnUnion, setPaths } = require('@adobe/aio-lib-runtime').utils
-const { flags } = require('@oclif/command')
+const { Flags } = require('@oclif/core')
 
 class DeployReport extends RuntimeBaseCommand {
   async run () {
-    const { flags } = this.parse(DeployReport)
+    const { flags } = await this.parse(DeployReport)
     try {
       const components = setPaths(flags)
       const packages = components.packages
@@ -89,18 +89,18 @@ class DeployReport extends RuntimeBaseCommand {
         this.logJSON('', trigger)
       }
     } catch (err) {
-      this.handleError('Failed to report', err)
+      await this.handleError('Failed to report', err)
     }
   }
 }
 
 DeployReport.flags = {
   ...RuntimeBaseCommand.flags,
-  manifest: flags.string({
+  manifest: Flags.string({
     char: 'm',
     description: 'the manifest file location' // help description for flag
   }),
-  deployment: flags.string({
+  deployment: Flags.string({
     char: 'd',
     description: 'the deployment file location' // help description for flag
   })

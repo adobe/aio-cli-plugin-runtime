@@ -11,12 +11,12 @@ governing permissions and limitations under the License.
 */
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
-const { flags } = require('@oclif/command')
+const { Flags } = require('@oclif/core')
 const { getKeyValueObjectFromMergedParameters } = require('@adobe/aio-lib-runtime').utils
 
 class ActionInvoke extends RuntimeBaseCommand {
   async run () {
-    const { args, flags } = this.parse(ActionInvoke)
+    const { args, flags } = await this.parse(ActionInvoke)
     const name = args.actionName
     try {
       const paramsAction = getKeyValueObjectFromMergedParameters(flags.param, flags['param-file'])
@@ -43,7 +43,7 @@ class ActionInvoke extends RuntimeBaseCommand {
       } else if (flags.blocking && err.error && err.error.activationId) {
         this.logJSON('', err.error)
       } else {
-        this.handleError('failed to invoke the action', err)
+        await this.handleError('failed to invoke the action', err)
       }
     }
   }
@@ -58,21 +58,21 @@ ActionInvoke.args = [
 
 ActionInvoke.flags = {
   ...RuntimeBaseCommand.flags,
-  param: flags.string({
+  param: Flags.string({
     char: 'p',
     description: 'parameter values in KEY VALUE format', // help description for flag
     multiple: true // allow setting this flag multiple times
   }),
-  'param-file': flags.string({
+  'param-file': Flags.string({
     char: 'P',
     description: 'FILE containing parameter values in JSON format' // help description for flag
   }),
-  blocking: flags.boolean({
+  blocking: Flags.boolean({
     char: 'b',
     description: 'blocking invoke', // help description for flag
     default: false
   }),
-  result: flags.boolean({
+  result: Flags.boolean({
     char: 'r',
     description: 'blocking invoke; show only activation result (unless there is a failure)', // help description for flag
     default: false

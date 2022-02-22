@@ -11,11 +11,10 @@ governing permissions and limitations under the License.
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 // eslint-disable-next-line no-unused-vars
-const { flags } = require('@oclif/command')
 
 class RouteGet extends RuntimeBaseCommand {
   async run () {
-    const { args } = this.parse(RouteGet)
+    const { args } = await this.parse(RouteGet)
 
     try {
       const ow = await this.wsk()
@@ -26,7 +25,7 @@ class RouteGet extends RuntimeBaseCommand {
       const result = await ow.routes.get(options)
       this.logJSON('', result.apis[0].value.apidoc)
     } catch (err) {
-      this.handleError('failed to get the api', err)
+      await this.handleError('failed to get the api', err)
     }
   }
 }

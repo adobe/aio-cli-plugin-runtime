@@ -9,13 +9,13 @@ the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTA
 OF ANY KIND, either express or implied. See the License for the specific language
 governing permissions and limitations under the License.
 */
-const { flags } = require('@oclif/command')
+const { Flags } = require('@oclif/core')
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 const { printLogs } = require('@adobe/aio-lib-runtime').utils
 
 class ActivationGet extends RuntimeBaseCommand {
   async run () {
-    const { args, flags } = this.parse(ActivationGet)
+    const { args, flags } = await this.parse(ActivationGet)
     let id = args.activationID
     try {
       const ow = await this.wsk()
@@ -24,7 +24,7 @@ class ActivationGet extends RuntimeBaseCommand {
         if (ax && ax.length > 0) {
           id = ax[0].activationId
         } else {
-          this.handleError('no activations were returned')
+          await this.handleError('no activations were returned')
         }
       }
       if (!id) {
@@ -40,7 +40,7 @@ class ActivationGet extends RuntimeBaseCommand {
         this.logJSON('', result)
       }
     } catch (err) {
-      this.handleError('failed to retrieve the activation', err)
+      await this.handleError('failed to retrieve the activation', err)
     }
   }
 }
@@ -53,11 +53,11 @@ ActivationGet.args = [
 
 ActivationGet.flags = {
   ...RuntimeBaseCommand.flags,
-  last: flags.boolean({
+  last: Flags.boolean({
     char: 'l',
     description: 'retrieves the most recent activation'
   }),
-  logs: flags.boolean({
+  logs: Flags.boolean({
     char: 'g',
     description: 'emit only the logs, stripped of time stamps and stream identifier'
   })

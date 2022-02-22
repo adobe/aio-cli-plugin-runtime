@@ -19,7 +19,7 @@ class AdobeIoRuntimeCommand extends RuntimeBaseCommand {
       await ow.logForwarding.setDestination('adobe_io_runtime', {})
       this.log('Log forwarding was set to adobe_io_runtime for this namespace')
     } catch (e) {
-      this.handleError('failed to update log forwarding configuration', e)
+      await this.handleError('failed to update log forwarding configuration', e)
     }
   }
 }

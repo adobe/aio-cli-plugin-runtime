@@ -12,12 +12,11 @@ governing permissions and limitations under the License.
 
 const moment = require('dayjs')
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
-const { flags } = require('@oclif/command')
-const { CliUx: cli } = require('@oclif/core')
+const { Flags, CliUx: cli } = require('@oclif/core')
 
 class PackageList extends RuntimeBaseCommand {
   async run () {
-    const { args, flags } = this.parse(PackageList)
+    const { args, flags } = await this.parse(PackageList)
     try {
       const ow = await this.wsk()
       const options = {}
@@ -82,7 +81,7 @@ class PackageList extends RuntimeBaseCommand {
         cli.ux.table(result, columns)
       }
     } catch (err) {
-      this.handleError('failed to list the packages', err)
+      await this.handleError('failed to list the packages', err)
     }
   }
 }
@@ -91,25 +90,25 @@ PackageList.flags = {
   ...RuntimeBaseCommand.flags,
   // example usage:  aio runtime:package:list --limit 10 --skip 2
   // aio runtime:package:list --count true OR  aio runtime:package:list --count yes
-  limit: flags.integer({
+  limit: Flags.integer({
     char: 'l',
     description: 'only return LIMIT number of packages'
   }),
-  skip: flags.integer({
+  skip: Flags.integer({
     char: 's',
     description: 'exclude the first SKIP number of packages from the result'
   }),
-  count: flags.boolean({
+  count: Flags.boolean({
     char: 'c',
     description: 'show only the total number of packages'
   }),
-  json: flags.boolean({
+  json: Flags.boolean({
     description: 'output raw json'
   }),
-  'name-sort': flags.boolean({
+  'name-sort': Flags.boolean({
     description: 'sort results by name'
   }),
-  name: flags.boolean({
+  name: Flags.boolean({
     char: 'n',
     description: 'sort results by name'
   })

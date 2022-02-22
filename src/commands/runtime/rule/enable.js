@@ -13,14 +13,14 @@ const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 
 class RuleEnable extends RuntimeBaseCommand {
   async run () {
-    const { args } = this.parse(RuleEnable)
+    const { args } = await this.parse(RuleEnable)
     try {
       const ow = await this.wsk()
       const RuleEnableObject = { ...args }
       const enableRule = await ow.rules.enable(RuleEnableObject)
       this.log(`Rule Enabled ${JSON.stringify(enableRule, null, 2)}`)
     } catch (err) {
-      this.handleError('failed to enable rule', err)
+      await this.handleError('failed to enable rule', err)
     }
   }
 }

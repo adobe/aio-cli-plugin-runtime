@@ -15,14 +15,14 @@ const { parsePackageName } = require('@adobe/aio-lib-runtime').utils
 
 class PackageGet extends RuntimeBaseCommand {
   async run () {
-    const { args } = this.parse(PackageGet)
+    const { args } = await this.parse(PackageGet)
     try {
       const ow = await this.wsk()
       const options = parsePackageName(args.packageName)
       const result = await ow.packages.get(options)
       this.logJSON('', result)
     } catch (err) {
-      this.handleError('failed to retrieve the package', err)
+      await this.handleError('failed to retrieve the package', err)
     }
   }
 }

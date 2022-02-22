@@ -163,7 +163,7 @@ global.createTestFlagsFunction = (TheCommand, Flags) => {
   return () => {
     // every command needs to override .flags (for global flags)
     // eslint: see https://eslint.org/docs/rules/no-prototype-builtins
-    expect(Object.prototype.hasOwnProperty.call(TheCommand, 'flags')).toBeTruthy()
+    expect(Object.prototype.hasOwnProperty.call(TheCommand, '_flags')).toBeTruthy()
 
     const flagsKeys = Object.keys(Flags)
     const theCommandFlagKeys = Object.keys(TheCommand.flags)
