@@ -79,20 +79,24 @@ describe('instance methods', () => {
     test('retrieve logs of an activation - with-results', () => {
       const cmd = rtLib.mockResolved(rtAction, { logs: ['this is a log', 'so is this'] })
       command.argv = ['12345']
+      const mockedLog = jest.spyOn(command.log, 'bind')
       return command.run()
-        .then((res) => {
+        .then(() => {
           expect(cmd).toHaveBeenCalledWith('12345')
-          expect(rtUtils.printLogs).toHaveBeenCalledWith({ logs: ['this is a log', 'so is this'] }, false, command.log)
+          expect(rtUtils.printLogs).toHaveBeenCalledWith({ logs: ['this is a log', 'so is this'] }, false, expect.any(Function))
+          expect(mockedLog).toHaveBeenCalledTimes(1)
         })
     })
 
     test('retrieve logs of an activation --strip', () => {
       const cmd = rtLib.mockResolved(rtAction, { logs: ['line1', 'line2', '2019-10-11T19:08:57.298Z  stdout: login-success'] })
       command.argv = ['12345', '-r']
+      const mockedLog = jest.spyOn(command.log, 'bind')
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalledWith('12345')
-          expect(rtUtils.printLogs).toHaveBeenCalledWith({ logs: ['line1', 'line2', '2019-10-11T19:08:57.298Z  stdout: login-success'] }, true, command.log)
+          expect(rtUtils.printLogs).toHaveBeenCalledWith({ logs: ['line1', 'line2', '2019-10-11T19:08:57.298Z  stdout: login-success'] }, true, expect.any(Function))
+          expect(mockedLog).toHaveBeenCalledTimes(2)
         })
     })
 

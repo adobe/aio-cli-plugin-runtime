@@ -51,9 +51,10 @@ test('flags', async () => {
 })
 
 describe('instance methods', () => {
-  let command, handleError, rtLib
+  let command, handleError, rtLib, mockedLogger
   beforeEach(async () => {
     command = new TheCommand([])
+    mockedLogger = jest.spyOn(command.log, 'bind')
     handleError = jest.spyOn(command, 'handleError')
     rtLib = await RuntimeLib.init({ apihost: 'fakehost', api_key: 'fakekey' })
     rtLib.mockResolved('actions.client.options', '')
@@ -82,7 +83,8 @@ describe('instance methods', () => {
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalledWith('12345')
-          expect(rtUtils.printLogs).toHaveBeenCalledWith({ logs: ['line1', 'line2', '2019-10-11T19:08:57.298Z  stdout: login-success'] }, true, command.log)
+          expect(rtUtils.printLogs).toHaveBeenCalledWith({ logs: ['line1', 'line2', '2019-10-11T19:08:57.298Z  stdout: login-success'] }, true, expect.any(Function))
+          expect(mockedLogger).toHaveBeenCalled()
         })
     })
 
@@ -106,7 +108,8 @@ describe('instance methods', () => {
         .then(() => {
           expect(axList).toHaveBeenCalled()
           expect(axGet).toHaveBeenCalledWith('12345')
-          expect(rtUtils.printLogs).toHaveBeenCalledWith({ logs: ['line1', 'line2', '2019-10-11T19:08:57.298Z  stdout: login-success'] }, true, command.log)
+          expect(rtUtils.printLogs).toHaveBeenCalledWith({ logs: ['line1', 'line2', '2019-10-11T19:08:57.298Z  stdout: login-success'] }, true, expect.any(Function))
+          expect(mockedLogger).toHaveBeenCalled()
         })
     })
 

@@ -30,7 +30,7 @@ class IndexCommand extends RuntimeBaseCommand {
       const entities = processPackage(packages, deploymentPackages, deploymentTriggers, params, false, options)
       const ow = await this.wsk(options)
       const logger = this.log
-      await deployPackage(entities, ow, logger, this.getImsOrgId())
+      await deployPackage(entities, ow, logger.bind(this), this.getImsOrgId())
     } catch (err) {
       await this.handleError('Failed to deploy', err)
     }

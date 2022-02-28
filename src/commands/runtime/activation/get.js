@@ -34,7 +34,7 @@ class ActivationGet extends RuntimeBaseCommand {
       if (flags.logs) {
         this.log('activation logs %s', id)
         const result = await ow.activations.logs(id)
-        printLogs(result, true, this.log)
+        printLogs(result, true, this.log.bind(this))
       } else {
         const result = await ow.activations.get(id)
         this.logJSON('', result)

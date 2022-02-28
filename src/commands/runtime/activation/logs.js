@@ -74,11 +74,11 @@ class ActivationLogs extends RuntimeBaseCommand {
         filterActions.push(flags.action)
       }
 
-      await rtLib.printActionLogs({ ow: owOptions }, this.log, limit, filterActions, flags.strip, flags.poll || flags.tail || flags.watch)
+      await rtLib.printActionLogs({ ow: owOptions }, this.log.bind(this), limit, filterActions, flags.strip, flags.poll || flags.tail || flags.watch)
     } else {
       return ow.activations.logs(args.activationId).then((result) => {
         this.log(chalk.dim('=== ') + chalk.bold('activation logs %s'), args.activationId)
-        printLogs(result, flags.strip, this.log)
+        printLogs(result, flags.strip, this.log.bind(this))
       }, async (err) => {
         await this.handleError('failed to retrieve logs for activation', err)
       })

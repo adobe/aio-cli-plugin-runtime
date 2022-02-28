@@ -31,7 +31,7 @@ class DeploySync extends RuntimeBaseCommand {
       const entities = processPackage(packages, deploymentPackages, deploymentTriggers, params, false, options)
       const ow = await this.wsk(options)
       const logger = this.log
-      await syncProject(components.projectName, components.manifestPath, components.manifestContent, entities, ow, logger, this.getImsOrgId())
+      await syncProject(components.projectName, components.manifestPath, components.manifestContent, entities, ow, logger.bind(this), this.getImsOrgId())
     } catch (err) {
       await this.handleError('Failed to sync', err)
     }

@@ -59,6 +59,7 @@ describe('instance methods', () => {
       })
       rtUtils.processPackage.mockReturnValue({ fake: 'entities' })
       config.get.mockReturnValue('fakeIMSOrg')
+      const mockedLog = jest.spyOn(command.log, 'bind')
       return command.run()
         .then(() => {
           expect(rtUtils.syncProject).toHaveBeenCalledWith(
@@ -67,10 +68,11 @@ describe('instance methods', () => {
             'fakeContent',
             { fake: 'entities' },
             rtLib,
-            command.log,
+            expect.any(Function),
             'fakeIMSOrg'
           )
           expect(stdout.output).toMatch('')
+          expect(mockedLog).toHaveBeenCalled()
         })
     })
 

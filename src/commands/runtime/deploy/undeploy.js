@@ -36,7 +36,7 @@ class DeployUndeploy extends RuntimeBaseCommand {
         entities = processPackage(packages, deploymentTriggers, deploymentPackages, {}, true, options) // true for getting entity namesOnly, we do not need to parse all actions files and so on
       }
 
-      await undeployPackage(entities, ow, logger)
+      await undeployPackage(entities, ow, logger.bind(this))
     } catch (err) {
       await this.handleError('Failed to undeploy', err)
     }
