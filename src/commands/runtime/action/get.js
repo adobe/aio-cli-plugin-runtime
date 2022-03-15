@@ -20,9 +20,11 @@ class ActionGet extends RuntimeBaseCommand {
     const { args, flags } = this.parse(ActionGet)
     const name = args.actionName
     const ow = await this.wsk()
+    const saveCode = flags.save || flags['save-as']
+    const fetchCode = !!(saveCode || flags.code || ActionGet.fullGet)
 
     try {
-      const result = await ow.actions.get(name)
+      const result = await ow.actions.get({ name, code: fetchCode })
       if (flags.url) {
         /*
           wsk go client uses :
@@ -52,16 +54,14 @@ class ActionGet extends RuntimeBaseCommand {
           this.log(`${opts.api}${nsPrefix}/${namespace}/${actionPrefix}/${packageName}${result.name}`)
         }
       } else {
-        const bSaveFile = flags['save-as'] && flags['save-as'].length > 0
-
-        if (flags.save || bSaveFile) {
+        if (saveCode) {
           if (result.exec.binary) {
-            const saveFileName = bSaveFile ? flags['save-as'] : `${result.name}.zip`
+            const saveFileName = flags['save-as'] || `${result.name}.zip`
             const data = Buffer.from(result.exec.code, 'base64')
             fs.writeFileSync(saveFileName, data, 'buffer')
           } else {
             const extension = fileExtensionForKind(result.exec.kind)
-            const saveFileName = bSaveFile ? flags['save-as'] : `${result.name}${extension}`
+            const saveFileName = flags['save-as'] || `${result.name}${extension}`
             fs.writeFileSync(saveFileName, result.exec.code)
           }
         } else if (ActionGet.fullGet) {
@@ -106,10 +106,12 @@ ActionGet.flags = {
   }),
   code: flags.boolean({
     char: 'c',
-    description: 'show action code (only works if code is not a zip file)'
+    description: 'show action code (only works if code is not a zip file)',
+    default: false
   }),
   save: flags.boolean({
-    description: 'save action code to file corresponding with action name'
+    description: 'save action code to file corresponding with action name',
+    default: false
   }),
   'save-as': flags.string({
     description: 'file to save action code to'
