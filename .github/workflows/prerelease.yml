@@ -32,7 +32,7 @@ jobs:
           npm test
       - name: Update your package.json with an npm pre-release version
         id: pre-release-version
-        uses: shazron/update-prerelease-npm-version@v1.1.8
+        uses: adobe/update-prerelease-npm-version@v1.0.0
         with:
           pre-release-tag: ${{ github.event.inputs.pre-release-tag }}
           dependencies-to-update: ${{ github.event.inputs.dependencies-to-update }}
