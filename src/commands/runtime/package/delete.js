@@ -84,7 +84,7 @@ PackageDelete.flags = {
   json: Flags.boolean({
     description: 'output raw json'
   }),
-  recursive: flags.boolean({
+  recursive: Flags.boolean({
     description: 'Deletes all associated actions (and rules & triggers associated with the actions)',
     char: 'r',
     default: false
