@@ -11,11 +11,10 @@ governing permissions and limitations under the License.
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 // eslint-disable-next-line no-unused-vars
-const { flags } = require('@oclif/command')
 
 class RouteDelete extends RuntimeBaseCommand {
   async run () {
-    const { args } = this.parse(RouteDelete)
+    const { args } = await this.parse(RouteDelete)
 
     try {
       const ow = await this.wsk()
@@ -27,7 +26,7 @@ class RouteDelete extends RuntimeBaseCommand {
 
       await ow.routes.delete(options)
     } catch (err) {
-      this.handleError('failed to delete the api', err)
+      await this.handleError('failed to delete the api', err)
     }
   }
 }

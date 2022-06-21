@@ -10,13 +10,13 @@ governing permissions and limitations under the License.
 */
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
-const { flags } = require('@oclif/command')
+const { Flags } = require('@oclif/core')
 const { PropertyKey, propertiesFile, PropertyEnv } = require('../../../properties')
 
 class PropertySet extends RuntimeBaseCommand {
   async run () {
     try {
-      const { flags } = this.parse(PropertySet)
+      const { flags } = await this.parse(PropertySet)
       const properties = propertiesFile()
 
       if (flags.auth) {
@@ -45,14 +45,14 @@ class PropertySet extends RuntimeBaseCommand {
 
       properties.save()
     } catch (err) {
-      this.handleError('failed to set the property', err)
+      await this.handleError('failed to set the property', err)
     }
   }
 }
 
 PropertySet.flags = {
   ...RuntimeBaseCommand.flags,
-  namespace: flags.string({
+  namespace: Flags.string({
     description: 'whisk namespace',
     env: PropertyEnv.NAMESPACE
   })

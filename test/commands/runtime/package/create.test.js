@@ -257,45 +257,27 @@ describe('instance methods', () => {
         })
     })
 
-    test('error on params flag parsing', () => {
-      return new Promise((resolve, reject) => {
-        rtLib.mockRejected(rtAction, '')
-        command.argv = ['packageName', '--param', 'a', 'b', 'c']
-        rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation(() => { throw new Error('parse error') })
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to create the package', new Error('parse error'))
-            resolve()
-          })
-      })
+    test('error on params flag parsing', async () => {
+      rtLib.mockRejected(rtAction, '')
+      command.argv = ['packageName', '--param', 'a', 'b', 'c']
+      rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation(() => { throw new Error('parse error') })
+      await expect(command.run()).rejects.toThrow()
+      expect(handleError).toHaveBeenLastCalledWith('failed to create the package', new Error('parse error'))
     })
 
-    test('error on annotation flag parsing', () => {
-      return new Promise((resolve, reject) => {
-        rtLib.mockRejected(rtAction, '')
-        command.argv = ['packageName', '--annotation', 'a', 'b', 'c']
-        rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation(() => { throw new Error('parse error') })
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to create the package', new Error('parse error'))
-            resolve()
-          })
-      })
+    test('error on annotation flag parsing', async () => {
+      rtLib.mockRejected(rtAction, '')
+      command.argv = ['packageName', '--annotation', 'a', 'b', 'c']
+      rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation(() => { throw new Error('parse error') })
+      await expect(command.run()).rejects.toThrow()
+      expect(handleError).toHaveBeenLastCalledWith('failed to create the package', new Error('parse error'))
     })
 
-    test('errors out on api error', () => {
-      return new Promise((resolve, reject) => {
-        rtLib.mockRejected(rtAction, new Error('an error'))
-        command.argv = ['packageName']
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to create the package', new Error('an error'))
-            resolve()
-          })
-      })
+    test('errors out on api error', async () => {
+      rtLib.mockRejected(rtAction, new Error('an error'))
+      command.argv = ['packageName']
+      await expect(command.run()).rejects.toThrow()
+      expect(handleError).toHaveBeenLastCalledWith('failed to create the package', new Error('an error'))
     })
   })
 })

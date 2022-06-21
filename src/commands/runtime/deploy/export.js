@@ -11,14 +11,14 @@ governing permissions and limitations under the License.
 */
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
-const { flags } = require('@oclif/command')
+const { Flags } = require('@oclif/core')
 const fs = require('fs')
 const yaml = require('js-yaml')
 const path = require('path')
 
 class DeployExport extends RuntimeBaseCommand {
   async run () {
-    const { flags } = this.parse(DeployExport)
+    const { flags } = await this.parse(DeployExport)
     try {
       const ow = await this.wsk()
       const projectEntities = await findProjectEntities(ow, flags.projectname)
@@ -26,9 +26,9 @@ class DeployExport extends RuntimeBaseCommand {
       const fileDirectory = path.dirname(manifest)
       const projectJSON = await createProjectJSON(projectEntities, flags.projectname, ow, fileDirectory)
       const yamlObject = { project: projectJSON }
-      fs.writeFileSync(manifest, yaml.safeDump(yamlObject))
+      fs.writeFileSync(manifest, yaml.safeDump(yamlObject, {}))
     } catch (err) {
-      this.handleError('Failed to export', err)
+      await this.handleError('Failed to export', err)
     }
   }
 }
@@ -91,7 +91,7 @@ async function createProjectJSON (entities, projectname, ow, fileDirectory) {
   const project = { name: projectname, packages: {} }
   for (const pkg of entities.packages) {
     const annotations = returninputsfromKeyValue(pkg.annotations)
-    project['packages'][pkg.name] = {
+    project.packages[pkg.name] = {
       version: pkg.version,
       namespace: pkg.namespace,
       annotations: annotations,
@@ -101,7 +101,7 @@ async function createProjectJSON (entities, projectname, ow, fileDirectory) {
       rules: {}
     }
     if (pkg.publish) {
-      project['packages'][pkg.name]['public'] = pkg.publish
+      project.packages[pkg.name].public = pkg.publish
     }
   }
 
@@ -122,7 +122,7 @@ async function createProjectJSON (entities, projectname, ow, fileDirectory) {
         memorySize: getAction.limits.memory,
         logSize: getAction.limits.logs
       }
-      project['packages'][packageName]['actions'][actionName] = {
+      project.packages[packageName].actions[actionName] = {
         version: getAction.version,
         namespace: getAction.namespace,
         annotations: returninputsfromKeyValue(getAction.annotations),
@@ -140,7 +140,7 @@ async function createProjectJSON (entities, projectname, ow, fileDirectory) {
       sequenceString = sequenceString.map(action => {
         return action.split('/').pop()
       })
-      project['packages'][packageName]['sequences'][actionName] = {
+      project.packages[packageName].sequences[actionName] = {
         actions: sequenceString.join()
       }
     }
@@ -148,21 +148,21 @@ async function createProjectJSON (entities, projectname, ow, fileDirectory) {
 
   for (const trigger of entities.triggers) {
     const getTrigger = await ow.triggers.get(trigger)
-    project['packages'][packageName]['triggers'][trigger] = {
+    project.packages[packageName].triggers[trigger] = {
       namespace: getTrigger.namespace,
       inputs: returninputsfromKeyValue(getTrigger.parameters),
       annotations: returninputsfromKeyValue(getTrigger.annotations)
     }
     for (const annotation of getTrigger.annotations) {
       if (annotation.key === 'feed') {
-        project['packages'][packageName]['triggers'][trigger]['feed'] = annotation.value
+        project.packages[packageName].triggers[trigger].feed = annotation.value
         break
       }
     }
   }
 
   for (const rule of entities.rules) {
-    project['packages'][packageName]['rules'][rule.name] = {
+    project.packages[packageName].rules[rule.name] = {
       action: rule.action.name,
       annotations: returninputsfromKeyValue(rule.annotations),
       trigger: rule.trigger.name
@@ -203,13 +203,13 @@ function returninputsfromKeyValue (inputs) {
 
 DeployExport.flags = {
   ...RuntimeBaseCommand.flags,
-  manifest: flags.string({
+  manifest: Flags.string({
     char: 'm',
     description: 'the manifest file location', // help description for flag
     required: true
   }),
 
-  projectname: flags.string({
+  projectname: Flags.string({
     description: 'the name of the project to be undeployed', // help description for flag
     required: true
   })

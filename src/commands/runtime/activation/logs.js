@@ -10,7 +10,7 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const { flags } = require('@oclif/command')
+const { Flags } = require('@oclif/core')
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 const rtLib = require('@adobe/aio-lib-runtime')
 const printLogs = rtLib.utils.printLogs
@@ -18,7 +18,7 @@ const chalk = require('chalk')
 
 class ActivationLogs extends RuntimeBaseCommand {
   async run () {
-    const { args, flags } = this.parse(ActivationLogs)
+    const { args, flags } = await this.parse(ActivationLogs)
     const ow = await this.wsk()
 
     const configuredLogForwarding = await ow.logForwarding.get()
@@ -59,7 +59,7 @@ class ActivationLogs extends RuntimeBaseCommand {
         } else { // Check in the manifest
           components = await rtLib.utils.setPaths()
           if (!Object.keys(components.manifestContent.packages).includes(flags.package)) {
-            this.handleError(`Could not find package ${flags.package} in manifest`)
+            await this.handleError(`Could not find package ${flags.package} in manifest`)
           }
           filterPackageActions(flags.package, components.manifestContent.packages[flags.package].actions)
         }
@@ -74,14 +74,13 @@ class ActivationLogs extends RuntimeBaseCommand {
         filterActions.push(flags.action)
       }
 
-      await rtLib.printActionLogs({ ow: owOptions }, this.log, limit, filterActions, flags.strip, flags.poll || flags.tail || flags.watch)
+      await rtLib.printActionLogs({ ow: owOptions }, this.log.bind(this), limit, filterActions, flags.strip, flags.poll || flags.tail || flags.watch)
     } else {
-      const logger = this.log
       return ow.activations.logs(args.activationId).then((result) => {
-        logger(chalk.dim('=== ') + chalk.bold('activation logs %s'), args.activationId)
-        printLogs(result, flags.strip, logger)
-      }, (err) => {
-        this.handleError('failed to retrieve logs for activation', err)
+        this.log(chalk.dim('=== ') + chalk.bold('activation logs %s'), args.activationId)
+        printLogs(result, flags.strip, this.log.bind(this))
+      }, async (err) => {
+        await this.handleError('failed to retrieve logs for activation', err)
       })
     }
   }
@@ -95,52 +94,52 @@ ActivationLogs.args = [
 
 ActivationLogs.flags = {
   ...RuntimeBaseCommand.flags,
-  action: flags.string({
+  action: Flags.string({
     description: 'Fetch logs for a specific action',
     exclusive: ['manifest', 'package'],
     char: 'a'
   }),
-  manifest: flags.boolean({
+  manifest: Flags.boolean({
     description: 'Fetch logs for all actions in the manifest',
     exclusive: ['package', 'action'],
     char: 'm'
   }),
-  package: flags.string({
+  package: Flags.string({
     description: 'Fetch logs for a specific package in the manifest',
     exclusive: ['manifest', 'action'],
     char: 'p'
   }),
-  deployed: flags.boolean({
+  deployed: Flags.boolean({
     description: 'Fetch logs for all actions deployed under a specific package',
     exclusive: ['manifest', 'action'],
     char: 'd'
   }),
-  last: flags.boolean({
+  last: Flags.boolean({
     char: 'l',
     description: 'retrieves the most recent activation logs'
   }),
-  strip: flags.boolean({
+  strip: Flags.boolean({
     char: 'r',
     description: 'strip timestamp information and output first line only',
     default: false
   }),
-  limit: flags.integer({
+  limit: Flags.integer({
     description: 'return logs only from last LIMIT number of activations',
     exclusive: ['last']
   }),
-  tail: flags.boolean({
+  tail: Flags.boolean({
     description: 'Fetch logs continuously',
     default: false,
     char: 't',
     exclusive: ['watch', 'poll']
   }),
-  watch: flags.boolean({
+  watch: Flags.boolean({
     description: 'Fetch logs continuously',
     default: false,
     char: 'w',
     exclusive: ['tail', 'poll']
   }),
-  poll: flags.boolean({
+  poll: Flags.boolean({
     description: 'Fetch logs continuously',
     default: false,
     char: 'o',

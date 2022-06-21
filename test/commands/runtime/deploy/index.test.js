@@ -52,7 +52,7 @@ const expectedDepTriggers = [{ fake: 'dep-triggers' }]
 const expectedPackages = { fake: 'packages' }
 
 describe('instance methods', () => {
-  let command, handleError, rtLib
+  let command, handleError, rtLib, mockedLogger
 
   beforeEach(() => {
     RuntimeLib.mockReset()
@@ -68,6 +68,7 @@ describe('instance methods', () => {
       projectName: 'fakeProjectName'
     })
     command = new TheCommand([])
+    mockedLogger = jest.spyOn(command.log, 'bind')
     command.getImsOrgId = jest.fn().mockReturnValue(expectedIMSOrg)
     handleError = jest.spyOn(command, 'handleError')
   })
@@ -84,8 +85,8 @@ describe('instance methods', () => {
       expect(utils.getKeyValueObjectFromMergedParameters).toHaveBeenCalledWith(undefined, undefined)
 
       expect(utils.processPackage).toHaveBeenCalledWith(expectedPackages, expectedDepPackages, expectedDepTriggers, {}, false, expectedOWOptions)
-      expect(utils.deployPackage).toHaveBeenCalledWith(expectedEntities, rtLib, command.log, expectedIMSOrg)
-
+      expect(utils.deployPackage).toHaveBeenCalledWith(expectedEntities, rtLib, expect.any(Function), expectedIMSOrg)
+      expect(mockedLogger).toHaveBeenCalled()
       expect(stdout.output).toMatch('')
       expect(handleError).not.toHaveBeenCalled()
     })
@@ -99,8 +100,8 @@ describe('instance methods', () => {
       expect(utils.getKeyValueObjectFromMergedParameters).toHaveBeenCalledWith(['key', 'value'], undefined)
 
       expect(utils.processPackage).toHaveBeenCalledWith(expectedPackages, expectedDepPackages, expectedDepTriggers, { fake: 'params', fake2: 'params2' }, false, expectedOWOptions)
-      expect(utils.deployPackage).toHaveBeenCalledWith(expectedEntities, rtLib, command.log, expectedIMSOrg)
-
+      expect(utils.deployPackage).toHaveBeenCalledWith(expectedEntities, rtLib, expect.any(Function), expectedIMSOrg)
+      expect(mockedLogger).toHaveBeenCalled()
       expect(stdout.output).toMatch('')
       expect(handleError).not.toHaveBeenCalled()
     })
@@ -114,8 +115,8 @@ describe('instance methods', () => {
       expect(utils.getKeyValueObjectFromMergedParameters).toHaveBeenCalledWith(['key', 'value', 'key2', 'value2'], undefined)
 
       expect(utils.processPackage).toHaveBeenCalledWith(expectedPackages, expectedDepPackages, expectedDepTriggers, { fake: 'params', fake2: 'params2' }, false, expectedOWOptions)
-      expect(utils.deployPackage).toHaveBeenCalledWith(expectedEntities, rtLib, command.log, expectedIMSOrg)
-
+      expect(utils.deployPackage).toHaveBeenCalledWith(expectedEntities, rtLib, expect.any(Function), expectedIMSOrg)
+      expect(mockedLogger).toHaveBeenCalled()
       expect(stdout.output).toMatch('')
       expect(handleError).not.toHaveBeenCalled()
     })
@@ -129,8 +130,8 @@ describe('instance methods', () => {
       expect(utils.getKeyValueObjectFromMergedParameters).toHaveBeenCalledWith(undefined, 'param-file.json')
 
       expect(utils.processPackage).toHaveBeenCalledWith(expectedPackages, expectedDepPackages, expectedDepTriggers, { fake: 'params', fake2: 'params2' }, false, expectedOWOptions)
-      expect(utils.deployPackage).toHaveBeenCalledWith(expectedEntities, rtLib, command.log, expectedIMSOrg)
-
+      expect(utils.deployPackage).toHaveBeenCalledWith(expectedEntities, rtLib, expect.any(Function), expectedIMSOrg)
+      expect(mockedLogger).toHaveBeenCalled()
       expect(stdout.output).toMatch('')
       expect(handleError).not.toHaveBeenCalled()
     })
@@ -144,8 +145,8 @@ describe('instance methods', () => {
       expect(utils.getKeyValueObjectFromMergedParameters).toHaveBeenCalledWith(['key', 'value', 'key2', 'value2'], 'param-file.json')
 
       expect(utils.processPackage).toHaveBeenCalledWith(expectedPackages, expectedDepPackages, expectedDepTriggers, { fake: 'params', fake2: 'params2' }, false, expectedOWOptions)
-      expect(utils.deployPackage).toHaveBeenCalledWith(expectedEntities, rtLib, command.log, expectedIMSOrg)
-
+      expect(utils.deployPackage).toHaveBeenCalledWith(expectedEntities, rtLib, expect.any(Function), expectedIMSOrg)
+      expect(mockedLogger).toHaveBeenCalled()
       expect(stdout.output).toMatch('')
       expect(handleError).not.toHaveBeenCalled()
     })

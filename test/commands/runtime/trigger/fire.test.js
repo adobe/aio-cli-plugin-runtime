@@ -88,17 +88,12 @@ describe('instance methods', () => {
         })
     })
 
-    test('fire a simple trigger, error', () => {
-      return new Promise((resolve, reject) => {
-        rtLib.mockRejected(rtAction, new Error('an error'))
-        command.argv = ['trigger1']
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to fire the trigger', new Error('an error'))
-            resolve()
-          })
-      })
+    test('fire a simple trigger, error', async () => {
+      rtLib.mockRejected(rtAction, new Error('an error'))
+      command.argv = ['trigger1']
+      const error = ['failed to fire the trigger', new Error('an error')]
+      await expect(command.run()).rejects.toThrow(...error)
+      expect(handleError).toHaveBeenLastCalledWith(...error)
     })
 
     test('fire a simple trigger, use param flag', () => {

@@ -78,17 +78,12 @@ describe('instance methods', () => {
         })
     })
 
-    test('errors out on api error', () => {
-      return new Promise((resolve, reject) => {
-        rtLib.mockRejected('rules.disable', new Error('an error'))
-        command.argv = ['nameFoo']
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to disable rule', new Error('an error'))
-            resolve()
-          })
-      })
+    test('errors out on api error', async () => {
+      rtLib.mockRejected('rules.disable', new Error('an error'))
+      command.argv = ['nameFoo']
+      const error = ['failed to disable rule', new Error('an error')]
+      await expect(command.run()).rejects.toThrow(...error)
+      expect(handleError).toHaveBeenLastCalledWith(...error)
     })
   })
 })

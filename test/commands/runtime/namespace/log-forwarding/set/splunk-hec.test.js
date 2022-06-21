@@ -38,5 +38,5 @@ test('set log forwarding settings to splunk_hec', () => {
 test('failed to set log forwarding settings to splunk_hec', async () => {
   rtLib.logForwarding.setDestination = jest.fn().mockRejectedValue(new Error('mocked error'))
   command.argv = ['--host', 'host1', '--port', 'port1', '--index', 'index1', '--hec-token', 'token1']
-  await expect(command.run()).rejects.toThrow(`failed to update log forwarding configuration: mocked error`)
+  await expect(command.run()).rejects.toThrow('failed to update log forwarding configuration: mocked error')
 })

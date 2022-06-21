@@ -12,13 +12,13 @@ governing permissions and limitations under the License.
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 const { getKeyValueArrayFromMergedParameters } = require('@adobe/aio-lib-runtime').utils
-const { flags } = require('@oclif/command')
+const { Flags } = require('@oclif/core')
 
 class TriggerCreate extends RuntimeBaseCommand {
   isUpdate () { return false }
 
   async run () {
-    const { args, flags } = this.parse(TriggerCreate)
+    const { args, flags } = await this.parse(TriggerCreate)
 
     try {
       const triggerPackage = getKeyValueArrayFromMergedParameters(flags.param, flags['param-file']) || []
@@ -48,7 +48,7 @@ class TriggerCreate extends RuntimeBaseCommand {
       await ow.triggers[method](options)
     } catch (err) {
       const method = this.isUpdate() ? 'update' : 'create'
-      this.handleError(`failed to ${method} the trigger`, err)
+      await this.handleError(`failed to ${method} the trigger`, err)
     }
   }
 }
@@ -63,25 +63,25 @@ TriggerCreate.args = [
 
 TriggerCreate.flags = {
   ...RuntimeBaseCommand.flags,
-  param: flags.string({
+  param: Flags.string({
     char: 'p',
     description: 'parameter values in KEY VALUE format', // help description for flag
     multiple: true // allow setting this flag multiple times
   }),
-  'param-file': flags.string({
+  'param-file': Flags.string({
     char: 'P',
     description: 'FILE containing parameter values in JSON format' // help description for flag
   }),
-  annotation: flags.string({
+  annotation: Flags.string({
     char: 'a',
     description: 'annotation values in KEY VALUE format', // help description for flag
     multiple: true // allow setting this flag multiple times
   }),
-  'annotation-file': flags.string({
+  'annotation-file': Flags.string({
     char: 'A',
     description: 'FILE containing annotation values in JSON format' // help description for flag
   }),
-  feed: flags.string({
+  feed: Flags.string({
     char: 'f',
     description: 'trigger feed ACTION_NAME'
   })

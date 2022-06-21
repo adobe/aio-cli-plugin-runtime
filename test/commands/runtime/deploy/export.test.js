@@ -152,12 +152,13 @@ describe('instance methods', () => {
       }
     ],
     exec:
-    { components: [
-      '/53444_51981/testSeq/zero',
-      '/53444_51981/testSeq/one',
-      '/53444_51981/testSeq/two'
-    ],
-    kind: 'sequence'
+    {
+      components: [
+        '/53444_51981/testSeq/zero',
+        '/53444_51981/testSeq/one',
+        '/53444_51981/testSeq/two'
+      ],
+      kind: 'sequence'
     },
     name: 'four',
     namespace: '53444_51981/testSeq',
@@ -185,10 +186,12 @@ describe('instance methods', () => {
       }
     ],
     exec:
-    { kind: 'nodejs:10',
-      code: `code`,
+    {
+      kind: 'nodejs:10',
+      code: 'code',
       binary: false,
-      main: 'split' },
+      main: 'split'
+    },
     limits: { concurrency: 1, logs: 10, memory: 256, timeout: 60000 },
     name: 'helloAction1',
     namespace: '53444_51981/testSeq',
@@ -221,7 +224,8 @@ describe('instance methods', () => {
       }
     ],
     exec:
-    { kind: 'nodejs:10',
+    {
+      kind: 'nodejs:10',
       binary: true,
       code: 'code'
     },
@@ -325,10 +329,12 @@ describe('instance methods', () => {
     parameters: [{
       key: 'name', value: 'Sam'
     },
-    { key: 'place',
+    {
+      key: 'place',
       value: ''
     },
-    { key: 'children',
+    {
+      key: 'children',
       value: 0
     }],
     publish: false,
@@ -362,10 +368,12 @@ describe('instance methods', () => {
     parameters: [{
       key: 'name', value: 'Sam'
     },
-    { key: 'place',
+    {
+      key: 'place',
       value: ''
     },
-    { key: 'children',
+    {
+      key: 'children',
       value: 0
     }],
     publish: false,
@@ -533,7 +541,7 @@ describe('instance methods', () => {
         })
     })
 
-    test('write sequence to js file', () => {
+    test('write sequence to js file', async () => {
       rtLib.mockResolved('actions.get', sequenceGet)
       rtLib.mockResolved(owTriggerList, triggerlist)
       rtLib.mockResolved('triggers.get', triggerGet)
@@ -541,10 +549,8 @@ describe('instance methods', () => {
       fs.writeFileSync = jest.fn()
       command.argv = ['--projectname', 'proj', '-m', '/deploy/manifest.yaml']
       const yaml = fixtureFile('deploy/export_yaml_Sequence.yaml')
-      return command.run()
-        .then(() => {
-          expect(fs.writeFileSync).toHaveBeenCalledWith('/deploy/manifest.yaml', yaml)
-        })
+      await command.run()
+      expect(fs.writeFileSync).toHaveBeenCalledWith('/deploy/manifest.yaml', yaml)
     })
 
     test('write binary of action to js file', () => {
@@ -624,17 +630,12 @@ describe('instance methods', () => {
         })
     })
 
-    test('errors out on api error', () => {
-      return new Promise((resolve, reject) => {
-        rtLib.mockRejected(rtPackageList, new Error('an error'))
-        command.argv = ['--projectname', 'proj', '-m', '/deploy/manifest.yaml']
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('Failed to export', new Error('an error'))
-            resolve()
-          })
-      })
+    test('errors out on api error', async () => {
+      rtLib.mockRejected(rtPackageList, new Error('an error'))
+      command.argv = ['--projectname', 'proj', '-m', '/deploy/manifest.yaml']
+      const error = ['Failed to export', new Error('an error')]
+      await expect(command.run()).rejects.toThrow(error[0])
+      expect(handleError).toHaveBeenLastCalledWith(...error)
     })
   })
 })

@@ -17,6 +17,12 @@ const RuntimeLib = require('@adobe/aio-lib-runtime')
 const rtUtils = RuntimeLib.utils
 const rtAction = 'actions.update'
 
+const rejectWithError = async (command, error, handleError) => {
+  await expect(command.run()).rejects.toThrow(...error)
+  expect(handleError).toHaveBeenLastCalledWith(...error)
+  return true
+}
+
 test('exports', async () => {
   expect(typeof TheCommand).toEqual('function')
   expect(TheCommand.prototype instanceof RuntimeBaseCommand).toBeTruthy()
@@ -149,11 +155,12 @@ describe('instance methods', () => {
           expect(rtUtils.getKeyValueArrayFromMergedParameters).toHaveBeenCalledWith(['a', 'b', 'c', 'd'], undefined)
           expect(cmd).toHaveBeenCalledWith({
             action: {
-              exec: {
-                code: jsFile, kind: 'nodejs:default' },
+              exec: { code: jsFile, kind: 'nodejs:default' },
               name,
-              parameters: [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }] },
-            name })
+              parameters: [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }]
+            },
+            name
+          })
           expect(stdout.output).toMatch('')
         })
     })
@@ -169,8 +176,10 @@ describe('instance methods', () => {
           expect(cmd).toHaveBeenCalledWith({
             action: {
               name,
-              parameters: [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }] },
-            name })
+              parameters: [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }]
+            },
+            name
+          })
           expect(stdout.output).toMatch('')
         })
     })
@@ -204,11 +213,12 @@ describe('instance methods', () => {
           expect(rtUtils.getKeyValueArrayFromMergedParameters).toHaveBeenCalledWith(undefined, '/action/parameters.json')
           expect(cmd).toHaveBeenCalledWith({
             action: {
-              exec: {
-                code: jsFile, kind: 'nodejs:default' },
+              exec: { code: jsFile, kind: 'nodejs:default' },
               name,
-              parameters: [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }] },
-            name })
+              parameters: [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }]
+            },
+            name
+          })
           expect(stdout.output).toMatch('')
         })
     })
@@ -224,8 +234,10 @@ describe('instance methods', () => {
           expect(cmd).toHaveBeenCalledWith({
             action: {
               name,
-              parameters: [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }] },
-            name })
+              parameters: [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }]
+            },
+            name
+          })
           expect(stdout.output).toMatch('')
         })
     })
@@ -463,20 +475,14 @@ describe('instance methods', () => {
         })
     })
 
-    test('update an action with action name and overlapping --env and --param keys', () => {
-      return new Promise((resolve, reject) => {
-        rtLib.mockRejected(rtAction, '')
-        const name = 'hello'
-        command.argv = [name, '/action/actionFile.js', '--env', 'a', 'b', '--param', 'a', 'd']
-        rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation((flags, file) => flags && [{ key: 'same', value: 'kv' }])
-        rtUtils.createKeyValueArrayFromFlag.mockReturnValue([{ key: 'same', value: 'abc' }])
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to update the action', new Error('Invalid argument(s). Environment variables and function parameters may not overlap'))
-            resolve()
-          })
-      })
+    test('update an action with action name and overlapping --env and --param keys', async () => {
+      rtLib.mockRejected(rtAction, '')
+      const name = 'hello'
+      command.argv = [name, '/action/actionFile.js', '--env', 'a', 'b', '--param', 'a', 'd']
+      rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation((flags, file) => flags && [{ key: 'same', value: 'kv' }])
+      rtUtils.createKeyValueArrayFromFlag.mockReturnValue([{ key: 'same', value: 'abc' }])
+      const error = ['failed to update the action', new Error('Invalid argument(s). Environment variables and function parameters may not overlap')]
+      expect(await rejectWithError(command, error, handleError)).toBeTruthy()
     })
 
     test('update an action with action name, action path and --env-file flag', () => {
@@ -815,134 +821,74 @@ describe('instance methods', () => {
         })
     })
 
-    test('tests for incorrect --sequence flags', () => {
-      return new Promise((resolve, reject) => {
-        rtLib.mockRejected(rtAction, '')
-        command.argv = ['hello', '--sequence', ' ,a,b,c']
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to update the action', new Error('Provide a valid sequence component'))
-            resolve()
-          })
-      })
+    test('tests for incorrect --sequence flags', async () => {
+      rtLib.mockRejected(rtAction, '')
+      command.argv = ['hello', '--sequence', ' ,a,b,c']
+      const error = ['failed to update the action', new Error('Provide a valid sequence component')]
+      expect(await rejectWithError(command, error, handleError)).toBeTruthy()
     })
 
-    test('tests for incorrect action with --kind', () => {
-      return new Promise((resolve, reject) => {
-        rtLib.mockRejected(rtAction, '')
-        command.argv = ['hello', '--kind', 'nodejs:10']
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to update the action', new Error('A kind can only be specified when you provide a code artifact'))
-            resolve()
-          })
-      })
+    test('tests for incorrect action with --kind', async () => {
+      rtLib.mockRejected(rtAction, '')
+      command.argv = ['hello', '--kind', 'nodejs:10']
+      const error = ['failed to update the action', new Error('A kind can only be specified when you provide a code artifact')]
+      expect(await rejectWithError(command, error, handleError)).toBeTruthy()
     })
 
-    test('tests for incorrect action path', () => {
-      return new Promise((resolve, reject) => {
-        rtLib.mockRejected(rtAction, '')
-        command.argv = ['hello', '/action/file.js', '--kind', 'nodejs:10']
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to update the action', new Error('Provide a valid path for ACTION'))
-            resolve()
-          })
-      })
+    test('tests for incorrect action path', async () => {
+      rtLib.mockRejected(rtAction, '')
+      command.argv = ['hello', '/action/file.js', '--kind', 'nodejs:10']
+      const error = ['failed to update the action', new Error('Provide a valid path for ACTION')]
+      expect(await rejectWithError(command, error, handleError)).toBeTruthy()
     })
 
-    test('tests for incorrect action zip path', () => {
-      return new Promise((resolve, reject) => {
-        rtLib.mockRejected(rtAction, '')
-        command.argv = ['hello', '/action/file.zip', '--kind', 'nodejs:10']
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to update the action', new Error('Provide a valid path for ACTION'))
-            resolve()
-          })
-      })
+    test('tests for incorrect action zip path', async () => {
+      rtLib.mockRejected(rtAction, '')
+      command.argv = ['hello', '/action/file.zip', '--kind', 'nodejs:10']
+      const error = ['failed to update the action', new Error('Provide a valid path for ACTION')]
+      expect(await rejectWithError(command, error, handleError)).toBeTruthy()
     })
 
-    test('error out if a zip file is deployed without the --kind flag', () => {
-      return new Promise((resolve, reject) => {
-        rtLib.mockRejected(rtAction, '')
-        command.argv = ['hello', '/action/zipAction.zip']
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to update the action', new Error('Invalid argument(s). Creating an action from a zip/binary artifact requires specifying the action kind explicitly'))
-            resolve()
-          })
-      })
+    test('error out if a zip file is deployed without the --kind flag', async () => {
+      rtLib.mockRejected(rtAction, '')
+      command.argv = ['hello', '/action/zipAction.zip']
+      const error = ['failed to update the action', new Error('Invalid argument(s). Creating an action from a zip/binary artifact requires specifying the action kind explicitly')]
+      expect(await rejectWithError(command, error, handleError)).toBeTruthy()
     })
 
-    test('tests for incorrect update with --main flag', () => {
-      return new Promise((resolve, reject) => {
-        rtLib.mockRejected(rtAction, '')
-        command.argv = ['hello', '--main', 'maynard']
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to update the action', new Error('The function handler can only be specified when you provide a code artifact'))
-            resolve()
-          })
-      })
+    test('tests for incorrect update with --main flag', async () => {
+      rtLib.mockRejected(rtAction, '')
+      command.argv = ['hello', '--main', 'maynard']
+      const error = ['failed to update the action', new Error('The function handler can only be specified when you provide a code artifact')]
+      expect(await rejectWithError(command, error, handleError)).toBeTruthy()
     })
 
-    test('tests for incorrect update with --main flag and --sequence', () => {
-      return new Promise((resolve, reject) => {
-        rtLib.mockRejected(rtAction, '')
-        command.argv = ['hello', '--main', 'maynard', '--sequence', 'a,b,c']
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to update the action', new Error('The function handler can only be specified when you provide a code artifact'))
-            resolve()
-          })
-      })
+    test('tests for incorrect update with --main flag and --sequence', async () => {
+      rtLib.mockRejected(rtAction, '')
+      command.argv = ['hello', '--main', 'maynard', '--sequence', 'a,b,c']
+      const error = ['failed to update the action', new Error('The function handler can only be specified when you provide a code artifact')]
+      expect(await rejectWithError(command, error, handleError)).toBeTruthy()
     })
 
-    test('tests for incorrect update with file artifact and --sequence', () => {
-      return new Promise((resolve, reject) => {
-        rtLib.mockRejected(rtAction, '')
-        command.argv = ['hello', '/action/actionFile.js', '--sequence', 'a,b,c']
-        command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to update the action', new Error('Cannot specify sequence and a code artifact at the same time'))
-            resolve()
-          })
-      })
+    test('tests for incorrect update with file artifact and --sequence', async () => {
+      rtLib.mockRejected(rtAction, '')
+      command.argv = ['hello', '/action/actionFile.js', '--sequence', 'a,b,c']
+      const error = ['failed to update the action', new Error('Cannot specify sequence and a code artifact at the same time')]
+      expect(await rejectWithError(command, error, handleError)).toBeTruthy()
     })
 
-    test('tests for incorrect update with file artifact and --sequence and --main', () => {
-      return new Promise((resolve, reject) => {
-        rtLib.mockRejected(rtAction, '')
-        command.argv = ['hello', '/action/actionFile.js', '--main', 'maynard', '--sequence', 'a,b,c']
-        command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to update the action', new Error('Cannot specify sequence and a code artifact at the same time'))
-            resolve()
-          })
-      })
+    test('tests for incorrect update with file artifact and --sequence and --main', async () => {
+      rtLib.mockRejected(rtAction, '')
+      command.argv = ['hello', '/action/actionFile.js', '--main', 'maynard', '--sequence', 'a,b,c']
+      const error = ['failed to update the action', new Error('Cannot specify sequence and a code artifact at the same time')]
+      expect(await rejectWithError(command, error, handleError)).toBeTruthy()
     })
 
-    test('errors out on api error', () => {
-      return new Promise((resolve, reject) => {
-        rtLib.mockRejected(rtAction, new Error('an error'))
-        command.argv = ['hello', '/action/actionFile.js']
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to update the action', new Error('an error'))
-            resolve()
-          })
-      })
+    test('errors out on api error', async () => {
+      rtLib.mockRejected(rtAction, new Error('an error'))
+      command.argv = ['hello', '/action/actionFile.js']
+      const error = ['failed to update the action', new Error('an error')]
+      expect(await rejectWithError(command, error, handleError)).toBeTruthy()
     })
   })
 })

@@ -12,11 +12,11 @@ governing permissions and limitations under the License.
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 const { getKeyValueObjectFromMergedParameters } = require('@adobe/aio-lib-runtime').utils
-const { flags } = require('@oclif/command')
+const { Flags } = require('@oclif/core')
 
 class TriggerFire extends RuntimeBaseCommand {
   async run () {
-    const { args, flags } = this.parse(TriggerFire)
+    const { args, flags } = await this.parse(TriggerFire)
 
     try {
       const triggerParams = getKeyValueObjectFromMergedParameters(flags.param, flags['param-file'])
@@ -29,7 +29,7 @@ class TriggerFire extends RuntimeBaseCommand {
       const result = await ow.triggers.invoke(options)
       this.logJSON('', result)
     } catch (err) {
-      this.handleError('failed to fire the trigger', err)
+      await this.handleError('failed to fire the trigger', err)
     }
   }
 }
@@ -44,12 +44,12 @@ TriggerFire.args = [
 
 TriggerFire.flags = {
   ...RuntimeBaseCommand.flags,
-  param: flags.string({
+  param: Flags.string({
     char: 'p',
     description: 'parameter values in KEY VALUE format', // help description for flag
     multiple: true // allow setting this flag multiple times
   }),
-  'param-file': flags.string({
+  'param-file': Flags.string({
     char: 'P',
     description: 'FILE containing parameter values in JSON format' // help description for flag
   })

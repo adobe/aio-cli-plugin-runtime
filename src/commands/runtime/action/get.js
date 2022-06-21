@@ -13,11 +13,11 @@ governing permissions and limitations under the License.
 const fs = require('fs')
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 const { fileExtensionForKind } = require('../../../kinds')
-const { flags } = require('@oclif/command')
+const { Flags } = require('@oclif/core')
 
 class ActionGet extends RuntimeBaseCommand {
   async run () {
-    const { args, flags } = this.parse(ActionGet)
+    const { args, flags } = await this.parse(ActionGet)
     const name = args.actionName
     const ow = await this.wsk()
     const saveCode = flags.save || flags['save-as']
@@ -74,8 +74,10 @@ class ActionGet extends RuntimeBaseCommand {
           }
         } else {
           // destructure getAction to remove the exec.code
-          this.logJSON(`${result.name}\n`, { ...result,
-            exec: { ...result.exec,
+          this.logJSON(`${result.name}\n`, {
+            ...result,
+            exec: {
+              ...result.exec,
               code: undefined
             }
           })
@@ -83,9 +85,9 @@ class ActionGet extends RuntimeBaseCommand {
       }
     } catch (err) {
       if (err.message === ActionGet.codeNotText) {
-        this.handleError(err.message)
+        await this.handleError(err.message)
       } else {
-        this.handleError('failed to retrieve the action', err)
+        await this.handleError('failed to retrieve the action', err)
       }
     }
   }
@@ -100,20 +102,20 @@ ActionGet.args = [
 
 ActionGet.flags = {
   ...RuntimeBaseCommand.flags,
-  url: flags.boolean({
+  url: Flags.boolean({
     char: 'r',
     description: 'get action url'
   }),
-  code: flags.boolean({
+  code: Flags.boolean({
     char: 'c',
     description: 'show action code (only works if code is not a zip file)',
     default: false
   }),
-  save: flags.boolean({
+  save: Flags.boolean({
     description: 'save action code to file corresponding with action name',
     default: false
   }),
-  'save-as': flags.string({
+  'save-as': Flags.string({
     description: 'file to save action code to'
   })
 }

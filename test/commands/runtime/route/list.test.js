@@ -103,16 +103,11 @@ describe('instance methods', () => {
         })
     })
 
-    test('error, throws exception', () => {
-      return new Promise((resolve, reject) => {
-        rtLib.mockRejected(rtAction, new Error('an error'))
-        return command.run()
-          .then(() => reject(new Error('should not succeed')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to list the api', new Error('an error'))
-            resolve()
-          })
-      })
+    test('error, throws exception', async () => {
+      rtLib.mockRejected(rtAction, new Error('an error'))
+      const error = ['failed to list the api', new Error('an error')]
+      await expect(command.run()).rejects.toThrow()
+      expect(handleError).toHaveBeenLastCalledWith(...error)
     })
   })
 })

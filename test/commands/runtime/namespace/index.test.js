@@ -12,7 +12,7 @@ governing permissions and limitations under the License.
 
 const TheCommand = require('../../../../src/commands/runtime/namespace/index.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
-const HHelp = require('@oclif/plugin-help').default
+const { Help } = require('@oclif/core')
 
 test('exports', async () => {
   expect(typeof TheCommand).toEqual('function')
@@ -46,7 +46,8 @@ describe('instance methods', () => {
     })
 
     test('returns help file for runtime command', () => {
-      const spy = jest.spyOn(HHelp.prototype, 'showHelp').mockReturnValue(true)
+      command.config = {}
+      const spy = jest.spyOn(Help.prototype, 'showHelp').mockReturnValue(true)
       return command.run().then(() => {
         expect(spy).toHaveBeenCalledWith(['runtime:namespace', '--help'])
       })

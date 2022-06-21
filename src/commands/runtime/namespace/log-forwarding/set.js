@@ -23,7 +23,7 @@ class SetCommand extends RuntimeBaseCommand {
       await logForwarding.setDestination(destination, settings)
       this.log(`Log forwarding was set to ${destination} for this namespace`)
     } catch (e) {
-      this.handleError('Failed to update log forwarding configuration', e)
+      await this.handleError('Failed to update log forwarding configuration', e)
     }
   }
 
@@ -38,7 +38,7 @@ class SetCommand extends RuntimeBaseCommand {
   }
 }
 
-SetCommand.description = `Configure log forwarding destination (interactive)`
+SetCommand.description = 'Configure log forwarding destination (interactive)'
 
 SetCommand.flags = {
   ...RuntimeBaseCommand.flags

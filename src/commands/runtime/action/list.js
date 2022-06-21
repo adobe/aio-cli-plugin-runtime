@@ -13,13 +13,12 @@ governing permissions and limitations under the License.
 const moment = require('dayjs')
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 const { parsePackageName } = require('@adobe/aio-lib-runtime').utils
-const { flags } = require('@oclif/command')
-const { cli } = require('cli-ux')
+const { Flags, CliUx: cli } = require('@oclif/core')
 const decorators = require('../../../decorators').decorators()
 
 class ActionList extends RuntimeBaseCommand {
   async run () {
-    const { flags, args } = this.parse(ActionList)
+    const { flags, args } = await this.parse(ActionList)
     const options = {
       ...flags
     }
@@ -87,10 +86,10 @@ class ActionList extends RuntimeBaseCommand {
             }
           }
         }
-        cli.table(result, columns)
+        cli.ux.table(result, columns)
       }
     } catch (err) {
-      this.handleError('failed to list the actions', err)
+      await this.handleError('failed to list the actions', err)
     }
   }
 }
@@ -105,25 +104,25 @@ ActionList.args = [
 ActionList.flags = {
   ...RuntimeBaseCommand.flags,
   // example usage:  aio runtime:action:list --limit 10 --skip 2
-  limit: flags.integer({
+  limit: Flags.integer({
     char: 'l',
     description: 'only return LIMIT number of actions'
   }),
-  skip: flags.integer({
+  skip: Flags.integer({
     char: 's',
     description: 'exclude the first SKIP number of actions from the result'
   }),
-  count: flags.boolean({
+  count: Flags.boolean({
     char: 'c',
     description: 'show only the total number of actions'
   }),
-  json: flags.boolean({
+  json: Flags.boolean({
     description: 'output raw json'
   }),
-  'name-sort': flags.boolean({
+  'name-sort': Flags.boolean({
     description: 'sort results by name'
   }),
-  name: flags.boolean({
+  name: Flags.boolean({
     char: 'n',
     description: 'sort results by name'
   })

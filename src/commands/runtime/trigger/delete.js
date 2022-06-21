@@ -15,7 +15,7 @@ const { parsePathPattern } = require('@adobe/aio-lib-runtime').utils
 
 class TriggerDelete extends RuntimeBaseCommand {
   async run () {
-    const { args } = this.parse(TriggerDelete)
+    const { args } = await this.parse(TriggerDelete)
     const triggerPath = args.triggerPath
     const [, namespace, name] = parsePathPattern(triggerPath)
 
@@ -24,7 +24,7 @@ class TriggerDelete extends RuntimeBaseCommand {
       const obj = { namespace, name }
       await ow.triggers.delete(obj)
     } catch (err) {
-      this.handleError(`Unable to delete trigger '${triggerPath}'`, err)
+      await this.handleError(`Unable to delete trigger '${triggerPath}'`, err)
     }
   }
 }

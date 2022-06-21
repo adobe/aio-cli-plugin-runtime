@@ -12,7 +12,7 @@ governing permissions and limitations under the License.
 
 const TheCommand = require('../../../../src/commands/runtime/action/index.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
-const HHelp = require('@oclif/plugin-help').default
+const { Help } = require('@oclif/core')
 
 test('exports', async () => {
   expect(typeof TheCommand).toEqual('function')
@@ -45,12 +45,12 @@ describe('instance methods', () => {
       expect(command.run).toBeInstanceOf(Function)
     })
 
-    test('returns help file for runtime command', () => {
-      const spy = jest.spyOn(HHelp.prototype, 'showHelp').mockReturnValue(true)
+    test('returns help file for runtime command', async () => {
+      const spy = jest.spyOn(Help.prototype, 'showHelp').mockReturnValue(true)
+      command.config = {}
       command.id = 'pgb'
-      return command.run().then(() => {
-        expect(spy).toHaveBeenCalledWith(['runtime:action', '--help'])
-      })
+      await command.run()
+      expect(spy).toHaveBeenCalledWith(['runtime:action', '--help'])
     })
   })
 })

@@ -13,11 +13,11 @@ governing permissions and limitations under the License.
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 const { parsePackageName } = require('@adobe/aio-lib-runtime').utils
 const { getKeyValueArrayFromMergedParameters } = require('@adobe/aio-lib-runtime').utils
-const { flags } = require('@oclif/command')
+const { Flags } = require('@oclif/core')
 
 class PackageBind extends RuntimeBaseCommand {
   async run () {
-    const { args, flags } = this.parse(PackageBind)
+    const { args, flags } = await this.parse(PackageBind)
     const name = args.bindPackageName
     try {
       const binding = parsePackageName(args.packageName)
@@ -37,7 +37,7 @@ class PackageBind extends RuntimeBaseCommand {
         this.logJSON('', result)
       }
     } catch (err) {
-      this.handleError('failed to bind the package', err)
+      await this.handleError('failed to bind the package', err)
     }
   }
 }
@@ -55,25 +55,25 @@ PackageBind.args = [
 
 PackageBind.flags = {
   ...RuntimeBaseCommand.flags,
-  param: flags.string({
+  param: Flags.string({
     char: 'p',
     description: 'parameters in key value pairs to be passed to the package', // help description for flag
     multiple: true // allow setting this flag multiple times
   }),
-  'param-file': flags.string({
+  'param-file': Flags.string({
     char: 'P',
     description: 'parameter to be passed to the package for json file' // help description for flag
   }),
-  annotation: flags.string({
+  annotation: Flags.string({
     char: 'a',
     description: 'annotation values in KEY VALUE format', // help description for flag
     multiple: true // allow setting this flag multiple times
   }),
-  'annotation-file': flags.string({
+  'annotation-file': Flags.string({
     char: 'A',
     description: 'FILE containing annotation values in JSON format' // help description for flag
   }),
-  json: flags.boolean({
+  json: Flags.boolean({
     description: 'output raw json'
   })
 }

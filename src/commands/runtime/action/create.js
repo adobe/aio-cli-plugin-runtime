@@ -14,13 +14,13 @@ const fs = require('fs')
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 const { createKeyValueArrayFromFlag, createKeyValueArrayFromFile, createComponentsfromSequence, getKeyValueArrayFromMergedParameters } = require('@adobe/aio-lib-runtime').utils
 const { kindForFileExtension } = require('../../../kinds')
-const { flags } = require('@oclif/command')
+const { Flags } = require('@oclif/core')
 
 class ActionCreate extends RuntimeBaseCommand {
   isUpdate () { return false }
 
   async run () {
-    const { args, flags } = this.parse(ActionCreate)
+    const { args, flags } = await this.parse(ActionCreate)
     const name = args.actionName
     let exec
     let paramsAction
@@ -197,7 +197,7 @@ class ActionCreate extends RuntimeBaseCommand {
       const ow = await this.wsk()
       await this.syncAction(ow, name, options, flags, method)
     } catch (err) {
-      this.handleError(`failed to ${method} the action`, err)
+      await this.handleError(`failed to ${method} the action`, err)
     }
   }
 
@@ -232,72 +232,72 @@ ActionCreate.args = [
 
 ActionCreate.flags = {
   ...RuntimeBaseCommand.flags,
-  param: flags.string({
+  param: Flags.string({
     char: 'p',
     description: 'parameter values in KEY VALUE format', // help description for flag
     multiple: true // allow setting this flag multiple times
   }),
-  copy: flags.string({
+  copy: Flags.string({
     description: 'copy an existing action' // help description for flag
   }),
-  env: flags.string({
+  env: Flags.string({
     char: 'e',
     description: 'environment values in KEY VALUE format', // help description for flag
     multiple: true // allow setting this flag multiple times
   }),
-  web: flags.string({
+  web: Flags.string({
     description: 'treat ACTION as a web action or as a raw HTTP web action', // help description for flag
     options: ['true', 'yes', 'false', 'no', 'raw']
   }),
-  'web-secure': flags.string({
+  'web-secure': Flags.string({
     description: 'secure the web action (valid values are true, false, or any string)', // help description for flag
     dependsOn: ['web']
   }),
-  'param-file': flags.string({
+  'param-file': Flags.string({
     char: 'P',
     description: 'FILE containing parameter values in JSON format' // help description for flag
   }),
-  'env-file': flags.string({
+  'env-file': Flags.string({
     char: 'E',
     description: 'FILE containing environment variables in JSON format' // help description for flag
   }),
-  timeout: flags.integer({
+  timeout: Flags.integer({
     char: 't',
     description: 'the timeout LIMIT in milliseconds after which the action is terminated (default 60000)' // help description for flag
   }),
-  memory: flags.integer({
+  memory: Flags.integer({
     char: 'm',
     description: 'the maximum memory LIMIT in MB for the action (default 256)' // help description for flag
   }),
-  logsize: flags.integer({
+  logsize: Flags.integer({
     char: 'l',
     description: 'the maximum log size LIMIT in MB for the action (default 10)' // help description for flag
   }),
-  kind: flags.string({
+  kind: Flags.string({
     description: 'the KIND of the action runtime (example: swift:default, nodejs:default)' // help description for flag
   }),
-  annotation: flags.string({
+  annotation: Flags.string({
     char: 'a',
     description: 'annotation values in KEY VALUE format', // help description for flag
     multiple: true // allow setting this flag multiple times
   }),
-  'annotation-file': flags.string({
+  'annotation-file': Flags.string({
     char: 'A',
     description: 'FILE containing annotation values in JSON format' // help description for flag
   }),
-  sequence: flags.string({
+  sequence: Flags.string({
     description: 'treat ACTION as comma separated sequence of actions to invoke' // help description for flag
   }),
-  docker: flags.string({
+  docker: Flags.string({
     description: '[Restricted Access] use provided Docker image (a path on DockerHub) to run the action' // help description for flag
   }),
-  main: flags.string({
+  main: Flags.string({
     description: 'the name of the action entry point (function or fully-qualified method name when applicable)'
   }),
-  binary: flags.boolean({
+  binary: Flags.boolean({
     description: 'treat code artifact as binary'
   }),
-  json: flags.boolean({
+  json: Flags.boolean({
     description: 'output raw json'
   })
 }

@@ -204,16 +204,11 @@ describe('instance methods', () => {
         })
     })
 
-    test('trigger list, error', () => {
-      return new Promise((resolve, reject) => {
-        rtLib.mockRejected('triggers.list', new Error('an error'))
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to list triggers', new Error('an error'))
-            resolve()
-          })
-      })
+    test('trigger list, error', async () => {
+      rtLib.mockRejected('triggers.list', new Error('an error'))
+      const error = ['failed to list triggers', new Error('an error')]
+      await expect(command.run()).rejects.toThrow(...error)
+      expect(handleError).toHaveBeenLastCalledWith(...error)
     })
 
     test('return list of triggers, --name-sort flag', () => {

@@ -10,12 +10,12 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const { flags } = require('@oclif/command')
+const { Flags } = require('@oclif/core')
 const RuntimeBaseCommand = require('../../../../../RuntimeBaseCommand')
 
 class AzureLogAnalyticsCommand extends RuntimeBaseCommand {
   async run () {
-    const { flags } = this.parse(AzureLogAnalyticsCommand)
+    const { flags } = await this.parse(AzureLogAnalyticsCommand)
     const ow = await this.wsk()
     try {
       await ow.logForwarding.setDestination('azure_log_analytics', {
@@ -23,26 +23,26 @@ class AzureLogAnalyticsCommand extends RuntimeBaseCommand {
         shared_key: flags['shared-key'],
         log_type: flags['log-type']
       })
-      this.log(`Log forwarding was set to azure_log_analytics for this namespace`)
+      this.log('Log forwarding was set to azure_log_analytics for this namespace')
     } catch (e) {
-      this.handleError('failed to update log forwarding configuration', e)
+      await this.handleError('failed to update log forwarding configuration', e)
     }
   }
 }
 
-AzureLogAnalyticsCommand.description = `Set log forwarding destination to Azure Log Analytics`
+AzureLogAnalyticsCommand.description = 'Set log forwarding destination to Azure Log Analytics'
 
 AzureLogAnalyticsCommand.flags = {
   ...RuntimeBaseCommand.flags,
-  'customer-id': flags.string({
+  'customer-id': Flags.string({
     description: 'Customer ID',
     required: true
   }),
-  'shared-key': flags.string({
+  'shared-key': Flags.string({
     description: 'Shared key',
     required: true
   }),
-  'log-type': flags.string({
+  'log-type': Flags.string({
     description: 'Log type',
     required: true
   })

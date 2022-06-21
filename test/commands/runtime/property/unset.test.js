@@ -138,16 +138,10 @@ describe('instance methods', () => {
       })
     })
 
-    test('unknown flag', () => {
-      return new Promise((resolve, reject) => {
-        command.argv = ['--unknown-flag']
-        return command.run()
-          .then(() => reject(new Error('this should not succeed')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to unset the property', new Error('Unexpected argument: --unknown-flag\nSee more help with --help'))
-            resolve()
-          })
-      })
+    test('unknown flag', async () => {
+      command.argv = ['--unknown-flag']
+      await expect(command.run()).rejects.toThrow()
+      expect(handleError).toHaveBeenLastCalledWith('failed to unset the property', new Error('Unexpected argument: --unknown-flag\nSee more help with --help'))
     })
   })
 })

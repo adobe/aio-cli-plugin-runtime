@@ -153,28 +153,16 @@ describe('instance methods', () => {
         })
     })
 
-    test('reject invalid package name', () => {
-      return new Promise((resolve, reject) => {
-        command.argv = ['/']
-        rtUtils.parsePackageName.mockImplementation(() => { throw new Error('parse error') })
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to list the actions', new Error('parse error'))
-            resolve()
-          })
-      })
+    test('reject invalid package name', async () => {
+      command.argv = ['/']
+      rtUtils.parsePackageName.mockImplementation(() => { throw new Error('parse error') })
+      await expect(command.run()).rejects.toThrow()
+      expect(handleError).toHaveBeenLastCalledWith('failed to list the actions', new Error('parse error'))
     })
-    test('errors out on api error', () => {
-      return new Promise((resolve, reject) => {
-        rtLib.mockRejected(rtAction, new Error('an error'))
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to list the actions', new Error('an error'))
-            resolve()
-          })
-      })
+    test('errors out on api error', async () => {
+      rtLib.mockRejected(rtAction, new Error('an error'))
+      await expect(command.run()).rejects.toThrow()
+      expect(handleError).toHaveBeenLastCalledWith('failed to list the actions', new Error('an error'))
     })
 
     test('return list of actions with annotated kinds', () => {

@@ -10,8 +10,7 @@ governing permissions and limitations under the License.
 */
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
-const { flags } = require('@oclif/command')
-const { cli } = require('cli-ux')
+const { Flags, CliUx: { ux: cli } } = require('@oclif/core')
 const { createFetch } = require('@adobe/aio-lib-core-networking')
 const { PropertyKey, PropertyDefault, propertiesFile, PropertyEnv } = require('../../../properties')
 const debug = require('debug')('aio-cli-plugin-runtime/property')
@@ -19,7 +18,7 @@ const config = require('@adobe/aio-lib-core-config')
 
 class PropertyGet extends RuntimeBaseCommand {
   async run () {
-    const { flags } = this.parse(PropertyGet)
+    const { flags } = await this.parse(PropertyGet)
 
     // if no property flags specified, default to all
     if (!(flags.all || flags.apiversion ||
@@ -91,14 +90,13 @@ class PropertyGet extends RuntimeBaseCommand {
         data.push({ Property: PropertyGet.flags.apibuildno.description, Value: result.buildno })
       }
     }
-
     cli.table(data,
       {
         Property: { minWidth: 10 },
         Value: { minWidth: 20 }
       },
       {
-        printLine: this.log,
+        printLine: this.log.bind(this),
         'no-truncate': true,
         ...flags // parsed flags
       })
@@ -108,19 +106,19 @@ class PropertyGet extends RuntimeBaseCommand {
 PropertyGet.flags = {
   // override property command flags, they need to be boolean type, not string
   ...Object.assign(RuntimeBaseCommand.flags, RuntimeBaseCommand.propertyFlags({ asBoolean: true })),
-  namespace: flags.boolean({
+  namespace: Flags.boolean({
     description: 'whisk namespace'
   }),
-  all: flags.boolean({
+  all: Flags.boolean({
     description: 'all properties'
   }),
-  apibuild: flags.boolean({
+  apibuild: Flags.boolean({
     description: 'whisk API build version'
   }),
-  apibuildno: flags.boolean({
+  apibuildno: Flags.boolean({
     description: 'whisk API build number'
   }),
-  cliversion: flags.boolean({
+  cliversion: Flags.boolean({
     description: 'whisk CLI version'
   })
 }

@@ -10,12 +10,12 @@ governing permissions and limitations under the License.
 */
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
-const { flags } = require('@oclif/command')
+const { Flags } = require('@oclif/core')
 const fs = require('fs')
 
 class RouteCreate extends RuntimeBaseCommand {
   async run () {
-    const { args, flags } = this.parse(RouteCreate)
+    const { args, flags } = await this.parse(RouteCreate)
 
     try {
       const ow = await this.wsk()
@@ -43,7 +43,7 @@ class RouteCreate extends RuntimeBaseCommand {
         this.log(`${result.gwApiUrl}${args.relPath}`)
       }
     } catch (err) {
-      this.handleError('failed to create the api', err)
+      await this.handleError('failed to create the api', err)
     }
   }
 }
@@ -74,19 +74,19 @@ RouteCreate.args = [
 
 RouteCreate.flags = {
   ...RuntimeBaseCommand.flags,
-  apiname: flags.string({
+  apiname: Flags.string({
     char: 'n',
     description: 'Friendly name of the API; ignored when CFG_FILE is specified (default BASE_PATH)',
     exclusive: ['config-file']
   }),
-  'response-type': flags.string({
+  'response-type': Flags.string({
     char: 'r',
     description: 'Set the web action response TYPE.',
     default: 'json',
     options: ['html', 'http', 'json', 'text', 'svg', 'json'],
     exclusive: ['config-file']
   }),
-  'config-file': flags.string({
+  'config-file': Flags.string({
     char: 'c',
     description: 'file containing API configuration in swagger JSON format'
   })

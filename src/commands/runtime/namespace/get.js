@@ -11,8 +11,7 @@ governing permissions and limitations under the License.
 */
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
-const { flags } = require('@oclif/command')
-const { cli } = require('cli-ux')
+const { Flags, CliUx: cli } = require('@oclif/core')
 
 function createColumns (columnName) {
   return {
@@ -62,7 +61,7 @@ async function getRulesWithStatus (ow, rules) {
 
 class NamespaceGet extends RuntimeBaseCommand {
   async run () {
-    const { flags } = this.parse(NamespaceGet)
+    const { flags } = await this.parse(NamespaceGet)
     try {
       const ow = await this.wsk()
       const data = await ow.namespaces.get()
@@ -78,26 +77,26 @@ class NamespaceGet extends RuntimeBaseCommand {
       } else {
         this.log('Entities in namespace:')
 
-        cli.table(data.packages, createColumns('packages'))
-        cli.table(data.actions, createColumns('actions'))
-        cli.table(data.triggers, createColumns('triggers'))
-        cli.table(data.rules, createColumns('rules'))
+        cli.ux.table(data.packages, createColumns('packages'))
+        cli.ux.table(data.actions, createColumns('actions'))
+        cli.ux.table(data.triggers, createColumns('triggers'))
+        cli.ux.table(data.rules, createColumns('rules'))
       }
     } catch (err) {
-      this.handleError('failed to get the data for a namespace', err)
+      await this.handleError('failed to get the data for a namespace', err)
     }
   }
 }
 
 NamespaceGet.flags = {
   ...RuntimeBaseCommand.flags,
-  json: flags.boolean({
+  json: Flags.boolean({
     description: 'output raw json'
   }),
-  'name-sort': flags.boolean({
+  'name-sort': Flags.boolean({
     description: 'sort results by name'
   }),
-  name: flags.boolean({
+  name: Flags.boolean({
     char: 'n',
     description: 'sort results by name'
   })

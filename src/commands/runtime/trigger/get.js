@@ -15,7 +15,7 @@ const { parsePathPattern } = require('@adobe/aio-lib-runtime').utils
 
 class TriggerGet extends RuntimeBaseCommand {
   async run () {
-    const { args } = this.parse(TriggerGet)
+    const { args } = await this.parse(TriggerGet)
     const triggerPath = args.triggerPath
     const [, namespace, name] = parsePathPattern(triggerPath)
 
@@ -25,7 +25,7 @@ class TriggerGet extends RuntimeBaseCommand {
       const result = await ow.triggers.get(obj)
       this.logJSON('', result)
     } catch (err) {
-      this.handleError(`Unable to get trigger '${triggerPath}'`, err)
+      await this.handleError(`Unable to get trigger '${triggerPath}'`, err)
     }
   }
 }

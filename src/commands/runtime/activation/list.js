@@ -12,14 +12,13 @@ governing permissions and limitations under the License.
 
 const moment = require('dayjs')
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
-const { flags } = require('@oclif/command')
-const { cli } = require('cli-ux')
+const { Flags, CliUx: cli } = require('@oclif/core')
 const decorators = require('../../../decorators').decorators()
-const statusStrings = ['success', 'app error', `dev error`, 'sys error']
+const statusStrings = ['success', 'app error', 'dev error', 'sys error']
 
 class ActivationList extends RuntimeBaseCommand {
   async run () {
-    const { args, flags } = this.parse(ActivationList)
+    const { args, flags } = await this.parse(ActivationList)
     const id = args.action_name
     try {
       const options = {}
@@ -84,7 +83,7 @@ class ActivationList extends RuntimeBaseCommand {
               if (row.statusCode === 2) {
                 const timeout = row.annotations.find(_ => _.key === 'timeout')
                 if (timeout && timeout.value) {
-                  return `timeout`
+                  return 'timeout'
                 }
               }
               return code
@@ -188,13 +187,13 @@ class ActivationList extends RuntimeBaseCommand {
           }
         }
         if (listActivation) {
-          cli.table(listActivation, columns, {
+          cli.ux.table(listActivation, columns, {
             'no-truncate': true
           })
         }
       }
     } catch (err) {
-      this.handleError('failed to list the activations', err)
+      await this.handleError('failed to list the activations', err)
     }
   }
 }
@@ -212,28 +211,28 @@ ActivationList.limits = {
 ActivationList.flags = {
   ...RuntimeBaseCommand.flags,
   // example usage:  aio runtime:activation:list --limit 10 --skip 2
-  limit: flags.integer({
+  limit: Flags.integer({
     char: 'l',
     description: 'only return LIMIT number of activations'
   }),
-  skip: flags.integer({
+  skip: Flags.integer({
     char: 's',
     description: 'exclude the first SKIP number of activations from the result'
   }),
-  since: flags.integer({
+  since: Flags.integer({
     description: 'return activations with timestamps later than SINCE; measured in milliseconds since Th, 01, Jan 1970'
   }),
-  upto: flags.integer({
+  upto: Flags.integer({
     description: 'return activations with timestamps earlier than UPTO; measured in milliseconds since Th, 01, Jan 1970'
   }),
-  count: flags.boolean({
+  count: Flags.boolean({
     char: 'c',
     description: 'show only the total number of activations'
   }),
-  json: flags.boolean({
+  json: Flags.boolean({
     description: 'output raw json'
   }),
-  full: flags.boolean({
+  full: Flags.boolean({
     char: 'f',
     description: 'include full activation description'
   })
