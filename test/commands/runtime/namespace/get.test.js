@@ -105,17 +105,11 @@ describe('instance methods', () => {
       })
     })
 
-    test('namespace list, error', () => {
-      return new Promise((resolve, reject) => {
-        const namespaceError = new Error('an error')
-        rtLib.mockRejected(rtAction, namespaceError)
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to get the data for a namespace', new Error('an error'))
-            resolve()
-          })
-      })
+    test('namespace list, error', async () => {
+      const namespaceError = new Error('an error')
+      rtLib.mockRejected(rtAction, namespaceError)
+      await expect(command.run()).rejects.toThrow()
+      expect(handleError).toHaveBeenLastCalledWith('failed to get the data for a namespace', new Error('an error'))
     })
 
     test('return list of actions, --name-sort flag', () => {

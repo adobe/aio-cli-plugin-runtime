@@ -10,12 +10,12 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const { flags } = require('@oclif/command')
+const { Flags } = require('@oclif/core')
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 
 class ActivationResult extends RuntimeBaseCommand {
   async run () {
-    const { args, flags } = this.parse(ActivationResult)
+    const { args, flags } = await this.parse(ActivationResult)
     let id = args.activationID
     try {
       const ow = await this.wsk()
@@ -30,7 +30,7 @@ class ActivationResult extends RuntimeBaseCommand {
       const result = await ow.activations.result(id)
       this.logJSON('', result)
     } catch (err) {
-      this.handleError('failed to fetch activation result', err)
+      await this.handleError('failed to fetch activation result', err)
     }
   }
 }
@@ -43,7 +43,7 @@ ActivationResult.args = [
 
 ActivationResult.flags = {
   ...RuntimeBaseCommand.flags,
-  last: flags.boolean({
+  last: Flags.boolean({
     char: 'l',
     description: 'retrieves the most recent activation result'
   })

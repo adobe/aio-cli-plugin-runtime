@@ -12,11 +12,11 @@ governing permissions and limitations under the License.
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 const { getProjectEntities, undeployPackage, processPackage, setPaths } = require('@adobe/aio-lib-runtime').utils
-const { flags } = require('@oclif/command')
+const { Flags } = require('@oclif/core')
 
 class DeployUndeploy extends RuntimeBaseCommand {
   async run () {
-    const { flags } = this.parse(DeployUndeploy)
+    const { flags } = await this.parse(DeployUndeploy)
     try {
       const options = await this.getOptions()
       const ow = await this.wsk(options)
@@ -36,20 +36,20 @@ class DeployUndeploy extends RuntimeBaseCommand {
         entities = processPackage(packages, deploymentTriggers, deploymentPackages, {}, true, options) // true for getting entity namesOnly, we do not need to parse all actions files and so on
       }
 
-      await undeployPackage(entities, ow, logger)
+      await undeployPackage(entities, ow, logger.bind(this))
     } catch (err) {
-      this.handleError('Failed to undeploy', err)
+      await this.handleError('Failed to undeploy', err)
     }
   }
 }
 
 DeployUndeploy.flags = {
   ...RuntimeBaseCommand.flags,
-  manifest: flags.string({
+  manifest: Flags.string({
     char: 'm',
     description: 'the manifest file location' // help description for flag
   }),
-  projectname: flags.string({
+  projectname: Flags.string({
     description: 'the name of the project to be undeployed' // help description for flag
   })
 }

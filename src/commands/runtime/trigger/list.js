@@ -12,12 +12,11 @@ governing permissions and limitations under the License.
 
 const moment = require('dayjs')
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
-const { flags } = require('@oclif/command')
-const { cli } = require('cli-ux')
+const { Flags, CliUx: cli } = require('@oclif/core')
 
 class TriggerList extends RuntimeBaseCommand {
   async run () {
-    const { flags } = this.parse(TriggerList)
+    const { flags } = await this.parse(TriggerList)
     try {
       const ow = await this.wsk()
       const options = {
@@ -85,37 +84,37 @@ class TriggerList extends RuntimeBaseCommand {
               get: row => row.name
             }
           }
-          cli.table(resultsWithStatus, columns)
+          cli.ux.table(resultsWithStatus, columns)
         }
       })
     } catch (err) {
-      this.handleError('failed to list triggers', err)
+      await this.handleError('failed to list triggers', err)
     }
   }
 }
 
 TriggerList.flags = {
   ...RuntimeBaseCommand.flags,
-  limit: flags.integer({
+  limit: Flags.integer({
     char: 'l',
     description: 'only return LIMIT number of triggers',
     default: 30
   }),
-  skip: flags.integer({
+  skip: Flags.integer({
     char: 's',
     description: 'exclude the first SKIP number of triggers from the result'
   }),
-  count: flags.boolean({
+  count: Flags.boolean({
     char: 'c',
     description: 'show only the total number of triggers'
   }),
-  json: flags.boolean({
+  json: Flags.boolean({
     description: 'output raw json'
   }),
-  'name-sort': flags.boolean({
+  'name-sort': Flags.boolean({
     description: 'sort results by name'
   }),
-  name: flags.boolean({
+  name: Flags.boolean({
     char: 'n',
     description: 'sort results by name'
   })

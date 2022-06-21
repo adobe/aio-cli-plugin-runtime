@@ -11,7 +11,7 @@ governing permissions and limitations under the License.
 */
 
 const { stdout } = require('stdout-stderr')
-const fs = require.requireActual('fs')
+const fs = jest.requireActual('fs')
 const eol = require('eol')
 
 jest.setTimeout(30000)
@@ -24,11 +24,11 @@ jest.mock('fs', () => require('jest-plugin-fs/mock'))
 jest.mock('openwhisk')
 
 // clear env variables
-delete process.env['WHISK_AUTH']
-delete process.env['WHISK_APIHOST']
-delete process.env['WHISK_APIVERSION']
-delete process.env['WHISK_NAMESPACE']
-delete process.env['WSK_CONFIG_FILE']
+delete process.env.WHISK_AUTH
+delete process.env.WHISK_APIHOST
+delete process.env.WHISK_APIVERSION
+delete process.env.WHISK_NAMESPACE
+delete process.env.WSK_CONFIG_FILE
 
 // trap console log
 // if you want to see output, you can do this:
@@ -163,7 +163,7 @@ global.createTestFlagsFunction = (TheCommand, Flags) => {
   return () => {
     // every command needs to override .flags (for global flags)
     // eslint: see https://eslint.org/docs/rules/no-prototype-builtins
-    expect(Object.prototype.hasOwnProperty.call(TheCommand, 'flags')).toBeTruthy()
+    expect(Object.prototype.hasOwnProperty.call(TheCommand, '_flags')).toBeTruthy()
 
     const flagsKeys = Object.keys(Flags)
     const theCommandFlagKeys = Object.keys(TheCommand.flags)

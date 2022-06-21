@@ -71,17 +71,12 @@ describe('instance methods', () => {
     })
   })
 
-  test('error, throws exception', () => {
-    return new Promise((resolve, reject) => {
-      rtLib.mockRejected(rtAction, new Error('an error'))
-      command.argv = ['/myapi']
-      return command.run()
-        .then(() => reject(new Error('should not succeed')))
-        .catch(() => {
-          expect(handleError).toHaveBeenLastCalledWith('failed to delete the api', new Error('an error'))
-          resolve()
-        })
-    })
+  test('error, throws exception', async () => {
+    rtLib.mockRejected(rtAction, new Error('an error'))
+    command.argv = ['/myapi']
+    const error = ['failed to delete the api', new Error('an error')]
+    await expect(command.run()).rejects.toThrow()
+    expect(handleError).toHaveBeenLastCalledWith(...error)
   })
 
   test('simple delete call', () => {

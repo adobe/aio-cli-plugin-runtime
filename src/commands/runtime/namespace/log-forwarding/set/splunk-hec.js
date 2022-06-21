@@ -10,12 +10,12 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const { flags } = require('@oclif/command')
+const { Flags } = require('@oclif/core')
 const RuntimeBaseCommand = require('../../../../../RuntimeBaseCommand')
 
 class SplunkHecCommand extends RuntimeBaseCommand {
   async run () {
-    const { flags } = this.parse(SplunkHecCommand)
+    const { flags } = await this.parse(SplunkHecCommand)
     const ow = await this.wsk()
     try {
       await ow.logForwarding.setDestination('splunk_hec', {
@@ -24,30 +24,30 @@ class SplunkHecCommand extends RuntimeBaseCommand {
         index: flags.index,
         hec_token: flags['hec-token']
       })
-      this.log(`Log forwarding was set to splunk_hec for this namespace`)
+      this.log('Log forwarding was set to splunk_hec for this namespace')
     } catch (e) {
-      this.handleError('failed to update log forwarding configuration', e)
+      await this.handleError('failed to update log forwarding configuration', e)
     }
   }
 }
 
-SplunkHecCommand.description = `Set log forwarding destination to Splunk HEC`
+SplunkHecCommand.description = 'Set log forwarding destination to Splunk HEC'
 
 SplunkHecCommand.flags = {
   ...RuntimeBaseCommand.flags,
-  host: flags.string({
+  host: Flags.string({
     description: 'Host',
     required: true
   }),
-  port: flags.string({
+  port: Flags.string({
     description: 'Port',
     required: true
   }),
-  index: flags.string({
+  index: Flags.string({
     description: 'Index',
     required: true
   }),
-  'hec-token': flags.string({
+  'hec-token': Flags.string({
     description: 'HEC token',
     required: true
   })

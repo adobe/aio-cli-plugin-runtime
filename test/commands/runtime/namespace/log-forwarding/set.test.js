@@ -43,20 +43,15 @@ beforeEach(async () => {
   rtLib.logForwarding.getDestinationSettings = jest.fn().mockReturnValue({ key: 'value' })
 })
 
-test('choices contain all supported log destinations', () => {
-  return new Promise(resolve => {
-    prompt.mockResolvedValueOnce({ type: 'something' })
-    return command.run()
-      .catch((e) => {
-        expect(prompt).toHaveBeenNthCalledWith(1, [{
-          name: 'type',
-          message: 'select log forwarding destination',
-          type: 'list',
-          choices: [{ name: 'Destination', value: 'destination' }]
-        }])
-        resolve()
-      })
-  })
+test('choices contain all supported log destinations', async () => {
+  prompt.mockResolvedValueOnce({ type: 'something' })
+  await expect(command.run()).rejects.toThrow()
+  expect(prompt).toHaveBeenNthCalledWith(1, [{
+    name: 'type',
+    message: 'select log forwarding destination',
+    type: 'list',
+    choices: [{ name: 'Destination', value: 'destination' }]
+  }])
 })
 
 test.each(dataFixtures)('set log forwarding settings to %s (interactive)', async (destination, input) => {
@@ -70,9 +65,7 @@ test.each(dataFixtures)('set log forwarding settings to %s (interactive)', async
       .then(() => {
         expect(stdout.output).toMatch(`Log forwarding was set to ${destination} for this namespace`)
         expect(setCall).toBeCalledTimes(1)
-        if (input !== undefined) {
-          expect(setCall).toHaveBeenCalledWith(destination, input)
-        }
+        expect(setCall).toHaveBeenCalledWith(destination, input)
         resolve()
       })
   })

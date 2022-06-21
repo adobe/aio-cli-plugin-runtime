@@ -12,11 +12,11 @@ governing permissions and limitations under the License.
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 const { setPaths, processPackage, syncProject } = require('@adobe/aio-lib-runtime').utils
-const { flags } = require('@oclif/command')
+const { Flags } = require('@oclif/core')
 
 class DeploySync extends RuntimeBaseCommand {
   async run () {
-    const { flags } = this.parse(DeploySync)
+    const { flags } = await this.parse(DeploySync)
     try {
       // in case of 'aio runtime:deploy' (without the path to the manifest file) the program looks for the manifest file in the current directory.
       const components = setPaths(flags)
@@ -31,20 +31,20 @@ class DeploySync extends RuntimeBaseCommand {
       const entities = processPackage(packages, deploymentPackages, deploymentTriggers, params, false, options)
       const ow = await this.wsk(options)
       const logger = this.log
-      await syncProject(components.projectName, components.manifestPath, components.manifestContent, entities, ow, logger, this.getImsOrgId())
+      await syncProject(components.projectName, components.manifestPath, components.manifestContent, entities, ow, logger.bind(this), this.getImsOrgId())
     } catch (err) {
-      this.handleError('Failed to sync', err)
+      await this.handleError('Failed to sync', err)
     }
   }
 }
 
 DeploySync.flags = {
   ...RuntimeBaseCommand.flags,
-  manifest: flags.string({
+  manifest: Flags.string({
     char: 'm',
     description: 'the manifest file location' // help description for flag
   }),
-  deployment: flags.string({
+  deployment: Flags.string({
     char: 'd',
     description: 'the path to the deployment file'
   })

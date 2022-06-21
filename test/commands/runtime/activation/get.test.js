@@ -51,9 +51,10 @@ test('flags', async () => {
 })
 
 describe('instance methods', () => {
-  let command, handleError, rtLib
+  let command, handleError, rtLib, mockedLogger
   beforeEach(async () => {
     command = new TheCommand([])
+    mockedLogger = jest.spyOn(command.log, 'bind')
     handleError = jest.spyOn(command, 'handleError')
     rtLib = await RuntimeLib.init({ apihost: 'fakehost', api_key: 'fakekey' })
     rtLib.mockResolved('actions.client.options', '')
@@ -82,7 +83,8 @@ describe('instance methods', () => {
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalledWith('12345')
-          expect(rtUtils.printLogs).toHaveBeenCalledWith({ logs: ['line1', 'line2', '2019-10-11T19:08:57.298Z  stdout: login-success'] }, true, command.log)
+          expect(rtUtils.printLogs).toHaveBeenCalledWith({ logs: ['line1', 'line2', '2019-10-11T19:08:57.298Z  stdout: login-success'] }, true, expect.any(Function))
+          expect(mockedLogger).toHaveBeenCalled()
         })
     })
 
@@ -106,7 +108,8 @@ describe('instance methods', () => {
         .then(() => {
           expect(axList).toHaveBeenCalled()
           expect(axGet).toHaveBeenCalledWith('12345')
-          expect(rtUtils.printLogs).toHaveBeenCalledWith({ logs: ['line1', 'line2', '2019-10-11T19:08:57.298Z  stdout: login-success'] }, true, command.log)
+          expect(rtUtils.printLogs).toHaveBeenCalledWith({ logs: ['line1', 'line2', '2019-10-11T19:08:57.298Z  stdout: login-success'] }, true, expect.any(Function))
+          expect(mockedLogger).toHaveBeenCalled()
         })
     })
 
@@ -123,17 +126,11 @@ describe('instance methods', () => {
       await expect(runResult).rejects.toThrow('failed to retrieve the activation')
     })
 
-    test('errors out on api error', () => {
-      return new Promise((resolve, reject) => {
-        rtLib.mockRejected(rtAction, new Error('an error'))
-        command.argv = ['12345']
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to retrieve the activation', new Error('an error'))
-            resolve()
-          })
-      })
+    test('errors out on api error', async () => {
+      rtLib.mockRejected(rtAction, new Error('an error'))
+      command.argv = ['12345']
+      await expect(command.run()).rejects.toThrow()
+      expect(handleError).toHaveBeenLastCalledWith('failed to retrieve the activation', new Error('an error'))
     })
   })
 })

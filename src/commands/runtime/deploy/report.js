@@ -12,11 +12,11 @@ governing permissions and limitations under the License.
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 const { processInputs, returnUnion, setPaths } = require('@adobe/aio-lib-runtime').utils
-const { flags } = require('@oclif/command')
+const { Flags } = require('@oclif/core')
 
 class DeployReport extends RuntimeBaseCommand {
   async run () {
-    const { flags } = this.parse(DeployReport)
+    const { flags } = await this.parse(DeployReport)
     try {
       const components = setPaths(flags)
       const packages = components.packages
@@ -32,17 +32,17 @@ class DeployReport extends RuntimeBaseCommand {
       const triggers = []
       Object.keys(packages).forEach((key) => {
         const objPkg = { name: key, Inputs: {} }
-        if (packages[key]['public']) {
-          objPkg.public = packages[key]['public']
+        if (packages[key].public) {
+          objPkg.public = packages[key].public
         }
         pkg.push(objPkg)
-        if (packages[key]['actions']) {
-          Object.keys(packages[key]['actions']).forEach((action) => {
+        if (packages[key].actions) {
+          Object.keys(packages[key].actions).forEach((action) => {
             const objAction = { name: action, Inputs: {} }
-            const packageInputs = packages[key]['actions'][action]['inputs'] || {}
+            const packageInputs = packages[key].actions[action].inputs || {}
             let deploymentInputs = {}
-            if (deploymentPackages[key] && deploymentPackages[key]['actions'] && deploymentPackages[key]['actions'][action]) {
-              deploymentInputs = deploymentPackages[key]['actions'][action]['inputs'] || {}
+            if (deploymentPackages[key] && deploymentPackages[key].actions && deploymentPackages[key].actions[action]) {
+              deploymentInputs = deploymentPackages[key].actions[action].inputs || {}
             }
             const allInputs = returnUnion(packageInputs, deploymentInputs)
             objAction.Inputs = processInputs(allInputs, {})
@@ -50,20 +50,20 @@ class DeployReport extends RuntimeBaseCommand {
           })
         }
 
-        if (packages[key]['sequences']) {
-          Object.keys(packages[key]['sequences']).forEach((sequence) => {
+        if (packages[key].sequences) {
+          Object.keys(packages[key].sequences).forEach((sequence) => {
             const objSequence = { name: sequence, Inputs: {} }
             actions.push(objSequence)
           })
         }
 
-        if (packages[key]['triggers']) {
-          Object.keys(packages[key]['triggers']).forEach((trigger) => {
+        if (packages[key].triggers) {
+          Object.keys(packages[key].triggers).forEach((trigger) => {
             const objTrigger = { name: trigger }
-            if (packages[key]['triggers'][trigger]['feed']) {
-              objTrigger.feed = packages[key]['triggers'][trigger]['feed']
+            if (packages[key].triggers[trigger].feed) {
+              objTrigger.feed = packages[key].triggers[trigger].feed
             }
-            const packageInputs = packages[key]['triggers'][trigger]['inputs'] || {}
+            const packageInputs = packages[key].triggers[trigger].inputs || {}
             let deploymentInputs = {}
             if (trigger in deploymentTriggers) {
               deploymentInputs = deploymentTriggers[trigger]
@@ -89,18 +89,18 @@ class DeployReport extends RuntimeBaseCommand {
         this.logJSON('', trigger)
       }
     } catch (err) {
-      this.handleError('Failed to report', err)
+      await this.handleError('Failed to report', err)
     }
   }
 }
 
 DeployReport.flags = {
   ...RuntimeBaseCommand.flags,
-  manifest: flags.string({
+  manifest: Flags.string({
     char: 'm',
     description: 'the manifest file location' // help description for flag
   }),
-  deployment: flags.string({
+  deployment: Flags.string({
     char: 'd',
     description: 'the deployment file location' // help description for flag
   })

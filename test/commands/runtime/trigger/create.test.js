@@ -97,17 +97,12 @@ describe('instance methods', () => {
         })
     })
 
-    test('create a simple trigger, error', () => {
-      return new Promise((resolve, reject) => {
-        rtLib.mockRejected(rtAction, new Error('an error'))
-        command.argv = ['trigger1']
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to create the trigger', new Error('an error'))
-            resolve()
-          })
-      })
+    test('create a simple trigger, error', async () => {
+      rtLib.mockRejected(rtAction, new Error('an error'))
+      command.argv = ['trigger1']
+      const error = ['failed to create the trigger', new Error('an error')]
+      await expect(command.run()).rejects.toThrow(...error)
+      expect(handleError).toHaveBeenLastCalledWith(...error)
     })
 
     test('create a simple trigger, use feed flag', () => {
@@ -121,24 +116,23 @@ describe('instance methods', () => {
       return command.run()
         .then(() => {
           expect(rtUtils.getKeyValueArrayFromMergedParameters).toHaveBeenCalledWith(['cron', '* * * * *'], undefined)
-          expect(cmd).toHaveBeenCalledWith({ name: 'trigger1',
+          expect(cmd).toHaveBeenCalledWith({
+            name: 'trigger1',
             trigger: {
               feed: '/whisk.system/alarms/alarm',
               parameters: [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }]
-            } })
+            }
+          })
           expect(stdout.output).toMatch('')
         })
     })
 
-    test('create a simple trigger, use feed flag - Error', () => {
+    test('create a simple trigger, use feed flag - Error', async () => {
       rtLib.mockRejected(rtAction, new Error('yo'))
       command.argv = ['trigger1', '--feed', '/whisk.system/alarms/alarm', '--param', 'cron', '* * * * *']
-      return command.run()
-        .then(() => { throw new Error('did not reject') })
-        .catch(e => {
-          expect(e).toEqual(new Error('failed to create the trigger: yo\n specify --verbose flag for more information'))
-          expect(stdout.output).toMatch('')
-        })
+      const error = new Error('failed to create the trigger: yo\n specify --verbose flag for more information')
+      await expect(command.run()).rejects.toThrow(error)
+      expect(stdout.output).toMatch('')
     })
 
     test('create a simple trigger, use param flag', () => {
@@ -148,10 +142,12 @@ describe('instance methods', () => {
       return command.run()
         .then(() => {
           expect(rtUtils.getKeyValueArrayFromMergedParameters).toHaveBeenCalledWith(['a', 'b', 'c', 'd'], undefined)
-          expect(cmd).toHaveBeenCalledWith({ name: 'trigger1',
+          expect(cmd).toHaveBeenCalledWith({
+            name: 'trigger1',
             trigger: {
               parameters: [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }]
-            } })
+            }
+          })
           expect(stdout.output).toMatch('')
         })
     })
@@ -168,10 +164,12 @@ describe('instance methods', () => {
       return command.run()
         .then(() => {
           expect(rtUtils.getKeyValueArrayFromMergedParameters).toHaveBeenCalledWith(undefined, '/trigger/parameters.json')
-          expect(cmd).toHaveBeenCalledWith({ name: 'trigger1',
+          expect(cmd).toHaveBeenCalledWith({
+            name: 'trigger1',
             trigger: {
               parameters: [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }]
-            } })
+            }
+          })
           expect(stdout.output).toMatch('')
         })
     })
@@ -183,10 +181,12 @@ describe('instance methods', () => {
       return command.run()
         .then(() => {
           expect(rtUtils.getKeyValueArrayFromMergedParameters).toHaveBeenCalledWith(['a', 'b', 'c', 'd'], undefined)
-          expect(cmd).toHaveBeenCalledWith({ name: 'trigger1',
+          expect(cmd).toHaveBeenCalledWith({
+            name: 'trigger1',
             trigger: {
               annotations: [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }]
-            } })
+            }
+          })
           expect(stdout.output).toMatch('')
         })
     })
@@ -203,10 +203,12 @@ describe('instance methods', () => {
       return command.run()
         .then(() => {
           expect(rtUtils.getKeyValueArrayFromMergedParameters).toHaveBeenCalledWith(undefined, '/trigger/annotations.json')
-          expect(cmd).toHaveBeenCalledWith({ name: 'trigger1',
+          expect(cmd).toHaveBeenCalledWith({
+            name: 'trigger1',
             trigger: {
               annotations: [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }]
-            } })
+            }
+          })
           expect(stdout.output).toMatch('')
         })
     })

@@ -12,13 +12,13 @@ governing permissions and limitations under the License.
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 const { getKeyValueArrayFromMergedParameters } = require('@adobe/aio-lib-runtime').utils
-const { flags } = require('@oclif/command')
+const { Flags } = require('@oclif/core')
 
 class PackageCreate extends RuntimeBaseCommand {
   isUpdate () { return false }
 
   async run () {
-    const { args, flags } = this.parse(PackageCreate)
+    const { args, flags } = await this.parse(PackageCreate)
     let paramsPackage // omit if no params are defined explicitly
     try {
       paramsPackage = getKeyValueArrayFromMergedParameters(flags.param, flags['param-file'])
@@ -33,18 +33,18 @@ class PackageCreate extends RuntimeBaseCommand {
       switch (flags.shared) {
         case 'true' :
         case 'yes' :
-          packageParams['publish'] = true
+          packageParams.publish = true
           break
         case 'false' :
         case 'no' :
-          packageParams['publish'] = false
+          packageParams.publish = false
           break
       }
       const options = {}
-      options['name'] = args.packageName
+      options.name = args.packageName
       // only provide 'pacakge' property if it's not empty
       if (Object.entries(packageParams).filter(([_, v]) => v !== undefined).length > 0) {
-        options['package'] = packageParams
+        options.package = packageParams
       }
       const ow = await this.wsk()
       const method = this.isUpdate() ? 'update' : 'create'
@@ -54,7 +54,7 @@ class PackageCreate extends RuntimeBaseCommand {
       }
     } catch (err) {
       const method = this.isUpdate() ? 'update' : 'create'
-      this.handleError(`failed to ${method} the package`, err)
+      await this.handleError(`failed to ${method} the package`, err)
     }
   }
 }
@@ -68,29 +68,29 @@ PackageCreate.args = [
 
 PackageCreate.flags = {
   ...RuntimeBaseCommand.flags,
-  param: flags.string({
+  param: Flags.string({
     char: 'p',
     description: 'parameters in key value pairs to be passed to the package', // help description for flag
     multiple: true // allow setting this flag multiple times
   }),
-  'param-file': flags.string({
+  'param-file': Flags.string({
     char: 'P',
     description: 'parameter to be passed to the package for json file' // help description for flag
   }),
-  shared: flags.string({
+  shared: Flags.string({
     description: 'parameter to be passed to indicate whether package is shared or private',
     options: ['true', 'yes', 'false', 'no']
   }),
-  annotation: flags.string({
+  annotation: Flags.string({
     char: 'a',
     description: 'annotation values in KEY VALUE format', // help description for flag
     multiple: true // allow setting this flag multiple times
   }),
-  'annotation-file': flags.string({
+  'annotation-file': Flags.string({
     char: 'A',
     description: 'FILE containing annotation values in JSON format' // help description for flag
   }),
-  json: flags.boolean({
+  json: Flags.boolean({
     description: 'output raw json'
   })
 }

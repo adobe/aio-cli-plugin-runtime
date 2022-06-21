@@ -17,14 +17,14 @@ class AdobeIoRuntimeCommand extends RuntimeBaseCommand {
     const ow = await this.wsk()
     try {
       await ow.logForwarding.setDestination('adobe_io_runtime', {})
-      this.log(`Log forwarding was set to adobe_io_runtime for this namespace`)
+      this.log('Log forwarding was set to adobe_io_runtime for this namespace')
     } catch (e) {
-      this.handleError('failed to update log forwarding configuration', e)
+      await this.handleError('failed to update log forwarding configuration', e)
     }
   }
 }
 
-AdobeIoRuntimeCommand.description = `Set log forwarding destination to Adobe I/O Runtime (Logs will be accessible via aio CLI)`
+AdobeIoRuntimeCommand.description = 'Set log forwarding destination to Adobe I/O Runtime (Logs will be accessible via aio CLI)'
 
 AdobeIoRuntimeCommand.flags = {
   ...RuntimeBaseCommand.flags

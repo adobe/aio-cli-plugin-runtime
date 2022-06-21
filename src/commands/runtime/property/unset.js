@@ -10,13 +10,13 @@ governing permissions and limitations under the License.
 */
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
-const { flags } = require('@oclif/command')
+const { Flags } = require('@oclif/core')
 const { PropertyKey, propertiesFile } = require('../../../properties')
 
 class PropertyUnset extends RuntimeBaseCommand {
   async run () {
     try {
-      const { flags } = this.parse(PropertyUnset)
+      const { flags } = await this.parse(PropertyUnset)
       const properties = propertiesFile()
 
       properties.unset = function (key) {
@@ -49,7 +49,7 @@ class PropertyUnset extends RuntimeBaseCommand {
 
       properties.save()
     } catch (err) {
-      this.handleError('failed to unset the property', err)
+      await this.handleError('failed to unset the property', err)
     }
   }
 }
@@ -57,7 +57,7 @@ class PropertyUnset extends RuntimeBaseCommand {
 PropertyUnset.flags = {
   // override property command flags, they need to be boolean type, not string
   ...Object.assign(RuntimeBaseCommand.flags, RuntimeBaseCommand.propertyFlags({ asBoolean: true })),
-  namespace: flags.boolean({
+  namespace: Flags.boolean({
     description: 'whisk namespace'
   })
 }

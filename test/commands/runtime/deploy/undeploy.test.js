@@ -47,10 +47,11 @@ const expectedDepTriggers = [{ fake: 'dep-triggers' }]
 const expectedPackages = { fake: 'packages' }
 
 describe('instance methods', () => {
-  let command, handleError, rtLib
+  let command, handleError, rtLib, mockedLog
 
   beforeEach(() => {
     command = new TheCommand([])
+    mockedLog = jest.spyOn(command.log, 'bind')
     handleError = jest.spyOn(command, 'handleError')
     RuntimeLib.mockReset()
     rtLib = RuntimeLib.init({ fake: 1 })
@@ -78,9 +79,10 @@ describe('instance methods', () => {
 
       expect(utils.processPackage).toHaveBeenCalledWith(expectedPackages, {}, {}, {}, true, expectedOWOptions)
       expect(utils.getProjectEntities).not.toHaveBeenCalled()
-      expect(utils.undeployPackage).toHaveBeenCalledWith(expectedEntities, rtLib, command.log)
+      expect(utils.undeployPackage).toHaveBeenCalledWith(expectedEntities, rtLib, expect.any(Function))
       expect(stdout.output).toMatch('')
       expect(handleError).not.toHaveBeenCalled()
+      expect(mockedLog).toHaveBeenCalled()
     })
 
     test('run with manifest flag', async () => {
@@ -90,33 +92,37 @@ describe('instance methods', () => {
 
       expect(utils.processPackage).toHaveBeenCalledWith(expectedPackages, {}, {}, {}, true, expectedOWOptions)
       expect(utils.getProjectEntities).not.toHaveBeenCalled()
-      expect(utils.undeployPackage).toHaveBeenCalledWith(expectedEntities, rtLib, command.log)
+      expect(utils.undeployPackage).toHaveBeenCalledWith(expectedEntities, rtLib, expect.any(Function))
       expect(stdout.output).toMatch('')
       expect(handleError).not.toHaveBeenCalled()
+      expect(mockedLog).toHaveBeenCalled()
     })
 
     test('run with project name flag', async () => {
       command.argv = ['--projectname', 'thedudesproject']
+      const mockedLog = jest.spyOn(command.log, 'bind')
       await command.run()
       expect(utils.setPaths).not.toHaveBeenCalled()
 
       expect(utils.processPackage).not.toHaveBeenCalled()
       expect(utils.getProjectEntities).toHaveBeenCalledWith('thedudesproject', false, rtLib)
-      expect(utils.undeployPackage).toHaveBeenCalledWith(expectedEntitiesFromGet, rtLib, command.log)
+      expect(utils.undeployPackage).toHaveBeenCalledWith(expectedEntitiesFromGet, rtLib, expect.any(Function))
       expect(stdout.output).toMatch('')
+      expect(mockedLog).toHaveBeenCalled()
       expect(handleError).not.toHaveBeenCalled()
     })
 
     test('run with project name and manifest flag', async () => {
       // ignores the manifest flag
       command.argv = ['-m', 'fake-manifest.yml', '--projectname', 'thedudesproject']
+      const mockedLog = jest.spyOn(command.log, 'bind')
       await command.run()
       expect(utils.setPaths).not.toHaveBeenCalled()
-
       expect(utils.processPackage).not.toHaveBeenCalled()
       expect(utils.getProjectEntities).toHaveBeenCalledWith('thedudesproject', false, rtLib)
-      expect(utils.undeployPackage).toHaveBeenCalledWith(expectedEntitiesFromGet, rtLib, command.log)
+      expect(utils.undeployPackage).toHaveBeenCalledWith(expectedEntitiesFromGet, rtLib, expect.any(Function))
       expect(stdout.output).toMatch('')
+      expect(mockedLog).toHaveBeenCalled()
       expect(handleError).not.toHaveBeenCalled()
     })
 

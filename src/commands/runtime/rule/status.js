@@ -13,14 +13,14 @@ const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 
 class RuleStatus extends RuntimeBaseCommand {
   async run () {
-    const { args } = this.parse(RuleStatus)
+    const { args } = await this.parse(RuleStatus)
     try {
       const ow = await this.wsk()
       const RuleStatusObject = { ...args }
       const statusRule = await ow.rules.get(RuleStatusObject)
       this.log(statusRule.status)
     } catch (err) {
-      this.handleError('failed to retrieve rule', err)
+      await this.handleError('failed to retrieve rule', err)
     }
   }
 }

@@ -197,17 +197,12 @@ describe('instance methods', () => {
         })
     })
 
-    test('errors out on api error', () => {
-      return new Promise((resolve, reject) => {
-        rtLib.mockRejected(rtAction, new Error('an error'))
-        command.argv = ['hello']
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith('failed to retrieve the action', new Error('an error'))
-            resolve()
-          })
-      })
+    test('errors out on api error', async () => {
+      rtLib.mockRejected(rtAction, new Error('an error'))
+      command.argv = ['hello']
+      const error = ['failed to retrieve the action', new Error('an error')]
+      await expect(command.run()).rejects.toThrow()
+      expect(handleError).toHaveBeenLastCalledWith(...error)
     })
   })
 
@@ -295,17 +290,11 @@ describe('instance methods', () => {
         })
     })
 
-    test('report error for show binary action code --code', () => {
-      return new Promise((resolve, reject) => {
-        rtLib.mockResolvedFixture(rtAction, 'action/get.binary.json')
-        command.argv = ['hello', '--code']
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(() => {
-            expect(handleError).toHaveBeenLastCalledWith(TheCommand.codeNotText)
-            resolve()
-          })
-      })
+    test('report error for show binary action code --code', async () => {
+      rtLib.mockResolvedFixture(rtAction, 'action/get.binary.json')
+      command.argv = ['hello', '--code']
+      await expect(command.run()).rejects.toThrow()
+      expect(handleError).toHaveBeenLastCalledWith(TheCommand.codeNotText)
     })
   })
 })

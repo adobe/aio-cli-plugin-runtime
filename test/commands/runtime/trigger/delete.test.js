@@ -90,19 +90,13 @@ describe('instance methods', () => {
       })
     })
 
-    test('trigger delete, error', () => {
-      return new Promise((resolve, reject) => {
-        const err = new Error('an error')
-        rtLib.mockRejected(rtAction, err)
-        command.argv = ['trigger1']
-        rtUtils.parsePathPattern.mockReturnValue([null, 'MySpecifiedNamespaceRet', 'trigger1Ret'])
-        return command.run()
-          .then(() => reject(new Error('does not throw error')))
-          .catch(e => {
-            expect(e.message).toMatch("Unable to delete trigger 'trigger1': " + err.message)
-            resolve()
-          })
-      })
+    test('trigger delete, error', async () => {
+      const err = new Error('an error')
+      rtLib.mockRejected(rtAction, err)
+      command.argv = ['trigger1']
+      rtUtils.parsePathPattern.mockReturnValue([null, 'MySpecifiedNamespaceRet', 'trigger1Ret'])
+      const error = ["Unable to delete trigger 'trigger1': " + err.message]
+      await expect(command.run()).rejects.toThrow(...error)
     })
   })
 })

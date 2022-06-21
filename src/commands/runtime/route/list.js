@@ -10,8 +10,7 @@ governing permissions and limitations under the License.
 */
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
-const { flags } = require('@oclif/command')
-const { cli } = require('cli-ux')
+const { Flags, CliUx: cli } = require('@oclif/core')
 
 function processApi (api) {
   const data = []
@@ -40,7 +39,7 @@ function processApi (api) {
 
 class RouteList extends RuntimeBaseCommand {
   async run () {
-    const { args, flags } = this.parse(RouteList)
+    const { args, flags } = await this.parse(RouteList)
 
     try {
       const ow = await this.wsk()
@@ -66,19 +65,19 @@ class RouteList extends RuntimeBaseCommand {
           }, data)
         })
 
-        cli.table(data, {
+        cli.ux.table(data, {
           Action: { minWidth: 10 },
           Verb: { minWidth: 10 },
           APIName: { header: 'API Name', minWidth: 10 },
           URL: { minWidth: 15, 'no-truncate': true }
         },
         {
-          printLine: this.log,
+          printLine: this.log.bind(this),
           ...flags // parsed flags
         })
       }
     } catch (err) {
-      this.handleError('failed to list the api', err)
+      await this.handleError('failed to list the api', err)
     }
   }
 }
@@ -101,15 +100,15 @@ RouteList.args = [
 
 RouteList.flags = {
   ...RuntimeBaseCommand.flags,
-  limit: flags.integer({
+  limit: Flags.integer({
     char: 'l',
     description: 'only return LIMIT number of triggers'
   }),
-  skip: flags.integer({
+  skip: Flags.integer({
     char: 's',
     description: 'exclude the first SKIP number of triggers from the result'
   }),
-  json: flags.boolean({
+  json: Flags.boolean({
     description: 'output raw json'
   })
 }
