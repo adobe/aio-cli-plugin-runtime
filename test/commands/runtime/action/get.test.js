@@ -61,7 +61,7 @@ describe('instance methods', () => {
       command.argv = ['hello']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith('hello')
+          expect(cmd).toHaveBeenCalledWith({ code: false, name: 'hello' })
           expect(stdout.output).toMatch('')
         })
     })
@@ -192,7 +192,7 @@ describe('instance methods', () => {
       command.argv = ['hello']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith('hello')
+          expect(cmd).toHaveBeenCalledWith({ code: false, name: 'hello' })
           expect(stdout.output).toMatch('') // TODO: json output
         })
     })
@@ -215,7 +215,7 @@ describe('instance methods', () => {
       command.argv = ['hello', '--save']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith('hello')
+          expect(cmd).toHaveBeenCalledWith({ code: true, name: 'hello' })
           expect(fs.writeFileSync).toHaveBeenCalledWith('hello.js', 'this is the code')
         })
     })
@@ -226,7 +226,7 @@ describe('instance methods', () => {
       command.argv = ['pkg/hello', '--save']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith('pkg/hello')
+          expect(cmd).toHaveBeenCalledWith({ code: true, name: 'pkg/hello' })
           expect(fs.writeFileSync).toHaveBeenCalledWith('hello.js', 'this is the code')
         })
     })
@@ -237,7 +237,7 @@ describe('instance methods', () => {
       command.argv = ['hello', '--save-as', 'filename.js']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith('hello')
+          expect(cmd).toHaveBeenCalledWith({ code: true, name: 'hello' })
           expect(fs.writeFileSync).toHaveBeenCalledWith('filename.js', 'this is the code')
         })
     })
@@ -248,7 +248,7 @@ describe('instance methods', () => {
       command.argv = ['hello', '--save']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith('hello')
+          expect(cmd).toHaveBeenCalledWith({ code: true, name: 'hello' })
           expect(fs.writeFileSync).toHaveBeenCalledWith('hello.zip',
             bufferData, 'buffer')
         })
@@ -260,7 +260,7 @@ describe('instance methods', () => {
       command.argv = ['hello', '--save-as', 'filename.zip']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith('hello')
+          expect(cmd).toHaveBeenCalledWith({ code: true, name: 'hello' })
           expect(fs.writeFileSync).toHaveBeenCalledWith('filename.zip',
             bufferData, 'buffer')
         })
@@ -272,7 +272,7 @@ describe('instance methods', () => {
       command.argv = ['hello']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith('hello')
+          expect(cmd).toHaveBeenCalledWith({ name: 'hello', code: true })
           const result = JSON.parse(stdout.output)
           delete result.date
           expect(`${JSON.stringify(result, null, 2)}\n`).toMatchFixture('action/get.json')
@@ -285,7 +285,7 @@ describe('instance methods', () => {
       command.argv = ['hello', '--code']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith('hello')
+          expect(cmd).toHaveBeenCalledWith({ code: true, name: 'hello' })
           expect(stdout.output).toMatch('this is the code')
         })
     })

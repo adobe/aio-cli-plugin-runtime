@@ -19,7 +19,7 @@ const statusStrings = ['success', 'app error', 'dev error', 'sys error']
 class ActivationList extends RuntimeBaseCommand {
   async run () {
     const { args, flags } = await this.parse(ActivationList)
-    const id = args.activation_name
+    const id = args.action_name
     try {
       const options = {}
       if (id) {
@@ -200,7 +200,7 @@ class ActivationList extends RuntimeBaseCommand {
 
 ActivationList.args = [
   {
-    name: 'activation_name'
+    name: 'action_name'
   }
 ]
 

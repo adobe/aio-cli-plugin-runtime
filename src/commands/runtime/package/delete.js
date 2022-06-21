@@ -17,11 +17,16 @@ const { Flags } = require('@oclif/core')
 class PackageDelete extends RuntimeBaseCommand {
   async run () {
     const { args, flags } = await this.parse(PackageDelete)
+    let result
     try {
       const ow = await this.wsk()
       const options = parsePackageName(args.packageName)
-      // Packages can be deleted only when there are no actions inside the packages
-      const result = await ow.packages.delete(options)
+      if (flags.recursive) {
+        // Packages can be deleted only when there are no actions inside the packagess
+        result = await recursivelyDeletePackage(ow, options)
+      } else {
+        result = await ow.packages.delete(options)
+      }
       if (flags.json) {
         this.logJSON('', result)
       }
@@ -29,6 +34,43 @@ class PackageDelete extends RuntimeBaseCommand {
       await this.handleError('failed to delete the package', err)
     }
   }
+}
+
+async function recursivelyDeletePackage (ow, pkg) {
+  const mapRulesToActionName = (rules) => {
+    let ruleMap = new Map()
+    if (Array.isArray(rules)) {
+      ruleMap = rules.reduce((rulesMap, rule) => {
+        const ruleData = {
+          ruleName: rule.name,
+          trigger: {
+            namespace: rule.trigger.path,
+            triggerName: rule.trigger.name
+          }
+        }
+        rulesMap.set(rule.action.name, ruleData)
+        return rulesMap
+      }, new Map())
+    }
+    return ruleMap
+  }
+  const actions = await ow.actions.list()
+  const mappedRules = mapRulesToActionName(await ow.rules.list())
+  const deleteEntitiesPromises = []
+  for (const action of actions) {
+    if (action.namespace.split('/').includes(pkg.name)) {
+      if (mappedRules.has(action.name)) {
+        const actionRule = mappedRules.get(action.name)
+        deleteEntitiesPromises.push(ow.triggers.delete(actionRule.trigger),
+          ow.rules.delete(actionRule.ruleName))
+      }
+      deleteEntitiesPromises.push(ow.actions.delete(action))
+    }
+  }
+  if (deleteEntitiesPromises.length > 0) {
+    await Promise.all(deleteEntitiesPromises)
+  }
+  return ow.packages.delete(pkg)
 }
 
 PackageDelete.args = [
@@ -41,6 +83,11 @@ PackageDelete.args = [
 PackageDelete.flags = {
   json: Flags.boolean({
     description: 'output raw json'
+  }),
+  recursive: flags.boolean({
+    description: 'Deletes all associated actions (and rules & triggers associated with the actions)',
+    char: 'r',
+    default: false
   })
 }
 

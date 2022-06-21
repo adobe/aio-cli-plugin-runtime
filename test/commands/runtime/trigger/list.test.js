@@ -122,7 +122,7 @@ describe('instance methods', () => {
       command.argv = ['--skip', '5']
       return command.run()
         .then(() => {
-          expect(cmd).toHaveBeenCalledWith({ skip: 5 })
+          expect(cmd).toHaveBeenCalledWith({ skip: 5, limit: 30 })
           expect(stdout.output).toMatch('')
         })
     })

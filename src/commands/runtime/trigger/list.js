@@ -97,7 +97,8 @@ TriggerList.flags = {
   ...RuntimeBaseCommand.flags,
   limit: Flags.integer({
     char: 'l',
-    description: 'only return LIMIT number of triggers'
+    description: 'only return LIMIT number of triggers',
+    default: 30
   }),
   skip: Flags.integer({
     char: 's',
