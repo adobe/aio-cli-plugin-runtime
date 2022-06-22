@@ -27,7 +27,6 @@
   "devDependencies": {
     "@babel/core": "^7.16.12",
     "@babel/preset-env": "^7.16.11",
-    "@oclif/test": "^1.2.8",
     "babel-jest": "^27.5.0",
     "babel-runtime": "^6.26.0",
     "dedent-js": "^1.0.1",
@@ -43,6 +42,7 @@
     "jest": "^27.5.0",
     "jest-junit": "^13.0.0",
     "jest-plugin-fs": "^2.9.0",
+    "oclif": "^3.0.1",
     "stdout-stderr": "^0.1.9"
   },
   "engines": {
@@ -68,9 +68,9 @@
     "posttest": "eslint src test e2e",
     "test": "npm run unit-tests",
     "unit-tests": "jest --ci",
-    "prepack": "oclif-dev manifest && oclif-dev readme",
+    "prepack": "oclif manifest && oclif readme",
     "postpack": "rm -f oclif.manifest.json",
-    "version": "oclif-dev readme && git add README.md",
+    "version": "oclif readme && git add README.md",
     "e2e": "jest --collectCoverage=false --testRegex './e2e/e2e.js'"
   },
   "jest": {
