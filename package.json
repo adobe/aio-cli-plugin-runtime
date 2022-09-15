@@ -60,6 +60,7 @@
   "oclif": {
     "commands": "./src/commands",
     "bin": "aio",
+    "topicSeparator": " ",
     "repositoryPrefix": "<%- repo %>/blob/<%- version %>/<%- commandPath %>"
   },
   "repository": "adobe/aio-cli-plugin-runtime",
