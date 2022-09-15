@@ -42,7 +42,7 @@
     "jest": "^27.5.0",
     "jest-junit": "^13.0.0",
     "jest-plugin-fs": "^2.9.0",
-    "oclif": "^3.0.1",
+    "oclif": "^3.2.0",
     "stdout-stderr": "^0.1.9"
   },
   "engines": {
@@ -60,6 +60,7 @@
   "oclif": {
     "commands": "./src/commands",
     "bin": "aio",
+    "topicSeparator": " ",
     "repositoryPrefix": "<%- repo %>/blob/<%- version %>/<%- commandPath %>"
   },
   "repository": "adobe/aio-cli-plugin-runtime",
@@ -68,7 +69,7 @@
     "posttest": "eslint src test e2e",
     "test": "npm run unit-tests",
     "unit-tests": "jest --ci",
-    "prepack": "oclif manifest && oclif readme",
+    "prepack": "oclif manifest && oclif readme --no-aliases",
     "postpack": "rm -f oclif.manifest.json",
     "version": "oclif readme && git add README.md",
     "e2e": "jest --collectCoverage=false --testRegex './e2e/e2e.js'"
