@@ -111,7 +111,7 @@ ActionList.flags = {
   // example usage:  aio runtime:action:list --limit 10 --skip 2
   limit: Flags.integer({
     char: 'l',
-    description: `only return LIMIT number of actions (min: ${ActionList.limits.min} max: ${ActionList.limits.max})`,
+    description: `only return LIMIT number of actions (min: ${ActionList.limits.min}, max: ${ActionList.limits.max})`,
     min: ActionList.limits.min,
     max: ActionList.limits.max
   }),
