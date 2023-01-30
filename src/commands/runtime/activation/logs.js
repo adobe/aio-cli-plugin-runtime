@@ -92,6 +92,11 @@ ActivationLogs.args = [
   }
 ]
 
+ActivationLogs.limits = {
+  min: 0,
+  max: 50
+}
+
 ActivationLogs.flags = {
   ...RuntimeBaseCommand.flags,
   action: Flags.string({
@@ -124,8 +129,10 @@ ActivationLogs.flags = {
     default: false
   }),
   limit: Flags.integer({
-    description: 'return logs only from last LIMIT number of activations',
-    exclusive: ['last']
+    description: `return logs only from last LIMIT number of activations (min: ${ActivationLogs.limits.min}, max: ${ActivationLogs.limits.max})`,
+    exclusive: ['last'],
+    min: ActivationLogs.limits.min,
+    max: ActivationLogs.limits.max
   }),
   tail: Flags.boolean({
     description: 'Fetch logs continuously',

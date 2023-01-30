@@ -86,13 +86,20 @@ class PackageList extends RuntimeBaseCommand {
   }
 }
 
+PackageList.limits = {
+  min: 0,
+  max: 50
+}
+
 PackageList.flags = {
   ...RuntimeBaseCommand.flags,
   // example usage:  aio runtime:package:list --limit 10 --skip 2
   // aio runtime:package:list --count true OR  aio runtime:package:list --count yes
   limit: Flags.integer({
     char: 'l',
-    description: 'only return LIMIT number of packages'
+    description: `only return LIMIT number of packages (min: ${PackageList.limits.min}, max: ${PackageList.limits.max})`,
+    min: PackageList.limits.min,
+    max: PackageList.limits.max
   }),
   skip: Flags.integer({
     char: 's',

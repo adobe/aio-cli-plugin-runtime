@@ -93,11 +93,18 @@ class TriggerList extends RuntimeBaseCommand {
   }
 }
 
+TriggerList.limits = {
+  min: 0,
+  max: 50
+}
+
 TriggerList.flags = {
   ...RuntimeBaseCommand.flags,
   limit: Flags.integer({
     char: 'l',
-    description: 'only return LIMIT number of triggers',
+    description: `only return LIMIT number of triggers (min: ${TriggerList.limits.min}, max: ${TriggerList.limits.max})`,
+    min: TriggerList.limits.min,
+    max: TriggerList.limits.max,
     default: 30
   }),
   skip: Flags.integer({
