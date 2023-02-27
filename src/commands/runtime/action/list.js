@@ -101,12 +101,19 @@ ActionList.args = [
   }
 ]
 
+ActionList.limits = {
+  min: 0,
+  max: 50
+}
+
 ActionList.flags = {
   ...RuntimeBaseCommand.flags,
   // example usage:  aio runtime:action:list --limit 10 --skip 2
   limit: Flags.integer({
     char: 'l',
-    description: 'only return LIMIT number of actions'
+    description: `only return LIMIT number of actions (min: ${ActionList.limits.min}, max: ${ActionList.limits.max})`,
+    min: ActionList.limits.min,
+    max: ActionList.limits.max
   }),
   skip: Flags.integer({
     char: 's',

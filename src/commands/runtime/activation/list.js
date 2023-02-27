@@ -205,6 +205,7 @@ ActivationList.args = [
 ]
 
 ActivationList.limits = {
+  min: 0,
   max: 50
 }
 
@@ -213,8 +214,8 @@ ActivationList.flags = {
   // example usage:  aio runtime:activation:list --limit 10 --skip 2
   limit: Flags.integer({
     char: 'l',
-    description: `only return LIMIT number of activations (Max: ${ActivationList.limits.max})`,
-    min: 0,
+    description: `only return LIMIT number of activations (min: ${ActivationList.limits.min}, max: ${ActivationList.limits.max})`,
+    min: ActivationList.limits.min,
     max: ActivationList.limits.max
   }),
   skip: Flags.integer({
