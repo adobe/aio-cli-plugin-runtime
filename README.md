@@ -342,7 +342,7 @@ Creates an Action
 
 ```
 USAGE
-  $ aio rt action create [ACTIONNAME] [ACTIONPATH] [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost
+  $ aio rt action create ACTIONNAME [ACTIONPATH] [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost
     <value>] [-u <value>] [-i] [--debug <value>] [-v] [--version] [--help] [-p <value>] [--copy <value>] [-e <value>]
     [--web-secure <value> --web true|yes|false|no|raw] [-P <value>] [-E <value>] [-t <value>] [-m <value>] [-l <value>]
     [--kind <value>] [-a <value>] [-A <value>] [--sequence <value>] [--docker <value>] [--main <value>] [--binary]
@@ -355,10 +355,11 @@ FLAGS
   -a, --annotation=<value>...    annotation values in KEY VALUE format
   -e, --env=<value>...           environment values in KEY VALUE format
   -i, --insecure                 bypass certificate check
-  -l, --logsize=<value>          the maximum log size LIMIT in MB for the action (default 10)
-  -m, --memory=<value>           the maximum memory LIMIT in MB for the action (default 256)
+  -l, --logsize=<value>          the maximum log size LIMIT in MB for the action (default 10, min: 0, max: 10)
+  -m, --memory=<value>           the maximum memory LIMIT in MB for the action (default 256, min: 128, max: 4096)
   -p, --param=<value>...         parameter values in KEY VALUE format
-  -t, --timeout=<value>          the timeout LIMIT in milliseconds after which the action is terminated (default 60000)
+  -t, --timeout=<value>          the timeout LIMIT in milliseconds after which the action is terminated (default 60000,
+                                 min: 100, max: 3600000)
   -u, --auth=<value>             whisk auth
   -v, --verbose                  Verbose output
   --apihost=<value>              whisk API host
@@ -393,7 +394,7 @@ Deletes an Action
 
 ```
 USAGE
-  $ aio rt action del [ACTIONNAME] [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
+  $ aio rt action del ACTIONNAME [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
     <value>] [-i] [--debug <value>] [-v] [--version] [--help] [--json]
 
 FLAGS
@@ -424,7 +425,7 @@ Deletes an Action
 
 ```
 USAGE
-  $ aio rt action delete [ACTIONNAME] [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
+  $ aio rt action delete ACTIONNAME [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
     <value>] [-i] [--debug <value>] [-v] [--version] [--help] [--json]
 
 FLAGS
@@ -455,7 +456,7 @@ Retrieves an Action
 
 ```
 USAGE
-  $ aio rt action get [ACTIONNAME] [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
+  $ aio rt action get ACTIONNAME [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
     <value>] [-i] [--debug <value>] [-v] [--version] [--help] [-r] [-c] [--save] [--save-as <value>]
 
 FLAGS
@@ -487,7 +488,7 @@ Invokes an Action
 
 ```
 USAGE
-  $ aio rt action invoke [ACTIONNAME] [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
+  $ aio rt action invoke ACTIONNAME [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
     <value>] [-i] [--debug <value>] [-v] [--version] [--help] [-p <value>] [-P <value>] [-b] [-r]
 
 FLAGS
@@ -525,7 +526,7 @@ USAGE
 FLAGS
   -c, --count           show only the total number of actions
   -i, --insecure        bypass certificate check
-  -l, --limit=<value>   only return LIMIT number of actions
+  -l, --limit=<value>   only return LIMIT number of actions (min: 0, max: 50)
   -n, --name            sort results by name
   -s, --skip=<value>    exclude the first SKIP number of actions from the result
   -u, --auth=<value>    whisk auth
@@ -565,7 +566,7 @@ USAGE
 FLAGS
   -c, --count           show only the total number of actions
   -i, --insecure        bypass certificate check
-  -l, --limit=<value>   only return LIMIT number of actions
+  -l, --limit=<value>   only return LIMIT number of actions (min: 0, max: 50)
   -n, --name            sort results by name
   -s, --skip=<value>    exclude the first SKIP number of actions from the result
   -u, --auth=<value>    whisk auth
@@ -599,7 +600,7 @@ Updates an Action
 
 ```
 USAGE
-  $ aio rt action update [ACTIONNAME] [ACTIONPATH] [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost
+  $ aio rt action update ACTIONNAME [ACTIONPATH] [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost
     <value>] [-u <value>] [-i] [--debug <value>] [-v] [--version] [--help] [-p <value>] [--copy <value>] [-e <value>]
     [--web-secure <value> --web true|yes|false|no|raw] [-P <value>] [-E <value>] [-t <value>] [-m <value>] [-l <value>]
     [--kind <value>] [-a <value>] [-A <value>] [--sequence <value>] [--docker <value>] [--main <value>] [--binary]
@@ -612,10 +613,11 @@ FLAGS
   -a, --annotation=<value>...    annotation values in KEY VALUE format
   -e, --env=<value>...           environment values in KEY VALUE format
   -i, --insecure                 bypass certificate check
-  -l, --logsize=<value>          the maximum log size LIMIT in MB for the action (default 10)
-  -m, --memory=<value>           the maximum memory LIMIT in MB for the action (default 256)
+  -l, --logsize=<value>          the maximum log size LIMIT in MB for the action (default 10, min: 0, max: 10)
+  -m, --memory=<value>           the maximum memory LIMIT in MB for the action (default 256, min: 128, max: 4096)
   -p, --param=<value>...         parameter values in KEY VALUE format
-  -t, --timeout=<value>          the timeout LIMIT in milliseconds after which the action is terminated (default 60000)
+  -t, --timeout=<value>          the timeout LIMIT in milliseconds after which the action is terminated (default 60000,
+                                 min: 100, max: 3600000)
   -u, --auth=<value>             whisk auth
   -v, --verbose                  Verbose output
   --apihost=<value>              whisk API host
@@ -656,7 +658,7 @@ USAGE
 FLAGS
   -c, --count           show only the total number of actions
   -i, --insecure        bypass certificate check
-  -l, --limit=<value>   only return LIMIT number of actions
+  -l, --limit=<value>   only return LIMIT number of actions (min: 0, max: 50)
   -n, --name            sort results by name
   -s, --skip=<value>    exclude the first SKIP number of actions from the result
   -u, --auth=<value>    whisk auth
@@ -696,7 +698,7 @@ USAGE
 FLAGS
   -c, --count           show only the total number of actions
   -i, --insecure        bypass certificate check
-  -l, --limit=<value>   only return LIMIT number of actions
+  -l, --limit=<value>   only return LIMIT number of actions (min: 0, max: 50)
   -n, --name            sort results by name
   -s, --skip=<value>    exclude the first SKIP number of actions from the result
   -u, --auth=<value>    whisk auth
@@ -796,7 +798,7 @@ FLAGS
   -c, --count           show only the total number of activations
   -f, --full            include full activation description
   -i, --insecure        bypass certificate check
-  -l, --limit=<value>   only return LIMIT number of activations
+  -l, --limit=<value>   only return LIMIT number of activations (min: 0, max: 50)
   -s, --skip=<value>    exclude the first SKIP number of activations from the result
   -u, --auth=<value>    whisk auth
   -v, --verbose         Verbose output
@@ -855,7 +857,7 @@ FLAGS
   --debug=<value>        Debug level output
   --help                 Show help
   --key=<value>          client key
-  --limit=<value>        return logs only from last LIMIT number of activations
+  --limit=<value>        return logs only from last LIMIT number of activations (min: 0, max: 50)
   --version              Show version
 
 DESCRIPTION
@@ -900,7 +902,7 @@ FLAGS
   --debug=<value>        Debug level output
   --help                 Show help
   --key=<value>          client key
-  --limit=<value>        return logs only from last LIMIT number of activations
+  --limit=<value>        return logs only from last LIMIT number of activations (min: 0, max: 50)
   --version              Show version
 
 DESCRIPTION
@@ -930,7 +932,7 @@ FLAGS
   -c, --count           show only the total number of activations
   -f, --full            include full activation description
   -i, --insecure        bypass certificate check
-  -l, --limit=<value>   only return LIMIT number of activations
+  -l, --limit=<value>   only return LIMIT number of activations (min: 0, max: 50)
   -s, --skip=<value>    exclude the first SKIP number of activations from the result
   -u, --auth=<value>    whisk auth
   -v, --verbose         Verbose output
@@ -1003,7 +1005,7 @@ FLAGS
   -c, --count           show only the total number of activations
   -f, --full            include full activation description
   -i, --insecure        bypass certificate check
-  -l, --limit=<value>   only return LIMIT number of activations
+  -l, --limit=<value>   only return LIMIT number of activations (min: 0, max: 50)
   -s, --skip=<value>    exclude the first SKIP number of activations from the result
   -u, --auth=<value>    whisk auth
   -v, --verbose         Verbose output
@@ -1047,7 +1049,7 @@ FLAGS
   -c, --count           show only the total number of activations
   -f, --full            include full activation description
   -i, --insecure        bypass certificate check
-  -l, --limit=<value>   only return LIMIT number of activations
+  -l, --limit=<value>   only return LIMIT number of activations (min: 0, max: 50)
   -s, --skip=<value>    exclude the first SKIP number of activations from the result
   -u, --auth=<value>    whisk auth
   -v, --verbose         Verbose output
@@ -1152,7 +1154,7 @@ delete an API
 
 ```
 USAGE
-  $ aio rt api delete [BASEPATHORAPINAME] [RELPATH] [APIVERB] [--cert] [--key] [--apiversion] [--apihost] [-u] [-i]
+  $ aio rt api delete BASEPATHORAPINAME [RELPATH] [APIVERB] [--cert] [--key] [--apiversion] [--apihost] [-u] [-i]
     [--debug <value>] [-v] [--version] [--help]
 
 ARGUMENTS
@@ -1187,7 +1189,7 @@ get API details
 
 ```
 USAGE
-  $ aio rt api get [BASEPATHORAPINAME] [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>]
+  $ aio rt api get BASEPATHORAPINAME [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>]
     [-v] [--version] [--help]
 
 ARGUMENTS
@@ -1578,7 +1580,7 @@ FLAGS
   --debug=<value>        Debug level output
   --help                 Show help
   --key=<value>          client key
-  --limit=<value>        return logs only from last LIMIT number of activations
+  --limit=<value>        return logs only from last LIMIT number of activations (min: 0, max: 50)
   --version              Show version
 
 DESCRIPTION
@@ -1623,7 +1625,7 @@ FLAGS
   --debug=<value>        Debug level output
   --help                 Show help
   --key=<value>          client key
-  --limit=<value>        return logs only from last LIMIT number of activations
+  --limit=<value>        return logs only from last LIMIT number of activations (min: 0, max: 50)
   --version              Show version
 
 DESCRIPTION
@@ -2890,7 +2892,7 @@ Bind parameters to a package
 
 ```
 USAGE
-  $ aio rt package bind [PACKAGENAME] [BINDPACKAGENAME] [--cert <value>] [--key <value>] [--apiversion <value>]
+  $ aio rt package bind PACKAGENAME BINDPACKAGENAME [--cert <value>] [--key <value>] [--apiversion <value>]
     [--apihost <value>] [-u <value>] [-i] [--debug <value>] [-v] [--version] [--help] [-p <value>] [-P <value>] [-a
     <value>] [-A <value>] [--json]
 
@@ -2926,7 +2928,7 @@ Creates a Package
 
 ```
 USAGE
-  $ aio rt package create [PACKAGENAME] [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
+  $ aio rt package create PACKAGENAME [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
     <value>] [-i] [--debug <value>] [-v] [--version] [--help] [-p <value>] [-P <value>] [--shared true|yes|false|no] [-a
     <value>] [-A <value>] [--json]
 
@@ -2964,7 +2966,7 @@ Deletes a Package
 
 ```
 USAGE
-  $ aio rt package delete [PACKAGENAME] [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
+  $ aio rt package delete PACKAGENAME [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
     <value>] [-i] [--debug <value>] [-v] [--version] [--help] [--json] [-r]
 
 FLAGS
@@ -2996,7 +2998,7 @@ Retrieves a Package
 
 ```
 USAGE
-  $ aio rt package get [PACKAGENAME] [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
+  $ aio rt package get PACKAGENAME [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
     <value>] [-i] [--debug <value>] [-v] [--version] [--help]
 
 FLAGS
@@ -3032,7 +3034,7 @@ USAGE
 FLAGS
   -c, --count           show only the total number of packages
   -i, --insecure        bypass certificate check
-  -l, --limit=<value>   only return LIMIT number of packages
+  -l, --limit=<value>   only return LIMIT number of packages (min: 0, max: 50)
   -n, --name            sort results by name
   -s, --skip=<value>    exclude the first SKIP number of packages from the result
   -u, --auth=<value>    whisk auth
@@ -3072,7 +3074,7 @@ USAGE
 FLAGS
   -c, --count           show only the total number of packages
   -i, --insecure        bypass certificate check
-  -l, --limit=<value>   only return LIMIT number of packages
+  -l, --limit=<value>   only return LIMIT number of packages (min: 0, max: 50)
   -n, --name            sort results by name
   -s, --skip=<value>    exclude the first SKIP number of packages from the result
   -u, --auth=<value>    whisk auth
@@ -3106,7 +3108,7 @@ Updates a Package
 
 ```
 USAGE
-  $ aio rt package update [PACKAGENAME] [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
+  $ aio rt package update PACKAGENAME [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
     <value>] [-i] [--debug <value>] [-v] [--version] [--help] [-p <value>] [-P <value>] [--shared true|yes|false|no] [-a
     <value>] [-A <value>] [--json]
 
@@ -3174,7 +3176,7 @@ Bind parameters to a package
 
 ```
 USAGE
-  $ aio rt pkg bind [PACKAGENAME] [BINDPACKAGENAME] [--cert <value>] [--key <value>] [--apiversion <value>]
+  $ aio rt pkg bind PACKAGENAME BINDPACKAGENAME [--cert <value>] [--key <value>] [--apiversion <value>]
     [--apihost <value>] [-u <value>] [-i] [--debug <value>] [-v] [--version] [--help] [-p <value>] [-P <value>] [-a
     <value>] [-A <value>] [--json]
 
@@ -3210,7 +3212,7 @@ Creates a Package
 
 ```
 USAGE
-  $ aio rt pkg create [PACKAGENAME] [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
+  $ aio rt pkg create PACKAGENAME [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
     <value>] [-i] [--debug <value>] [-v] [--version] [--help] [-p <value>] [-P <value>] [--shared true|yes|false|no] [-a
     <value>] [-A <value>] [--json]
 
@@ -3248,7 +3250,7 @@ Deletes a Package
 
 ```
 USAGE
-  $ aio rt pkg delete [PACKAGENAME] [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
+  $ aio rt pkg delete PACKAGENAME [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
     <value>] [-i] [--debug <value>] [-v] [--version] [--help] [--json] [-r]
 
 FLAGS
@@ -3280,7 +3282,7 @@ Retrieves a Package
 
 ```
 USAGE
-  $ aio rt pkg get [PACKAGENAME] [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
+  $ aio rt pkg get PACKAGENAME [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
     <value>] [-i] [--debug <value>] [-v] [--version] [--help]
 
 FLAGS
@@ -3316,7 +3318,7 @@ USAGE
 FLAGS
   -c, --count           show only the total number of packages
   -i, --insecure        bypass certificate check
-  -l, --limit=<value>   only return LIMIT number of packages
+  -l, --limit=<value>   only return LIMIT number of packages (min: 0, max: 50)
   -n, --name            sort results by name
   -s, --skip=<value>    exclude the first SKIP number of packages from the result
   -u, --auth=<value>    whisk auth
@@ -3356,7 +3358,7 @@ USAGE
 FLAGS
   -c, --count           show only the total number of packages
   -i, --insecure        bypass certificate check
-  -l, --limit=<value>   only return LIMIT number of packages
+  -l, --limit=<value>   only return LIMIT number of packages (min: 0, max: 50)
   -n, --name            sort results by name
   -s, --skip=<value>    exclude the first SKIP number of packages from the result
   -u, --auth=<value>    whisk auth
@@ -3390,7 +3392,7 @@ Updates a Package
 
 ```
 USAGE
-  $ aio rt pkg update [PACKAGENAME] [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
+  $ aio rt pkg update PACKAGENAME [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
     <value>] [-i] [--debug <value>] [-v] [--version] [--help] [-p <value>] [-P <value>] [--shared true|yes|false|no] [-a
     <value>] [-A <value>] [--json]
 
@@ -3722,7 +3724,7 @@ delete an API
 
 ```
 USAGE
-  $ aio rt route delete [BASEPATHORAPINAME] [RELPATH] [APIVERB] [--cert] [--key] [--apiversion] [--apihost] [-u] [-i]
+  $ aio rt route delete BASEPATHORAPINAME [RELPATH] [APIVERB] [--cert] [--key] [--apiversion] [--apihost] [-u] [-i]
     [--debug <value>] [-v] [--version] [--help]
 
 ARGUMENTS
@@ -3757,7 +3759,7 @@ get API details
 
 ```
 USAGE
-  $ aio rt route get [BASEPATHORAPINAME] [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>]
+  $ aio rt route get BASEPATHORAPINAME [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>]
     [-v] [--version] [--help]
 
 ARGUMENTS
@@ -3902,8 +3904,8 @@ Create a Rule
 
 ```
 USAGE
-  $ aio rt rule create [NAME] [TRIGGER] [ACTION] [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug
-    <value>] [-v] [--version] [--help] [--json]
+  $ aio rt rule create NAME TRIGGER ACTION [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>]
+    [-v] [--version] [--help] [--json]
 
 ARGUMENTS
   NAME     Name of the rule
@@ -3936,8 +3938,8 @@ Delete a Rule
 
 ```
 USAGE
-  $ aio rt rule delete [NAME] [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>] [-v]
-    [--version] [--help] [--json]
+  $ aio rt rule delete NAME [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>] [-v] [--version]
+    [--help] [--json]
 
 ARGUMENTS
   NAME  Name of the rule
@@ -3968,8 +3970,8 @@ Disable a Rule
 
 ```
 USAGE
-  $ aio rt rule disable [NAME] [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>] [-v]
-    [--version] [--help]
+  $ aio rt rule disable NAME [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>] [-v] [--version]
+    [--help]
 
 ARGUMENTS
   NAME  Name of the rule
@@ -3999,8 +4001,8 @@ Enable a Rule
 
 ```
 USAGE
-  $ aio rt rule enable [NAME] [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>] [-v]
-    [--version] [--help]
+  $ aio rt rule enable NAME [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>] [-v] [--version]
+    [--help]
 
 ARGUMENTS
   NAME  Name of the rule
@@ -4030,8 +4032,8 @@ Retrieves a Rule
 
 ```
 USAGE
-  $ aio rt rule get [NAME] [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>] [-v]
-    [--version] [--help]
+  $ aio rt rule get NAME [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>] [-v] [--version]
+    [--help]
 
 ARGUMENTS
   NAME  Name of the rule
@@ -4067,7 +4069,7 @@ USAGE
 FLAGS
   -c, --count          show only the total number of rules
   -i, --insecure       bypass certificate check
-  -l, --limit=<value>  Limit number of rules returned
+  -l, --limit=<value>  Limit number of rules returned (min: 0, max: 50)
   -n, --name           sort results by name
   -s, --skip=<value>   Skip number of rules returned
   -u, --auth           whisk auth
@@ -4103,7 +4105,7 @@ USAGE
 FLAGS
   -c, --count          show only the total number of rules
   -i, --insecure       bypass certificate check
-  -l, --limit=<value>  Limit number of rules returned
+  -l, --limit=<value>  Limit number of rules returned (min: 0, max: 50)
   -n, --name           sort results by name
   -s, --skip=<value>   Skip number of rules returned
   -u, --auth           whisk auth
@@ -4133,8 +4135,8 @@ Gets the status of a rule
 
 ```
 USAGE
-  $ aio rt rule status [NAME] [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>] [-v]
-    [--version] [--help]
+  $ aio rt rule status NAME [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>] [-v] [--version]
+    [--help]
 
 ARGUMENTS
   NAME  Name of the rule
@@ -4164,8 +4166,8 @@ Update a Rule
 
 ```
 USAGE
-  $ aio rt rule update [NAME] [TRIGGER] [ACTION] [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug
-    <value>] [-v] [--version] [--help] [--json]
+  $ aio rt rule update NAME TRIGGER ACTION [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>]
+    [-v] [--version] [--help] [--json]
 
 ARGUMENTS
   NAME     Name of the rule
@@ -4226,7 +4228,7 @@ Create a trigger for Adobe I/O Runtime
 
 ```
 USAGE
-  $ aio rt trigger create [TRIGGERNAME] [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>] [-v]
+  $ aio rt trigger create TRIGGERNAME [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>] [-v]
     [--version] [--help] [-p <value>] [-P <value>] [-a <value>] [-A <value>] [-f <value>]
 
 ARGUMENTS
@@ -4262,7 +4264,7 @@ Delete a trigger for Adobe I/O Runtime
 
 ```
 USAGE
-  $ aio rt trigger delete [TRIGGERPATH] [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>] [-v]
+  $ aio rt trigger delete TRIGGERPATH [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>] [-v]
     [--version] [--help]
 
 ARGUMENTS
@@ -4293,7 +4295,7 @@ Fire a trigger for Adobe I/O Runtime
 
 ```
 USAGE
-  $ aio rt trigger fire [TRIGGERNAME] [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>] [-v]
+  $ aio rt trigger fire TRIGGERNAME [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>] [-v]
     [--version] [--help] [-p <value>] [-P <value>]
 
 ARGUMENTS
@@ -4326,7 +4328,7 @@ Get a trigger for Adobe I/O Runtime
 
 ```
 USAGE
-  $ aio rt trigger get [TRIGGERPATH] [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>] [-v]
+  $ aio rt trigger get TRIGGERPATH [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>] [-v]
     [--version] [--help]
 
 ARGUMENTS
@@ -4363,7 +4365,7 @@ USAGE
 FLAGS
   -c, --count          show only the total number of triggers
   -i, --insecure       bypass certificate check
-  -l, --limit=<value>  [default: 30] only return LIMIT number of triggers
+  -l, --limit=<value>  [default: 30] only return LIMIT number of triggers (min: 0, max: 50)
   -n, --name           sort results by name
   -s, --skip=<value>   exclude the first SKIP number of triggers from the result
   -u, --auth           whisk auth
@@ -4399,7 +4401,7 @@ USAGE
 FLAGS
   -c, --count          show only the total number of triggers
   -i, --insecure       bypass certificate check
-  -l, --limit=<value>  [default: 30] only return LIMIT number of triggers
+  -l, --limit=<value>  [default: 30] only return LIMIT number of triggers (min: 0, max: 50)
   -n, --name           sort results by name
   -s, --skip=<value>   exclude the first SKIP number of triggers from the result
   -u, --auth           whisk auth
@@ -4429,7 +4431,7 @@ Update or create a trigger for Adobe I/O Runtime
 
 ```
 USAGE
-  $ aio rt trigger update [TRIGGERNAME] [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>] [-v]
+  $ aio rt trigger update TRIGGERNAME [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>] [-v]
     [--version] [--help] [-p <value>] [-P <value>] [-a <value>] [-A <value>]
 
 ARGUMENTS
@@ -4486,7 +4488,7 @@ ALIASES
   $ aio rt
 ```
 
-_See code: [src/commands/runtime/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/6.0.1/src/commands/runtime/index.js)_
+_See code: [src/commands/runtime/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/6.0.2/src/commands/runtime/index.js)_
 
 ## `aio runtime action`
 
@@ -4522,7 +4524,7 @@ Creates an Action
 
 ```
 USAGE
-  $ aio runtime action create [ACTIONNAME] [ACTIONPATH] [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost
+  $ aio runtime action create ACTIONNAME [ACTIONPATH] [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost
     <value>] [-u <value>] [-i] [--debug <value>] [-v] [--version] [--help] [-p <value>] [--copy <value>] [-e <value>]
     [--web-secure <value> --web true|yes|false|no|raw] [-P <value>] [-E <value>] [-t <value>] [-m <value>] [-l <value>]
     [--kind <value>] [-a <value>] [-A <value>] [--sequence <value>] [--docker <value>] [--main <value>] [--binary]
@@ -4535,10 +4537,11 @@ FLAGS
   -a, --annotation=<value>...    annotation values in KEY VALUE format
   -e, --env=<value>...           environment values in KEY VALUE format
   -i, --insecure                 bypass certificate check
-  -l, --logsize=<value>          the maximum log size LIMIT in MB for the action (default 10)
-  -m, --memory=<value>           the maximum memory LIMIT in MB for the action (default 256)
+  -l, --logsize=<value>          the maximum log size LIMIT in MB for the action (default 10, min: 0, max: 10)
+  -m, --memory=<value>           the maximum memory LIMIT in MB for the action (default 256, min: 128, max: 4096)
   -p, --param=<value>...         parameter values in KEY VALUE format
-  -t, --timeout=<value>          the timeout LIMIT in milliseconds after which the action is terminated (default 60000)
+  -t, --timeout=<value>          the timeout LIMIT in milliseconds after which the action is terminated (default 60000,
+                                 min: 100, max: 3600000)
   -u, --auth=<value>             whisk auth
   -v, --verbose                  Verbose output
   --apihost=<value>              whisk API host
@@ -4573,7 +4576,7 @@ Deletes an Action
 
 ```
 USAGE
-  $ aio runtime action del [ACTIONNAME] [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
+  $ aio runtime action del ACTIONNAME [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
     <value>] [-i] [--debug <value>] [-v] [--version] [--help] [--json]
 
 FLAGS
@@ -4604,7 +4607,7 @@ Deletes an Action
 
 ```
 USAGE
-  $ aio runtime action delete [ACTIONNAME] [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
+  $ aio runtime action delete ACTIONNAME [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
     <value>] [-i] [--debug <value>] [-v] [--version] [--help] [--json]
 
 FLAGS
@@ -4635,7 +4638,7 @@ Retrieves an Action
 
 ```
 USAGE
-  $ aio runtime action get [ACTIONNAME] [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
+  $ aio runtime action get ACTIONNAME [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
     <value>] [-i] [--debug <value>] [-v] [--version] [--help] [-r] [-c] [--save] [--save-as <value>]
 
 FLAGS
@@ -4667,7 +4670,7 @@ Invokes an Action
 
 ```
 USAGE
-  $ aio runtime action invoke [ACTIONNAME] [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
+  $ aio runtime action invoke ACTIONNAME [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
     <value>] [-i] [--debug <value>] [-v] [--version] [--help] [-p <value>] [-P <value>] [-b] [-r]
 
 FLAGS
@@ -4705,7 +4708,7 @@ USAGE
 FLAGS
   -c, --count           show only the total number of actions
   -i, --insecure        bypass certificate check
-  -l, --limit=<value>   only return LIMIT number of actions
+  -l, --limit=<value>   only return LIMIT number of actions (min: 0, max: 50)
   -n, --name            sort results by name
   -s, --skip=<value>    exclude the first SKIP number of actions from the result
   -u, --auth=<value>    whisk auth
@@ -4745,7 +4748,7 @@ USAGE
 FLAGS
   -c, --count           show only the total number of actions
   -i, --insecure        bypass certificate check
-  -l, --limit=<value>   only return LIMIT number of actions
+  -l, --limit=<value>   only return LIMIT number of actions (min: 0, max: 50)
   -n, --name            sort results by name
   -s, --skip=<value>    exclude the first SKIP number of actions from the result
   -u, --auth=<value>    whisk auth
@@ -4779,7 +4782,7 @@ Updates an Action
 
 ```
 USAGE
-  $ aio runtime action update [ACTIONNAME] [ACTIONPATH] [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost
+  $ aio runtime action update ACTIONNAME [ACTIONPATH] [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost
     <value>] [-u <value>] [-i] [--debug <value>] [-v] [--version] [--help] [-p <value>] [--copy <value>] [-e <value>]
     [--web-secure <value> --web true|yes|false|no|raw] [-P <value>] [-E <value>] [-t <value>] [-m <value>] [-l <value>]
     [--kind <value>] [-a <value>] [-A <value>] [--sequence <value>] [--docker <value>] [--main <value>] [--binary]
@@ -4792,10 +4795,11 @@ FLAGS
   -a, --annotation=<value>...    annotation values in KEY VALUE format
   -e, --env=<value>...           environment values in KEY VALUE format
   -i, --insecure                 bypass certificate check
-  -l, --logsize=<value>          the maximum log size LIMIT in MB for the action (default 10)
-  -m, --memory=<value>           the maximum memory LIMIT in MB for the action (default 256)
+  -l, --logsize=<value>          the maximum log size LIMIT in MB for the action (default 10, min: 0, max: 10)
+  -m, --memory=<value>           the maximum memory LIMIT in MB for the action (default 256, min: 128, max: 4096)
   -p, --param=<value>...         parameter values in KEY VALUE format
-  -t, --timeout=<value>          the timeout LIMIT in milliseconds after which the action is terminated (default 60000)
+  -t, --timeout=<value>          the timeout LIMIT in milliseconds after which the action is terminated (default 60000,
+                                 min: 100, max: 3600000)
   -u, --auth=<value>             whisk auth
   -v, --verbose                  Verbose output
   --apihost=<value>              whisk API host
@@ -4836,7 +4840,7 @@ USAGE
 FLAGS
   -c, --count           show only the total number of actions
   -i, --insecure        bypass certificate check
-  -l, --limit=<value>   only return LIMIT number of actions
+  -l, --limit=<value>   only return LIMIT number of actions (min: 0, max: 50)
   -n, --name            sort results by name
   -s, --skip=<value>    exclude the first SKIP number of actions from the result
   -u, --auth=<value>    whisk auth
@@ -4876,7 +4880,7 @@ USAGE
 FLAGS
   -c, --count           show only the total number of actions
   -i, --insecure        bypass certificate check
-  -l, --limit=<value>   only return LIMIT number of actions
+  -l, --limit=<value>   only return LIMIT number of actions (min: 0, max: 50)
   -n, --name            sort results by name
   -s, --skip=<value>    exclude the first SKIP number of actions from the result
   -u, --auth=<value>    whisk auth
@@ -4976,7 +4980,7 @@ FLAGS
   -c, --count           show only the total number of activations
   -f, --full            include full activation description
   -i, --insecure        bypass certificate check
-  -l, --limit=<value>   only return LIMIT number of activations
+  -l, --limit=<value>   only return LIMIT number of activations (min: 0, max: 50)
   -s, --skip=<value>    exclude the first SKIP number of activations from the result
   -u, --auth=<value>    whisk auth
   -v, --verbose         Verbose output
@@ -5035,7 +5039,7 @@ FLAGS
   --debug=<value>        Debug level output
   --help                 Show help
   --key=<value>          client key
-  --limit=<value>        return logs only from last LIMIT number of activations
+  --limit=<value>        return logs only from last LIMIT number of activations (min: 0, max: 50)
   --version              Show version
 
 DESCRIPTION
@@ -5080,7 +5084,7 @@ FLAGS
   --debug=<value>        Debug level output
   --help                 Show help
   --key=<value>          client key
-  --limit=<value>        return logs only from last LIMIT number of activations
+  --limit=<value>        return logs only from last LIMIT number of activations (min: 0, max: 50)
   --version              Show version
 
 DESCRIPTION
@@ -5110,7 +5114,7 @@ FLAGS
   -c, --count           show only the total number of activations
   -f, --full            include full activation description
   -i, --insecure        bypass certificate check
-  -l, --limit=<value>   only return LIMIT number of activations
+  -l, --limit=<value>   only return LIMIT number of activations (min: 0, max: 50)
   -s, --skip=<value>    exclude the first SKIP number of activations from the result
   -u, --auth=<value>    whisk auth
   -v, --verbose         Verbose output
@@ -5183,7 +5187,7 @@ FLAGS
   -c, --count           show only the total number of activations
   -f, --full            include full activation description
   -i, --insecure        bypass certificate check
-  -l, --limit=<value>   only return LIMIT number of activations
+  -l, --limit=<value>   only return LIMIT number of activations (min: 0, max: 50)
   -s, --skip=<value>    exclude the first SKIP number of activations from the result
   -u, --auth=<value>    whisk auth
   -v, --verbose         Verbose output
@@ -5227,7 +5231,7 @@ FLAGS
   -c, --count           show only the total number of activations
   -f, --full            include full activation description
   -i, --insecure        bypass certificate check
-  -l, --limit=<value>   only return LIMIT number of activations
+  -l, --limit=<value>   only return LIMIT number of activations (min: 0, max: 50)
   -s, --skip=<value>    exclude the first SKIP number of activations from the result
   -u, --auth=<value>    whisk auth
   -v, --verbose         Verbose output
@@ -5332,7 +5336,7 @@ delete an API
 
 ```
 USAGE
-  $ aio runtime api delete [BASEPATHORAPINAME] [RELPATH] [APIVERB] [--cert] [--key] [--apiversion] [--apihost] [-u] [-i]
+  $ aio runtime api delete BASEPATHORAPINAME [RELPATH] [APIVERB] [--cert] [--key] [--apiversion] [--apihost] [-u] [-i]
     [--debug <value>] [-v] [--version] [--help]
 
 ARGUMENTS
@@ -5367,7 +5371,7 @@ get API details
 
 ```
 USAGE
-  $ aio runtime api get [BASEPATHORAPINAME] [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>]
+  $ aio runtime api get BASEPATHORAPINAME [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>]
     [-v] [--version] [--help]
 
 ARGUMENTS
@@ -5723,7 +5727,7 @@ FLAGS
   --debug=<value>        Debug level output
   --help                 Show help
   --key=<value>          client key
-  --limit=<value>        return logs only from last LIMIT number of activations
+  --limit=<value>        return logs only from last LIMIT number of activations (min: 0, max: 50)
   --version              Show version
 
 DESCRIPTION
@@ -5768,7 +5772,7 @@ FLAGS
   --debug=<value>        Debug level output
   --help                 Show help
   --key=<value>          client key
-  --limit=<value>        return logs only from last LIMIT number of activations
+  --limit=<value>        return logs only from last LIMIT number of activations (min: 0, max: 50)
   --version              Show version
 
 DESCRIPTION
@@ -7070,7 +7074,7 @@ Bind parameters to a package
 
 ```
 USAGE
-  $ aio runtime package bind [PACKAGENAME] [BINDPACKAGENAME] [--cert <value>] [--key <value>] [--apiversion <value>]
+  $ aio runtime package bind PACKAGENAME BINDPACKAGENAME [--cert <value>] [--key <value>] [--apiversion <value>]
     [--apihost <value>] [-u <value>] [-i] [--debug <value>] [-v] [--version] [--help] [-p <value>] [-P <value>] [-a
     <value>] [-A <value>] [--json]
 
@@ -7106,7 +7110,7 @@ Creates a Package
 
 ```
 USAGE
-  $ aio runtime package create [PACKAGENAME] [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
+  $ aio runtime package create PACKAGENAME [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
     <value>] [-i] [--debug <value>] [-v] [--version] [--help] [-p <value>] [-P <value>] [--shared true|yes|false|no] [-a
     <value>] [-A <value>] [--json]
 
@@ -7144,7 +7148,7 @@ Deletes a Package
 
 ```
 USAGE
-  $ aio runtime package delete [PACKAGENAME] [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
+  $ aio runtime package delete PACKAGENAME [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
     <value>] [-i] [--debug <value>] [-v] [--version] [--help] [--json] [-r]
 
 FLAGS
@@ -7176,7 +7180,7 @@ Retrieves a Package
 
 ```
 USAGE
-  $ aio runtime package get [PACKAGENAME] [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
+  $ aio runtime package get PACKAGENAME [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
     <value>] [-i] [--debug <value>] [-v] [--version] [--help]
 
 FLAGS
@@ -7212,7 +7216,7 @@ USAGE
 FLAGS
   -c, --count           show only the total number of packages
   -i, --insecure        bypass certificate check
-  -l, --limit=<value>   only return LIMIT number of packages
+  -l, --limit=<value>   only return LIMIT number of packages (min: 0, max: 50)
   -n, --name            sort results by name
   -s, --skip=<value>    exclude the first SKIP number of packages from the result
   -u, --auth=<value>    whisk auth
@@ -7252,7 +7256,7 @@ USAGE
 FLAGS
   -c, --count           show only the total number of packages
   -i, --insecure        bypass certificate check
-  -l, --limit=<value>   only return LIMIT number of packages
+  -l, --limit=<value>   only return LIMIT number of packages (min: 0, max: 50)
   -n, --name            sort results by name
   -s, --skip=<value>    exclude the first SKIP number of packages from the result
   -u, --auth=<value>    whisk auth
@@ -7286,7 +7290,7 @@ Updates a Package
 
 ```
 USAGE
-  $ aio runtime package update [PACKAGENAME] [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
+  $ aio runtime package update PACKAGENAME [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
     <value>] [-i] [--debug <value>] [-v] [--version] [--help] [-p <value>] [-P <value>] [--shared true|yes|false|no] [-a
     <value>] [-A <value>] [--json]
 
@@ -7354,7 +7358,7 @@ Bind parameters to a package
 
 ```
 USAGE
-  $ aio runtime pkg bind [PACKAGENAME] [BINDPACKAGENAME] [--cert <value>] [--key <value>] [--apiversion <value>]
+  $ aio runtime pkg bind PACKAGENAME BINDPACKAGENAME [--cert <value>] [--key <value>] [--apiversion <value>]
     [--apihost <value>] [-u <value>] [-i] [--debug <value>] [-v] [--version] [--help] [-p <value>] [-P <value>] [-a
     <value>] [-A <value>] [--json]
 
@@ -7390,7 +7394,7 @@ Creates a Package
 
 ```
 USAGE
-  $ aio runtime pkg create [PACKAGENAME] [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
+  $ aio runtime pkg create PACKAGENAME [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
     <value>] [-i] [--debug <value>] [-v] [--version] [--help] [-p <value>] [-P <value>] [--shared true|yes|false|no] [-a
     <value>] [-A <value>] [--json]
 
@@ -7428,7 +7432,7 @@ Deletes a Package
 
 ```
 USAGE
-  $ aio runtime pkg delete [PACKAGENAME] [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
+  $ aio runtime pkg delete PACKAGENAME [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
     <value>] [-i] [--debug <value>] [-v] [--version] [--help] [--json] [-r]
 
 FLAGS
@@ -7460,7 +7464,7 @@ Retrieves a Package
 
 ```
 USAGE
-  $ aio runtime pkg get [PACKAGENAME] [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
+  $ aio runtime pkg get PACKAGENAME [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
     <value>] [-i] [--debug <value>] [-v] [--version] [--help]
 
 FLAGS
@@ -7496,7 +7500,7 @@ USAGE
 FLAGS
   -c, --count           show only the total number of packages
   -i, --insecure        bypass certificate check
-  -l, --limit=<value>   only return LIMIT number of packages
+  -l, --limit=<value>   only return LIMIT number of packages (min: 0, max: 50)
   -n, --name            sort results by name
   -s, --skip=<value>    exclude the first SKIP number of packages from the result
   -u, --auth=<value>    whisk auth
@@ -7536,7 +7540,7 @@ USAGE
 FLAGS
   -c, --count           show only the total number of packages
   -i, --insecure        bypass certificate check
-  -l, --limit=<value>   only return LIMIT number of packages
+  -l, --limit=<value>   only return LIMIT number of packages (min: 0, max: 50)
   -n, --name            sort results by name
   -s, --skip=<value>    exclude the first SKIP number of packages from the result
   -u, --auth=<value>    whisk auth
@@ -7570,7 +7574,7 @@ Updates a Package
 
 ```
 USAGE
-  $ aio runtime pkg update [PACKAGENAME] [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
+  $ aio runtime pkg update PACKAGENAME [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
     <value>] [-i] [--debug <value>] [-v] [--version] [--help] [-p <value>] [-P <value>] [--shared true|yes|false|no] [-a
     <value>] [-A <value>] [--json]
 
@@ -7931,7 +7935,7 @@ delete an API
 
 ```
 USAGE
-  $ aio runtime route delete [BASEPATHORAPINAME] [RELPATH] [APIVERB] [--cert] [--key] [--apiversion] [--apihost] [-u] [-i]
+  $ aio runtime route delete BASEPATHORAPINAME [RELPATH] [APIVERB] [--cert] [--key] [--apiversion] [--apihost] [-u] [-i]
     [--debug <value>] [-v] [--version] [--help]
 
 ARGUMENTS
@@ -7966,7 +7970,7 @@ get API details
 
 ```
 USAGE
-  $ aio runtime route get [BASEPATHORAPINAME] [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>]
+  $ aio runtime route get BASEPATHORAPINAME [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>]
     [-v] [--version] [--help]
 
 ARGUMENTS
@@ -8111,8 +8115,8 @@ Create a Rule
 
 ```
 USAGE
-  $ aio runtime rule create [NAME] [TRIGGER] [ACTION] [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug
-    <value>] [-v] [--version] [--help] [--json]
+  $ aio runtime rule create NAME TRIGGER ACTION [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>]
+    [-v] [--version] [--help] [--json]
 
 ARGUMENTS
   NAME     Name of the rule
@@ -8145,8 +8149,8 @@ Delete a Rule
 
 ```
 USAGE
-  $ aio runtime rule delete [NAME] [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>] [-v]
-    [--version] [--help] [--json]
+  $ aio runtime rule delete NAME [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>] [-v] [--version]
+    [--help] [--json]
 
 ARGUMENTS
   NAME  Name of the rule
@@ -8177,8 +8181,8 @@ Disable a Rule
 
 ```
 USAGE
-  $ aio runtime rule disable [NAME] [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>] [-v]
-    [--version] [--help]
+  $ aio runtime rule disable NAME [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>] [-v] [--version]
+    [--help]
 
 ARGUMENTS
   NAME  Name of the rule
@@ -8208,8 +8212,8 @@ Enable a Rule
 
 ```
 USAGE
-  $ aio runtime rule enable [NAME] [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>] [-v]
-    [--version] [--help]
+  $ aio runtime rule enable NAME [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>] [-v] [--version]
+    [--help]
 
 ARGUMENTS
   NAME  Name of the rule
@@ -8239,8 +8243,8 @@ Retrieves a Rule
 
 ```
 USAGE
-  $ aio runtime rule get [NAME] [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>] [-v]
-    [--version] [--help]
+  $ aio runtime rule get NAME [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>] [-v] [--version]
+    [--help]
 
 ARGUMENTS
   NAME  Name of the rule
@@ -8276,7 +8280,7 @@ USAGE
 FLAGS
   -c, --count          show only the total number of rules
   -i, --insecure       bypass certificate check
-  -l, --limit=<value>  Limit number of rules returned
+  -l, --limit=<value>  Limit number of rules returned (min: 0, max: 50)
   -n, --name           sort results by name
   -s, --skip=<value>   Skip number of rules returned
   -u, --auth           whisk auth
@@ -8312,7 +8316,7 @@ USAGE
 FLAGS
   -c, --count          show only the total number of rules
   -i, --insecure       bypass certificate check
-  -l, --limit=<value>  Limit number of rules returned
+  -l, --limit=<value>  Limit number of rules returned (min: 0, max: 50)
   -n, --name           sort results by name
   -s, --skip=<value>   Skip number of rules returned
   -u, --auth           whisk auth
@@ -8342,8 +8346,8 @@ Gets the status of a rule
 
 ```
 USAGE
-  $ aio runtime rule status [NAME] [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>] [-v]
-    [--version] [--help]
+  $ aio runtime rule status NAME [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>] [-v] [--version]
+    [--help]
 
 ARGUMENTS
   NAME  Name of the rule
@@ -8373,8 +8377,8 @@ Update a Rule
 
 ```
 USAGE
-  $ aio runtime rule update [NAME] [TRIGGER] [ACTION] [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug
-    <value>] [-v] [--version] [--help] [--json]
+  $ aio runtime rule update NAME TRIGGER ACTION [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>]
+    [-v] [--version] [--help] [--json]
 
 ARGUMENTS
   NAME     Name of the rule
@@ -8435,7 +8439,7 @@ Create a trigger for Adobe I/O Runtime
 
 ```
 USAGE
-  $ aio runtime trigger create [TRIGGERNAME] [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>] [-v]
+  $ aio runtime trigger create TRIGGERNAME [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>] [-v]
     [--version] [--help] [-p <value>] [-P <value>] [-a <value>] [-A <value>] [-f <value>]
 
 ARGUMENTS
@@ -8471,7 +8475,7 @@ Delete a trigger for Adobe I/O Runtime
 
 ```
 USAGE
-  $ aio runtime trigger delete [TRIGGERPATH] [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>] [-v]
+  $ aio runtime trigger delete TRIGGERPATH [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>] [-v]
     [--version] [--help]
 
 ARGUMENTS
@@ -8502,7 +8506,7 @@ Fire a trigger for Adobe I/O Runtime
 
 ```
 USAGE
-  $ aio runtime trigger fire [TRIGGERNAME] [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>] [-v]
+  $ aio runtime trigger fire TRIGGERNAME [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>] [-v]
     [--version] [--help] [-p <value>] [-P <value>]
 
 ARGUMENTS
@@ -8535,7 +8539,7 @@ Get a trigger for Adobe I/O Runtime
 
 ```
 USAGE
-  $ aio runtime trigger get [TRIGGERPATH] [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>] [-v]
+  $ aio runtime trigger get TRIGGERPATH [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>] [-v]
     [--version] [--help]
 
 ARGUMENTS
@@ -8572,7 +8576,7 @@ USAGE
 FLAGS
   -c, --count          show only the total number of triggers
   -i, --insecure       bypass certificate check
-  -l, --limit=<value>  [default: 30] only return LIMIT number of triggers
+  -l, --limit=<value>  [default: 30] only return LIMIT number of triggers (min: 0, max: 50)
   -n, --name           sort results by name
   -s, --skip=<value>   exclude the first SKIP number of triggers from the result
   -u, --auth           whisk auth
@@ -8608,7 +8612,7 @@ USAGE
 FLAGS
   -c, --count          show only the total number of triggers
   -i, --insecure       bypass certificate check
-  -l, --limit=<value>  [default: 30] only return LIMIT number of triggers
+  -l, --limit=<value>  [default: 30] only return LIMIT number of triggers (min: 0, max: 50)
   -n, --name           sort results by name
   -s, --skip=<value>   exclude the first SKIP number of triggers from the result
   -u, --auth           whisk auth
@@ -8638,7 +8642,7 @@ Update or create a trigger for Adobe I/O Runtime
 
 ```
 USAGE
-  $ aio runtime trigger update [TRIGGERNAME] [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>] [-v]
+  $ aio runtime trigger update TRIGGERNAME [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>] [-v]
     [--version] [--help] [-p <value>] [-P <value>] [-a <value>] [-A <value>]
 
 ARGUMENTS
