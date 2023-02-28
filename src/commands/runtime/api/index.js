@@ -16,15 +16,16 @@ const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 class IndexCommand extends RuntimeBaseCommand {
   async run () {
     const help = new Help(this.config)
-    await help.showHelp(['runtime:route', '--help'])
+    await help.showHelp(['runtime:api', '--help'])
   }
 }
 
-IndexCommand.description = 'Manage your routes'
+IndexCommand.description = 'Manage your api routes'
 
 IndexCommand.aliases = [
-  'runtime:api',
-  'rt:api'
+  'rt:api',
+  'runtime:route',
+  'rt:route'
 ]
 
 module.exports = IndexCommand

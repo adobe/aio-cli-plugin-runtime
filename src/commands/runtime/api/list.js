@@ -116,13 +116,13 @@ RouteList.flags = {
 RouteList.description = 'list route/apis for Adobe I/O Runtime'
 
 RouteList.aliases = [
-  'runtime:route:ls',
-  'runtime:api:list',
   'runtime:api:ls',
-  'rt:route:list',
-  'rt:route:ls',
+  'runtime:route:list',
+  'runtime:route:ls',
   'rt:api:list',
-  'rt:api:ls'
+  'rt:api:ls',
+  'rt:route:list',
+  'rt:route:ls'
 ]
 
 module.exports = RouteList

@@ -10,10 +10,10 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const TheCommand = require('../../../../src/commands/runtime/route/get.js')
+const TheCommand = require('../../../../src/commands/runtime/api/delete.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
 const { stdout } = require('stdout-stderr')
-const rtAction = 'routes.get'
+const rtAction = 'routes.delete'
 const RuntimeLib = require('@adobe/aio-lib-runtime')
 
 test('exports', async () => {
@@ -34,11 +34,20 @@ test('aliases', async () => {
 test('args', async () => {
   const args = TheCommand.args
   expect(args).toBeDefined()
-  expect(args.length).toEqual(1)
+  expect(args.length).toEqual(3)
 
   expect(args[0].name).toEqual('basePathOrApiName')
   expect(args[0].required).toBeTruthy()
   expect(args[0].description).toBeDefined()
+
+  expect(args[1].name).toEqual('relPath')
+  expect(args[1].required).toBeFalsy()
+  expect(args[1].description).toBeDefined()
+
+  expect(args[2].name).toEqual('apiVerb')
+  expect(args[2].required).toBeFalsy()
+  expect(args[2].options).toMatchObject(['get', 'post', 'put', 'patch', 'delete', 'head', 'options'])
+  expect(args[2].description).toBeDefined()
 })
 
 // eslint-disable-next-line jest/expect-expect
@@ -60,20 +69,23 @@ describe('instance methods', () => {
     test('exists', async () => {
       expect(command.run).toBeInstanceOf(Function)
     })
+  })
 
-    test('error, throws exception', async () => {
-      rtLib.mockRejected(rtAction, new Error('an error'))
-      command.argv = ['/myapi']
-      await expect(command.run()).rejects.toThrow()
-      expect(handleError).toHaveBeenLastCalledWith('failed to get the api', new Error('an error'))
-    })
+  test('error, throws exception', async () => {
+    rtLib.mockRejected(rtAction, new Error('an error'))
+    command.argv = ['/myapi']
+    const error = ['failed to delete the api', new Error('an error')]
+    await expect(command.run()).rejects.toThrow()
+    expect(handleError).toHaveBeenLastCalledWith(...error)
+  })
 
-    test('simple get call', async () => {
-      const cmd = rtLib.mockResolvedFixture(rtAction, 'route/get.json')
-      command.argv = ['/myapi']
-      await command.run()
-      expect(cmd).toHaveBeenCalledWith({ basepath: '/myapi' })
-      expect(stdout.output).toMatchFixture('route/get.txt')
-    })
+  test('simple delete call', () => {
+    const cmd = rtLib.mockResolved(rtAction, '')
+    command.argv = ['/myapi', '/mypath', 'get']
+    return command.run()
+      .then(() => {
+        expect(cmd).toHaveBeenCalledWith({ basepath: '/myapi', relpath: '/mypath', operation: 'get' })
+        expect(stdout.output).toMatch('')
+      })
   })
 })

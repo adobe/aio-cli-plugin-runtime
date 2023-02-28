@@ -10,7 +10,7 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const TheCommand = require('../../../../src/commands/runtime/route/index.js')
+const TheCommand = require('../../../../src/commands/runtime/api/index.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
 const { Help } = require('@oclif/core')
 
@@ -49,7 +49,7 @@ describe('instance methods', () => {
       command.config = {}
       const spy = jest.spyOn(Help.prototype, 'showHelp').mockReturnValue(true)
       return command.run().then(() => {
-        expect(spy).toHaveBeenCalledWith(['runtime:route', '--help'])
+        expect(spy).toHaveBeenCalledWith(['runtime:api', '--help'])
       })
     })
   })

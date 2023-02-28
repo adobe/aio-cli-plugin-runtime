@@ -95,7 +95,7 @@ RouteCreate.flags = {
 RouteCreate.description = 'create a new api route'
 
 RouteCreate.aliases = [
-  'runtime:api:create',
+  'runtime:route:create',
   'rt:route:create',
   'rt:api:create'
 ]
