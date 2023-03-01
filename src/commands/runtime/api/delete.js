@@ -12,9 +12,9 @@ governing permissions and limitations under the License.
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 // eslint-disable-next-line no-unused-vars
 
-class RouteDelete extends RuntimeBaseCommand {
+class ApiDelete extends RuntimeBaseCommand {
   async run () {
-    const { args } = await this.parse(RouteDelete)
+    const { args } = await this.parse(ApiDelete)
 
     try {
       const ow = await this.wsk()
@@ -31,7 +31,7 @@ class RouteDelete extends RuntimeBaseCommand {
   }
 }
 
-RouteDelete.args = [
+ApiDelete.args = [
   {
     name: 'basePathOrApiName',
     required: true,
@@ -48,16 +48,16 @@ RouteDelete.args = [
   }
 ]
 
-RouteDelete.flags = {
+ApiDelete.flags = {
   ...RuntimeBaseCommand.flags
 }
 
-RouteDelete.description = 'delete an API'
+ApiDelete.description = 'delete an API'
 
-RouteDelete.aliases = [
+ApiDelete.aliases = [
   'runtime:route:delete',
   'rt:route:delete',
   'rt:api:delete'
 ]
 
-module.exports = RouteDelete
+module.exports = ApiDelete

@@ -37,9 +37,9 @@ function processApi (api) {
   return data
 }
 
-class RouteList extends RuntimeBaseCommand {
+class ApiList extends RuntimeBaseCommand {
   async run () {
-    const { args, flags } = await this.parse(RouteList)
+    const { args, flags } = await this.parse(ApiList)
 
     try {
       const ow = await this.wsk()
@@ -82,7 +82,7 @@ class RouteList extends RuntimeBaseCommand {
   }
 }
 
-RouteList.args = [
+ApiList.args = [
   {
     name: 'basePath',
     description: 'The base path of the api'
@@ -98,7 +98,7 @@ RouteList.args = [
   }
 ]
 
-RouteList.flags = {
+ApiList.flags = {
   ...RuntimeBaseCommand.flags,
   limit: Flags.integer({
     char: 'l',
@@ -113,9 +113,9 @@ RouteList.flags = {
   })
 }
 
-RouteList.description = 'list route/apis for Adobe I/O Runtime'
+ApiList.description = 'list route/apis for Adobe I/O Runtime'
 
-RouteList.aliases = [
+ApiList.aliases = [
   'runtime:api:ls',
   'runtime:route:list',
   'runtime:route:ls',
@@ -125,4 +125,4 @@ RouteList.aliases = [
   'rt:route:ls'
 ]
 
-module.exports = RouteList
+module.exports = ApiList

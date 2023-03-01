@@ -12,9 +12,9 @@ governing permissions and limitations under the License.
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 // eslint-disable-next-line no-unused-vars
 
-class RouteGet extends RuntimeBaseCommand {
+class ApiGet extends RuntimeBaseCommand {
   async run () {
-    const { args } = await this.parse(RouteGet)
+    const { args } = await this.parse(ApiGet)
 
     try {
       const ow = await this.wsk()
@@ -30,7 +30,7 @@ class RouteGet extends RuntimeBaseCommand {
   }
 }
 
-RouteGet.args = [
+ApiGet.args = [
   {
     name: 'basePathOrApiName',
     required: true,
@@ -38,16 +38,16 @@ RouteGet.args = [
   }
 ]
 
-RouteGet.flags = {
+ApiGet.flags = {
   ...RuntimeBaseCommand.flags
 }
 
-RouteGet.description = 'get API details'
+ApiGet.description = 'get API details'
 
-RouteGet.aliases = [
+ApiGet.aliases = [
   'runtime:route:get',
   'rt:route:get',
   'rt:api:get'
 ]
 
-module.exports = RouteGet
+module.exports = ApiGet
