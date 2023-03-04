@@ -71,7 +71,7 @@
     "unit-tests": "jest --ci",
     "prepack": "oclif manifest && oclif readme --no-aliases",
     "postpack": "rm -f oclif.manifest.json",
-    "version": "oclif readme && git add README.md",
+    "version": "oclif readme --no-aliases && git add README.md",
     "e2e": "jest --collectCoverage=false --testRegex './e2e/e2e.js'"
   },
   "jest": {
