@@ -12,52 +12,42 @@ governing permissions and limitations under the License.
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 // eslint-disable-next-line no-unused-vars
 
-class RouteDelete extends RuntimeBaseCommand {
+class ApiGet extends RuntimeBaseCommand {
   async run () {
-    const { args } = await this.parse(RouteDelete)
+    const { args } = await this.parse(ApiGet)
 
     try {
       const ow = await this.wsk()
       const options = {
-        basepath: args.basePathOrApiName,
-        relpath: args.relPath,
-        operation: args.apiVerb
+        basepath: args.basePathOrApiName
       }
 
-      await ow.routes.delete(options)
+      const result = await ow.routes.get(options)
+      this.logJSON('', result.apis[0].value.apidoc)
     } catch (err) {
-      await this.handleError('failed to delete the api', err)
+      await this.handleError('failed to get the api', err)
     }
   }
 }
 
-RouteDelete.args = [
+ApiGet.args = [
   {
     name: 'basePathOrApiName',
     required: true,
     description: 'The base path or api name'
-  },
-  {
-    name: 'relPath',
-    description: 'The path of the api relative to the base path'
-  },
-  {
-    name: 'apiVerb',
-    description: 'The http verb',
-    options: ['get', 'post', 'put', 'patch', 'delete', 'head', 'options']
   }
 ]
 
-RouteDelete.flags = {
+ApiGet.flags = {
   ...RuntimeBaseCommand.flags
 }
 
-RouteDelete.description = 'delete an API'
+ApiGet.description = 'get API details'
 
-RouteDelete.aliases = [
-  'runtime:api:delete',
-  'rt:route:delete',
-  'rt:api:delete'
+ApiGet.aliases = [
+  'runtime:route:get',
+  'rt:route:get',
+  'rt:api:get'
 ]
 
-module.exports = RouteDelete
+module.exports = ApiGet
