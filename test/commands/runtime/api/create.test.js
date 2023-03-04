@@ -10,7 +10,7 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const TheCommand = require('../../../../src/commands/runtime/route/create.js')
+const TheCommand = require('../../../../src/commands/runtime/api/create.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
 const rtAction = 'routes.create'
 const { stdout } = require('stdout-stderr')
@@ -85,7 +85,7 @@ describe('instance methods', () => {
   })
   beforeAll(() => {
     const json = {
-      'route/api_swagger.json': fixtureFile('route/api_swagger.json')
+      'api/api_swagger.json': fixtureFile('api/api_swagger.json')
     }
     fakeFileSystem.addJson(json)
   })
@@ -118,9 +118,9 @@ describe('instance methods', () => {
     })
 
     test('create api with --config-file', () => {
-      const apiSwagger = fixtureFile('route/api_swagger.json')
+      const apiSwagger = fixtureFile('api/api_swagger.json')
       const cmd = rtLib.mockResolved(rtAction, { gwApiUrl: 'http://myserver' })
-      command.argv = ['--config-file', '/route/api_swagger.json']
+      command.argv = ['--config-file', '/api/api_swagger.json']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalledWith({

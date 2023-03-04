@@ -13,9 +13,9 @@ const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 const { Flags } = require('@oclif/core')
 const fs = require('fs')
 
-class RouteCreate extends RuntimeBaseCommand {
+class ApiCreate extends RuntimeBaseCommand {
   async run () {
-    const { args, flags } = await this.parse(RouteCreate)
+    const { args, flags } = await this.parse(ApiCreate)
 
     try {
       const ow = await this.wsk()
@@ -48,7 +48,7 @@ class RouteCreate extends RuntimeBaseCommand {
   }
 }
 
-RouteCreate.args = [
+ApiCreate.args = [
   {
     name: 'basePath',
     required: false,
@@ -72,7 +72,7 @@ RouteCreate.args = [
   }
 ]
 
-RouteCreate.flags = {
+ApiCreate.flags = {
   ...RuntimeBaseCommand.flags,
   apiname: Flags.string({
     char: 'n',
@@ -92,12 +92,12 @@ RouteCreate.flags = {
   })
 }
 
-RouteCreate.description = 'create a new api route'
+ApiCreate.description = 'create a new api route'
 
-RouteCreate.aliases = [
-  'runtime:api:create',
+ApiCreate.aliases = [
+  'runtime:route:create',
   'rt:route:create',
   'rt:api:create'
 ]
 
-module.exports = RouteCreate
+module.exports = ApiCreate

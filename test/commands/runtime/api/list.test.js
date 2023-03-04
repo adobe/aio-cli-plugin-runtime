@@ -10,7 +10,7 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const TheCommand = require('../../../../src/commands/runtime/route/list.js')
+const TheCommand = require('../../../../src/commands/runtime/api/list.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
 const rtAction = 'routes.list'
 const RuntimeLib = require('@adobe/aio-lib-runtime')
@@ -87,18 +87,18 @@ describe('instance methods', () => {
     })
 
     test('no required args (all are optional) - should not throw exception', () => {
-      rtLib.mockResolvedFixture(rtAction, 'route/list.json')
+      rtLib.mockResolvedFixture(rtAction, 'api/list.json')
       return expect(() => {
         return command.run()
       }).not.toThrow()
     })
 
     test('no required args (all are optional) - should not throw exception, --json flag', () => {
-      rtLib.mockResolvedFixture(rtAction, 'route/list.json')
+      rtLib.mockResolvedFixture(rtAction, 'api/list.json')
       command.argv = ['--json']
       return command.run()
         .then(() => {
-          const expectedJson = fixtureJson('route/list.json')
+          const expectedJson = fixtureJson('api/list.json')
           expect(JSON.parse(stdout.output)).toMatchObject(expectedJson.apis[0].value.apidoc)
         })
     })
