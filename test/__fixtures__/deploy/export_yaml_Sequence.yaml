@@ -16,7 +16,7 @@ project:
           annotations: {}
       sequences:
         four:
-          actions: 'zero,one,two'
+          actions: zero,one,two
       rules:
         meetPersonRule:
           action: three

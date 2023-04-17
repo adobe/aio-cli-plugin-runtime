@@ -26,7 +26,7 @@ class DeployExport extends RuntimeBaseCommand {
       const fileDirectory = path.dirname(manifest)
       const projectJSON = await createProjectJSON(projectEntities, flags.projectname, ow, fileDirectory)
       const yamlObject = { project: projectJSON }
-      fs.writeFileSync(manifest, yaml.safeDump(yamlObject, {}))
+      fs.writeFileSync(manifest, yaml.dump(yamlObject, {}))
     } catch (err) {
       await this.handleError('Failed to export', err)
     }
