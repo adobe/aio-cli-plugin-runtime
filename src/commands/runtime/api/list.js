@@ -28,7 +28,7 @@ function processApi (api) {
 
       item.Action = `/${operation.operationId}`
       item.Verb = verb
-      item.APIName = api.value.apidoc.basePath
+      item.APIName = api.value.apidoc.info.title
       item.URL = `${api.value.gwApiUrl}${key}`
       data.push(item)
     })
