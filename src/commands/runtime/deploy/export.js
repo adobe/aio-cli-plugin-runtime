@@ -33,6 +33,10 @@ class DeployExport extends RuntimeBaseCommand {
   }
 }
 
+/**
+ * @param ow
+ * @param projectName
+ */
 async function findProjectEntities (ow, projectName) {
   const packages = []
   const actions = []
@@ -80,13 +84,19 @@ async function findProjectEntities (ow, projectName) {
   }
 
   const entities = {
-    packages: packages,
-    actions: actions,
-    triggers: triggers,
-    rules: rules
+    packages,
+    actions,
+    triggers,
+    rules
   }
   return entities
 }
+/**
+ * @param entities
+ * @param projectname
+ * @param ow
+ * @param fileDirectory
+ */
 async function createProjectJSON (entities, projectname, ow, fileDirectory) {
   const project = { name: projectname, packages: {} }
   for (const pkg of entities.packages) {
@@ -94,7 +104,7 @@ async function createProjectJSON (entities, projectname, ow, fileDirectory) {
     project.packages[pkg.name] = {
       version: pkg.version,
       namespace: pkg.namespace,
-      annotations: annotations,
+      annotations,
       actions: {},
       triggers: {},
       sequences: {},
@@ -130,7 +140,7 @@ async function createProjectJSON (entities, projectname, ow, fileDirectory) {
         function: functionValue,
         runtime: getAction.exec.kind,
         main: getAction.exec.main || '',
-        limits: limits
+        limits
       }
       const obj = { name: functionValue, code: getAction.exec.code }
       filesObject.push(obj)
@@ -172,6 +182,10 @@ async function createProjectJSON (entities, projectname, ow, fileDirectory) {
   return project
 }
 
+/**
+ * @param fileObj
+ * @param fileDirectory
+ */
 function writeFiles (fileObj, fileDirectory) {
   for (const file of fileObj) {
     const packageName = path.dirname(file.name)
@@ -189,6 +203,9 @@ function writeFiles (fileObj, fileDirectory) {
   }
 }
 
+/**
+ * @param inputs
+ */
 function returninputsfromKeyValue (inputs) {
   const inputObj = {}
   for (const input of inputs) {

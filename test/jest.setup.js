@@ -184,6 +184,9 @@ expect.extend({
 })
 
 // clean trailing whitespace which will vary with different terminal settings
+/**
+ * @param input
+ */
 function cleanWhite (input) {
   return eol.split(input).map(line => { return line.trim() }).join(eol.auto)
 }

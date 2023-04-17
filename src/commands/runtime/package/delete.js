@@ -36,6 +36,10 @@ class PackageDelete extends RuntimeBaseCommand {
   }
 }
 
+/**
+ * @param ow
+ * @param pkg
+ */
 async function recursivelyDeletePackage (ow, pkg) {
   const mapRulesToActionName = (rules) => {
     let ruleMap = new Map()

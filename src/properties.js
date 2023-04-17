@@ -42,6 +42,9 @@ const PropertyDefault = {
   CONFIG_FILE: path.join(require('os').homedir(), '.wskprops')
 }
 
+/**
+ *
+ */
 function propertiesFile () {
   let properties = { get: () => null }
   const wskConfigFile = process.env[PropertyEnv.CONFIG_FILE] || config.get('runtime.config_file') || PropertyDefault.CONFIG_FILE

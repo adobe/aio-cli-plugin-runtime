@@ -79,11 +79,18 @@ test.each(dataFixtures)('failed to set log forwarding settings to %s (interactiv
   await expect(command.run()).rejects.toThrow(`Failed to update log forwarding configuration: mocked error for ${destination}`)
 })
 
+/**
+ * @param dstName
+ * @param fnCallback
+ */
 function mockSelectedDestination (dstName, fnCallback) {
   prompt.mockResolvedValueOnce({ type: dstName })
   rtLib.logForwarding.setDestination = fnCallback
 }
 
+/**
+ * @param config
+ */
 function mockDestinationConfig (config) {
   prompt.mockResolvedValueOnce(config)
 }
