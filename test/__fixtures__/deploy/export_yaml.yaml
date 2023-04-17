@@ -10,12 +10,12 @@ project:
           version: 0.0.9
           namespace: 53444_51981/testSeq
           annotations:
-            exec: 'nodejs:10'
+            exec: nodejs:10
           inputs:
             key1: val1
             key2: val1
           function: testSeq/helloAction1.js
-          runtime: 'nodejs:10'
+          runtime: nodejs:10
           main: split
           limits:
             timeout: 60000

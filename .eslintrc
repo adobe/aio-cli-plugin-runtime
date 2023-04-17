@@ -1,32 +1,5 @@
 {
-    "env": {
-        "node": true,
-        "es6": true,
-        "jest": true
-    },
-    "parserOptions": {
-        "ecmaVersion": 2018
-    },
-    "plugins": [
-        "jest"
-    ],
-    "extends": [
-        "plugin:jest/recommended",
-        "standard"
-    ],
-    "rules": {
-        "no-var": 2,
-        "node/no-extraneous-require": ["error", {
-            "allowModules": [],
-            "resolvePaths": [],
-            "tryExtensions": [".js"]
-        }],
-        "node/no-missing-require": ["error", {
-            "allowModules": [],
-            "resolvePaths": [],
-            "tryExtensions": [".js"]
-        }]
-    },
+    "extends": "@adobe/eslint-config-aio-lib-config",
     "globals": {
       "fixtureFile": true,
       "fixtureFileWithTimeZoneAdjustment": true,

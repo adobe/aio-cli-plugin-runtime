@@ -12,6 +12,7 @@ governing permissions and limitations under the License.
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 const { Flags, CliUx: cli } = require('@oclif/core')
 
+/** @private */
 function processApi (api) {
   const data = []
   const paths = api.value.apidoc.paths

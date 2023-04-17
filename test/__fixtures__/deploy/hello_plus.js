@@ -1,4 +1,5 @@
 
+/** @private */
 function main (params) {
   const msg = 'Hello, ' + params.name + ' , ' + params.place + '.'
   const employees = 'You have ' + params.employees + ' employees '
