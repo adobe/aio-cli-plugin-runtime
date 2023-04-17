@@ -13,9 +13,7 @@ governing permissions and limitations under the License.
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 const { Flags, CliUx: cli } = require('@oclif/core')
 
-/**
- * @param columnName
- */
+/** @private */
 function createColumns (columnName) {
   return {
     firstColumn: {
@@ -51,10 +49,7 @@ function createColumns (columnName) {
   }
 }
 
-/**
- * @param ow
- * @param rules
- */
+/** @private */
 async function getRulesWithStatus (ow, rules) {
   // unfortunately for rules, we need to do a 'get' for each to get the status
   // (this is done the same way in the Go CLI)

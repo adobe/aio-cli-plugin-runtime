@@ -33,10 +33,7 @@ class DeployExport extends RuntimeBaseCommand {
   }
 }
 
-/**
- * @param ow
- * @param projectName
- */
+/** @private */
 async function findProjectEntities (ow, projectName) {
   const packages = []
   const actions = []
@@ -91,12 +88,8 @@ async function findProjectEntities (ow, projectName) {
   }
   return entities
 }
-/**
- * @param entities
- * @param projectname
- * @param ow
- * @param fileDirectory
- */
+
+/** @private */
 async function createProjectJSON (entities, projectname, ow, fileDirectory) {
   const project = { name: projectname, packages: {} }
   for (const pkg of entities.packages) {
@@ -182,10 +175,7 @@ async function createProjectJSON (entities, projectname, ow, fileDirectory) {
   return project
 }
 
-/**
- * @param fileObj
- * @param fileDirectory
- */
+/** @private */
 function writeFiles (fileObj, fileDirectory) {
   for (const file of fileObj) {
     const packageName = path.dirname(file.name)
@@ -203,9 +193,7 @@ function writeFiles (fileObj, fileDirectory) {
   }
 }
 
-/**
- * @param inputs
- */
+/** @private */
 function returninputsfromKeyValue (inputs) {
   const inputObj = {}
   for (const input of inputs) {
