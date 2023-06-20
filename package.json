@@ -46,8 +46,7 @@
     "jest-junit": "^13.0.0",
     "jest-plugin-fs": "^2.9.0",
     "oclif": "^3.2.0",
-    "stdout-stderr": "^0.1.9",
-    "typescript": "^5.0.4"
+    "stdout-stderr": "^0.1.9"
   },
   "engines": {
     "node": "^14.18 || ^16.13 || >=18"
