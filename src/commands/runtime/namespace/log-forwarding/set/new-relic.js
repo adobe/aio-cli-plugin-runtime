@@ -35,7 +35,7 @@ NewRelicCommand.flags = {
   ...RuntimeBaseCommand.flags,
   'base-uri': Flags.string({
     description: 'Base URI',
-    required: false
+    required: true
   }),
   'license-key': Flags.string({
     description: 'License Key',
