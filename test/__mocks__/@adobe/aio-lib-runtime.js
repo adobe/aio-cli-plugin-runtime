@@ -16,8 +16,7 @@ const mockRtLibInstance = {
     get: jest.fn(),
     setAdobeIoRuntime: jest.fn(),
     setAzureLogAnalytics: jest.fn(),
-    setSplunkHec: jest.fn(),
-    setNewRelic: jest.fn()
+    setSplunkHec: jest.fn()
   },
   feeds: {},
   routes: {},

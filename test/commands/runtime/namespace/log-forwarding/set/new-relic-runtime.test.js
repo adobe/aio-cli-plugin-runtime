@@ -29,7 +29,7 @@ test('set log forwarding settings to new_relic', () => {
       .then(() => {
         expect(stdout.output).toMatch(/Log forwarding was set to new_relic for this namespace/)
         expect(setCall).toBeCalledTimes(1)
-        expect(setCall).toHaveBeenCalledWith('new_relic', { customer_id: 'customer1', shared_key: 'key1', log_type: 'mylog' })
+        expect(setCall).toHaveBeenCalledWith('new_relic', { base_uri: 'uri1', license_key: 'key1' })
         resolve()
       })
   })
