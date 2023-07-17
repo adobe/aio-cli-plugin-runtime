@@ -74,6 +74,7 @@ $ aio runtime --help
 * [`aio runtime namespace log-forwarding set adobe-io-runtime`](#aio-runtime-namespace-log-forwarding-set-adobe-io-runtime)
 * [`aio runtime namespace log-forwarding set azure-log-analytics`](#aio-runtime-namespace-log-forwarding-set-azure-log-analytics)
 * [`aio runtime namespace log-forwarding set splunk-hec`](#aio-runtime-namespace-log-forwarding-set-splunk-hec)
+* [`aio runtime namespace log-forwarding set new-relic`](#aio-runtime-namespace-log-forwarding-set-new-relic)
 * [`aio runtime package`](#aio-runtime-package)
 * [`aio runtime package bind PACKAGENAME BINDPACKAGENAME`](#aio-runtime-package-bind-packagename-bindpackagename)
 * [`aio runtime package create PACKAGENAME`](#aio-runtime-package-create-packagename)
@@ -1280,6 +1281,42 @@ ALIASES
   $ aio rt namespace lf set splunk-hec
   $ aio rt ns log-forwarding set splunk-hec
   $ aio rt ns lf set splunk-hec
+```
+
+## `aio runtime namespace log-forwarding set new-relic`
+
+Set log forwarding destination to New Relic
+
+```
+USAGE
+  $ aio runtime namespace log-forwarding set new-relic --base-uri <value> --license-key <value>  [--cert] [--key]
+    [--apiversion] [--apihost] [-u] [-i] [--debug <value>] [-v] [--version] [--help]
+
+FLAGS
+  -i, --insecure         bypass certificate check
+  -u, --auth             whisk auth
+  -v, --verbose          Verbose output
+  --apihost              whisk API host
+  --apiversion           whisk API version
+  --base-uri=<value>     (optional) Base URI
+  --cert                 client cert
+  --debug=<value>        Debug level output
+  --help                 Show help
+  --key                  client key
+  --license-key=<value>  (required) License key
+  --version              Show version
+
+DESCRIPTION
+  Set log forwarding destination to New Relic
+
+ALIASES
+  $ aio runtime ns log-forwarding set new-relic
+  $ aio runtime ns lf set new-relic
+  $ aio runtime namespace lf set new-relic
+  $ aio rt namespace log-forwarding set new-relic
+  $ aio rt namespace lf set new-relic
+  $ aio rt ns log-forwarding set new-relic
+  $ aio rt ns lf set new-relic
 ```
 
 ## `aio runtime package`
