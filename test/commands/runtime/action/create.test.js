@@ -365,7 +365,7 @@ describe('instance methods', () => {
     test('creates an action with action name, action path, --params flag, limits and kind', () => {
       const name = 'hello'
       const cmd = rtLib.mockResolved(rtAction, { res: 'fake' })
-      command.argv = [name, '/action/actionFile.js', '--param', 'a', 'b', '--param', 'c', 'd', '--logsize', '8', '--memory', '128', '--kind', 'nodejs:10']
+      command.argv = [name, '/action/actionFile.js', '--param', 'a', 'b', '--param', 'c', 'd', '--logsize', '8', '--memory', '128', '--concurrency', '1', '--kind', 'nodejs:10']
       rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation((flags, file) => flags && ([{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }]))
       return command.run()
         .then(() => {
@@ -384,7 +384,37 @@ describe('instance methods', () => {
               ],
               limits: {
                 logs: 8,
-                memory: 128
+                memory: 128,
+                concurrency: 1
+              }
+            }
+          })
+          expect(stdout.output).toMatch('')
+        })
+    })
+
+    test('creates an action with action name, action path, --params flag, only concurrency limit and kind', () => {
+      const name = 'hello'
+      const cmd = rtLib.mockResolved(rtAction, { res: 'fake' })
+      command.argv = [name, '/action/actionFile.js', '--param', 'a', 'b', '--param', 'c', 'd', '--concurrency', '1', '--kind', 'nodejs:10']
+      rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation((flags, file) => flags && ([{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }]))
+      return command.run()
+        .then(() => {
+          expect(rtUtils.getKeyValueArrayFromMergedParameters).toHaveBeenCalledWith(['a', 'b', 'c', 'd'], undefined)
+          expect(cmd).toHaveBeenCalledWith({
+            name,
+            action: {
+              name,
+              exec: {
+                code: jsFile,
+                kind: 'nodejs:10'
+              },
+              parameters: [
+                { key: 'fakeParam', value: 'aaa' },
+                { key: 'fakeParam2', value: 'bbb' }
+              ],
+              limits: {
+                concurrency: 1
               }
             }
           })
@@ -846,6 +876,20 @@ describe('instance methods', () => {
       const invalidValue = '11'
       command.argv = [flag, invalidValue]
       await expect(command.run()).rejects.toThrow(`Parsing ${flag} \n\tExpected an integer less than or equal to 10 but received: ${invalidValue}\nSee more help with --help`)
+    })
+
+    test('errors out on create with concurrency below min', async () => {
+      const flag = '--concurrency'
+      const invalidValue = '0'
+      command.argv = [flag, invalidValue]
+      await expect(command.run()).rejects.toThrow(`Parsing ${flag} \n\tExpected an integer greater than or equal to 1 but received: ${invalidValue}\nSee more help with --help`)
+    })
+
+    test('errors out on create with concurrency above max', async () => {
+      const flag = '--concurrency'
+      const invalidValue = '501'
+      command.argv = [flag, invalidValue]
+      await expect(command.run()).rejects.toThrow(`Parsing ${flag} \n\tExpected an integer less than or equal to 500 but received: ${invalidValue}\nSee more help with --help`)
     })
 
     test('errors on --web-secure with --web false flag', async () => {
