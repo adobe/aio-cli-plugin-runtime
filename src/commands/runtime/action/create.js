@@ -246,10 +246,6 @@ ActionCreate.limits = {
   logsizeMB: {
     min: 0,
     max: 10
-  },
-  concurrency: {
-    min: 1,
-    max: 500
   }
 }
 
@@ -304,9 +300,7 @@ ActionCreate.flags = {
   }),
   concurrency: Flags.integer({
     char: 'c',
-    description: `the maximum number of action invocations to send to the same container in parallel (default 200, min: ${ActionCreate.limits.concurrency.min}, max: ${ActionCreate.limits.concurrency.max})`, // help description for flag
-    min: ActionCreate.limits.concurrency.min,
-    max: ActionCreate.limits.concurrency.max
+    description: 'the maximum number of action invocations to send to the same container in parallel (default 200, min: 1, max: 500)' // help description for flag
   }),
   kind: Flags.string({
     description: 'the KIND of the action runtime (example: swift:default, nodejs:default)' // help description for flag

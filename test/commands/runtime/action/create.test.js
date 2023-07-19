@@ -878,20 +878,6 @@ describe('instance methods', () => {
       await expect(command.run()).rejects.toThrow(`Parsing ${flag} \n\tExpected an integer less than or equal to 10 but received: ${invalidValue}\nSee more help with --help`)
     })
 
-    test('errors out on create with concurrency below min', async () => {
-      const flag = '--concurrency'
-      const invalidValue = '0'
-      command.argv = [flag, invalidValue]
-      await expect(command.run()).rejects.toThrow(`Parsing ${flag} \n\tExpected an integer greater than or equal to 1 but received: ${invalidValue}\nSee more help with --help`)
-    })
-
-    test('errors out on create with concurrency above max', async () => {
-      const flag = '--concurrency'
-      const invalidValue = '501'
-      command.argv = [flag, invalidValue]
-      await expect(command.run()).rejects.toThrow(`Parsing ${flag} \n\tExpected an integer less than or equal to 500 but received: ${invalidValue}\nSee more help with --help`)
-    })
-
     test('errors on --web-secure with --web false flag', async () => {
       rtLib.mockRejected(rtAction, '')
       command.argv = ['hello', '/action/fileWithNoExt', '--web-secure', 'true', '--web', 'false']
