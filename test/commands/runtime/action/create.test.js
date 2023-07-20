@@ -293,11 +293,11 @@ test('creates an action with action name, action path, --param-file and param fl
     })
 })
 
-test('creates an action with action name, action path, --params flag and limits', () => {
+test('creates an action with action name, action path, --params flag, limits and kind', () => {
   const name = 'hello'
   const cmd = rtLib.mockResolved(rtAction, { res: 'fake' })
-  command.argv = [name, '/action/actionFile.js', '--param', 'a', 'b', '--param', 'c', 'd', '--logsize', '8', '--memory', '128', '--timeout', '20000']
-  rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation((flags, file) => flags && [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }])
+  command.argv = [name, '/action/actionFile.js', '--param', 'a', 'b', '--param', 'c', 'd', '--logsize', '8', '--memory', '128', '--concurrency', '1', '--kind', 'nodejs:10']
+  rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation((flags, file) => flags && ([{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }]))
   return command.run()
     .then(() => {
       expect(rtUtils.getKeyValueArrayFromMergedParameters).toHaveBeenCalledWith(['a', 'b', 'c', 'd'], undefined)
@@ -306,8 +306,8 @@ test('creates an action with action name, action path, --params flag and limits'
         action: {
           name,
           exec: {
-            code: JS_FILE,
-            kind: 'nodejs:default'
+            code: jsFile,
+            kind: 'nodejs:10'
           },
           parameters: [
             { key: 'fakeParam', value: 'aaa' },
@@ -316,7 +316,36 @@ test('creates an action with action name, action path, --params flag and limits'
           limits: {
             logs: 8,
             memory: 128,
-            timeout: 20000
+            concurrency: 1
+          }
+        }
+      })
+      expect(stdout.output).toMatch('')
+    })
+})
+
+test('creates an action with action name, action path, --params flag, only concurrency limit and kind', () => {
+  const name = 'hello'
+  const cmd = rtLib.mockResolved(rtAction, { res: 'fake' })
+  command.argv = [name, '/action/actionFile.js', '--param', 'a', 'b', '--param', 'c', 'd', '--concurrency', '1', '--kind', 'nodejs:10']
+  rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation((flags, file) => flags && ([{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }]))
+  return command.run()
+    .then(() => {
+      expect(rtUtils.getKeyValueArrayFromMergedParameters).toHaveBeenCalledWith(['a', 'b', 'c', 'd'], undefined)
+      expect(cmd).toHaveBeenCalledWith({
+        name,
+        action: {
+          name,
+          exec: {
+            code: jsFile,
+            kind: 'nodejs:10'
+          },
+          parameters: [
+            { key: 'fakeParam', value: 'aaa' },
+            { key: 'fakeParam2', value: 'bbb' }
+          ],
+          limits: {
+            concurrency: 1
           }
         }
       })
@@ -348,36 +377,6 @@ test('creates an action with action name, action path, --params flag and limits 
             logs: 8,
             memory: 128,
             timeout: 20000
-          }
-        }
-      })
-      expect(stdout.output).toMatch('')
-    })
-})
-
-test('creates an action with action name, action path, --params flag, limits and kind', () => {
-  const name = 'hello'
-  const cmd = rtLib.mockResolved(rtAction, { res: 'fake' })
-  command.argv = [name, '/action/actionFile.js', '--param', 'a', 'b', '--param', 'c', 'd', '--logsize', '8', '--memory', '128', '--kind', 'nodejs:10']
-  rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation((flags, file) => flags && ([{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }]))
-  return command.run()
-    .then(() => {
-      expect(rtUtils.getKeyValueArrayFromMergedParameters).toHaveBeenCalledWith(['a', 'b', 'c', 'd'], undefined)
-      expect(cmd).toHaveBeenCalledWith({
-        name,
-        action: {
-          name,
-          exec: {
-            code: JS_FILE,
-            kind: 'nodejs:10'
-          },
-          parameters: [
-            { key: 'fakeParam', value: 'aaa' },
-            { key: 'fakeParam2', value: 'bbb' }
-          ],
-          limits: {
-            logs: 8,
-            memory: 128
           }
         }
       })
