@@ -306,7 +306,7 @@ test('creates an action with action name, action path, --params flag, limits and
         action: {
           name,
           exec: {
-            code: jsFile,
+            code: JS_FILE,
             kind: 'nodejs:10'
           },
           parameters: [
@@ -337,7 +337,7 @@ test('creates an action with action name, action path, --params flag, only concu
         action: {
           name,
           exec: {
-            code: jsFile,
+            code: JS_FILE,
             kind: 'nodejs:10'
           },
           parameters: [
