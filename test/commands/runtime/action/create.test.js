@@ -836,48 +836,6 @@ describe('instance methods', () => {
       await expect(rejectWithError(command, error, handleError)).toBeTruthy()
     })
 
-    test('errors out on create with timeout below min', async () => {
-      const flag = '--timeout'
-      const invalidValue = '99'
-      command.argv = [flag, invalidValue]
-      await expect(command.run()).rejects.toThrow(`Parsing ${flag} \n\tExpected an integer greater than or equal to 100 but received: ${invalidValue}\nSee more help with --help`)
-    })
-
-    test('errors out on create with timeout above max', async () => {
-      const flag = '--timeout'
-      const invalidValue = '3600001'
-      command.argv = [flag, invalidValue]
-      await expect(command.run()).rejects.toThrow(`Parsing ${flag} \n\tExpected an integer less than or equal to 3600000 but received: ${invalidValue}\nSee more help with --help`)
-    })
-
-    test('errors out on create with memory below min', async () => {
-      const flag = '--memory'
-      const invalidValue = '127'
-      command.argv = [flag, invalidValue]
-      await expect(command.run()).rejects.toThrow(`Parsing ${flag} \n\tExpected an integer greater than or equal to 128 but received: ${invalidValue}\nSee more help with --help`)
-    })
-
-    test('errors out on create with memory above max', async () => {
-      const flag = '--memory'
-      const invalidValue = '4097'
-      command.argv = [flag, invalidValue]
-      await expect(command.run()).rejects.toThrow(`Parsing ${flag} \n\tExpected an integer less than or equal to 4096 but received: ${invalidValue}\nSee more help with --help`)
-    })
-
-    test('errors out on create with logsize below min', async () => {
-      const flag = '--logsize'
-      const invalidValue = '-1'
-      command.argv = [flag, invalidValue]
-      await expect(command.run()).rejects.toThrow(`Parsing ${flag} \n\tExpected an integer greater than or equal to 0 but received: ${invalidValue}\nSee more help with --help`)
-    })
-
-    test('errors out on create with logsize above max', async () => {
-      const flag = '--logsize'
-      const invalidValue = '11'
-      command.argv = [flag, invalidValue]
-      await expect(command.run()).rejects.toThrow(`Parsing ${flag} \n\tExpected an integer less than or equal to 10 but received: ${invalidValue}\nSee more help with --help`)
-    })
-
     test('errors on --web-secure with --web false flag', async () => {
       rtLib.mockRejected(rtAction, '')
       command.argv = ['hello', '/action/fileWithNoExt', '--web-secure', 'true', '--web', 'false']

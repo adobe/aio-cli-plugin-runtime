@@ -80,18 +80,11 @@ class RuleList extends RuntimeBaseCommand {
 
 RuleList.description = 'Retrieves a list of Rules'
 
-RuleList.limits = {
-  min: 0,
-  max: 50
-}
-
 RuleList.flags = {
   ...RuntimeBaseCommand.flags,
   limit: Flags.integer({
     char: 'l',
-    description: `Limit number of rules returned (min: ${RuleList.limits.min}, max: ${RuleList.limits.max})`,
-    min: RuleList.limits.min,
-    max: RuleList.limits.max
+    description: 'Limit number of rules returned (min: 0, max: 50)'
   }),
   skip: Flags.integer({
     char: 's',
