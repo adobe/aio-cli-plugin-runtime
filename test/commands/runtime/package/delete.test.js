@@ -33,10 +33,8 @@ test('aliases', async () => {
 })
 
 test('args', async () => {
-  const deleteName = TheCommand.args[0]
-  expect(deleteName.name).toBeDefined()
-  expect(deleteName.name).toEqual('packageName')
-  expect(deleteName.required).toEqual(true)
+  expect(TheCommand.args.packageName).toBeDefined()
+  expect(TheCommand.args.packageName.required).toEqual(true)
 })
 
 describe('instance methods', () => {

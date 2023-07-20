@@ -220,16 +220,6 @@ class ActionCreate extends RuntimeBaseCommand {
   }
 }
 
-// ActionCreate.args0 = [
-//   {
-//     name: 'actionName',
-//     required: true
-//   },
-//   {
-//     name: 'actionPath'
-//   }
-// ]
-
 ActionCreate.args = {
   actionName: Args.string({ required: true }),
   actionPath: Args.string()

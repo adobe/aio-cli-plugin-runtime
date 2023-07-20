@@ -33,10 +33,8 @@ test('aliases', async () => {
 })
 
 test('args', async () => {
-  const getName = TheCommand.args[0]
-  expect(getName.name).toBeDefined()
-  expect(getName.name).toEqual('packageName')
-  expect(getName.required).toEqual(true)
+  expect(TheCommand.args.packageName).toBeDefined()
+  expect(TheCommand.args.packageName.required).toEqual(true)
 })
 
 describe('instance methods', () => {

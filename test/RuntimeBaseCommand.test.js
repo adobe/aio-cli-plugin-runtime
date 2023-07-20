@@ -21,8 +21,6 @@ beforeEach(() => {
   clearMockedFs()
 })
 
-const WSK_PROPS_PATH = require('path').join(require('os').homedir(), '.wskprops')
-
 test('exports', async () => {
   expect(typeof TheCommand).toEqual('function')
   expect(TheCommand.prototype).toBeInstanceOf(Command)
@@ -238,24 +236,19 @@ describe('instance methods', () => {
       })
     })
 
-    // eslint-disable-next-line jest/expect-expect
-    test('no config file, no problem', () => {
+    test('no config file, no problem', async () => {
       process.env[PropertyEnv.AUTH] = '1234'
 
-      return command.wsk().then(() => {
-        delete process.env[PropertyEnv.AUTH]
-      })
+      await expect(command.wsk()).resolves.not.toThrow()
+      delete process.env[PropertyEnv.AUTH]
     })
 
-    // eslint-disable-next-line jest/expect-expect
-    test('should not throw if config file specified but doesnt exist', () => {
+    test('should not throw if config file specified but doesnt exist', async () => {
       process.env[PropertyEnv.CONFIG_FILE] = '/foo'
       process.env[PropertyEnv.AUTH] = '1234'
 
-      return command.wsk().then(() => {
-        delete process.env[PropertyEnv.CONFIG_FILE]
-        delete process.env[PropertyEnv.AUTH]
-      })
+      await expect(command.wsk()).resolves.not.toThrow()
+      delete process.env[PropertyEnv.CONFIG_FILE]
     })
   })
 

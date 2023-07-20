@@ -1,6 +1,7 @@
 {
     "extends": "@adobe/eslint-config-aio-lib-config",
     "globals": {
+      "WSK_PROPS_PATH": true,
       "createFileSystem": true,
       "clearMockedFs": true,
       "fixtureFile": true,

@@ -10,6 +10,8 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
+/* eslint jest/no-standalone-expect: ["error", { "additionalTestBlockFunctions": ["expect.extend"] }] */
+
 const { stdout } = require('stdout-stderr')
 const realFs = jest.requireActual('fs')
 const fs = require('fs')
@@ -29,6 +31,9 @@ delete process.env.WHISK_APIVERSION
 delete process.env.WHISK_NAMESPACE
 delete process.env.WSK_CONFIG_FILE
 
+// default location of .wskprops
+global.WSK_PROPS_PATH = require('path').join(require('os').homedir(), '.wskprops')
+
 // trap console log
 // if you want to see output, you can do this:
 // beforeEach(() => { stdout.start(); stdout.print = true })
@@ -38,6 +43,8 @@ afterEach(() => { stdout.stop() })
 jest.mock('fs', () => ({
   ...jest.requireActual('fs'),
   existsSync: jest.fn(),
+  writeFileSync: jest.fn(),
+  mkdirSync: jest.fn(),
   // we have to have the default behaviour at the start since @oclif/core does some file reading on require
   readFileSync: jest.fn((p) => jest.requireActual('fs').readFileSync(p)),
   unlinkSync: jest.fn(),
@@ -50,16 +57,20 @@ global.createFileSystem = (initialFiles = {}) => {
 
   fs.existsSync.mockImplementation((filePath) => {
     const value = !!myFileSystem[filePath]
-    if (!value) {
+    if (!value && filePath !== WSK_PROPS_PATH) { // for testing, we don't want to use an existing .wskprops
       return realFs.existsSync(filePath)
     } else {
       return value
     }
   })
 
+  fs.writeFileSync.mockImplementation((filePath, value) => {
+    myFileSystem[filePath] = value
+  })
+
   fs.readFileSync.mockImplementation((filePath) => {
     const value = myFileSystem[filePath]
-    if (!value) {
+    if (value === undefined && filePath !== WSK_PROPS_PATH) { // for testing, we don't want to use an existing .wskprops
       return realFs.readFileSync(filePath)
     } else {
       return value
@@ -81,6 +92,8 @@ global.createFileSystem = (initialFiles = {}) => {
     return item
   })
 
+  fs.mkdirSync = jest.fn() // don't do anything
+
   return myFileSystem
 }
 
@@ -88,7 +101,9 @@ global.clearMockedFs = () => {
   const mockedFs = require('fs')
 
   mockedFs.existsSync.mockImplementation((p) => realFs.existsSync(p))
-  mockedFs.readFileSync.mockImplementation((p) => realFs.readFileSync(p))
+  mockedFs.writeFileSync.mockImplementation((p, ...rest) => realFs.writeFileSync(p, ...rest))
+  mockedFs.mkdirSync.mockImplementation((p, ...rest) => realFs.mkdirSync(p, ...rest))
+  mockedFs.readFileSync.mockImplementation((p, ...rest) => realFs.readFileSync(p, ...rest))
   mockedFs.unlinkSync.mockImplementation((p) => realFs.unlinkSync(p))
   mockedFs.rmdirSync.mockImplementation((p) => realFs.rmdirSync(p))
   mockedFs.readdirSync.mockImplementation((p) => realFs.readdirSync(p))
@@ -194,7 +209,6 @@ global.createTestFlagsFunction = (TheCommand, Flags) => {
 expect.extend({
   toMatchFixture (received, argument) {
     const val = fixtureFile(argument)
-    // eslint-disable-next-line jest/no-standalone-expect
     expect(eol.auto(received)).toEqual(eol.auto(val))
     return { pass: true }
   }
@@ -210,7 +224,6 @@ expect.extend({
   toMatchFixtureIgnoreWhite (received, argument) {
     const val = cleanWhite(fixtureFile(argument))
     // eat white
-    // eslint-disable-next-line jest/no-standalone-expect
     expect(cleanWhite(received)).toEqual(val)
     return { pass: true }
   }
@@ -219,8 +232,9 @@ expect.extend({
 expect.extend({
   toMatchFixtureJson (received, argument) {
     const val = fixtureJson(argument)
-    // eslint-disable-next-line jest/no-standalone-expect
     expect(received).toEqual(val)
     return { pass: true }
   }
 })
+
+global.createFileSystem({ [WSK_PROPS_PATH]: fixtureFile('wsk.properties') }) // seed the filesystem with .wskprops

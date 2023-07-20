@@ -10,7 +10,7 @@ governing permissions and limitations under the License.
 */
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
-// eslint-disable-next-line no-unused-vars
+const { Args } = require('@oclif/core')
 
 class ApiDelete extends RuntimeBaseCommand {
   async run () {
@@ -31,22 +31,19 @@ class ApiDelete extends RuntimeBaseCommand {
   }
 }
 
-ApiDelete.args = [
-  {
-    name: 'basePathOrApiName',
+ApiDelete.args = {
+  basePathOrApiName: Args.string({
     required: true,
     description: 'The base path or api name'
-  },
-  {
-    name: 'relPath',
+  }),
+  relPath: Args.string({
     description: 'The path of the api relative to the base path'
-  },
-  {
-    name: 'apiVerb',
+  }),
+  apiVerb: Args.string({
     description: 'The http verb',
     options: ['get', 'post', 'put', 'patch', 'delete', 'head', 'options']
-  }
-]
+  })
+}
 
 ApiDelete.flags = {
   ...RuntimeBaseCommand.flags

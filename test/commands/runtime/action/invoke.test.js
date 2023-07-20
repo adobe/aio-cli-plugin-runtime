@@ -47,10 +47,8 @@ test('flags', async () => {
 })
 
 test('args', async () => {
-  const invokeName = TheCommand.args[0]
-  expect(invokeName.name).toBeDefined()
-  expect(invokeName.name).toEqual('actionName')
-  expect(invokeName.required).toEqual(true)
+  expect(TheCommand.args.actionName).toBeDefined()
+  expect(TheCommand.args.actionName.required).toEqual(true)
 })
 
 describe('instance methods', () => {
@@ -66,7 +64,7 @@ describe('instance methods', () => {
 
   afterAll(() => {
     // reset back to normal
-    fakeFileSystem.reset()
+    clearMockedFs()
   })
 
   describe('run', () => {

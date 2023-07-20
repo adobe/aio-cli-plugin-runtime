@@ -39,9 +39,7 @@ test('flags', async () => {
 })
 
 test('args', async () => {
-  const listName = TheCommand.args[0]
-  expect(listName.name).toBeDefined()
-  expect(listName.name).toEqual('namespace')
+  expect(TheCommand.args.namespace).toBeDefined()
 })
 
 describe('instance methods', () => {

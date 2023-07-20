@@ -16,15 +16,7 @@ class ActionUpdate extends ActionCreate {
   isUpdate () { return true }
 }
 
-ActionUpdate.args = [
-  {
-    name: 'actionName',
-    required: true
-  },
-  {
-    name: 'actionPath'
-  }
-]
+ActionUpdate.args = ActionCreate.args
 
 ActionUpdate.flags = ActionCreate.flags
 

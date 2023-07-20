@@ -10,6 +10,7 @@ governing permissions and limitations under the License.
 */
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
+const { Args } = require('@oclif/core')
 
 class RuleEnable extends RuntimeBaseCommand {
   async run () {
@@ -27,13 +28,12 @@ class RuleEnable extends RuntimeBaseCommand {
 
 RuleEnable.description = 'Enable a Rule'
 
-RuleEnable.args = [
-  {
-    name: 'name',
+RuleEnable.args = {
+  name: Args.string({
     required: true,
     description: 'Name of the rule'
-  }
-]
+  })
+}
 
 RuleEnable.flags = {
   ...RuntimeBaseCommand.flags

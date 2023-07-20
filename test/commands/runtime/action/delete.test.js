@@ -32,10 +32,8 @@ test('aliases', async () => {
 })
 
 test('args', async () => {
-  const deleteName = TheCommand.args[0]
-  expect(deleteName.name).toBeDefined()
-  expect(deleteName.name).toEqual('actionName')
-  expect(deleteName.required).toEqual(true)
+  expect(TheCommand.args.actionName).toBeDefined()
+  expect(TheCommand.args.actionName.required).toEqual(true)
 })
 
 describe('instance methods', () => {

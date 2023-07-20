@@ -10,13 +10,13 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const { Flags } = require('@oclif/core')
+const { Flags, Args } = require('@oclif/core')
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 
 class ActivationResult extends RuntimeBaseCommand {
   async run () {
     const { args, flags } = await this.parse(ActivationResult)
-    let id = args.activationID
+    let id = args.activationId
     try {
       const ow = await this.wsk()
       if (flags.last) {
@@ -35,11 +35,10 @@ class ActivationResult extends RuntimeBaseCommand {
   }
 }
 
-ActivationResult.args = [
-  {
-    name: 'activationID'
-  }
-]
+ActivationResult.args = {
+  activationId: Args.string({
+  })
+}
 
 ActivationResult.flags = {
   ...RuntimeBaseCommand.flags,

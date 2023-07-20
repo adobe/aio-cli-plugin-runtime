@@ -17,6 +17,9 @@ const { stdout } = require('stdout-stderr')
 const rtPackageList = 'packages.list'
 const owRulesList = 'rules.list'
 const owTriggerList = 'triggers.list'
+const rtPackagesGet = 'packages.get'
+const rtActionsGet = 'actions.get'
+const rtTriggersGet = 'triggers.get'
 const fs = require('fs')
 
 test('exports', async () => {
@@ -418,29 +421,30 @@ describe('instance methods', () => {
     version: '0.0.2'
   }]
 
+  const FILE_SYSTEM_JSON = {
+    [WSK_PROPS_PATH]: 'AUTH=something',
+    '/deploy/deployment_syncSequences.yaml': fixtureFile('deploy/deployment_syncSequences.yaml'),
+    '/deploy/manifest.yaml': fixtureFile('deploy/manifest.yaml'),
+    '/deploy/deployment_actionMissingInputs.yaml': fixtureFile('deploy/deployment_actionMissingInputs.yaml'),
+    '/deploy/deployment_syncMissingAction.yaml': fixtureFile('deploy/deployment_syncMissingAction.yaml'),
+    '/deploy/manifest.yml': fixtureFile('deploy/manifest.yml'),
+    '/deploy/hello.js': fixtureFile('deploy/hello.js'),
+    '/deploy/hello_plus.js': fixtureFile('deploy/hello_plus.js'),
+    '/deploy/deployment.yaml': fixtureFile('deploy/deployment.yaml'),
+    '/deploy/deployment.yml': fixtureFile('deploy/deployment.yml')
+  }
+
   let rtLib
   beforeEach(() => {
     RuntimeLib.mockReset()
     rtLib = RuntimeLib.init({ fake: 'credentials' })
     command = new TheCommand([])
     handleError = jest.spyOn(command, 'handleError')
-    const json = {
-      'deploy/deployment_syncSequences.yaml': fixtureFile('deploy/deployment_syncSequences.yaml'),
-      'deploy/manifest.yaml': fixtureFile('deploy/manifest.yaml'),
-      'deploy/deployment_actionMissingInputs.yaml': fixtureFile('deploy/deployment_actionMissingInputs.yaml'),
-      'deploy/deployment_syncMissingAction.yaml': fixtureFile('deploy/deployment_syncMissingAction.yaml'),
-      'deploy/manifest.yml': fixtureFile('deploy/manifest.yml'),
-      'deploy/hello.js': fixtureFile('deploy/hello.js'),
-      'deploy/hello_plus.js': fixtureFile('deploy/hello_plus.js'),
-      'deploy/deployment.yaml': fixtureFile('deploy/deployment.yaml'),
-      'deploy/deployment.yml': fixtureFile('deploy/deployment.yml')
-    }
-    fakeFileSystem.addJson(json)
+    createFileSystem(FILE_SYSTEM_JSON)
   })
 
   afterEach(() => {
-    // reset back to normal
-    fakeFileSystem.reset()
+    clearMockedFs()
   })
 
   describe('run', () => {
@@ -459,10 +463,10 @@ describe('instance methods', () => {
     })
 
     test('fetch list of actions to be exported from project name', () => {
-      const cmd = rtLib.mockResolved('packages.get', packageget)
+      const cmd = rtLib.mockResolved(rtPackagesGet, packageget)
       command.argv = ['--projectname', 'proj', '-m', '/deploy/manifest.yaml']
       rtLib.mockResolved(rtPackageList, packagelist)
-      rtLib.mockResolved('actions.get', actionGet)
+      rtLib.mockResolved(rtActionsGet, actionGet)
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalled()
@@ -471,11 +475,10 @@ describe('instance methods', () => {
     })
 
     test('fetch list of packages (shared) to be exported from project name', () => {
-      const cmd = rtLib.mockResolved('packages.get', emptyPackage)
+      const cmd = rtLib.mockResolved(rtPackagesGet, emptyPackage)
       command.argv = ['--projectname', 'proj', '-m', '/deploy/manifest.yaml']
       rtLib.mockResolved(rtPackageList, sharedPackagelist)
-      rtLib.mockResolved('actions.get', '')
-      fs.writeFileSync = jest.fn()
+      rtLib.mockResolved(rtActionsGet, '')
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalled()
@@ -488,8 +491,8 @@ describe('instance methods', () => {
       const cmd = rtLib.mockResolved(owTriggerList, '')
       command.argv = ['--projectname', 'proj', '-m', '/deploy/manifest.yaml']
       rtLib.mockResolved(rtPackageList, packagelist)
-      rtLib.mockResolved('packages.get', packageget)
-      rtLib.mockResolved('actions.get', actionGet)
+      rtLib.mockResolved(rtPackagesGet, packageget)
+      rtLib.mockResolved(rtActionsGet, actionGet)
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalled()
@@ -501,8 +504,8 @@ describe('instance methods', () => {
       const cmd = rtLib.mockResolved(owRulesList, '')
       command.argv = ['--projectname', 'proj', '-m', '/deploy/manifest.yaml']
       rtLib.mockResolved(rtPackageList, packagelist)
-      rtLib.mockResolved('packages.get', packageget)
-      rtLib.mockResolved('actions.get', actionGet)
+      rtLib.mockResolved(rtPackagesGet, packageget)
+      rtLib.mockResolved(rtActionsGet, actionGet)
       rtLib.mockResolved(owTriggerList, '')
       return command.run()
         .then(() => {
@@ -513,9 +516,8 @@ describe('instance methods', () => {
 
     test('write to manifest file when trigger has a feed', () => {
       rtLib.mockResolved(owTriggerList, triggerWithFeed)
-      rtLib.mockResolved('triggers.get', triggerGetWithFeed)
+      rtLib.mockResolved(rtTriggersGet, triggerGetWithFeed)
       rtLib.mockResolved(owRulesList, ruleslist)
-      fs.writeFileSync = jest.fn()
       command.argv = ['--projectname', 'proj', '-m', '/deploy/manifest.yaml']
       const yaml = fixtureFile('deploy/export_yaml_feed.yaml')
       return command.run()
@@ -528,9 +530,8 @@ describe('instance methods', () => {
 
     test('write action to js file', () => {
       rtLib.mockResolved(owTriggerList, triggerlist)
-      rtLib.mockResolved('triggers.get', triggerGet)
+      rtLib.mockResolved(rtTriggersGet, triggerGet)
       rtLib.mockResolved(owRulesList, ruleslist)
-      fs.writeFileSync = jest.fn()
       command.argv = ['--projectname', 'proj', '-m', '/deploy/manifest.yaml']
       const yaml = fixtureFile('deploy/export_yaml.yaml')
       return command.run()
@@ -542,11 +543,10 @@ describe('instance methods', () => {
     })
 
     test('write sequence to js file', async () => {
-      rtLib.mockResolved('actions.get', sequenceGet)
+      rtLib.mockResolved(rtActionsGet, sequenceGet)
       rtLib.mockResolved(owTriggerList, triggerlist)
-      rtLib.mockResolved('triggers.get', triggerGet)
+      rtLib.mockResolved(rtTriggersGet, triggerGet)
       rtLib.mockResolved(owRulesList, ruleslist)
-      fs.writeFileSync = jest.fn()
       command.argv = ['--projectname', 'proj', '-m', '/deploy/manifest.yaml']
       const yaml = fixtureFile('deploy/export_yaml_Sequence.yaml')
       await command.run()
@@ -555,11 +555,10 @@ describe('instance methods', () => {
 
     test('write binary of action to js file', () => {
       const bufferData = Buffer.from('code', 'base64')
-      rtLib.mockResolved('actions.get', actionBinaryGet)
+      rtLib.mockResolved(rtActionsGet, actionBinaryGet)
       rtLib.mockResolved(owTriggerList, triggerlist)
-      rtLib.mockResolved('triggers.get', triggerGet)
+      rtLib.mockResolved(rtTriggersGet, triggerGet)
       rtLib.mockResolved(owRulesList, ruleslist)
-      fs.writeFileSync = jest.fn()
       command.argv = ['--projectname', 'proj', '-m', '/deploy/manifest.yaml']
       return command.run()
         .then(() => {
@@ -571,7 +570,6 @@ describe('instance methods', () => {
       rtLib.mockResolved(rtPackageList, packageNoAnnotations)
       rtLib.mockResolved(owTriggerList, '')
       rtLib.mockResolved(owRulesList, '')
-      fs.writeFileSync = jest.fn()
       command.argv = ['--projectname', 'proj', '-m', '/deploy/manifest.yaml']
       const yaml = fixtureFile('deploy/export_yaml_noAnnotations.yaml')
       return command.run()
@@ -582,7 +580,6 @@ describe('instance methods', () => {
 
     test('write project name to manifest file if package has no whisk managed project name and there are no triggers and rules', () => {
       rtLib.mockResolved(rtPackageList, packagelistNoProjectName)
-      fs.writeFileSync = jest.fn()
       rtLib.mockResolved(owTriggerList, '')
       rtLib.mockResolved(owRulesList, '')
       command.argv = ['--projectname', 'proj', '-m', '/deploy/manifest.yaml']
@@ -597,7 +594,7 @@ describe('instance methods', () => {
       rtLib.mockResolved(rtPackageList, '')
       rtLib.mockResolved(owTriggerList, triggerNoProjectName)
       rtLib.mockResolved(owRulesList, '')
-      const cmd = rtLib.mockResolved('triggers.get', '')
+      const cmd = rtLib.mockResolved(rtTriggersGet, '')
       command.argv = ['--projectname', 'proj', '-m', '/deploy/manifest.yaml']
       return command.run()
         .then(() => {
@@ -609,7 +606,7 @@ describe('instance methods', () => {
       rtLib.mockResolved(rtPackageList, '')
       rtLib.mockResolved(owTriggerList, triggerNoAnnotation)
       rtLib.mockResolved(owRulesList, '')
-      const cmd = rtLib.mockResolved('triggers.get', '')
+      const cmd = rtLib.mockResolved(rtTriggersGet, '')
       command.argv = ['--projectname', 'proj', '-m', '/deploy/manifest.yaml']
       return command.run()
         .then(() => {
@@ -619,7 +616,6 @@ describe('instance methods', () => {
 
     test('write project name to manifest file if rule has no whisk managed project name', () => {
       rtLib.mockResolved(rtPackageList, '')
-      fs.writeFileSync = jest.fn()
       rtLib.mockResolved(owTriggerList, '')
       rtLib.mockResolved(owRulesList, rulesNoAnnotations)
       command.argv = ['--projectname', 'proj', '-m', '/deploy/manifest.yaml']
@@ -636,6 +632,23 @@ describe('instance methods', () => {
       const error = ['Failed to export', new Error('an error')]
       await expect(command.run()).rejects.toThrow(error[0])
       expect(handleError).toHaveBeenLastCalledWith(...error)
+    })
+
+    test('do not create the package folder if it already exists (coverage)', () => {
+      const newJson = {
+        ...FILE_SYSTEM_JSON,
+        '/deploy/testSeq': true
+      }
+      createFileSystem(newJson)
+
+      rtLib.mockResolved(rtPackageList, packagelist)
+      command.argv = ['--projectname', 'proj', '-m', '/deploy/manifest.yaml']
+      const yaml = fixtureFile('deploy/export_yaml_noAnnotations.yaml')
+      return command.run()
+        .then(() => {
+          expect(fs.writeFileSync).toHaveBeenCalledWith('/deploy/manifest.yaml', yaml)
+          expect(fs.mkdirSync).not.toHaveBeenCalled()
+        })
     })
   })
 })

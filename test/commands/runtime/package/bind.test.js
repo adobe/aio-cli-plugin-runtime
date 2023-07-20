@@ -46,14 +46,11 @@ test('flags', async () => {
 })
 
 test('args', async () => {
-  const packageName = TheCommand.args[0]
-  expect(packageName.name).toBeDefined()
-  expect(packageName.name).toEqual('packageName')
-  expect(packageName.required).toEqual(true)
-  const bindPackageName = TheCommand.args[1]
-  expect(bindPackageName.name).toBeDefined()
-  expect(bindPackageName.name).toEqual('bindPackageName')
-  expect(bindPackageName.required).toEqual(true)
+  expect(TheCommand.args.packageName).toBeDefined()
+  expect(TheCommand.args.packageName.required).toEqual(true)
+
+  expect(TheCommand.args.bindPackageName).toBeDefined()
+  expect(TheCommand.args.bindPackageName.required).toEqual(true)
 })
 
 describe('instance methods', () => {
@@ -68,7 +65,7 @@ describe('instance methods', () => {
 
   afterAll(() => {
     // reset back to normal
-    fakeFileSystem.reset()
+    clearMockedFs()
   })
 
   describe('run', () => {

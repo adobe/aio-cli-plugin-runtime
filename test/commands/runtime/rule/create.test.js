@@ -10,6 +10,8 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
+/* eslint jest/expect-expect: ["error", { "assertFunctionNames": ["expect", "createTestBaseFlagsFunction"] }] */
+
 const TheCommand = require('../../../../src/commands/runtime/rule/create.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
 const rtAction = 'rules.create'
@@ -32,24 +34,19 @@ test('aliases', async () => {
 })
 
 test('args', async () => {
-  const args = TheCommand.args
-  expect(args).toBeDefined()
-  expect(args.length).toEqual(3)
+  expect(TheCommand.args.name).toBeDefined()
+  expect(TheCommand.args.name.required).toBeTruthy()
+  expect(TheCommand.args.name.description).toBeDefined()
 
-  expect(args[0].name).toEqual('name')
-  expect(args[0].required).toBeTruthy()
-  expect(args[0].description).toBeDefined()
+  expect(TheCommand.args.trigger).toBeDefined()
+  expect(TheCommand.args.trigger.required).toBeTruthy()
+  expect(TheCommand.args.trigger.description).toBeDefined()
 
-  expect(args[1].name).toEqual('trigger')
-  expect(args[1].required).toBeTruthy()
-  expect(args[1].description).toBeDefined()
-
-  expect(args[2].name).toEqual('action')
-  expect(args[2].required).toBeTruthy()
-  expect(args[2].description).toBeDefined()
+  expect(TheCommand.args.action).toBeDefined()
+  expect(TheCommand.args.action.required).toBeTruthy()
+  expect(TheCommand.args.action.description).toBeDefined()
 })
 
-// eslint-disable-next-line jest/expect-expect
 test('base flags included in command flags',
   createTestBaseFlagsFunction(TheCommand, RuntimeBaseCommand)
 )

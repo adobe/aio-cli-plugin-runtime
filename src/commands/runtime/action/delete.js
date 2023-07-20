@@ -11,7 +11,7 @@ governing permissions and limitations under the License.
 */
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
-const { Flags } = require('@oclif/core')
+const { Flags, Args } = require('@oclif/core')
 
 class ActionDelete extends RuntimeBaseCommand {
   async run () {
@@ -29,12 +29,11 @@ class ActionDelete extends RuntimeBaseCommand {
   }
 }
 
-ActionDelete.args = [
-  {
-    name: 'actionName',
+ActionDelete.args = {
+  actionName: Args.string({
     required: true
-  }
-]
+  })
+}
 
 ActionDelete.flags = {
   ...RuntimeBaseCommand.flags,

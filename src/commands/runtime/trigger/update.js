@@ -12,18 +12,18 @@ governing permissions and limitations under the License.
 
 const TriggerCreate = require('./create')
 const cloneDeep = require('lodash.clonedeep')
+const { Args } = require('@oclif/core')
 
 class TriggerUpdate extends TriggerCreate {
   isUpdate () { return true }
 }
 
-TriggerUpdate.args = [
-  {
-    name: 'triggerName',
+TriggerUpdate.args = {
+  triggerName: Args.string({
     required: true,
     description: 'The name of the trigger'
-  }
-]
+  })
+}
 
 TriggerUpdate.flags = cloneDeep(TriggerCreate.flags)
 // TODO: Updating a feed is not supported as per wsk cli. Need to check if we can still support it.

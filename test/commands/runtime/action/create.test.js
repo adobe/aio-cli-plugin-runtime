@@ -67,7 +67,6 @@ test('aliases', async () => {
 // ///////////////////////////////////////////
 
 const JS_FILE = fixtureFile('action/actionFile.js')
-const WSK_PROPS_PATH = require('path').join(require('os').homedir(), '.wskprops')
 const FILE_SYSTEM_JSON = {
   [WSK_PROPS_PATH]: 'AUTH=something',
   '/action/actionFile.js': fixtureFile('action/actionFile.js'),

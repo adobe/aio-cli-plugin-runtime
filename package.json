@@ -68,11 +68,10 @@
   },
   "repository": "adobe/aio-cli-plugin-runtime",
   "scripts": {
-    "jest:debug": "jest --runInBand test/commands/runtime/action/create*",
     "eslint-fix": "eslint src test e2e --fix",
     "posttest": "eslint src test e2e",
     "test": "npm run unit-tests",
-    "unit-tests": "jest --ci",
+    "unit-tests": "jest --ci --runInBand test",
     "prepack": "oclif manifest && oclif readme --no-aliases",
     "postpack": "rm -f oclif.manifest.json",
     "version": "oclif readme --no-aliases && git add README.md",

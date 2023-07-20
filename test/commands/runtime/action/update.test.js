@@ -62,13 +62,9 @@ test('flags', async () => {
 })
 
 test('args', async () => {
-  const actionName = TheCommand.args[0]
-  expect(actionName.name).toBeDefined()
-  expect(actionName.name).toEqual('actionName')
-  expect(actionName.required).toEqual(true)
-  const actionPath = TheCommand.args[1]
-  expect(actionPath.name).toBeDefined()
-  expect(actionPath.name).toEqual('actionPath')
+  expect(TheCommand.args.actionName).toBeDefined()
+  expect(TheCommand.args.actionName.required).toEqual(true)
+  expect(TheCommand.args.actionPath).toBeDefined()
 })
 
 describe('instance methods', () => {
@@ -81,17 +77,18 @@ describe('instance methods', () => {
     RuntimeLib.mockReset()
   })
 
+  const FILE_SYSTEM_JSON = {
+    [WSK_PROPS_PATH]: 'AUTH=something',
+    '/action/actionFile.js': fixtureFile('action/actionFile.js'),
+    '/action/zipAction.zip': 'fakezipfile'
+  }
+
   beforeAll(() => {
-    const json = {
-      'action/actionFile.js': fixtureFile('action/actionFile.js'),
-      'action/zipAction.zip': 'fakezipfile'
-    }
-    fakeFileSystem.addJson(json)
+    createFileSystem(FILE_SYSTEM_JSON)
   })
 
   afterAll(() => {
-    // reset back to normal
-    fakeFileSystem.reset()
+    clearMockedFs()
   })
 
   describe('run', () => {

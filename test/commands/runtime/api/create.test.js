@@ -10,6 +10,8 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
+/* eslint jest/expect-expect: ["error", { "assertFunctionNames": ["expect", "createTestBaseFlagsFunction"] }] */
+
 const TheCommand = require('../../../../src/commands/runtime/api/create.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
 const rtAction = 'routes.create'
@@ -32,29 +34,24 @@ test('aliases', async () => {
 })
 
 test('args', async () => {
-  const args = TheCommand.args
-  expect(args).toBeDefined()
-  expect(args.length).toEqual(4)
+  expect(TheCommand.args.basePath).toBeDefined()
+  expect(TheCommand.args.basePath.required).not.toBeTruthy()
+  expect(TheCommand.args.basePath.description).toBeDefined()
 
-  expect(args[0].name).toEqual('basePath')
-  expect(args[0].required).not.toBeTruthy()
-  expect(args[0].description).toBeDefined()
+  expect(TheCommand.args.basePath).toBeDefined()
+  expect(TheCommand.args.basePath.required).not.toBeTruthy()
+  expect(TheCommand.args.basePath.description).toBeDefined()
 
-  expect(args[1].name).toEqual('relPath')
-  expect(args[1].required).not.toBeTruthy()
-  expect(args[1].description).toBeDefined()
+  expect(TheCommand.args.apiVerb).toBeDefined()
+  expect(TheCommand.args.apiVerb.required).not.toBeTruthy()
+  expect(TheCommand.args.apiVerb.options).toMatchObject(['get', 'post', 'put', 'patch', 'delete', 'head', 'options'])
+  expect(TheCommand.args.apiVerb.description).toBeDefined()
 
-  expect(args[2].name).toEqual('apiVerb')
-  expect(args[2].required).not.toBeTruthy()
-  expect(args[2].options).toMatchObject(['get', 'post', 'put', 'patch', 'delete', 'head', 'options'])
-  expect(args[2].description).toBeDefined()
-
-  expect(args[3].name).toEqual('action')
-  expect(args[3].required).not.toBeTruthy()
-  expect(args[3].description).toBeDefined()
+  expect(TheCommand.args.action).toBeDefined()
+  expect(TheCommand.args.action.required).not.toBeTruthy()
+  expect(TheCommand.args.action.description).toBeDefined()
 })
 
-// eslint-disable-next-line jest/expect-expect
 test('base flags included in command flags',
   createTestBaseFlagsFunction(TheCommand, RuntimeBaseCommand)
 )
@@ -83,15 +80,18 @@ describe('instance methods', () => {
     rtLib.mockResolved('actions.client.options', '')
     RuntimeLib.mockReset()
   })
+
+  const FILE_SYSTEM_JSON = {
+    [WSK_PROPS_PATH]: 'AUTH=something',
+    '/api/api_swagger.json': fixtureFile('api/api_swagger.json')
+  }
+
   beforeAll(() => {
-    const json = {
-      'api/api_swagger.json': fixtureFile('api/api_swagger.json')
-    }
-    fakeFileSystem.addJson(json)
+    createFileSystem(FILE_SYSTEM_JSON)
   })
+
   afterAll(() => {
-    // reset back to normal
-    fakeFileSystem.reset()
+    clearMockedFs()
   })
 
   describe('run', () => {

@@ -10,7 +10,7 @@ governing permissions and limitations under the License.
 */
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
-const { Flags } = require('@oclif/core')
+const { Flags, Args } = require('@oclif/core')
 
 class RuleCreate extends RuntimeBaseCommand {
   isUpdate () { return false }
@@ -34,23 +34,20 @@ class RuleCreate extends RuntimeBaseCommand {
 
 RuleCreate.description = 'Create a Rule'
 
-RuleCreate.args = [
-  {
-    name: 'name',
+RuleCreate.args = {
+  name: Args.string({
     required: true,
     description: 'Name of the rule'
-  },
-  {
-    name: 'trigger',
+  }),
+  trigger: Args.string({
     required: true,
     description: 'Name of the trigger'
-  },
-  {
-    name: 'action',
+  }),
+  action: Args.string({
     required: true,
     description: 'Name of the action'
-  }
-]
+  })
+}
 
 RuleCreate.flags = {
   ...RuntimeBaseCommand.flags,

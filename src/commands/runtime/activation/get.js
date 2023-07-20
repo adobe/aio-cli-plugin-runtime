@@ -9,14 +9,14 @@ the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTA
 OF ANY KIND, either express or implied. See the License for the specific language
 governing permissions and limitations under the License.
 */
-const { Flags } = require('@oclif/core')
+const { Flags, Args } = require('@oclif/core')
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 const { printLogs } = require('@adobe/aio-lib-runtime').utils
 
 class ActivationGet extends RuntimeBaseCommand {
   async run () {
     const { args, flags } = await this.parse(ActivationGet)
-    let id = args.activationID
+    let id = args.activationId
     try {
       const ow = await this.wsk()
       if (flags.last) {
@@ -28,7 +28,7 @@ class ActivationGet extends RuntimeBaseCommand {
         }
       }
       if (!id) {
-        this.error('missing required argument activationID')
+        this.error('missing required argument activationId')
       }
 
       if (flags.logs) {
@@ -45,11 +45,10 @@ class ActivationGet extends RuntimeBaseCommand {
   }
 }
 
-ActivationGet.args = [
-  {
-    name: 'activationID'
-  }
-]
+ActivationGet.args = {
+  activationId: Args.string({
+  })
+}
 
 ActivationGet.flags = {
   ...RuntimeBaseCommand.flags,

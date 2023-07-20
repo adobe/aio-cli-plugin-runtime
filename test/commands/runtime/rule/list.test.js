@@ -10,6 +10,8 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
+/* eslint jest/expect-expect: ["error", { "assertFunctionNames": ["expect", "createTestBaseFlagsFunction"] }] */
+
 const TheCommand = require('../../../../src/commands/runtime/rule/list.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
 const rtAction = 'rules.list'
@@ -31,7 +33,6 @@ test('aliases', async () => {
   expect(TheCommand.aliases.length).toBeGreaterThan(0)
 })
 
-// eslint-disable-next-line jest/expect-expect
 test('base flags included in command flags',
   createTestBaseFlagsFunction(TheCommand, RuntimeBaseCommand)
 )
@@ -150,16 +151,15 @@ describe('instance methods', () => {
         })
     })
 
-    // eslint-disable-next-line jest/no-commented-out-tests
-    // test('return the number of rules with count flag', () => {
-    //   let cmd = rtLib.mockResolved(rtAction, '2')
-    //   command.argv = ['--count']
-    //   return command.run()
-    //     .then(() => {
-    //       expect(cmd).toHaveBeenCalledWith({ 'count': true, 'limit': 30 })
-    //       expect(stdout.output).toMatch('2')
-    //     })
-    // })
+    test('return the number of rules with count flag', () => {
+      const cmd = rtLib.mockResolved(rtAction, Promise.resolve({ rules: 2 }))
+      command.argv = ['--count']
+      return command.run()
+        .then(() => {
+          expect(cmd).toHaveBeenCalledWith({ count: true, useragent: expect.any(String) })
+          expect(stdout.output).toMatch('2')
+        })
+    })
 
     test('return empty list of rules', () => {
       const cmd = rtLib.mockResolved(rtAction, [])

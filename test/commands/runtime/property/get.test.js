@@ -10,6 +10,8 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
+/* eslint jest/expect-expect: ["error", { "assertFunctionNames": ["expect", "createTestFlagsFunction"] }] */
+
 const TheCommand = require('../../../../src/commands/runtime/property/get.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
 const { stdout } = require('stdout-stderr')
@@ -36,15 +38,14 @@ test('aliases', async () => {
 })
 
 test('args', async () => {
-  expect(TheCommand.args).not.toBeDefined()
+  expect(TheCommand.args).toEqual({})
 })
 
-// eslint-disable-next-line jest/expect-expect
-test('base flags included in command flags',
+test('base flags included in command flags', () => {
   createTestFlagsFunction(TheCommand, {
     ...RuntimeBaseCommand.flags
   })
-)
+})
 
 test('flags', async () => {
   const flags = TheCommand.flags
@@ -82,12 +83,20 @@ describe('instance methods', () => {
     command = new TheCommand([])
   })
 
+  afterEach(() => {
+    clearMockedFs()
+  })
+
   describe('run', () => {
     test('exists', async () => {
       expect(command.run).toBeInstanceOf(Function)
     })
 
     test('no flags', () => {
+      createFileSystem({
+        [WSK_PROPS_PATH]: fixtureFile('wsk.properties')
+      })
+
       // cli version
       command.config = fixtureJson('property/config.json')
       return command.run()
@@ -97,6 +106,10 @@ describe('instance methods', () => {
     })
 
     test('no flags, api server unreachable', () => {
+      createFileSystem({
+        [WSK_PROPS_PATH]: fixtureFile('wsk.properties')
+      })
+
       // apibuild and apibuildno
       mockFetch.mockRejectedValue(new Error('no connection'))
 
@@ -109,6 +122,10 @@ describe('instance methods', () => {
     })
 
     test('--all', () => {
+      createFileSystem({
+        [WSK_PROPS_PATH]: fixtureFile('wsk.properties')
+      })
+
       // cli version
       command.config = fixtureJson('property/config.json')
       // set flag
@@ -120,6 +137,10 @@ describe('instance methods', () => {
     })
 
     test('--namespace', () => {
+      createFileSystem({
+        [WSK_PROPS_PATH]: fixtureFile('wsk.properties')
+      })
+
       // cli version
       command.config = fixtureJson('property/config.json')
       // set flag
@@ -131,6 +152,10 @@ describe('instance methods', () => {
     })
 
     test('--auth', () => {
+      createFileSystem({
+        [WSK_PROPS_PATH]: fixtureFile('wsk.properties')
+      })
+
       // cli version
       command.config = fixtureJson('property/config.json')
       // set flag
@@ -142,6 +167,10 @@ describe('instance methods', () => {
     })
 
     test('--apihost', () => {
+      createFileSystem({
+        [WSK_PROPS_PATH]: fixtureFile('wsk.properties')
+      })
+
       // cli version
       command.config = fixtureJson('property/config.json')
       // set flag
@@ -198,7 +227,9 @@ describe('instance methods', () => {
     })
 
     test('keys not found in .wskconfig, use defaults', () => {
-      fakeFileSystem.reset({ emptyWskProps: true })
+      createFileSystem({
+        [WSK_PROPS_PATH]: fixtureFile('empty-wsk.properties')
+      })
 
       // cli version
       command.config = fixtureJson('property/config.json')
@@ -207,12 +238,14 @@ describe('instance methods', () => {
       return command.run()
         .then(() => {
           expect(stdout.output).toMatchFixture('property/all-empty-wskprops.txt')
-          fakeFileSystem.reset()
         })
     })
 
     test('ENV overrides', () => {
-      fakeFileSystem.reset({ emptyWskProps: true })
+      createFileSystem({
+        [WSK_PROPS_PATH]: fixtureFile('empty-wsk.properties')
+      })
+
       process.env[PropertyEnv.APIHOST] = 'https://google.com'
       process.env[PropertyEnv.AUTH] = 'foobar'
       process.env[PropertyEnv.APIVERSION] = 'v12.4'
