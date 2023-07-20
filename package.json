@@ -68,6 +68,7 @@
   },
   "repository": "adobe/aio-cli-plugin-runtime",
   "scripts": {
+    "jest:debug": "jest --runInBand test/commands/runtime/action/create*",
     "eslint-fix": "eslint src test e2e --fix",
     "posttest": "eslint src test e2e",
     "test": "npm run unit-tests",

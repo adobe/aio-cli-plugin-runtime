@@ -14,7 +14,7 @@ const fs = require('fs')
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 const { createKeyValueArrayFromFlag, createKeyValueArrayFromFile, createComponentsfromSequence, getKeyValueArrayFromMergedParameters } = require('@adobe/aio-lib-runtime').utils
 const { kindForFileExtension } = require('../../../kinds')
-const { Flags } = require('@oclif/core')
+const { Flags, Args } = require('@oclif/core')
 
 class ActionCreate extends RuntimeBaseCommand {
   isUpdate () { return false }
@@ -66,7 +66,7 @@ class ActionCreate extends RuntimeBaseCommand {
             if (!flags.kind && !flags.docker) {
               throw (new Error(ActionCreate.errorMessages.missingKindForZip))
             }
-            exec.code = fs.readFileSync(args.actionPath).toString('base64')
+            exec.code = Buffer.from(fs.readFileSync(args.actionPath)).toString('base64')
           } else {
             exec.code = fs.readFileSync(args.actionPath, { encoding: 'utf8' })
           }
@@ -220,15 +220,20 @@ class ActionCreate extends RuntimeBaseCommand {
   }
 }
 
-ActionCreate.args = [
-  {
-    name: 'actionName',
-    required: true
-  },
-  {
-    name: 'actionPath'
-  }
-]
+// ActionCreate.args0 = [
+//   {
+//     name: 'actionName',
+//     required: true
+//   },
+//   {
+//     name: 'actionPath'
+//   }
+// ]
+
+ActionCreate.args = {
+  actionName: Args.string({ required: true }),
+  actionPath: Args.string()
+}
 
 ActionCreate.limits = {
   timeoutMs: {
@@ -324,6 +329,7 @@ ActionCreate.flags = {
 }
 
 ActionCreate.description = 'Creates an Action'
+
 ActionCreate.errorMessages = {
   websecure: 'Cannot specify --web-secure without also specifying --web [true|raw]',
   sequenceWithAction: 'Cannot specify sequence and a code artifact at the same time',

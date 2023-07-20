@@ -155,4 +155,6 @@ RuntimeBaseCommand.flags = {
   })
 }
 
+RuntimeBaseCommand.args = {}
+
 module.exports = RuntimeBaseCommand

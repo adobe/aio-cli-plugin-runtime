@@ -11,14 +11,13 @@ governing permissions and limitations under the License.
 */
 
 const { stdout } = require('stdout-stderr')
-const fs = jest.requireActual('fs')
+const realFs = jest.requireActual('fs')
+const fs = require('fs')
 const eol = require('eol')
+const path = require('path')
 
 jest.setTimeout(30000)
 jest.useFakeTimers()
-
-// dont touch the real fs
-jest.mock('fs', () => require('jest-plugin-fs/mock'))
 
 // ensure a mocked openwhisk module for unit-tests
 jest.mock('openwhisk')
@@ -36,9 +35,71 @@ delete process.env.WSK_CONFIG_FILE
 beforeEach(() => { stdout.start() })
 afterEach(() => { stdout.stop() })
 
+jest.mock('fs', () => ({
+  ...jest.requireActual('fs'),
+  existsSync: jest.fn(),
+  // we have to have the default behaviour at the start since @oclif/core does some file reading on require
+  readFileSync: jest.fn((p) => jest.requireActual('fs').readFileSync(p)),
+  unlinkSync: jest.fn(),
+  rmdirSync: jest.fn(),
+  readdirSync: jest.fn()
+}))
+
+global.createFileSystem = (initialFiles = {}) => {
+  const myFileSystem = { ...initialFiles }
+
+  fs.existsSync.mockImplementation((filePath) => {
+    const value = !!myFileSystem[filePath]
+    if (!value) {
+      return realFs.existsSync(filePath)
+    } else {
+      return value
+    }
+  })
+
+  fs.readFileSync.mockImplementation((filePath) => {
+    const value = myFileSystem[filePath]
+    if (!value) {
+      return realFs.readFileSync(filePath)
+    } else {
+      return value
+    }
+  })
+
+  const removeFile = (filePath) => {
+    delete myFileSystem[filePath]
+  }
+
+  fs.unlinkSync.mockImplementation(removeFile)
+  fs.rmdirSync.mockImplementation(removeFile)
+
+  fs.readdirSync.mockImplementation((filePath) => {
+    const item = myFileSystem[filePath]
+    if (!Array.isArray(item)) {
+      throw new Error(`Fake filesystem ${filePath} value does not contain an array.`)
+    }
+    return item
+  })
+
+  return myFileSystem
+}
+
+global.clearMockedFs = () => {
+  const mockedFs = require('fs')
+
+  mockedFs.existsSync.mockImplementation((p) => realFs.existsSync(p))
+  mockedFs.readFileSync.mockImplementation((p) => realFs.readFileSync(p))
+  mockedFs.unlinkSync.mockImplementation((p) => realFs.unlinkSync(p))
+  mockedFs.rmdirSync.mockImplementation((p) => realFs.rmdirSync(p))
+  mockedFs.readdirSync.mockImplementation((p) => realFs.readdirSync(p))
+}
+
 // helper for fixtures
 global.fixtureFile = (output) => {
-  return fs.readFileSync(`./test/__fixtures__/${output}`).toString()
+  if (!realFs.existsSync(`./test/__fixtures__/${output}`)) {
+    throw new Error(`./test/__fixtures__/${output}` + ' not found')
+  }
+  return realFs.readFileSync(`./test/__fixtures__/${output}`).toString()
 }
 
 // helper for fixtures, with regex replacement of place holders
@@ -103,57 +164,13 @@ global.fixtureFileWithTimeZoneAdjustment = (() => {
 
 // helper for fixtures
 global.fixtureJson = (output) => {
-  return JSON.parse(fs.readFileSync(`./test/__fixtures__/${output}`).toString())
+  return JSON.parse(realFs.readFileSync(path.join(__dirname, '__fixtures__', output)).toString())
 }
 
 // helper for zip fixtures
 global.fixtureZip = (output) => {
-  return fs.readFileSync(`./test/__fixtures__/${output}`)
+  return realFs.readFileSync(path.join(__dirname, '__fixtures__', output))
 }
-
-// define a filesystem with a fake .wskprops
-const wskprops = require('path').join(require('os').homedir(), '.wskprops')
-const wskPropsFs = {
-  [wskprops]: global.fixtureFile('wsk.properties')
-}
-const emptyWskPropsFs = {
-  [wskprops]: global.fixtureFile('empty-wsk.properties')
-}
-
-// set the fake filesystem
-const ffs = require('jest-plugin-fs').default
-
-global.fakeFileSystem = {
-  addJson: (json) => {
-    // add to existing
-    ffs.mock(json)
-  },
-  removeKeys: (arr) => {
-    // remove from existing
-    const files = ffs.files()
-    for (const prop in files) {
-      if (arr.includes(prop)) {
-        delete files[prop]
-      }
-    }
-    ffs.restore()
-    ffs.mock(files)
-  },
-  clear: () => {
-    // reset to empty
-    ffs.restore()
-  },
-  reset: ({ emptyWskProps = false } = {}) => {
-    // reset to file system with wskprops
-    ffs.restore()
-    ffs.mock(emptyWskProps ? emptyWskPropsFs : wskPropsFs)
-  },
-  files: () => {
-    return ffs.files()
-  }
-}
-// seed the fake filesystem
-fakeFileSystem.reset()
 
 global.createTestBaseFlagsFunction = (TheCommand, BaseCommand) => {
   return global.createTestFlagsFunction(TheCommand, BaseCommand.flags)
