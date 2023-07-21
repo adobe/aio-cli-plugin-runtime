@@ -229,21 +229,6 @@ ActionCreate.args = {
   actionPath: Args.string()
 }
 
-ActionCreate.limits = {
-  timeoutMs: {
-    min: 100,
-    max: 3600000
-  },
-  memoryMB: {
-    min: 128,
-    max: 4096
-  },
-  logsizeMB: {
-    min: 0,
-    max: 10
-  }
-}
-
 ActionCreate.flags = {
   ...RuntimeBaseCommand.flags,
   param: Flags.string({
@@ -277,21 +262,15 @@ ActionCreate.flags = {
   }),
   timeout: Flags.integer({
     char: 't',
-    description: `the timeout LIMIT in milliseconds after which the action is terminated (default 60000, min: ${ActionCreate.limits.timeoutMs.min}, max: ${ActionCreate.limits.timeoutMs.max})`, // help description for flag
-    min: ActionCreate.limits.timeoutMs.min,
-    max: ActionCreate.limits.timeoutMs.max
+    description: 'the timeout LIMIT in milliseconds after which the action is terminated (default 60000, min: 100, max: 3600000)' // help description for flag
   }),
   memory: Flags.integer({
     char: 'm',
-    description: `the maximum memory LIMIT in MB for the action (default 256, min: ${ActionCreate.limits.memoryMB.min}, max: ${ActionCreate.limits.memoryMB.max})`, // help description for flag
-    min: ActionCreate.limits.memoryMB.min,
-    max: ActionCreate.limits.memoryMB.max
+    description: 'the maximum memory LIMIT in MB for the action (default 256, min: 128, max: 4096)' // help description for flag
   }),
   logsize: Flags.integer({
     char: 'l',
-    description: `the maximum log size LIMIT in MB for the action (default 10, min: ${ActionCreate.limits.logsizeMB.min}, max: ${ActionCreate.limits.logsizeMB.max})`, // help description for flag
-    min: ActionCreate.limits.logsizeMB.min,
-    max: ActionCreate.limits.logsizeMB.max
+    description: 'the maximum log size LIMIT in MB for the action (default 10, min: 0, max: 10)' // help description for flag
   }),
   concurrency: Flags.integer({
     char: 'c',

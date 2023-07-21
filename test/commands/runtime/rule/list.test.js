@@ -213,19 +213,5 @@ describe('instance methods', () => {
       await expect(command.run()).rejects.toThrow(...error)
       expect(handleError).toHaveBeenLastCalledWith(...error)
     })
-
-    test('errors out on list with limit below min', async () => {
-      const flag = '--limit'
-      const invalidValue = '-1'
-      command.argv = [flag, invalidValue]
-      await expect(command.run()).rejects.toThrow(`Parsing ${flag} \n\tExpected an integer greater than or equal to 0 but received: ${invalidValue}\nSee more help with --help`)
-    })
-
-    test('errors out on list with limit above max', async () => {
-      const flag = '--limit'
-      const invalidValue = '51'
-      command.argv = [flag, invalidValue]
-      await expect(command.run()).rejects.toThrow(`Parsing ${flag} \n\tExpected an integer less than or equal to 50 but received: ${invalidValue}\nSee more help with --help`)
-    })
   })
 })
