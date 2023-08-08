@@ -8,7 +8,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@adobe/aio-lib-core-config": "^3.0.0",
+    "@adobe/aio-lib-core-config": "^4.0.0",
     "@adobe/aio-lib-core-networking": "^4.1.0",
     "@adobe/aio-lib-runtime": "^5.0.0",
     "@oclif/core": "^1.3.0",
