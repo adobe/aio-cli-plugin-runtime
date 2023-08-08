@@ -28,7 +28,7 @@ test('set log forwarding settings to azure_log_analytics', () => {
     return command.run()
       .then(() => {
         expect(stdout.output).toMatch(/Log forwarding was set to azure_log_analytics for this namespace/)
-        expect(setCall).toBeCalledTimes(1)
+        expect(setCall).toHaveBeenCalledTimes(1)
         expect(setCall).toHaveBeenCalledWith('azure_log_analytics', { customer_id: 'customer1', shared_key: 'key1', log_type: 'mylog' })
         resolve()
       })
