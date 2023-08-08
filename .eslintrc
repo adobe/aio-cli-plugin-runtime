@@ -10,5 +10,15 @@
       "fixtureZip": true,
       "createTestBaseFlagsFunction": true,
       "createTestFlagsFunction": true
+    },
+    "rules": {
+      "jsdoc/tag-lines": [
+          // The Error level should be `error`, `warn`, or `off` (or 2, 1, or 0)
+          "error",
+          "never",
+          {
+            "startLines": null
+          }
+      ]
     }
 }

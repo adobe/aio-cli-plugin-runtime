@@ -35,9 +35,8 @@ delete process.env.WSK_CONFIG_FILE
 global.WSK_PROPS_PATH = require('path').join(require('os').homedir(), '.wskprops')
 
 // trap console log
-// if you want to see output, you can do this:
-// beforeEach(() => { stdout.start(); stdout.print = true })
-beforeEach(() => { stdout.start() })
+// if you want to see output, set stdout.print = true:
+beforeEach(() => { stdout.start(); stdout.print = false })
 afterEach(() => { stdout.stop() })
 
 jest.mock('fs', () => ({
@@ -209,6 +208,7 @@ global.createTestFlagsFunction = (TheCommand, Flags) => {
 expect.extend({
   toMatchFixture (received, argument) {
     const val = fixtureFile(argument)
+    // eslint-disable-next-line jest/no-standalone-expect
     expect(eol.auto(received)).toEqual(eol.auto(val))
     return { pass: true }
   }
@@ -224,6 +224,7 @@ expect.extend({
   toMatchFixtureIgnoreWhite (received, argument) {
     const val = cleanWhite(fixtureFile(argument))
     // eat white
+    // eslint-disable-next-line jest/no-standalone-expect
     expect(cleanWhite(received)).toEqual(val)
     return { pass: true }
   }
@@ -232,6 +233,7 @@ expect.extend({
 expect.extend({
   toMatchFixtureJson (received, argument) {
     const val = fixtureJson(argument)
+    // eslint-disable-next-line jest/no-standalone-expect
     expect(received).toEqual(val)
     return { pass: true }
   }

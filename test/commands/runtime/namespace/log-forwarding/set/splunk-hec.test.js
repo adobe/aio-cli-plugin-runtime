@@ -28,7 +28,7 @@ test('set log forwarding settings to splunk_hec', () => {
     return command.run()
       .then(() => {
         expect(stdout.output).toMatch(/Log forwarding was set to splunk_hec for this namespace/)
-        expect(setCall).toBeCalledTimes(1)
+        expect(setCall).toHaveBeenCalledTimes(1)
         expect(setCall).toHaveBeenCalledWith('splunk_hec', { host: 'host1', port: 'port1', index: 'index1', hec_token: 'token1' })
         resolve()
       })
