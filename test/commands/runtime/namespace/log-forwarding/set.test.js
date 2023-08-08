@@ -68,7 +68,7 @@ test.each(dataFixtures)('set log forwarding settings to %s (interactive)', async
     return command.run()
       .then(() => {
         expect(stdout.output).toMatch(`Log forwarding was set to ${destination} for this namespace`)
-        expect(setCall).toBeCalledTimes(1)
+        expect(setCall).toHaveBeenCalledTimes(1)
         expect(setCall).toHaveBeenCalledWith(destination, input)
         resolve()
       })
