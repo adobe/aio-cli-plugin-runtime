@@ -10,6 +10,9 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
+const { AbortController } = require('node-abort-controller')
+global.AbortController = AbortController
+
 const { Command, Flags } = require('@oclif/core')
 
 const { propertiesFile, PropertyEnv, PropertyDefault } = require('./properties')
@@ -154,5 +157,7 @@ RuntimeBaseCommand.flags = {
     default: 'aio-cli-plugin-runtime@' + require('../package.json').version
   })
 }
+
+RuntimeBaseCommand.args = {}
 
 module.exports = RuntimeBaseCommand

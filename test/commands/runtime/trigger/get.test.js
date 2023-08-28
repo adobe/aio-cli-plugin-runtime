@@ -10,6 +10,8 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
+/* eslint jest/expect-expect: ["error", { "assertFunctionNames": ["expect", "createTestBaseFlagsFunction"] }] */
+
 const TheCommand = require('../../../../src/commands/runtime/trigger/get.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
 const RuntimeLib = require('@adobe/aio-lib-runtime')
@@ -33,15 +35,11 @@ test('aliases', async () => {
 })
 
 test('args', async () => {
-  const triggerPath = TheCommand.args[0]
-
-  expect(triggerPath).toBeDefined()
-  expect(triggerPath.name).toEqual('triggerPath')
-  expect(triggerPath.required).toEqual(true)
-  expect(triggerPath.description).toBeDefined()
+  expect(TheCommand.args.triggerPath).toBeDefined()
+  expect(TheCommand.args.triggerPath.required).toEqual(true)
+  expect(TheCommand.args.triggerPath.description).toBeDefined()
 })
 
-// eslint-disable-next-line jest/expect-expect
 test('base flags included in command flags',
   createTestBaseFlagsFunction(TheCommand, RuntimeBaseCommand)
 )

@@ -34,7 +34,7 @@ test('flags', async () => {
 })
 
 test('args', async () => {
-  expect(TheCommand.args).toBeUndefined()
+  expect(TheCommand.args).toEqual({})
 })
 
 describe('instance methods', () => {

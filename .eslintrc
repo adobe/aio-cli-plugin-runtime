@@ -1,11 +1,13 @@
 {
     "extends": "@adobe/eslint-config-aio-lib-config",
     "globals": {
+      "WSK_PROPS_PATH": true,
+      "createFileSystem": true,
+      "clearMockedFs": true,
       "fixtureFile": true,
       "fixtureFileWithTimeZoneAdjustment": true,
       "fixtureJson": true,
       "fixtureZip": true,
-      "fakeFileSystem": true,
       "createTestBaseFlagsFunction": true,
       "createTestFlagsFunction": true
     },

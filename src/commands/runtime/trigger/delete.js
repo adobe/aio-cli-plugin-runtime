@@ -12,6 +12,7 @@ governing permissions and limitations under the License.
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 const { parsePathPattern } = require('@adobe/aio-lib-runtime').utils
+const { Args } = require('@oclif/core')
 
 class TriggerDelete extends RuntimeBaseCommand {
   async run () {
@@ -29,13 +30,12 @@ class TriggerDelete extends RuntimeBaseCommand {
   }
 }
 
-TriggerDelete.args = [
-  {
-    name: 'triggerPath',
+TriggerDelete.args = {
+  triggerPath: Args.string({
     required: true,
     description: 'The name of the trigger, in the format /NAMESPACE/NAME'
-  }
-]
+  })
+}
 
 TriggerDelete.flags = {
   ...RuntimeBaseCommand.flags

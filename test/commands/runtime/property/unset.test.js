@@ -10,6 +10,8 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
+/* eslint jest/expect-expect: ["error", { "assertFunctionNames": ["expect", "createTestFlagsFunction"] }] */
+
 const TheCommand = require('../../../../src/commands/runtime/property/unset.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
 
@@ -29,15 +31,14 @@ test('aliases', async () => {
 })
 
 test('args', async () => {
-  expect(TheCommand.args).not.toBeDefined()
+  expect(TheCommand.args).toEqual({})
 })
 
-// eslint-disable-next-line jest/expect-expect
-test('base flags included in command flags',
+test('base flags included in command flags', () => {
   createTestFlagsFunction(TheCommand, {
     ...RuntimeBaseCommand.flags
   })
-)
+})
 
 test('flags', async () => {
   const flags = TheCommand.flags
@@ -66,82 +67,40 @@ describe('instance methods', () => {
       expect(command.run).toBeInstanceOf(Function)
     })
 
-    // eslint-disable-next-line jest/expect-expect
     test('--auth', () => {
-      return new Promise((resolve) => {
-      // unset flag
-        command.argv = ['--auth']
-        return command.run()
-          .then(() => {
-            resolve()
-          })
-      })
+      command.argv = ['--auth']
+      return expect(command.run()).resolves.not.toThrow()
     })
 
-    // eslint-disable-next-line jest/expect-expect
     test('--apihost', () => {
-      return new Promise((resolve) => {
-      // unset flag
-        command.argv = ['--apihost']
-        return command.run()
-          .then(() => {
-            resolve()
-          })
-      })
+      command.argv = ['--apihost']
+      return expect(command.run()).resolves.not.toThrow()
     })
 
-    // eslint-disable-next-line jest/expect-expect
     test('--apiversion', () => {
-      return new Promise((resolve) => {
-      // unset flag
-        command.argv = ['--apiversion']
-        return command.run()
-          .then(() => {
-            resolve()
-          })
-      })
+      command.argv = ['--apiversion']
+      return expect(command.run()).resolves.not.toThrow()
     })
 
-    // eslint-disable-next-line jest/expect-expect
     test('--cert', () => {
-      return new Promise((resolve) => {
-      // unset flag
-        command.argv = ['--cert']
-        return command.run()
-          .then(() => {
-            resolve()
-          })
-      })
+      command.argv = ['--cert']
+      return expect(command.run()).resolves.not.toThrow()
     })
 
-    // eslint-disable-next-line jest/expect-expect
     test('--key', () => {
-      return new Promise((resolve) => {
-      // unset flag
-        command.argv = ['--key']
-        return command.run()
-          .then(() => {
-            resolve()
-          })
-      })
+      command.argv = ['--key']
+      return expect(command.run()).resolves.not.toThrow()
     })
 
-    // eslint-disable-next-line jest/expect-expect
     test('--namespace', () => {
-      return new Promise((resolve) => {
-      // unset flag
-        command.argv = ['--namespace']
-        return command.run()
-          .then(() => {
-            resolve()
-          })
-      })
+      command.argv = ['--namespace']
+      return expect(command.run()).resolves.not.toThrow()
     })
 
     test('unknown flag', async () => {
       command.argv = ['--unknown-flag']
       await expect(command.run()).rejects.toThrow()
-      expect(handleError).toHaveBeenLastCalledWith('failed to unset the property', new Error('Unexpected argument: --unknown-flag\nSee more help with --help'))
+      expect(handleError).toHaveBeenLastCalledWith('failed to unset the property', new Error('Nonexistent flag: --unknown-flag\nSee more help with --help'))
     })
   })
 })

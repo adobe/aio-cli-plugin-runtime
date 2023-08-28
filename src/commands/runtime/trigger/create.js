@@ -12,7 +12,7 @@ governing permissions and limitations under the License.
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 const { getKeyValueArrayFromMergedParameters } = require('@adobe/aio-lib-runtime').utils
-const { Flags } = require('@oclif/core')
+const { Flags, Args } = require('@oclif/core')
 
 class TriggerCreate extends RuntimeBaseCommand {
   isUpdate () { return false }
@@ -53,13 +53,12 @@ class TriggerCreate extends RuntimeBaseCommand {
   }
 }
 
-TriggerCreate.args = [
-  {
-    name: 'triggerName',
+TriggerCreate.args = {
+  triggerName: Args.string({
     required: true,
     description: 'The name of the trigger'
-  }
-]
+  })
+}
 
 TriggerCreate.flags = {
   ...RuntimeBaseCommand.flags,

@@ -17,7 +17,8 @@ const RuntimeLib = require('@adobe/aio-lib-runtime')
 const OpenWhiskError = require('openwhisk/lib/openwhisk_error')
 
 beforeEach(() => {
-  fakeFileSystem.reset()
+  RuntimeLib.init.mockClear()
+  clearMockedFs()
 })
 
 test('exports', async () => {
@@ -39,7 +40,7 @@ test('flags', async () => {
 })
 
 test('args', async () => {
-  expect(TheCommand.args).toBeUndefined()
+  expect(TheCommand.args).toEqual({})
 })
 
 describe('instance methods', () => {
@@ -55,9 +56,9 @@ describe('instance methods', () => {
     })
 
     test('apihost default', async () => {
-      const files = {}
-      files[require('path').join(require('os').homedir(), '.wskprops')] = 'AUTH=1234'
-      fakeFileSystem.addJson(files)
+      createFileSystem({
+        [WSK_PROPS_PATH]: 'AUTH=1234'
+      })
 
       return command.wsk().then(() => {
         expect(RuntimeLib.init).toHaveBeenLastCalledWith(
@@ -68,28 +69,36 @@ describe('instance methods', () => {
 
     test('empty APIHOST should throw', async () => {
       process.env[PropertyEnv.APIHOST] = '    '
+      createFileSystem({
+        [WSK_PROPS_PATH]: 'APIHOST=some.url'
+      })
+
       await expect(command.wsk()).rejects.toThrow(new Error('An API host must be specified'))
     })
 
     test('null AUTH should throw', async () => {
       delete process.env[PropertyEnv.APIHOST]
       delete process.env[PropertyEnv.AUTH]
-      const files = {}
-      files[require('path').join(require('os').homedir(), '.wskprops')] = ''
-      fakeFileSystem.addJson(files)
+      createFileSystem({
+        [WSK_PROPS_PATH]: 'AUTH='
+      })
       await expect(command.wsk()).rejects.toThrow(new Error('An AUTH key must be specified'))
     })
 
     test('empty AUTH should throw', async () => {
       process.env[PropertyEnv.AUTH] = '    '
+      createFileSystem({
+        [WSK_PROPS_PATH]: 'AUTH=some-auth'
+      })
+
       await expect(command.wsk()).rejects.toThrow(new Error('An AUTH key must be specified'))
       delete process.env[PropertyEnv.AUTH]
     })
 
     test('not string AUTH should not throw', async () => {
-      const files = {}
-      files[require('path').join(require('os').homedir(), '.wskprops')] = 'AUTH=1234'
-      fakeFileSystem.addJson(files)
+      createFileSystem({
+        [WSK_PROPS_PATH]: 'AUTH=1234'
+      })
 
       return command.wsk().then(() => {
         expect(RuntimeLib.init).toHaveBeenLastCalledWith(
@@ -100,9 +109,9 @@ describe('instance methods', () => {
     })
 
     test('auth with inline comment should trim the comment', async () => {
-      const files = {}
-      files[require('path').join(require('os').homedir(), '.wskprops')] = 'AUTH=123 #inline-comment'
-      fakeFileSystem.addJson(files)
+      createFileSystem({
+        [WSK_PROPS_PATH]: 'AUTH=123 #inline-comment'
+      })
 
       return command.wsk().then(() => {
         expect(RuntimeLib.init).toHaveBeenLastCalledWith(
@@ -115,6 +124,10 @@ describe('instance methods', () => {
     test('apihost flag with env', async () => {
       const value = 'http://my-server'
       process.env[PropertyEnv.APIHOST] = value
+
+      createFileSystem({
+        [WSK_PROPS_PATH]: fixtureFile('wsk.properties')
+      })
 
       return command.wsk().then(() => {
         expect(RuntimeLib.init).toHaveBeenLastCalledWith(
@@ -134,6 +147,10 @@ describe('instance methods', () => {
       const value = 'a9329ekasgk01'
       process.env[PropertyEnv.AUTH] = value
 
+      createFileSystem({
+        [WSK_PROPS_PATH]: fixtureFile('wsk.properties')
+      })
+
       return command.wsk().then(() => {
         expect(RuntimeLib.init).toHaveBeenLastCalledWith(
           // the values are from the wsk.properties fixture
@@ -151,6 +168,10 @@ describe('instance methods', () => {
     test('apiversion flag with env', async () => {
       const value = 'v2'
       process.env[PropertyEnv.APIVERSION] = value
+
+      createFileSystem({
+        [WSK_PROPS_PATH]: fixtureFile('wsk.properties')
+      })
 
       return command.wsk().then(() => {
         expect(RuntimeLib.init).toHaveBeenLastCalledWith(
@@ -206,31 +227,28 @@ describe('instance methods', () => {
     })
 
     test('returns a promise', () => {
+      createFileSystem({
+        [WSK_PROPS_PATH]: fixtureFile('wsk.properties')
+      })
+
       return command.wsk().then((ow) => {
         expect(ow).toBe(ow)
       })
     })
 
-    // eslint-disable-next-line jest/expect-expect
-    test('no config file, no problem', () => {
-      fakeFileSystem.clear()
+    test('no config file, no problem', async () => {
       process.env[PropertyEnv.AUTH] = '1234'
 
-      return command.wsk().then(() => {
-        delete process.env[PropertyEnv.AUTH]
-      })
+      await expect(command.wsk()).resolves.not.toThrow()
+      delete process.env[PropertyEnv.AUTH]
     })
 
-    // eslint-disable-next-line jest/expect-expect
-    test('should not throw if config file specified but doesnt exist', () => {
-      fakeFileSystem.clear()
+    test('should not throw if config file specified but doesnt exist', async () => {
       process.env[PropertyEnv.CONFIG_FILE] = '/foo'
       process.env[PropertyEnv.AUTH] = '1234'
 
-      return command.wsk().then(() => {
-        delete process.env[PropertyEnv.CONFIG_FILE]
-        delete process.env[PropertyEnv.AUTH]
-      })
+      await expect(command.wsk()).resolves.not.toThrow()
+      delete process.env[PropertyEnv.CONFIG_FILE]
     })
   })
 

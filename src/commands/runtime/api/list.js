@@ -10,7 +10,7 @@ governing permissions and limitations under the License.
 */
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
-const { Flags, CliUx: cli } = require('@oclif/core')
+const { Flags, Args, ux } = require('@oclif/core')
 
 /** @private */
 function processApi (api) {
@@ -66,7 +66,7 @@ class ApiList extends RuntimeBaseCommand {
           }, data)
         })
 
-        cli.ux.table(data, {
+        ux.table(data, {
           Action: { minWidth: 10 },
           Verb: { minWidth: 10 },
           APIName: { header: 'API Name', minWidth: 10 },
@@ -83,21 +83,18 @@ class ApiList extends RuntimeBaseCommand {
   }
 }
 
-ApiList.args = [
-  {
-    name: 'basePath',
+ApiList.args = {
+  basePath: Args.string({
     description: 'The base path of the api'
-  },
-  {
-    name: 'relPath',
+  }),
+  relPath: Args.string({
     description: 'The path of the api relative to the base path'
-  },
-  {
-    name: 'apiVerb',
+  }),
+  apiVerb: Args.string({
     description: 'The http verb',
     options: ['get', 'post', 'put', 'patch', 'delete', 'head', 'options']
-  }
-]
+  })
+}
 
 ApiList.flags = {
   ...RuntimeBaseCommand.flags,

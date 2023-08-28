@@ -33,10 +33,8 @@ test('aliases', async () => {
 })
 
 test('args', async () => {
-  const getName = TheCommand.args[0]
-  expect(getName.name).toBeDefined()
-  expect(getName.name).toEqual('actionName')
-  expect(getName.required).toEqual(true)
+  expect(TheCommand.args.actionName).toBeDefined()
+  expect(TheCommand.args.actionName.required).toEqual(true)
 })
 
 describe('instance methods', () => {
@@ -210,7 +208,6 @@ describe('instance methods', () => {
     const bufferData = Buffer.from('this is the code', 'base64')
 
     test('retrieve an action --save', () => {
-      fs.writeFileSync = jest.fn()
       const cmd = rtLib.mockResolvedFixture(rtAction, 'action/get.json')
       command.argv = ['hello', '--save']
       return command.run()
@@ -221,7 +218,6 @@ describe('instance methods', () => {
     })
 
     test('retrieve an action in a package --save', () => {
-      fs.writeFileSync = jest.fn()
       const cmd = rtLib.mockResolvedFixture(rtAction, 'action/getpackage.json')
       command.argv = ['pkg/hello', '--save']
       return command.run()
@@ -233,7 +229,6 @@ describe('instance methods', () => {
 
     test('retrieve an action --save-as', () => {
       const cmd = rtLib.mockResolvedFixture(rtAction, 'action/get.json')
-      fs.writeFileSync = jest.fn()
       command.argv = ['hello', '--save-as', 'filename.js']
       return command.run()
         .then(() => {
@@ -244,7 +239,6 @@ describe('instance methods', () => {
 
     test('retrieve an action --save (binary)', () => {
       const cmd = rtLib.mockResolvedFixture(rtAction, 'action/get.binary.json')
-      fs.writeFileSync = jest.fn()
       command.argv = ['hello', '--save']
       return command.run()
         .then(() => {
@@ -256,7 +250,6 @@ describe('instance methods', () => {
 
     test('retrieve an action --save-as (binary)', () => {
       const cmd = rtLib.mockResolvedFixture(rtAction, 'action/get.binary.json')
-      fs.writeFileSync = jest.fn()
       command.argv = ['hello', '--save-as', 'filename.zip']
       return command.run()
         .then(() => {

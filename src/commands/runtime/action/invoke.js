@@ -11,7 +11,7 @@ governing permissions and limitations under the License.
 */
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
-const { Flags } = require('@oclif/core')
+const { Flags, Args } = require('@oclif/core')
 const { getKeyValueObjectFromMergedParameters } = require('@adobe/aio-lib-runtime').utils
 
 class ActionInvoke extends RuntimeBaseCommand {
@@ -49,12 +49,11 @@ class ActionInvoke extends RuntimeBaseCommand {
   }
 }
 
-ActionInvoke.args = [
-  {
-    name: 'actionName',
+ActionInvoke.args = {
+  actionName: Args.string({
     required: true
-  }
-]
+  })
+}
 
 ActionInvoke.flags = {
   ...RuntimeBaseCommand.flags,
