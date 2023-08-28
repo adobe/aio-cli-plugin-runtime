@@ -14,7 +14,6 @@ const path = require('path')
 
 /**
  * Get the file extension for a kind
- *
  * @param {string} kind the kind
  * @returns {string} the file extension, or '' if not found
  */
@@ -40,7 +39,6 @@ function fileExtensionForKind (kind) {
 
 /**
  * Get the kind for a file extension
- *
  * @param {string} filename the filename
  * @returns {string}  the kind, or undefined if not found
  */

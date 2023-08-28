@@ -27,8 +27,8 @@ test('set log forwarding settings to adobe_io_runtime', () => {
     return command.run()
       .then(() => {
         expect(stdout.output).toMatch(/Log forwarding was set to adobe_io_runtime for this namespace/)
-        expect(setCall).toBeCalledTimes(1)
-        expect(setCall).toBeCalledWith('adobe_io_runtime', {})
+        expect(setCall).toHaveBeenCalledTimes(1)
+        expect(setCall).toHaveBeenCalledWith('adobe_io_runtime', {})
         resolve()
       })
   })
