@@ -1,16 +1,16 @@
 {
   "name": "@adobe/aio-cli-plugin-runtime",
   "description": "Adobe I/O Runtime commands for the Adobe I/O CLI",
-  "version": "6.2.0",
+  "version": "7.0.0",
   "author": "Adobe Inc.",
   "bugs": "https://github.com/adobe/aio-cli-plugin-runtime/issues",
   "publishConfig": {
     "access": "public"
   },
   "dependencies": {
-    "@adobe/aio-lib-core-config": "^4.0.0",
-    "@adobe/aio-lib-core-networking": "^4.1.0",
-    "@adobe/aio-lib-runtime": "^5.0.0",
+    "@adobe/aio-lib-core-config": "^5",
+    "@adobe/aio-lib-core-networking": "^5",
+    "@adobe/aio-lib-runtime": "^6",
     "@oclif/core": "^1.3.0",
     "@types/jest": "^29.5.3",
     "chalk": "^4.1.2",
