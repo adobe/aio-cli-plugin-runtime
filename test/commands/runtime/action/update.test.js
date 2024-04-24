@@ -383,7 +383,7 @@ describe('instance methods', () => {
     test('updates an action with action name, --params flag, limits', () => {
       const name = 'hello'
       const cmd = rtLib.mockResolved(rtAction, { res: 'fake' })
-      command.argv = [name, '--param', 'a', 'b', '--param', 'c', 'd', '--logsize', '8', '--memory', '128']
+      command.argv = [name, '--param', 'a', 'b', '--param', 'c', 'd', '--logsize', '0', '--memory', '128']
       rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation((flags, file) => flags && [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }])
       return command.run()
         .then(() => {
@@ -397,7 +397,7 @@ describe('instance methods', () => {
                 { key: 'fakeParam2', value: 'bbb' }
               ],
               limits: {
-                logs: 8,
+                logs: 0,
                 memory: 128
               }
             }
