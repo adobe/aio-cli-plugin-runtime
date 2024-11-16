@@ -13,7 +13,7 @@ governing permissions and limitations under the License.
 const moment = require('dayjs')
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 const { parsePackageName } = require('@adobe/aio-lib-runtime').utils
-const { Flags, CliUx: cli } = require('@oclif/core')
+const { Flags, ux } = require('@oclif/core')
 const decorators = require('../../../decorators').decorators()
 
 class ActionList extends RuntimeBaseCommand {
@@ -86,7 +86,7 @@ class ActionList extends RuntimeBaseCommand {
             }
           }
         }
-        cli.ux.table(result, columns)
+        ux.table(result, columns)
       }
     } catch (err) {
       await this.handleError('failed to list the actions', err)
