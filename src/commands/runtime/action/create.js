@@ -172,7 +172,7 @@ class ActionCreate extends RuntimeBaseCommand {
         limits = limits || {}
         limits.timeout = flags.timeout
       }
-      if (flags.logsize) {
+      if (flags.logsize !== undefined) {
         limits = limits || {}
         limits.logs = flags.logsize
       }
