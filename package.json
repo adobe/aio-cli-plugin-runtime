@@ -33,7 +33,7 @@
     "dedent-js": "^1.0.1",
     "eol": "^0.9.1",
     "eslint": "^8.57.1",
-    "eslint-config-oclif": "^4.0.0",
+    "eslint-config-oclif": "^5.2.2",
     "eslint-config-standard": "^17.1.0",
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-jest": "^27.9.0",
