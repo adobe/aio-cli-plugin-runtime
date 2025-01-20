@@ -11,7 +11,7 @@
     "@adobe/aio-lib-core-config": "^5",
     "@adobe/aio-lib-core-networking": "^5",
     "@adobe/aio-lib-runtime": "^6",
-    "@oclif/core": "^1.3.0",
+    "@oclif/core": "^4.2.3",
     "@types/jest": "^29.5.3",
     "chalk": "^4.1.2",
     "dayjs": "^1.10.4",
