@@ -9,10 +9,10 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
+const RuntimeDeployCommand = require('../../../RuntimeDeployCommand')
 // eslint-disable-next-line no-unused-vars
 
-class ApiDelete extends RuntimeBaseCommand {
+class ApiDelete extends RuntimeDeployCommand {
   async run () {
     const { args } = await this.parse(ApiDelete)
 
@@ -49,7 +49,7 @@ ApiDelete.args = [
 ]
 
 ApiDelete.flags = {
-  ...RuntimeBaseCommand.flags
+  ...RuntimeDeployCommand.flags
 }
 
 ApiDelete.description = 'delete an API'
