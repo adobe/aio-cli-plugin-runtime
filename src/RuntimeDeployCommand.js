@@ -5,6 +5,11 @@ const { CLI } = require('@adobe/aio-lib-ims/src/context')
 const { getCliEnv } = require('@adobe/aio-lib-env')
 const runtimeLib = require('@adobe/aio-lib-runtime')
 
+/**
+ * Class representing a command to deploy runtime.
+ * 
+ * @extends RuntimeBaseCommand
+ */
 class RuntimeDeployCommand extends RuntimeBaseCommand {
     async wsk(options) {
         if (!options) {
@@ -22,7 +27,7 @@ class RuntimeDeployCommand extends RuntimeBaseCommand {
             }
             options = await this.getOptions()
             options.auth_handler = authHandler
-            options.apihost = "http://localhost:3000/runtime"
+            options.apihost = env.API_HOST ?? "http://localhost:3000/runtime"
         }
         return runtimeLib.init(options)
     }
