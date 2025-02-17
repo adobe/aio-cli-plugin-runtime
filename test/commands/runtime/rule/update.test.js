@@ -11,14 +11,14 @@ governing permissions and limitations under the License.
 */
 
 const TheCommand = require('../../../../src/commands/runtime/rule/update.js')
-const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
+const RuntimeDeployCommand = require('../../../../src/RuntimeDeployCommand.js')
 const rtAction = 'rules.update'
 const { stdout } = require('stdout-stderr')
 const RuntimeLib = require('@adobe/aio-lib-runtime')
 
 test('exports', async () => {
   expect(typeof TheCommand).toEqual('function')
-  expect(TheCommand.prototype instanceof RuntimeBaseCommand).toBeTruthy()
+  expect(TheCommand.prototype instanceof RuntimeDeployCommand).toBeTruthy()
 })
 
 test('description', async () => {
@@ -51,7 +51,7 @@ test('args', async () => {
 
 // eslint-disable-next-line jest/expect-expect
 test('base flags included in command flags',
-  createTestBaseFlagsFunction(TheCommand, RuntimeBaseCommand)
+  createTestBaseFlagsFunction(TheCommand, RuntimeDeployCommand)
 )
 
 test('flags', async () => {

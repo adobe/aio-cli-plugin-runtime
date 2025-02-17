@@ -7,34 +7,32 @@ const runtimeLib = require('@adobe/aio-lib-runtime')
 
 /**
  * Class representing a command to deploy runtime.
- * 
- * @extends RuntimeBaseCommand
+ *
+ * @augments RuntimeBaseCommand
  */
 class RuntimeDeployCommand extends RuntimeBaseCommand {
-    async wsk(options) {
-        if (!options) {
-            const authHandler = {
-                getAuthHeader: async () => {
-                    await context.setCli({ 'cli.bare-output': true }, false) // set this globally
+  async wsk (options) {
+    if (!options) {
+      const authHandler = {
+        getAuthHeader: async () => {
+          await context.setCli({ 'cli.bare-output': true }, false) // set this globally
+          const env = getCliEnv()
+          console.debug(`Retrieving CLI Token using env=${env}`)
+          const accessToken = await getToken(CLI)
 
-                    const env = getCliEnv()
-
-                    console.debug(`Retrieving CLI Token using env=${env}`)
-                    const accessToken = await getToken(CLI)
-
-                    return `Bearer ${accessToken}`
-                }
-            }
-            options = await this.getOptions()
-            options.auth_handler = authHandler
-            options.apihost = env.API_HOST ?? "http://localhost:3000/runtime"
+          return `Bearer ${accessToken}`
         }
-        return runtimeLib.init(options)
+      }
+      options = await this.getOptions()
+      options.auth_handler = authHandler
+      options.apihost = options.apihost ?? 'https://adobeioruntime.net'
     }
+    return runtimeLib.init(options)
+  }
 }
 
 RuntimeDeployCommand.flags = {
-    ...RuntimeDeployCommand.flags
+  ...RuntimeDeployCommand.flags
 }
 
 module.exports = RuntimeDeployCommand
