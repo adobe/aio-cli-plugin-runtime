@@ -10,10 +10,10 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const RuntimeDeployCommand = require('../../../RuntimeDeployCommand')
+const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 const { parsePathPattern } = require('@adobe/aio-lib-runtime').utils
 
-class TriggerDelete extends RuntimeDeployCommand {
+class TriggerDelete extends RuntimeBaseCommand {
   async run () {
     const { args } = await this.parse(TriggerDelete)
     const triggerPath = args.triggerPath
@@ -38,7 +38,7 @@ TriggerDelete.args = [
 ]
 
 TriggerDelete.flags = {
-  ...RuntimeDeployCommand.flags
+  ...RuntimeBaseCommand.flags
 }
 
 TriggerDelete.description = 'Delete a trigger for Adobe I/O Runtime'
