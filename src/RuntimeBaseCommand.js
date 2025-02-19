@@ -79,7 +79,7 @@ class RuntimeBaseCommand extends Command {
       }
       options = await this.getOptions()
       options.auth_handler = authHandler
-      options.apihost = options.apihost ?? 'https://adobeioruntime.net'
+      options.apihost = options.apihost ?? PropertyDefault.DEPLOYSERVICEURL
     }
     return runtimeLib.init(options)
   }
