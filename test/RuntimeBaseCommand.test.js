@@ -67,6 +67,11 @@ describe('instance methods', () => {
   })
 
   describe('init', () => {
+    const response = {
+      apihost: 'https://adobeioruntime.net',
+      api_key: 1234,
+      apiversion: 'v1'
+    }
     test('is a function', async () => {
       expect(command.init).toBeInstanceOf(Function)
     })
@@ -77,16 +82,7 @@ describe('instance methods', () => {
       fakeFileSystem.addJson(files)
 
       return command.wsk().then(() => {
-        expect(RuntimeLib.init).toHaveBeenLastCalledWith(
-          {
-            apihost: 'https://adobeioruntime.net',
-            api_key: 1234,
-            apiversion: 'v1',
-            auth_handler: expect.objectContaining({
-              getAuthHeader: expect.any(Function)
-            })
-          }
-        )
+        expect(RuntimeLib.init).toHaveBeenLastCalledWith(response)
       })
     })
 
@@ -116,16 +112,7 @@ describe('instance methods', () => {
       fakeFileSystem.addJson(files)
 
       return command.wsk().then(() => {
-        expect(RuntimeLib.init).toHaveBeenLastCalledWith(
-          {
-            api_key: 1234,
-            apihost: 'https://adobeioruntime.net',
-            apiversion: 'v1',
-            auth_handler: expect.objectContaining({
-              getAuthHeader: expect.any(Function)
-            })
-          }
-        )
+        expect(RuntimeLib.init).toHaveBeenLastCalledWith(response)
         delete process.env[PropertyEnv.APIHOST]
       })
     })
@@ -140,10 +127,7 @@ describe('instance methods', () => {
           {
             api_key: 123,
             apihost: 'https://adobeioruntime.net',
-            apiversion: 'v1',
-            auth_handler: expect.objectContaining({
-              getAuthHeader: expect.any(Function)
-            })
+            apiversion: 'v1'
           }
         )
         delete process.env[PropertyEnv.APIHOST]
@@ -161,10 +145,7 @@ describe('instance methods', () => {
             api_key: 'some-gibberish-not-a-real-key',
             namespace: 'some_namespace',
             apihost: value,
-            apiversion: 'v1',
-            auth_handler: expect.objectContaining({
-              getAuthHeader: expect.any(Function)
-            })
+            apiversion: 'v1'
           }
         )
         delete process.env[PropertyEnv.APIHOST]
@@ -182,10 +163,7 @@ describe('instance methods', () => {
             api_key: value,
             namespace: 'some_namespace',
             apihost: 'some.host',
-            apiversion: 'v1',
-            auth_handler: expect.objectContaining({
-              getAuthHeader: expect.any(Function)
-            })
+            apiversion: 'v1'
           }
         )
         delete process.env[PropertyEnv.AUTH]
@@ -203,10 +181,7 @@ describe('instance methods', () => {
             api_key: 'some-gibberish-not-a-real-key',
             namespace: 'some_namespace',
             apihost: 'some.host',
-            apiversion: value,
-            auth_handler: expect.objectContaining({
-              getAuthHeader: expect.any(Function)
-            })
+            apiversion: value
           }
         )
         delete process.env[PropertyEnv.APIVERSION]
@@ -361,77 +336,156 @@ describe('instance methods', () => {
   })
 
   describe('authHandler', () => {
-    test('No Options : should return the correct Authorization header using getAuthHeader', async () => {
-      const mockToken = 'mock-access-token'
-      getToken.mockResolvedValue(mockToken)
-
-      // Spy on runtimeLib.init to capture options before it's used
-      let capturedOptions
-      RuntimeLib.init.mockImplementation(async (options) => {
-        capturedOptions = options // Store options for later verification
-        return {} // Mock runtimeLib.init() return value
+    describe('when IS_DEPLOY_SERVICE_ENABLED = true', () => {
+      beforeEach(() => {
+        process.env.IS_DEPLOY_SERVICE_ENABLED = true
       })
 
-      // Call wsk() which internally sets auth_handler
-      await command.wsk()
+      afterEach(() => {
+        process.env.IS_DEPLOY_SERVICE_ENABLED = false
+      })
+      test('No Options : should return the correct Authorization header using getAuthHeader', async () => {
+        const mockToken = 'mock-access-token'
+        getToken.mockResolvedValue(mockToken)
 
-      // Ensure options were captured
-      expect(capturedOptions).toBeDefined()
-      expect(capturedOptions.auth_handler).toBeDefined()
-      expect(capturedOptions.apihost).toBeDefined()
-      expect(capturedOptions.apihost).toBe('some.host')
+        // Spy on runtimeLib.init to capture options before it's used
+        let capturedOptions
+        RuntimeLib.init.mockImplementation(async (options) => {
+          capturedOptions = options // Store options for later verification
+          return {} // Mock runtimeLib.init() return value
+        })
 
-      // Call getAuthHeader() from captured options
-      const authHeader = await capturedOptions.auth_handler.getAuthHeader()
+        // Call wsk() which internally sets auth_handler
+        await command.wsk()
 
-      expect(context.setCli).toHaveBeenCalledWith({ 'cli.bare-output': true }, false)
-      expect(getCliEnv).toHaveBeenCalled()
-      expect(getToken).toHaveBeenCalled()
-      expect(authHeader).toBe(`Bearer ${mockToken}`)
+        // Ensure options were captured
+        expect(capturedOptions).toBeDefined()
+        expect(capturedOptions.auth_handler).toBeDefined()
+        expect(capturedOptions.apihost).toBeDefined()
+        expect(capturedOptions.apihost).toBe('some.host')
+
+        // Call getAuthHeader() from captured options
+        const authHeader = await capturedOptions.auth_handler.getAuthHeader()
+
+        expect(context.setCli).toHaveBeenCalledWith({ 'cli.bare-output': true }, false)
+        expect(getCliEnv).toHaveBeenCalled()
+        expect(getToken).toHaveBeenCalled()
+        expect(authHeader).toBe(`Bearer ${mockToken}`)
+      })
+
+      test('With Options : should return the correct Authorization header using getAuthHeader', async () => {
+        const mockToken = 'mock-access-token'
+        getToken.mockResolvedValue(mockToken)
+
+        const options = {
+          auth_handler: {
+            getAuthHeader: async () => `Bearer ${mockToken}`
+          },
+          apihost: 'https://custom-api.adobe.com'
+        }
+
+        await command.wsk(options) // Call wsk() with an existing options object
+
+        expect(RuntimeLib.init).toHaveBeenCalledWith(options)
+      })
+
+      test('Default OW Host testing', async () => {
+        delete process.env[PropertyEnv.APIHOST]
+
+        const mockToken = 'mock-access-token'
+        getToken.mockResolvedValue(mockToken)
+
+        command.getOptions = jest.fn().mockResolvedValue({})
+
+        // Mock runtimeLib.init to track its calls
+        const mockInit = jest.fn().mockResolvedValue({})
+        RuntimeLib.init = mockInit
+
+        // Call wsk() without options
+        await command.wsk()
+
+        // Assertions
+        expect(RuntimeLib.init).toHaveBeenCalled()
+
+        // Verify the passed options contain the default apihost
+        const optionsPassedToInit = mockInit.mock.calls[0][0] // Get the options passed to init
+        expect(optionsPassedToInit.apihost).toBe('https://adobeioruntime.net')
+
+        // Ensure the Authorization header is set correctly
+        expect(optionsPassedToInit.auth_handler).toBeDefined()
+        const authHeader = await optionsPassedToInit.auth_handler.getAuthHeader()
+        expect(authHeader).toBe(`Bearer ${mockToken}`)
+      })
     })
 
-    test('With Options : should return the correct Authorization header using getAuthHeader', async () => {
-      const mockToken = 'mock-access-token'
-      getToken.mockResolvedValue(mockToken)
+    describe('when IS_DEPLOY_SERVICE_ENABLED = false', () => {
+      beforeEach(() => {
+        process.env.IS_DEPLOY_SERVICE_ENABLED = false
+      })
 
-      const options = {
-        auth_handler: {
-          getAuthHeader: async () => `Bearer ${mockToken}`
-        },
-        apihost: 'https://custom-api.adobe.com'
-      }
+      test('No Options : should return the correct Authorization header using getAuthHeader', async () => {
+        const mockToken = 'mock-access-token'
+        getToken.mockResolvedValue(mockToken)
 
-      await command.wsk(options) // Call wsk() with an existing options object
+        // Spy on runtimeLib.init to capture options before it's used
+        let capturedOptions
+        RuntimeLib.init.mockImplementation(async (options) => {
+          capturedOptions = options // Store options for later verification
+          return {} // Mock runtimeLib.init() return value
+        })
 
-      expect(RuntimeLib.init).toHaveBeenCalledWith(options)
-    })
+        // Call wsk() which internally sets auth_handler
+        await command.wsk()
 
-    test('Default OW Host testing', async () => {
-      delete process.env[PropertyEnv.APIHOST]
+        // Ensure options were captured
+        expect(capturedOptions).toBeDefined()
+        expect(capturedOptions.auth_handler).not.toBeDefined()
+        expect(capturedOptions.apihost).toBeDefined()
+        expect(capturedOptions.apihost).toBe('some.host')
+      })
 
-      const mockToken = 'mock-access-token'
-      getToken.mockResolvedValue(mockToken)
+      test('With Options : should return the correct Authorization header using getAuthHeader', async () => {
+        const mockToken = 'mock-access-token'
+        getToken.mockResolvedValue(mockToken)
 
-      command.getOptions = jest.fn().mockResolvedValue({})
+        const options = {
+          auth_handler: {
+            getAuthHeader: async () => `Bearer ${mockToken}`
+          },
+          apihost: 'https://custom-api.adobe.com'
+        }
 
-      // Mock runtimeLib.init to track its calls
-      const mockInit = jest.fn().mockResolvedValue({})
-      RuntimeLib.init = mockInit
+        await command.wsk(options) // Call wsk() with an existing options object
 
-      // Call wsk() without options
-      await command.wsk()
+        expect(RuntimeLib.init).toHaveBeenCalledWith(options)
+      })
 
-      // Assertions
-      expect(RuntimeLib.init).toHaveBeenCalled()
+      test('Default OW Host testing', async () => {
+        delete process.env[PropertyEnv.APIHOST]
 
-      // Verify the passed options contain the default apihost
-      const optionsPassedToInit = mockInit.mock.calls[0][0] // Get the options passed to init
-      expect(optionsPassedToInit.apihost).toBe('https://adobeioruntime.net')
+        const mockToken = 'mock-access-token'
+        getToken.mockResolvedValue(mockToken)
 
-      // Ensure the Authorization header is set correctly
-      expect(optionsPassedToInit.auth_handler).toBeDefined()
-      const authHeader = await optionsPassedToInit.auth_handler.getAuthHeader()
-      expect(authHeader).toBe(`Bearer ${mockToken}`)
+        // command.getOptions = jest.fn().mockResolvedValue({})
+
+        // Mock runtimeLib.init to track its calls
+        const mockInit = jest.fn().mockResolvedValue({})
+        RuntimeLib.init = mockInit
+
+        // Call wsk() without options
+        await command.wsk()
+
+        // Assertions
+        expect(RuntimeLib.init).toHaveBeenCalled()
+
+        // Verify the passed options contain the default apihost
+        const optionsPassedToInit = mockInit.mock.calls[0][0] // Get the options passed to init
+        expect(optionsPassedToInit.apihost).toBe('some.host')
+        expect(optionsPassedToInit.namespace).toBe('some_namespace')
+
+        // Ensure the Authorization header is set correctly
+        expect(optionsPassedToInit.auth_handler).not.toBeDefined()
+      })
     })
   })
 })

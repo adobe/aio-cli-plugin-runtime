@@ -78,8 +78,10 @@ class RuntimeBaseCommand extends Command {
         }
       }
       options = await this.getOptions()
-      options.auth_handler = authHandler
-      options.apihost = options.apihost ?? PropertyDefault.DEPLOYSERVICEURL
+      if (process.env.IS_DEPLOY_SERVICE_ENABLED === 'true') {
+        options.auth_handler = authHandler
+        options.apihost = options.apihost ?? PropertyDefault.DEPLOYSERVICEURL
+      }
     }
     return runtimeLib.init(options)
   }
