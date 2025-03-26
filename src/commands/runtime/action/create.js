@@ -11,10 +11,10 @@ governing permissions and limitations under the License.
 */
 
 const fs = require('fs')
-const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 const { createKeyValueArrayFromFlag, createKeyValueArrayFromFile, createComponentsfromSequence, getKeyValueArrayFromMergedParameters } = require('@adobe/aio-lib-runtime').utils
 const { kindForFileExtension } = require('../../../kinds')
 const { Flags } = require('@oclif/core')
+const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 
 class ActionCreate extends RuntimeBaseCommand {
   isUpdate () { return false }
