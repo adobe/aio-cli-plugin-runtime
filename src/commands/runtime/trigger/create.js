@@ -10,11 +10,11 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
+const DeployServiceCommand = require('../../../DeployServiceCommand')
 const { getKeyValueArrayFromMergedParameters } = require('@adobe/aio-lib-runtime').utils
 const { Flags } = require('@oclif/core')
 
-class TriggerCreate extends RuntimeBaseCommand {
+class TriggerCreate extends DeployServiceCommand {
   isUpdate () { return false }
 
   async run () {
@@ -62,7 +62,7 @@ TriggerCreate.args = [
 ]
 
 TriggerCreate.flags = {
-  ...RuntimeBaseCommand.flags,
+  ...DeployServiceCommand.flags,
   param: Flags.string({
     char: 'p',
     description: 'parameter values in KEY VALUE format', // help description for flag

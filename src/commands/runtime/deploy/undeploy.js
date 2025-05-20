@@ -19,7 +19,7 @@ class DeployUndeploy extends RuntimeBaseCommand {
     const { flags } = await this.parse(DeployUndeploy)
     try {
       const options = await this.getOptions()
-      const ow = await this.wsk(options)
+      const ow = await this.wsk()
       const logger = this.log
 
       let entities

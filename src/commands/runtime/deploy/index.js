@@ -28,7 +28,7 @@ class IndexCommand extends RuntimeBaseCommand {
       const params = getKeyValueObjectFromMergedParameters(flags.param, flags['param-file'])
       const options = await this.getOptions()
       const entities = processPackage(packages, deploymentPackages, deploymentTriggers, params, false, options)
-      const ow = await this.wsk(options)
+      const ow = await this.wsk()
       const logger = this.log
       await deployPackage(entities, ow, logger.bind(this), this.getImsOrgId())
     } catch (err) {

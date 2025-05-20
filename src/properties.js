@@ -35,7 +35,7 @@ const PropertyEnv = {
 const PropertyDefault = {
   AUTH: '',
   APIHOST: 'https://adobeioruntime.net',
-  DEPLOYSERVICEURL: 'https://adobeioruntime.net',
+  DEPLOYSERVICEURL: 'https://deploy-service.app-builder.adp.adobe.io/runtime',
   APIVERSION: 'v1',
   NAMESPACE: '_',
   CERT: '',

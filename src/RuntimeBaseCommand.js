@@ -22,6 +22,12 @@ const { getToken, context } = require('@adobe/aio-lib-ims')
 const { getCliEnv } = require('@adobe/aio-lib-env')
 const { CLI } = require('@adobe/aio-lib-ims/src/context')
 
+/**
+ * @typedef {Object} WskCreateOptions
+ * @property {boolean} [useRuntimeAuth=false] - Whether to use Runtime authentication
+ * @property {Object} [wskClientOptions] - The options to pass to the wsk client. If not provided, will be generated from getOptions()
+ */
+
 class RuntimeBaseCommand extends Command {
   async getOptions () {
     const { flags } = await this.parse(this.constructor)
@@ -34,7 +40,8 @@ class RuntimeBaseCommand extends Command {
       apihost: flags.apihost || config.get('runtime.apihost') || properties.get('APIHOST') || PropertyDefault.APIHOST,
       namespace: config.get('runtime.namespace') || properties.get('NAMESPACE'),
       api_key: flags.auth || config.get('runtime.auth') || properties.get('AUTH'),
-      ignore_certs: flags.insecure || config.get('runtime.insecure')
+      ignore_certs: flags.insecure || config.get('runtime.insecure'),
+      useRuntimeAuth: process.env.USE_RUNTIME_AUTH || flags.useRuntimeAuth
     }
 
     // remove any null or undefined keys
@@ -67,21 +74,7 @@ class RuntimeBaseCommand extends Command {
 
   async wsk (options) {
     if (!options) {
-      const authHandler = {
-        getAuthHeader: async () => {
-          await context.setCli({ 'cli.bare-output': true }, false) // set this globally
-          const env = getCliEnv()
-          console.debug(`Retrieving CLI Token using env=${env}`)
-          const accessToken = await getToken(CLI)
-
-          return `Bearer ${accessToken}`
-        }
-      }
       options = await this.getOptions()
-      if (process.env.IS_DEPLOY_SERVICE_ENABLED === 'true') {
-        options.auth_handler = authHandler
-        options.apihost = options.apihost ?? PropertyDefault.DEPLOYSERVICEURL
-      }
     }
     return runtimeLib.init(options)
   }
