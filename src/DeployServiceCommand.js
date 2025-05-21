@@ -60,8 +60,6 @@ async getAccessToken({ useCachedToken = false } = {}) {
   getAuthHandler () {
     return {
       getAuthHeader: async () => {
-        await context.setCli({ 'cli.bare-output': true }, false) // set this globally
-        const env = getCliEnv()
         this.debug(`Retrieving CLI Token using env=${env}`)
         const { accessToken } = await this.getAccessToken()
 
