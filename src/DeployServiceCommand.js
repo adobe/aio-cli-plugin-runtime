@@ -20,13 +20,50 @@ const RuntimeBaseCommand = require('./RuntimeBaseCommand')
 
 class DeployServiceCommand extends RuntimeBaseCommand {
 
+/**
+ * Retrieves an access token for Adobe I/O CLI authentication.
+ * This function handles both CLI and custom contexts, setting up the appropriate
+ * authentication context and retrieving the corresponding access token.
+ * 
+ * @async
+ * @function getAccessToken
+ * @param {Object} [options] - Options for token retrieval
+ * @param {boolean} [options.useCachedToken=false] - Whether to use a cached token instead of requesting a new one
+ * @returns {Promise<{accessToken: string|null, env: string}>} An object containing:
+ *   - accessToken: The retrieved access token for authentication, or null if token retrieval failed
+ *   - env: The current CLI environment (e.g. 'prod', 'stage')
+ * @throws {Error} If token retrieval fails or context setup fails
+ */
+async getAccessToken({ useCachedToken = false } = {}) {
+  const env = getCliEnv()
+  let contextName = CLI // default
+  const currentContext = await context.getCurrent() // potential override
+
+  if (currentContext !== CLI) {
+    contextName = currentContext
+  } else {
+    await context.setCli({ 'cli.bare-output': true }, false) // set this globally
+  }
+
+  let accessToken = null
+  if (useCachedToken) {
+    const contextConfig = await context.get(contextName)
+    accessToken = contextConfig?.access_token?.token
+  } else {
+    accessToken = await getToken(contextName)
+  }
+
+  return { accessToken, env }
+}
+
+
   getAuthHandler () {
     return {
       getAuthHeader: async () => {
         await context.setCli({ 'cli.bare-output': true }, false) // set this globally
         const env = getCliEnv()
         this.debug(`Retrieving CLI Token using env=${env}`)
-        const accessToken = await getToken(CLI)
+        const { accessToken } = await this.getAccessToken()
 
         return `Bearer ${accessToken}`
       }
@@ -35,7 +72,8 @@ class DeployServiceCommand extends RuntimeBaseCommand {
 
   async setRuntimeApiHostAndAuthHandler(options) {
     if (!options.useRuntimeAuth) {
-      options.apihost = process.env.DEPLOY_SERVICE_URL ?? PropertyDefault.DEPLOYSERVICEURL
+      const endpoint = process.env.AIO_DEPLOY_SERVICE_URL ?? PropertyDefault.DEPLOYSERVICEURL
+      options.apihost = `${endpoint}/runtime`
       options.auth_handler = this.getAuthHandler()
     }
 
