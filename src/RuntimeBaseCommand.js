@@ -18,14 +18,11 @@ const debug = createDebug('aio-cli-plugin-runtime')
 const http = require('http')
 const runtimeLib = require('@adobe/aio-lib-runtime')
 const config = require('@adobe/aio-lib-core-config')
-const { getToken, context } = require('@adobe/aio-lib-ims')
-const { getCliEnv } = require('@adobe/aio-lib-env')
-const { CLI } = require('@adobe/aio-lib-ims/src/context')
 
 /**
- * @typedef {Object} WskCreateOptions
+ * @typedef {object} WskCreateOptions
  * @property {boolean} [useRuntimeAuth=false] - Whether to use Runtime authentication
- * @property {Object} [wskClientOptions] - The options to pass to the wsk client. If not provided, will be generated from getOptions()
+ * @property {object} [wskClientOptions] - The options to pass to the wsk client. If not provided, will be generated from getOptions()
  */
 
 class RuntimeBaseCommand extends Command {
