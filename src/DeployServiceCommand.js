@@ -69,7 +69,7 @@ class DeployServiceCommand extends RuntimeBaseCommand {
 
   async setRuntimeApiHostAndAuthHandler (options) {
     let _options = structuredClone(options)
-    if (!_options?.useRuntimeAuth) {
+    if (!_options?.['use-runtime-auth']) {
       const endpoint = process.env.AIO_DEPLOY_SERVICE_URL ?? PropertyDefault.DEPLOYSERVICEURL
       _options = _options ?? {}
       _options.apihost = `${endpoint}/runtime`
@@ -91,7 +91,7 @@ class DeployServiceCommand extends RuntimeBaseCommand {
 
 DeployServiceCommand.flags = {
   ...RuntimeBaseCommand.flags,
-  useRuntimeAuth: Flags.boolean({ char: 'r', description: 'use Runtime auth [default: false]', default: false })
+  'use-runtime-auth': Flags.boolean({ char: 'r', description: 'use Runtime auth [default: false]', default: false })
 }
 
 module.exports = DeployServiceCommand

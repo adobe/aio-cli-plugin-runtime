@@ -50,7 +50,7 @@ describe('DeployServiceCommand', () => {
 
   test('flags', async () => {
     expect(Object.keys(TheCommand.flags)).toEqual(expect.arrayContaining([
-      'useRuntimeAuth'
+      'use-runtime-auth'
     ]))
   })
 
@@ -134,7 +134,7 @@ describe('DeployServiceCommand', () => {
       expect(result.auth_handler).toBeDefined()
     })
 
-    test('should set runtime API host and auth handler when useRuntimeAuth is false', async () => {
+    test('should set runtime API host and auth handler when use-runtime-auth is false', async () => {
       const mockOptions = { someOption: 'value' }
       const result = await command.setRuntimeApiHostAndAuthHandler(mockOptions)
 
@@ -142,8 +142,8 @@ describe('DeployServiceCommand', () => {
       expect(result.auth_handler).toBeDefined()
     })
 
-    test('should not modify options when useRuntimeAuth is true', async () => {
-      const mockOptions = { useRuntimeAuth: true, someOption: 'value' }
+    test('should not modify options when use-runtime-auth is true', async () => {
+      const mockOptions = { 'use-runtime-auth': true, someOption: 'value' }
       const result = await command.setRuntimeApiHostAndAuthHandler(mockOptions)
 
       expect(result).toEqual(mockOptions)

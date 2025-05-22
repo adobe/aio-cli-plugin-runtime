@@ -28,6 +28,7 @@ class DeploySync extends DeployServiceCommand {
       }
       const params = {}
       const options = await this.getOptions()
+      delete options['use-runtime-auth']
       const entities = processPackage(packages, deploymentPackages, deploymentTriggers, params, false, options)
       const ow = await this.wsk()
       const logger = this.log

@@ -19,12 +19,6 @@ const http = require('http')
 const runtimeLib = require('@adobe/aio-lib-runtime')
 const config = require('@adobe/aio-lib-core-config')
 
-/**
- * @typedef {object} WskCreateOptions
- * @property {boolean} [useRuntimeAuth=false] - Whether to use Runtime authentication
- * @property {object} [wskClientOptions] - The options to pass to the wsk client. If not provided, will be generated from getOptions()
- */
-
 class RuntimeBaseCommand extends Command {
   async getOptions () {
     const { flags } = await this.parse(this.constructor)
@@ -38,7 +32,7 @@ class RuntimeBaseCommand extends Command {
       namespace: config.get('runtime.namespace') || properties.get('NAMESPACE'),
       api_key: flags.auth || config.get('runtime.auth') || properties.get('AUTH'),
       ignore_certs: flags.insecure || config.get('runtime.insecure'),
-      useRuntimeAuth: process.env.USE_RUNTIME_AUTH || flags.useRuntimeAuth
+      'use-runtime-auth': process.env.USE_RUNTIME_AUTH || flags['use-runtime-auth']
     }
 
     // remove any null or undefined keys

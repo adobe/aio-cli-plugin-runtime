@@ -238,7 +238,7 @@ describe('instance methods', () => {
 
     test('returns a promise (pass options)', () => {
       RuntimeLib.init.mockReturnValue({})
-      const options = { useRuntimeAuth: true }
+      const options = {}
       return command.wsk(options).then((ow) => {
         expect(ow).toBeDefined()
       })

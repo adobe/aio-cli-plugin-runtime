@@ -10,15 +10,16 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
+const DeployServiceCommand = require('../../../DeployServiceCommand')
 const { getProjectEntities, undeployPackage, processPackage, setPaths } = require('@adobe/aio-lib-runtime').utils
 const { Flags } = require('@oclif/core')
 
-class DeployUndeploy extends RuntimeBaseCommand {
+class DeployUndeploy extends DeployServiceCommand {
   async run () {
     const { flags } = await this.parse(DeployUndeploy)
     try {
       const options = await this.getOptions()
+      delete options['use-runtime-auth']
       const ow = await this.wsk()
       const logger = this.log
 
@@ -44,7 +45,7 @@ class DeployUndeploy extends RuntimeBaseCommand {
 }
 
 DeployUndeploy.flags = {
-  ...RuntimeBaseCommand.flags,
+  ...DeployServiceCommand.flags,
   manifest: Flags.string({
     char: 'm',
     description: 'the manifest file location' // help description for flag
