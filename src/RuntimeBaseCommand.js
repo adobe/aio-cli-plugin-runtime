@@ -70,10 +70,11 @@ class RuntimeBaseCommand extends Command {
   }
 
   async wsk (options) {
-    if (!options) {
-      options = await this.getOptions()
+    let _options = structuredClone(options)
+    if (!_options) {
+      _options = await this.getOptions()
     }
-    return runtimeLib.init(options)
+    return runtimeLib.init(_options)
   }
 
   getImsOrgId () {
