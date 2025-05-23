@@ -9,9 +9,9 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
+const DeployServiceCommand = require('../../../DeployServiceCommand')
 
-class RuleDisable extends RuntimeBaseCommand {
+class RuleDisable extends DeployServiceCommand {
   async run () {
     const { args } = await this.parse(RuleDisable)
     try {
@@ -36,7 +36,7 @@ RuleDisable.args = [
 ]
 
 RuleDisable.flags = {
-  ...RuntimeBaseCommand.flags
+  ...DeployServiceCommand.flags
 }
 
 RuleDisable.aliases = [

@@ -70,8 +70,9 @@
   },
   "repository": "adobe/aio-cli-plugin-runtime",
   "scripts": {
-    "eslint-fix": "eslint src test e2e --fix",
-    "posttest": "eslint src test e2e",
+    "lint-fix": "eslint src test e2e --fix",
+    "lint": "eslint src test e2e",
+    "posttest": "npm run lint",
     "test": "npm run unit-tests",
     "unit-tests": "jest --ci",
     "prepack": "oclif manifest && oclif readme --no-aliases",

@@ -18,9 +18,6 @@ const debug = createDebug('aio-cli-plugin-runtime')
 const http = require('http')
 const runtimeLib = require('@adobe/aio-lib-runtime')
 const config = require('@adobe/aio-lib-core-config')
-const { getToken, context } = require('@adobe/aio-lib-ims')
-const { getCliEnv } = require('@adobe/aio-lib-env')
-const { CLI } = require('@adobe/aio-lib-ims/src/context')
 
 class RuntimeBaseCommand extends Command {
   async getOptions () {
@@ -34,7 +31,8 @@ class RuntimeBaseCommand extends Command {
       apihost: flags.apihost || config.get('runtime.apihost') || properties.get('APIHOST') || PropertyDefault.APIHOST,
       namespace: config.get('runtime.namespace') || properties.get('NAMESPACE'),
       api_key: flags.auth || config.get('runtime.auth') || properties.get('AUTH'),
-      ignore_certs: flags.insecure || config.get('runtime.insecure')
+      ignore_certs: flags.insecure || config.get('runtime.insecure'),
+      'use-runtime-auth': process.env.USE_RUNTIME_AUTH || flags['use-runtime-auth']
     }
 
     // remove any null or undefined keys
@@ -66,24 +64,11 @@ class RuntimeBaseCommand extends Command {
   }
 
   async wsk (options) {
-    if (!options) {
-      const authHandler = {
-        getAuthHeader: async () => {
-          await context.setCli({ 'cli.bare-output': true }, false) // set this globally
-          const env = getCliEnv()
-          console.debug(`Retrieving CLI Token using env=${env}`)
-          const accessToken = await getToken(CLI)
-
-          return `Bearer ${accessToken}`
-        }
-      }
-      options = await this.getOptions()
-      if (process.env.IS_DEPLOY_SERVICE_ENABLED === 'true') {
-        options.auth_handler = authHandler
-        options.apihost = options.apihost ?? PropertyDefault.DEPLOYSERVICEURL
-      }
+    let _options = structuredClone(options)
+    if (!_options) {
+      _options = await this.getOptions()
     }
-    return runtimeLib.init(options)
+    return runtimeLib.init(_options)
   }
 
   getImsOrgId () {

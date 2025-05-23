@@ -9,11 +9,11 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
+const DeployServiceCommand = require('../../../DeployServiceCommand')
 const { Flags } = require('@oclif/core')
 const fs = require('fs')
 
-class ApiCreate extends RuntimeBaseCommand {
+class ApiCreate extends DeployServiceCommand {
   async run () {
     const { args, flags } = await this.parse(ApiCreate)
 
@@ -73,7 +73,7 @@ ApiCreate.args = [
 ]
 
 ApiCreate.flags = {
-  ...RuntimeBaseCommand.flags,
+  ...DeployServiceCommand.flags,
   apiname: Flags.string({
     char: 'n',
     description: 'Friendly name of the API; ignored when CFG_FILE is specified (default BASE_PATH)',

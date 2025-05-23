@@ -14,9 +14,9 @@ const fs = require('fs')
 const { createKeyValueArrayFromFlag, createKeyValueArrayFromFile, createComponentsfromSequence, getKeyValueArrayFromMergedParameters } = require('@adobe/aio-lib-runtime').utils
 const { kindForFileExtension } = require('../../../kinds')
 const { Flags } = require('@oclif/core')
-const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
+const DeployServiceCommand = require('../../../DeployServiceCommand')
 
-class ActionCreate extends RuntimeBaseCommand {
+class ActionCreate extends DeployServiceCommand {
   isUpdate () { return false }
 
   async run () {
@@ -235,7 +235,8 @@ ActionCreate.args = [
 ]
 
 ActionCreate.flags = {
-  ...RuntimeBaseCommand.flags,
+  ...DeployServiceCommand.flags,
+
   param: Flags.string({
     char: 'p',
     description: 'parameter values in KEY VALUE format', // help description for flag
