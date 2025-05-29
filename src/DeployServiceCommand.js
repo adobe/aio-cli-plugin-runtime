@@ -38,7 +38,7 @@ class DeployServiceCommand extends RuntimeBaseCommand {
     let contextName = CLI // default
     const currentContext = await context.getCurrent() // potential override
 
-    if (currentContext !== CLI) {
+    if (currentContext && currentContext !== CLI) {
       contextName = currentContext
     } else {
       await context.setCli({ 'cli.bare-output': true }, false) // set this globally
