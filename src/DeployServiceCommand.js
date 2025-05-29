@@ -14,7 +14,8 @@ const { Flags } = require('@oclif/core')
 
 const { PropertyDefault } = require('./properties')
 const runtimeLib = require('@adobe/aio-lib-runtime')
-const { getToken, context, CLI } = require('@adobe/aio-lib-ims')
+const { getToken, context } = require('@adobe/aio-lib-ims')
+const { CLI } = require('@adobe/aio-lib-ims/src/context')
 const { getCliEnv } = require('@adobe/aio-lib-env')
 const RuntimeBaseCommand = require('./RuntimeBaseCommand')
 
