@@ -62,8 +62,8 @@ describe('DeployServiceCommand', () => {
       getCliEnv.mockReturnValue(mockEnv)
     })
 
-    test('should use CLI context by default', async () => {
-      context.getCurrent.mockResolvedValue(CLI)
+    test('should use CLI context (default) if current context undefined', async () => {
+      context.getCurrent.mockResolvedValue(undefined)
       getToken.mockResolvedValue(mockToken)
 
       const result = await command.getAccessToken()
