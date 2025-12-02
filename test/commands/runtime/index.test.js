@@ -52,8 +52,9 @@ describe('instance methods', () => {
     test('returns help file for runtime command', () => {
       const spy = jest.spyOn(Help.prototype, 'showHelp').mockReturnValue(true)
       command.config = {}
+      command.id = 'runtime' // Set the command ID for the test
       return command.run().then(() => {
-        expect(spy).toHaveBeenCalledWith(['runtime', '--help'])
+        expect(spy).toHaveBeenCalledWith(['runtime'])
       })
     })
   })
