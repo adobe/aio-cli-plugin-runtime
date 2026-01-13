@@ -46,14 +46,12 @@ test('flags', async () => {
 })
 
 test('args', async () => {
-  const packageName = TheCommand.args[0]
-  expect(packageName.name).toBeDefined()
-  expect(packageName.name).toEqual('packageName')
-  expect(packageName.required).toEqual(true)
-  const bindPackageName = TheCommand.args[1]
-  expect(bindPackageName.name).toBeDefined()
-  expect(bindPackageName.name).toEqual('bindPackageName')
-  expect(bindPackageName.required).toEqual(true)
+  const args = TheCommand.args
+  expect(args).toBeDefined()
+  expect(args.packageName).toBeDefined()
+  expect(args.packageName.required).toEqual(true)
+  expect(args.bindPackageName).toBeDefined()
+  expect(args.bindPackageName.required).toEqual(true)
 })
 
 describe('instance methods', () => {

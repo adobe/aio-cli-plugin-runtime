@@ -34,18 +34,18 @@ test('aliases', async () => {
 test('args', async () => {
   const args = TheCommand.args
   expect(args).toBeDefined()
-  expect(args.length).toEqual(3)
+  expect(Object.keys(args).length).toEqual(3)
 
-  expect(args[0].name).toEqual('basePathOrApiName')
-  expect(args[0].required).toBeTruthy()
-  expect(args[0].description).toBeDefined()
+  expect(args.basePathOrApiName).toBeDefined()
+  expect(args.basePathOrApiName.required).toBeTruthy()
+  expect(args.basePathOrApiName.description).toBeDefined()
 
-  expect(args[1].name).toEqual('relPath')
-  expect(args[1].required).toBeFalsy()
-  expect(args[1].description).toBeDefined()
+  expect(args.relPath).toBeDefined()
+  expect(args.relPath.required).toBeFalsy()
+  expect(args.relPath.description).toBeDefined()
 
-  expect(args[2].name).toEqual('apiVerb')
-  expect(args[2].required).toBeFalsy()
+  expect(args.apiVerb).toBeDefined()
+  expect(args.apiVerb.required).toBeFalsy()
   expect(args[2].options).toMatchObject(['get', 'post', 'put', 'patch', 'delete', 'head', 'options'])
   expect(args[2].description).toBeDefined()
 })

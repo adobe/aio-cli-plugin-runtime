@@ -30,7 +30,11 @@ test('aliases', async () => {
 })
 
 test('args', async () => {
-  expect(TheCommand.args).toBeUndefined()
+  if (TheCommand.args === undefined) {
+    expect(TheCommand.args).toBeUndefined()
+  } else {
+    expect(Object.keys(TheCommand.args).length).toEqual(0)
+  }
 })
 
 describe('instance methods', () => {

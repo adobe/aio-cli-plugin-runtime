@@ -34,24 +34,24 @@ test('aliases', async () => {
 test('args', async () => {
   const args = TheCommand.args
   expect(args).toBeDefined()
-  expect(args.length).toEqual(4)
+  expect(Object.keys(args).length).toEqual(4)
 
-  expect(args[0].name).toEqual('basePath')
-  expect(args[0].required).not.toBeTruthy()
-  expect(args[0].description).toBeDefined()
+  expect(args.basePath).toBeDefined()
+  expect(args.basePath.required).not.toBeTruthy()
+  expect(args.basePath.description).toBeDefined()
 
-  expect(args[1].name).toEqual('relPath')
-  expect(args[1].required).not.toBeTruthy()
-  expect(args[1].description).toBeDefined()
+  expect(args.relPath).toBeDefined()
+  expect(args.relPath.required).not.toBeTruthy()
+  expect(args.relPath.description).toBeDefined()
 
-  expect(args[2].name).toEqual('apiVerb')
-  expect(args[2].required).not.toBeTruthy()
-  expect(args[2].options).toMatchObject(['get', 'post', 'put', 'patch', 'delete', 'head', 'options'])
-  expect(args[2].description).toBeDefined()
+  expect(args.apiVerb).toBeDefined()
+  expect(args.apiVerb.required).not.toBeTruthy()
+  expect(args.apiVerb.options).toMatchObject(['get', 'post', 'put', 'patch', 'delete', 'head', 'options'])
+  expect(args.apiVerb.description).toBeDefined()
 
-  expect(args[3].name).toEqual('action')
-  expect(args[3].required).not.toBeTruthy()
-  expect(args[3].description).toBeDefined()
+  expect(args.action).toBeDefined()
+  expect(args.action.required).not.toBeTruthy()
+  expect(args.action.description).toBeDefined()
 })
 
 // eslint-disable-next-line jest/expect-expect

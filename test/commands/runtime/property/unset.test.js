@@ -29,7 +29,11 @@ test('aliases', async () => {
 })
 
 test('args', async () => {
-  expect(TheCommand.args).not.toBeDefined()
+  if (TheCommand.args === undefined) {
+    expect(TheCommand.args).toBeUndefined()
+  } else {
+    expect(Object.keys(TheCommand.args).length).toEqual(0)
+  }
 })
 
 // eslint-disable-next-line jest/expect-expect

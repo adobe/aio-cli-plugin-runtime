@@ -62,13 +62,11 @@ test('flags', async () => {
 })
 
 test('args', async () => {
-  const actionName = TheCommand.args[0]
-  expect(actionName.name).toBeDefined()
-  expect(actionName.name).toEqual('actionName')
-  expect(actionName.required).toEqual(true)
-  const actionPath = TheCommand.args[1]
-  expect(actionPath.name).toBeDefined()
-  expect(actionPath.name).toEqual('actionPath')
+  const args = TheCommand.args
+  expect(args).toBeDefined()
+  expect(args.actionName).toBeDefined()
+  expect(args.actionName.required).toEqual(true)
+  expect(args.actionPath).toBeDefined()
 })
 
 describe('instance methods', () => {
