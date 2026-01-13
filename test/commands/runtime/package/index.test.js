@@ -29,6 +29,7 @@ test('aliases', async () => {
   expect(TheCommand.aliases.length).toBeGreaterThan(0)
 })
 
+test('args', async () => {
   if (TheCommand.args === undefined) {
     expect(TheCommand.args).toBeUndefined()
   } else {

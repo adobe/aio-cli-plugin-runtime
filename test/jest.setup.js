@@ -22,17 +22,46 @@ jest.mock('fs', () => {
   const actualFs = jest.requireActual('fs')
   return {
     ...actualFs,
-    readFileSync: jest.fn((path) => {
-      if (global.__mockFs[path]) {
-        return typeof global.__mockFs[path] === 'string' ? global.__mockFs[path] : Buffer.from(global.__mockFs[path])
+    readFileSync: jest.fn((path, options) => {
+      if (global.__mockFs.hasOwnProperty(path)) {
+        const content = global.__mockFs[path]
+        if (content === '') {
+          return Buffer.from('')
+        }
+        if (options && options.encoding) {
+          return typeof content === 'string' ? content : Buffer.from(content).toString(options.encoding)
+        }
+        if (path.endsWith('.zip') || path.endsWith('.bin')) {
+          return Buffer.from(typeof content === 'string' ? content : content)
+        }
+        return typeof content === 'string' ? content : Buffer.from(content)
       }
-      return actualFs.readFileSync(path)
+      if (path.endsWith('.wskprops')) {
+        const wskPropsKey = Object.keys(global.__mockFs).find(key => key.endsWith('.wskprops'))
+        if (wskPropsKey) {
+          const content = global.__mockFs[wskPropsKey]
+          if (content === '') {
+            return Buffer.from('')
+          }
+          return typeof content === 'string' ? content : Buffer.from(content)
+        }
+      }
+      return actualFs.readFileSync(path, options)
     }),
     writeFileSync: jest.fn((path, data) => {
       global.__mockFs[path] = data
     }),
     existsSync: jest.fn((path) => {
-      return global.__mockFs.hasOwnProperty(path) || actualFs.existsSync(path)
+      if (global.__mockFs.hasOwnProperty(path)) {
+        return true
+      }
+      if (path.endsWith('.wskprops')) {
+        const wskPropsKey = Object.keys(global.__mockFs).find(key => key.endsWith('.wskprops'))
+        if (wskPropsKey) {
+          return true
+        }
+      }
+      return actualFs.existsSync(path)
     }),
     statSync: jest.fn((path) => {
       if (global.__mockFs.hasOwnProperty(path)) {

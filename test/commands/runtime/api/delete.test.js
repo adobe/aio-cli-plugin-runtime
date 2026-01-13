@@ -46,8 +46,8 @@ test('args', async () => {
 
   expect(args.apiVerb).toBeDefined()
   expect(args.apiVerb.required).toBeFalsy()
-  expect(args[2].options).toMatchObject(['get', 'post', 'put', 'patch', 'delete', 'head', 'options'])
-  expect(args[2].description).toBeDefined()
+  expect(args.apiVerb.options).toMatchObject(['get', 'post', 'put', 'patch', 'delete', 'head', 'options'])
+  expect(args.apiVerb.description).toBeDefined()
 })
 
 // eslint-disable-next-line jest/expect-expect
