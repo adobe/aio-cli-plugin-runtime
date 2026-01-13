@@ -52,6 +52,21 @@ jest.mock('fs', () => {
         }
       }
       return files.length > 0 ? files : actualFs.readdirSync(path)
+    }),
+    mkdirSync: jest.fn((path, options) => {
+      if (!global.__mockFs[path]) {
+        global.__mockFs[path] = null
+      }
+      if (options && options.recursive) {
+        const parts = path.split('/').filter(p => p)
+        let currentPath = ''
+        for (const part of parts) {
+          currentPath = currentPath ? `${currentPath}/${part}` : part
+          if (!global.__mockFs.hasOwnProperty(currentPath)) {
+            global.__mockFs[currentPath] = null
+          }
+        }
+      }
     })
   }
 })

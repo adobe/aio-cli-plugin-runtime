@@ -10,7 +10,7 @@ governing permissions and limitations under the License.
 */
 
 const DeployServiceCommand = require('../../../DeployServiceCommand')
-// eslint-disable-next-line no-unused-vars
+const { Args } = require('@oclif/core')
 
 class ApiDelete extends DeployServiceCommand {
   async run () {
