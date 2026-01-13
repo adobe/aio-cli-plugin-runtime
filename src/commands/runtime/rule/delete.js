@@ -10,7 +10,7 @@ governing permissions and limitations under the License.
 */
 
 const DeployServiceCommand = require('../../../DeployServiceCommand')
-const { Flags } = require('@oclif/core')
+const { Args, Flags } = require('@oclif/core')
 
 class RuleDelete extends DeployServiceCommand {
   async run () {
@@ -30,13 +30,9 @@ class RuleDelete extends DeployServiceCommand {
 
 RuleDelete.description = 'Delete a Rule'
 
-RuleDelete.args = [
-  {
-    name: 'name',
-    required: true,
-    description: 'Name of the rule'
-  }
-]
+RuleDelete.args = {
+  name: Args.string({ required: true, description: 'Name of the rule' })
+}
 
 RuleDelete.flags = {
   ...DeployServiceCommand.flags,

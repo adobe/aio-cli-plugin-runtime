@@ -74,12 +74,9 @@ async function recursivelyDeletePackage (ow, pkg) {
   return ow.packages.delete(pkg)
 }
 
-PackageDelete.args = [
-  {
-    name: 'packageName',
-    required: true
-  }
-]
+PackageDelete.args = {
+  packageName: Args.string({ required: true })
+}
 
 PackageDelete.flags = {
   json: Flags.boolean({

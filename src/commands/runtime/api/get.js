@@ -10,6 +10,7 @@ governing permissions and limitations under the License.
 */
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
+const { Args } = require('@oclif/core')
 // eslint-disable-next-line no-unused-vars
 
 class ApiGet extends RuntimeBaseCommand {
@@ -30,13 +31,9 @@ class ApiGet extends RuntimeBaseCommand {
   }
 }
 
-ApiGet.args = [
-  {
-    name: 'basePathOrApiName',
-    required: true,
-    description: 'The base path or api name'
-  }
-]
+ApiGet.args = {
+  basePathOrApiName: Args.string({ required: true, description: 'The base path or api name' })
+}
 
 ApiGet.flags = {
   ...RuntimeBaseCommand.flags

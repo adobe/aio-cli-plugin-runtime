@@ -12,7 +12,7 @@ governing permissions and limitations under the License.
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 const { getKeyValueObjectFromMergedParameters } = require('@adobe/aio-lib-runtime').utils
-const { Flags } = require('@oclif/core')
+const { Args, Flags } = require('@oclif/core')
 
 class TriggerFire extends RuntimeBaseCommand {
   async run () {
@@ -34,13 +34,9 @@ class TriggerFire extends RuntimeBaseCommand {
   }
 }
 
-TriggerFire.args = [
-  {
-    name: 'triggerName',
-    required: true,
-    description: 'The name of the trigger'
-  }
-]
+TriggerFire.args = {
+  triggerName: Args.string({ required: true, description: 'The name of the trigger' })
+}
 
 TriggerFire.flags = {
   ...RuntimeBaseCommand.flags,

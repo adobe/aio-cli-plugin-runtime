@@ -10,6 +10,7 @@ governing permissions and limitations under the License.
 */
 
 const RuleCreate = require('./create')
+const { Args } = require('@oclif/core')
 
 class RuleUpdate extends RuleCreate {
   isUpdate () { return true }
@@ -17,23 +18,11 @@ class RuleUpdate extends RuleCreate {
 
 RuleUpdate.description = 'Update a Rule'
 
-RuleUpdate.args = [
-  {
-    name: 'name',
-    required: true,
-    description: 'Name of the rule'
-  },
-  {
-    name: 'trigger',
-    required: true,
-    description: 'Name of the trigger'
-  },
-  {
-    name: 'action',
-    required: true,
-    description: 'Name of the action'
-  }
-]
+RuleUpdate.args = {
+  name: Args.string({ required: true, description: 'Name of the rule' }),
+  trigger: Args.string({ required: true, description: 'Name of the trigger' }),
+  action: Args.string({ required: true, description: 'Name of the action' })
+}
 
 RuleUpdate.flags = RuleCreate.flags
 

@@ -12,7 +12,7 @@ governing permissions and limitations under the License.
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 const { getKeyValueArrayFromMergedParameters } = require('@adobe/aio-lib-runtime').utils
-const { Flags } = require('@oclif/core')
+const { Args, Flags } = require('@oclif/core')
 
 class PackageCreate extends RuntimeBaseCommand {
   isUpdate () { return false }
@@ -59,12 +59,9 @@ class PackageCreate extends RuntimeBaseCommand {
   }
 }
 
-PackageCreate.args = [
-  {
-    name: 'packageName',
-    required: true
-  }
-]
+PackageCreate.args = {
+  packageName: Args.string({ required: true })
+}
 
 PackageCreate.flags = {
   ...RuntimeBaseCommand.flags,

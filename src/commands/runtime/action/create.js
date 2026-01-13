@@ -13,7 +13,7 @@ governing permissions and limitations under the License.
 const fs = require('fs')
 const { createKeyValueArrayFromFlag, createKeyValueArrayFromFile, createComponentsfromSequence, getKeyValueArrayFromMergedParameters } = require('@adobe/aio-lib-runtime').utils
 const { kindForFileExtension } = require('../../../kinds')
-const { Flags } = require('@oclif/core')
+const { Args, Flags } = require('@oclif/core')
 const DeployServiceCommand = require('../../../DeployServiceCommand')
 
 class ActionCreate extends DeployServiceCommand {
@@ -224,15 +224,10 @@ class ActionCreate extends DeployServiceCommand {
   }
 }
 
-ActionCreate.args = [
-  {
-    name: 'actionName',
-    required: true
-  },
-  {
-    name: 'actionPath'
-  }
-]
+ActionCreate.args = {
+  actionName: Args.string({ required: true }),
+  actionPath: Args.string({ required: false })
+}
 
 ActionCreate.flags = {
   ...DeployServiceCommand.flags,

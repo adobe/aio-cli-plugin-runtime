@@ -13,7 +13,7 @@ governing permissions and limitations under the License.
 const fs = require('fs')
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 const { fileExtensionForKind } = require('../../../kinds')
-const { Flags } = require('@oclif/core')
+const { Args, Flags } = require('@oclif/core')
 
 class ActionGet extends RuntimeBaseCommand {
   async run () {
@@ -93,12 +93,9 @@ class ActionGet extends RuntimeBaseCommand {
   }
 }
 
-ActionGet.args = [
-  {
-    name: 'actionName',
-    required: true
-  }
-]
+ActionGet.args = {
+  actionName: Args.string({ required: true })
+}
 
 ActionGet.flags = {
   ...RuntimeBaseCommand.flags,

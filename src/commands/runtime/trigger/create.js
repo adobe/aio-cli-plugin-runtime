@@ -12,7 +12,7 @@ governing permissions and limitations under the License.
 
 const DeployServiceCommand = require('../../../DeployServiceCommand')
 const { getKeyValueArrayFromMergedParameters } = require('@adobe/aio-lib-runtime').utils
-const { Flags } = require('@oclif/core')
+const { Args, Flags } = require('@oclif/core')
 
 class TriggerCreate extends DeployServiceCommand {
   isUpdate () { return false }
@@ -53,13 +53,9 @@ class TriggerCreate extends DeployServiceCommand {
   }
 }
 
-TriggerCreate.args = [
-  {
-    name: 'triggerName',
-    required: true,
-    description: 'The name of the trigger'
-  }
-]
+TriggerCreate.args = {
+  triggerName: Args.string({ required: true, description: 'The name of the trigger' })
+}
 
 TriggerCreate.flags = {
   ...DeployServiceCommand.flags,

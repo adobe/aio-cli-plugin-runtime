@@ -11,6 +11,7 @@ governing permissions and limitations under the License.
 */
 
 const DeployServiceCommand = require('../../../DeployServiceCommand')
+const { Args } = require('@oclif/core')
 const { parsePathPattern } = require('@adobe/aio-lib-runtime').utils
 
 class TriggerDelete extends DeployServiceCommand {
@@ -29,13 +30,9 @@ class TriggerDelete extends DeployServiceCommand {
   }
 }
 
-TriggerDelete.args = [
-  {
-    name: 'triggerPath',
-    required: true,
-    description: 'The name of the trigger, in the format /NAMESPACE/NAME'
-  }
-]
+TriggerDelete.args = {
+  triggerPath: Args.string({ required: true, description: 'The name of the trigger, in the format /NAMESPACE/NAME' })
+}
 
 TriggerDelete.flags = {
   ...DeployServiceCommand.flags

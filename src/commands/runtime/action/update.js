@@ -11,20 +11,16 @@ governing permissions and limitations under the License.
 */
 
 const ActionCreate = require('./create')
+const { Args } = require('@oclif/core')
 
 class ActionUpdate extends ActionCreate {
   isUpdate () { return true }
 }
 
-ActionUpdate.args = [
-  {
-    name: 'actionName',
-    required: true
-  },
-  {
-    name: 'actionPath'
-  }
-]
+ActionUpdate.args = {
+  actionName: Args.string({ required: true }),
+  actionPath: Args.string({ required: false })
+}
 
 ActionUpdate.flags = ActionCreate.flags
 

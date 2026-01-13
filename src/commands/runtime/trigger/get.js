@@ -11,6 +11,7 @@ governing permissions and limitations under the License.
 */
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
+const { Args } = require('@oclif/core')
 const { parsePathPattern } = require('@adobe/aio-lib-runtime').utils
 
 class TriggerGet extends RuntimeBaseCommand {
@@ -34,13 +35,9 @@ TriggerGet.flags = {
   ...RuntimeBaseCommand.flags
 }
 
-TriggerGet.args = [
-  {
-    name: 'triggerPath',
-    required: true,
-    description: 'The name/path of the trigger, in the format /NAMESPACE/NAME'
-  }
-]
+TriggerGet.args = {
+  triggerPath: Args.string({ required: true, description: 'The name/path of the trigger, in the format /NAMESPACE/NAME' })
+}
 
 TriggerGet.description = 'Get a trigger for Adobe I/O Runtime'
 

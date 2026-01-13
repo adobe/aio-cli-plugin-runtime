@@ -17,8 +17,44 @@ const eol = require('eol')
 jest.setTimeout(30000)
 jest.useFakeTimers()
 
-// dont touch the real fs
-jest.mock('fs', () => require('jest-plugin-fs/mock'))
+global.__mockFs = {}
+jest.mock('fs', () => {
+  const actualFs = jest.requireActual('fs')
+  return {
+    ...actualFs,
+    readFileSync: jest.fn((path) => {
+      if (global.__mockFs[path]) {
+        return typeof global.__mockFs[path] === 'string' ? global.__mockFs[path] : Buffer.from(global.__mockFs[path])
+      }
+      return actualFs.readFileSync(path)
+    }),
+    writeFileSync: jest.fn((path, data) => {
+      global.__mockFs[path] = data
+    }),
+    existsSync: jest.fn((path) => {
+      return global.__mockFs.hasOwnProperty(path) || actualFs.existsSync(path)
+    }),
+    statSync: jest.fn((path) => {
+      if (global.__mockFs.hasOwnProperty(path)) {
+        return {
+          isFile: () => true,
+          isDirectory: () => false,
+          size: typeof global.__mockFs[path] === 'string' ? Buffer.byteLength(global.__mockFs[path]) : global.__mockFs[path].length
+        }
+      }
+      return actualFs.statSync(path)
+    }),
+    readdirSync: jest.fn((path) => {
+      const files = []
+      for (const filePath in global.__mockFs) {
+        if (filePath.startsWith(path)) {
+          files.push(filePath.replace(path + '/', ''))
+        }
+      }
+      return files.length > 0 ? files : actualFs.readdirSync(path)
+    })
+  }
+})
 
 // ensure a mocked openwhisk module for unit-tests
 jest.mock('openwhisk')
@@ -120,36 +156,28 @@ const emptyWskPropsFs = {
   [wskprops]: global.fixtureFile('empty-wsk.properties')
 }
 
-// set the fake filesystem
-const ffs = require('jest-plugin-fs').default
-
 global.fakeFileSystem = {
   addJson: (json) => {
     // add to existing
-    ffs.mock(json)
+    Object.assign(global.__mockFs, json)
   },
   removeKeys: (arr) => {
     // remove from existing
-    const files = ffs.files()
-    for (const prop in files) {
-      if (arr.includes(prop)) {
-        delete files[prop]
-      }
+    for (const prop of arr) {
+      delete global.__mockFs[prop]
     }
-    ffs.restore()
-    ffs.mock(files)
   },
   clear: () => {
     // reset to empty
-    ffs.restore()
+    Object.keys(global.__mockFs).forEach(key => delete global.__mockFs[key])
   },
   reset: ({ emptyWskProps = false } = {}) => {
     // reset to file system with wskprops
-    ffs.restore()
-    ffs.mock(emptyWskProps ? emptyWskPropsFs : wskPropsFs)
+    Object.keys(global.__mockFs).forEach(key => delete global.__mockFs[key])
+    Object.assign(global.__mockFs, emptyWskProps ? emptyWskPropsFs : wskPropsFs)
   },
   files: () => {
-    return ffs.files()
+    return { ...global.__mockFs }
   }
 }
 // seed the fake filesystem

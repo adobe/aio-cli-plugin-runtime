@@ -42,16 +42,10 @@ class PackageBind extends RuntimeBaseCommand {
   }
 }
 
-PackageBind.args = [
-  {
-    name: 'packageName',
-    required: true
-  },
-  {
-    name: 'bindPackageName',
-    required: true
-  }
-]
+PackageBind.args = {
+  packageName: Args.string({ required: true }),
+  bindPackageName: Args.string({ required: true })
+}
 
 PackageBind.flags = {
   ...RuntimeBaseCommand.flags,
