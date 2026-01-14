@@ -120,7 +120,7 @@ describe('instance methods', () => {
     test('create api with --config-file', () => {
       const apiSwagger = fixtureFile('api/api_swagger.json')
       const cmd = rtLib.mockResolved(rtAction, { gwApiUrl: 'http://myserver' })
-      command.argv = ['--config-file', '/api/api_swagger.json']
+      command.argv = ['--config-file', 'api/api_swagger.json']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalledWith({

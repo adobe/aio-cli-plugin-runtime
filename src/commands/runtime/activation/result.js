@@ -36,7 +36,9 @@ class ActivationResult extends RuntimeBaseCommand {
 }
 
 ActivationResult.args = {
-  activationID: Args.string({ required: false })
+  activationID: Args.string({
+    required: false
+  })
 }
 
 ActivationResult.flags = {

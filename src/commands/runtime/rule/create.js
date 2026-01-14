@@ -35,9 +35,18 @@ class RuleCreate extends DeployServiceCommand {
 RuleCreate.description = 'Create a Rule'
 
 RuleCreate.args = {
-  name: Args.string({ required: true, description: 'Name of the rule' }),
-  trigger: Args.string({ required: true, description: 'Name of the trigger' }),
-  action: Args.string({ required: true, description: 'Name of the action' })
+  name: Args.string({
+    required: true,
+    description: 'Name of the rule'
+  }),
+  trigger: Args.string({
+    required: true,
+    description: 'Name of the trigger'
+  }),
+  action: Args.string({
+    required: true,
+    description: 'Name of the action'
+  })
 }
 
 RuleCreate.flags = {

@@ -29,7 +29,10 @@ class RuleStatus extends RuntimeBaseCommand {
 RuleStatus.description = 'Gets the status of a rule'
 
 RuleStatus.args = {
-  name: Args.string({ required: true, description: 'Name of the rule' })
+  name: Args.string({
+    required: true,
+    description: 'Name of the rule'
+  })
 }
 
 RuleStatus.flags = {

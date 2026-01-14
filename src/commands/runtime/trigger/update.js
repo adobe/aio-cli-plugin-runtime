@@ -19,7 +19,10 @@ class TriggerUpdate extends TriggerCreate {
 }
 
 TriggerUpdate.args = {
-  triggerName: Args.string({ required: true, description: 'The name of the trigger' })
+  triggerName: Args.string({
+    required: true,
+    description: 'The name of the trigger'
+  })
 }
 
 TriggerUpdate.flags = cloneDeep(TriggerCreate.flags)

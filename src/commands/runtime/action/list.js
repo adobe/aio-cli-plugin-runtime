@@ -95,7 +95,9 @@ class ActionList extends RuntimeBaseCommand {
 }
 
 ActionList.args = {
-  packageName: Args.string({ required: false })
+  packageName: Args.string({
+    required: false
+  })
 }
 
 ActionList.flags = {

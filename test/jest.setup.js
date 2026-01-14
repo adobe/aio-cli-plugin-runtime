@@ -15,7 +15,6 @@ const fs = jest.requireActual('fs')
 const eol = require('eol')
 
 jest.setTimeout(30000)
-jest.useFakeTimers()
 
 global.__mockFs = {}
 jest.mock('fs', () => {
@@ -65,19 +64,26 @@ jest.mock('fs', () => {
     }),
     statSync: jest.fn((path) => {
       if (global.__mockFs.hasOwnProperty(path)) {
+        const content = global.__mockFs[path]
+        const isDirectory = content === null
         return {
-          isFile: () => true,
-          isDirectory: () => false,
-          size: typeof global.__mockFs[path] === 'string' ? Buffer.byteLength(global.__mockFs[path]) : global.__mockFs[path].length
+          isFile: () => !isDirectory,
+          isDirectory: () => isDirectory,
+          size: isDirectory ? 0 : (typeof content === 'string' ? Buffer.byteLength(content) : (content ? content.length : 0))
         }
       }
       return actualFs.statSync(path)
     }),
     readdirSync: jest.fn((path) => {
       const files = []
+      const normalizedPath = path.endsWith('/') ? path : `${path}/`
       for (const filePath in global.__mockFs) {
-        if (filePath.startsWith(path)) {
-          files.push(filePath.replace(path + '/', ''))
+        if (filePath.startsWith(normalizedPath)) {
+          const relativePath = filePath.substring(normalizedPath.length)
+          if (relativePath && !relativePath.includes('/')) {
+            files.push(relativePath)
+          }
+        } else if (filePath === path && global.__mockFs[filePath] === null) {
         }
       }
       return files.length > 0 ? files : actualFs.readdirSync(path)

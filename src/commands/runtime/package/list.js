@@ -115,7 +115,9 @@ PackageList.flags = {
 }
 
 PackageList.args = {
-  namespace: Args.string({ required: false })
+  namespace: Args.string({
+    required: false
+  })
 }
 
 PackageList.description = 'Lists all the Packages'

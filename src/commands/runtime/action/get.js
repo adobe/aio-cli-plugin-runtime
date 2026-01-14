@@ -94,7 +94,9 @@ class ActionGet extends RuntimeBaseCommand {
 }
 
 ActionGet.args = {
-  actionName: Args.string({ required: true })
+  actionName: Args.string({
+    required: true
+  })
 }
 
 ActionGet.flags = {

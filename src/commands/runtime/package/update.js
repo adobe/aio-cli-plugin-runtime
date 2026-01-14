@@ -18,7 +18,9 @@ class PackageUpdate extends PackageCreate {
 }
 
 PackageUpdate.args = {
-  packageName: Args.string({ required: true })
+  packageName: Args.string({
+    required: true
+  })
 }
 
 PackageUpdate.flags = PackageCreate.flags

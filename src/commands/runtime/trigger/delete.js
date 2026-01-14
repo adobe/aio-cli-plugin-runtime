@@ -31,7 +31,10 @@ class TriggerDelete extends DeployServiceCommand {
 }
 
 TriggerDelete.args = {
-  triggerPath: Args.string({ required: true, description: 'The name of the trigger, in the format /NAMESPACE/NAME' })
+  triggerPath: Args.string({
+    required: true,
+    description: 'The name of the trigger, in the format /NAMESPACE/NAME'
+  })
 }
 
 TriggerDelete.flags = {

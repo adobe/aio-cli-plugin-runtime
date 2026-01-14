@@ -29,7 +29,10 @@ class RuleEnable extends DeployServiceCommand {
 RuleEnable.description = 'Enable a Rule'
 
 RuleEnable.args = {
-  name: Args.string({ required: true, description: 'Name of the rule' })
+  name: Args.string({
+    required: true,
+    description: 'Name of the rule'
+  })
 }
 
 RuleEnable.flags = {

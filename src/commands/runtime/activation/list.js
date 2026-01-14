@@ -199,7 +199,9 @@ class ActivationList extends RuntimeBaseCommand {
 }
 
 ActivationList.args = {
-  action_name: Args.string({ required: false })
+  action_name: Args.string({
+    required: false
+  })
 }
 
 ActivationList.flags = {

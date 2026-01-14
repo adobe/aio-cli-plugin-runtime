@@ -30,7 +30,9 @@ class ActionDelete extends DeployServiceCommand {
 }
 
 ActionDelete.args = {
-  actionName: Args.string({ required: true })
+  actionName: Args.string({
+    required: true
+  })
 }
 
 ActionDelete.flags = {

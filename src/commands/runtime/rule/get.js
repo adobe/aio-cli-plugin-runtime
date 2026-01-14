@@ -29,7 +29,10 @@ class RuleGet extends RuntimeBaseCommand {
 RuleGet.description = 'Retrieves a Rule'
 
 RuleGet.args = {
-  name: Args.string({ required: true, description: 'Name of the rule' })
+  name: Args.string({
+    required: true,
+    description: 'Name of the rule'
+  })
 }
 
 RuleGet.flags = {

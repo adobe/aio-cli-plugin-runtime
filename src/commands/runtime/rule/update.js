@@ -19,9 +19,18 @@ class RuleUpdate extends RuleCreate {
 RuleUpdate.description = 'Update a Rule'
 
 RuleUpdate.args = {
-  name: Args.string({ required: true, description: 'Name of the rule' }),
-  trigger: Args.string({ required: true, description: 'Name of the trigger' }),
-  action: Args.string({ required: true, description: 'Name of the action' })
+  name: Args.string({
+    required: true,
+    description: 'Name of the rule'
+  }),
+  trigger: Args.string({
+    required: true,
+    description: 'Name of the trigger'
+  }),
+  action: Args.string({
+    required: true,
+    description: 'Name of the action'
+  })
 }
 
 RuleUpdate.flags = RuleCreate.flags

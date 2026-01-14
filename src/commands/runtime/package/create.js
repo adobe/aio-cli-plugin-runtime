@@ -60,7 +60,9 @@ class PackageCreate extends RuntimeBaseCommand {
 }
 
 PackageCreate.args = {
-  packageName: Args.string({ required: true })
+  packageName: Args.string({
+    required: true
+  })
 }
 
 PackageCreate.flags = {

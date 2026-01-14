@@ -56,27 +56,27 @@ class ApiList extends RuntimeBaseCommand {
 
       if (flags.json) {
         this.logJSON('', result.apis[0].value.apidoc)
-      } else {
-        let data = []
-        result.apis.forEach(api => {
-          // join the two arrays by reduce
-          data = processApi(api).reduce((coll, item) => {
-            coll.push(item)
-            return coll
-          }, data)
-        })
-
-        ux.table(data, {
-          Action: { minWidth: 10 },
-          Verb: { minWidth: 10 },
-          APIName: { header: 'API Name', minWidth: 10 },
-          URL: { minWidth: 15, 'no-truncate': true }
-        },
-        {
-          printLine: this.log.bind(this),
-          ...flags // parsed flags
-        })
+        return
       }
+
+      let data = []
+      result.apis.forEach(api => {
+        // join the two arrays by reduce
+        data = processApi(api).reduce((coll, item) => {
+          coll.push(item)
+          return coll
+        }, data)
+      })
+
+      ux.table(data, {
+        Action: { minWidth: 10 },
+        Verb: { minWidth: 10 },
+        APIName: { header: 'API Name', minWidth: 10 },
+        URL: { minWidth: 15, 'no-truncate': true }
+      },
+      {
+        printLine: this.log.bind(this)
+      })
     } catch (err) {
       await this.handleError('failed to list the api', err)
     }
@@ -84,9 +84,19 @@ class ApiList extends RuntimeBaseCommand {
 }
 
 ApiList.args = {
-  basePath: Args.string({ required: false, description: 'The base path of the api' }),
-  relPath: Args.string({ required: false, description: 'The path of the api relative to the base path' }),
-  apiVerb: Args.string({ required: false, description: 'The http verb', options: ['get', 'post', 'put', 'patch', 'delete', 'head', 'options'] })
+  basePath: Args.string({
+    required: false,
+    description: 'The base path of the api'
+  }),
+  relPath: Args.string({
+    required: false,
+    description: 'The path of the api relative to the base path'
+  }),
+  apiVerb: Args.string({
+    required: false,
+    description: 'The http verb',
+    options: ['get', 'post', 'put', 'patch', 'delete', 'head', 'options']
+  })
 }
 
 ApiList.flags = {

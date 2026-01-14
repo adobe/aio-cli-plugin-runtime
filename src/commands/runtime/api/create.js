@@ -49,10 +49,23 @@ class ApiCreate extends DeployServiceCommand {
 }
 
 ApiCreate.args = {
-  basePath: Args.string({ required: false, description: 'The base path of the api' }),
-  relPath: Args.string({ required: false, description: 'The path of the api relative to the base path' }),
-  apiVerb: Args.string({ required: false, description: 'The http verb', options: ['get', 'post', 'put', 'patch', 'delete', 'head', 'options'] }),
-  action: Args.string({ required: false, description: 'The action to call' })
+  basePath: Args.string({
+    required: false,
+    description: 'The base path of the api'
+  }),
+  relPath: Args.string({
+    required: false,
+    description: 'The path of the api relative to the base path'
+  }),
+  apiVerb: Args.string({
+    required: false,
+    description: 'The http verb',
+    options: ['get', 'post', 'put', 'patch', 'delete', 'head', 'options']
+  }),
+  action: Args.string({
+    required: false,
+    description: 'The action to call'
+  })
 }
 
 ApiCreate.flags = {

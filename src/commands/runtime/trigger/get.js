@@ -36,7 +36,10 @@ TriggerGet.flags = {
 }
 
 TriggerGet.args = {
-  triggerPath: Args.string({ required: true, description: 'The name/path of the trigger, in the format /NAMESPACE/NAME' })
+  triggerPath: Args.string({
+    required: true,
+    description: 'The name/path of the trigger, in the format /NAMESPACE/NAME'
+  })
 }
 
 TriggerGet.description = 'Get a trigger for Adobe I/O Runtime'

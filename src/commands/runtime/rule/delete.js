@@ -31,7 +31,10 @@ class RuleDelete extends DeployServiceCommand {
 RuleDelete.description = 'Delete a Rule'
 
 RuleDelete.args = {
-  name: Args.string({ required: true, description: 'Name of the rule' })
+  name: Args.string({
+    required: true,
+    description: 'Name of the rule'
+  })
 }
 
 RuleDelete.flags = {

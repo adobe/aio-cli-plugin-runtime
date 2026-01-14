@@ -35,7 +35,10 @@ class TriggerFire extends RuntimeBaseCommand {
 }
 
 TriggerFire.args = {
-  triggerName: Args.string({ required: true, description: 'The name of the trigger' })
+  triggerName: Args.string({
+    required: true,
+    description: 'The name of the trigger'
+  })
 }
 
 TriggerFire.flags = {

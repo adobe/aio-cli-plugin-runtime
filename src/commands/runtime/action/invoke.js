@@ -50,7 +50,9 @@ class ActionInvoke extends RuntimeBaseCommand {
 }
 
 ActionInvoke.args = {
-  actionName: Args.string({ required: true })
+  actionName: Args.string({
+    required: true
+  })
 }
 
 ActionInvoke.flags = {

@@ -32,9 +32,19 @@ class ApiDelete extends DeployServiceCommand {
 }
 
 ApiDelete.args = {
-  basePathOrApiName: Args.string({ required: true, description: 'The base path or api name' }),
-  relPath: Args.string({ required: false, description: 'The path of the api relative to the base path' }),
-  apiVerb: Args.string({ required: false, description: 'The http verb', options: ['get', 'post', 'put', 'patch', 'delete', 'head', 'options'] })
+  basePathOrApiName: Args.string({
+    required: true,
+    description: 'The base path or api name'
+  }),
+  relPath: Args.string({
+    required: false,
+    description: 'The path of the api relative to the base path'
+  }),
+  apiVerb: Args.string({
+    required: false,
+    description: 'The http verb',
+    options: ['get', 'post', 'put', 'patch', 'delete', 'head', 'options']
+  })
 }
 
 ApiDelete.flags = {

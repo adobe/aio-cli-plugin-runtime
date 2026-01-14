@@ -87,7 +87,9 @@ class ActivationLogs extends RuntimeBaseCommand {
 }
 
 ActivationLogs.args = {
-  activationId: Args.string({ required: false })
+  activationId: Args.string({
+    required: false
+  })
 }
 
 ActivationLogs.flags = {

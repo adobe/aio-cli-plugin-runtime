@@ -18,8 +18,12 @@ class ActionUpdate extends ActionCreate {
 }
 
 ActionUpdate.args = {
-  actionName: Args.string({ required: true }),
-  actionPath: Args.string({ required: false })
+  actionName: Args.string({
+    required: true
+  }),
+  actionPath: Args.string({
+    required: false
+  })
 }
 
 ActionUpdate.flags = ActionCreate.flags

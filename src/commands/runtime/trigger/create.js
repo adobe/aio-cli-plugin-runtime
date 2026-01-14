@@ -54,7 +54,10 @@ class TriggerCreate extends DeployServiceCommand {
 }
 
 TriggerCreate.args = {
-  triggerName: Args.string({ required: true, description: 'The name of the trigger' })
+  triggerName: Args.string({
+    required: true,
+    description: 'The name of the trigger'
+  })
 }
 
 TriggerCreate.flags = {

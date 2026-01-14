@@ -29,7 +29,9 @@ class PackageGet extends RuntimeBaseCommand {
 }
 
 PackageGet.args = {
-  packageName: Args.string({ required: true })
+  packageName: Args.string({
+    required: true
+  })
 }
 
 PackageGet.flags = {

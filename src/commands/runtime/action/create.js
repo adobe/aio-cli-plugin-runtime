@@ -225,8 +225,12 @@ class ActionCreate extends DeployServiceCommand {
 }
 
 ActionCreate.args = {
-  actionName: Args.string({ required: true }),
-  actionPath: Args.string({ required: false })
+  actionName: Args.string({
+    required: true
+  }),
+  actionPath: Args.string({
+    required: false
+  })
 }
 
 ActionCreate.flags = {
