@@ -47,10 +47,10 @@ test('flags', async () => {
 })
 
 test('args', async () => {
-  const invokeName = TheCommand.args[0]
-  expect(invokeName.name).toBeDefined()
-  expect(invokeName.name).toEqual('actionName')
-  expect(invokeName.required).toEqual(true)
+  const args = TheCommand.args
+  expect(args).toBeDefined()
+  expect(args.actionName).toBeDefined()
+  expect(args.actionName.required).toEqual(true)
 })
 
 describe('instance methods', () => {

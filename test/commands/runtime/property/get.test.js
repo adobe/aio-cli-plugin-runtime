@@ -36,7 +36,13 @@ test('aliases', async () => {
 })
 
 test('args', async () => {
-  expect(TheCommand.args).not.toBeDefined()
+  /* eslint-disable jest/no-conditional-expect */
+  if (TheCommand.args === undefined) {
+    expect(TheCommand.args).toBeUndefined()
+  } else {
+    expect(Object.keys(TheCommand.args).length).toEqual(0)
+  }
+  /* eslint-enable jest/no-conditional-expect */
 })
 
 // eslint-disable-next-line jest/expect-expect

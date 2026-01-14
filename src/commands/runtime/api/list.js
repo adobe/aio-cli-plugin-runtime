@@ -10,7 +10,7 @@ governing permissions and limitations under the License.
 */
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
-const { Flags, CliUx: cli } = require('@oclif/core')
+const { Args, Flags, ux } = require('@oclif/core')
 
 /** @private */
 function processApi (api) {
@@ -40,7 +40,13 @@ function processApi (api) {
 
 class ApiList extends RuntimeBaseCommand {
   async run () {
+    // Workaround for oclif v2 parsing issue: capture argv before parse() when multiple optional args are present
+    // oclif v2 doesn't properly parse --json flag when command has 3+ optional positional arguments
+    // Related: https://github.com/oclif/core/issues/854 (workaround: search argv directly)
+    const argvBeforeParse = this.argv ? [...this.argv] : []
     const { args, flags } = await this.parse(ApiList)
+    const hasJsonInArgv = argvBeforeParse.includes('--json')
+    const shouldOutputJson = flags.json || hasJsonInArgv
 
     try {
       const ow = await this.wsk()
@@ -54,50 +60,50 @@ class ApiList extends RuntimeBaseCommand {
 
       const result = await ow.routes.list(options)
 
-      if (flags.json) {
+      if (shouldOutputJson) {
         this.logJSON('', result.apis[0].value.apidoc)
-      } else {
-        let data = []
-        result.apis.forEach(api => {
-          // join the two arrays by reduce
-          data = processApi(api).reduce((coll, item) => {
-            coll.push(item)
-            return coll
-          }, data)
-        })
-
-        cli.ux.table(data, {
-          Action: { minWidth: 10 },
-          Verb: { minWidth: 10 },
-          APIName: { header: 'API Name', minWidth: 10 },
-          URL: { minWidth: 15, 'no-truncate': true }
-        },
-        {
-          printLine: this.log.bind(this),
-          ...flags // parsed flags
-        })
+        return
       }
+
+      let data = []
+      result.apis.forEach(api => {
+        // join the two arrays by reduce
+        data = processApi(api).reduce((coll, item) => {
+          coll.push(item)
+          return coll
+        }, data)
+      })
+
+      ux.table(data, {
+        Action: { minWidth: 10 },
+        Verb: { minWidth: 10 },
+        APIName: { header: 'API Name', minWidth: 10 },
+        URL: { minWidth: 15, 'no-truncate': true }
+      },
+      {
+        printLine: this.log.bind(this)
+      })
     } catch (err) {
       await this.handleError('failed to list the api', err)
     }
   }
 }
 
-ApiList.args = [
-  {
-    name: 'basePath',
+ApiList.args = {
+  basePath: Args.string({
+    required: false,
     description: 'The base path of the api'
-  },
-  {
-    name: 'relPath',
+  }),
+  relPath: Args.string({
+    required: false,
     description: 'The path of the api relative to the base path'
-  },
-  {
-    name: 'apiVerb',
+  }),
+  apiVerb: Args.string({
+    required: false,
     description: 'The http verb',
     options: ['get', 'post', 'put', 'patch', 'delete', 'head', 'options']
-  }
-]
+  })
+}
 
 ApiList.flags = {
   ...RuntimeBaseCommand.flags,

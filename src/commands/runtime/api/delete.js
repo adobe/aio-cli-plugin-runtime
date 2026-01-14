@@ -10,7 +10,7 @@ governing permissions and limitations under the License.
 */
 
 const DeployServiceCommand = require('../../../DeployServiceCommand')
-// eslint-disable-next-line no-unused-vars
+const { Args } = require('@oclif/core')
 
 class ApiDelete extends DeployServiceCommand {
   async run () {
@@ -31,22 +31,21 @@ class ApiDelete extends DeployServiceCommand {
   }
 }
 
-ApiDelete.args = [
-  {
-    name: 'basePathOrApiName',
+ApiDelete.args = {
+  basePathOrApiName: Args.string({
     required: true,
     description: 'The base path or api name'
-  },
-  {
-    name: 'relPath',
+  }),
+  relPath: Args.string({
+    required: false,
     description: 'The path of the api relative to the base path'
-  },
-  {
-    name: 'apiVerb',
+  }),
+  apiVerb: Args.string({
+    required: false,
     description: 'The http verb',
     options: ['get', 'post', 'put', 'patch', 'delete', 'head', 'options']
-  }
-]
+  })
+}
 
 ApiDelete.flags = {
   ...DeployServiceCommand.flags

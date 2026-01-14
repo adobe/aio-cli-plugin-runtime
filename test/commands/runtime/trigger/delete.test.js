@@ -33,12 +33,11 @@ test('aliases', async () => {
 })
 
 test('args', async () => {
-  const triggerPath = TheCommand.args[0]
-
-  expect(triggerPath).toBeDefined()
-  expect(triggerPath.name).toEqual('triggerPath')
-  expect(triggerPath.required).toEqual(true)
-  expect(triggerPath.description).toBeDefined()
+  const args = TheCommand.args
+  expect(args).toBeDefined()
+  expect(args.triggerPath).toBeDefined()
+  expect(args.triggerPath.required).toEqual(true)
+  expect(args.triggerPath.description).toBeDefined()
 })
 
 // eslint-disable-next-line jest/expect-expect

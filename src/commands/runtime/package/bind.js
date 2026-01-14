@@ -13,7 +13,7 @@ governing permissions and limitations under the License.
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 const { parsePackageName } = require('@adobe/aio-lib-runtime').utils
 const { getKeyValueArrayFromMergedParameters } = require('@adobe/aio-lib-runtime').utils
-const { Flags } = require('@oclif/core')
+const { Args, Flags } = require('@oclif/core')
 
 class PackageBind extends RuntimeBaseCommand {
   async run () {
@@ -42,16 +42,14 @@ class PackageBind extends RuntimeBaseCommand {
   }
 }
 
-PackageBind.args = [
-  {
-    name: 'packageName',
+PackageBind.args = {
+  packageName: Args.string({
     required: true
-  },
-  {
-    name: 'bindPackageName',
+  }),
+  bindPackageName: Args.string({
     required: true
-  }
-]
+  })
+}
 
 PackageBind.flags = {
   ...RuntimeBaseCommand.flags,

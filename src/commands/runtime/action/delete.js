@@ -11,7 +11,7 @@ governing permissions and limitations under the License.
 */
 
 const DeployServiceCommand = require('../../../DeployServiceCommand')
-const { Flags } = require('@oclif/core')
+const { Args, Flags } = require('@oclif/core')
 
 class ActionDelete extends DeployServiceCommand {
   async run () {
@@ -29,12 +29,11 @@ class ActionDelete extends DeployServiceCommand {
   }
 }
 
-ActionDelete.args = [
-  {
-    name: 'actionName',
+ActionDelete.args = {
+  actionName: Args.string({
     required: true
-  }
-]
+  })
+}
 
 ActionDelete.flags = {
   ...DeployServiceCommand.flags,

@@ -10,7 +10,7 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const { Flags } = require('@oclif/core')
+const { Args, Flags } = require('@oclif/core')
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 const rtLib = require('@adobe/aio-lib-runtime')
 const printLogs = rtLib.utils.printLogs
@@ -86,11 +86,11 @@ class ActivationLogs extends RuntimeBaseCommand {
   }
 }
 
-ActivationLogs.args = [
-  {
-    name: 'activationId'
-  }
-]
+ActivationLogs.args = {
+  activationId: Args.string({
+    required: false
+  })
+}
 
 ActivationLogs.flags = {
   ...RuntimeBaseCommand.flags,

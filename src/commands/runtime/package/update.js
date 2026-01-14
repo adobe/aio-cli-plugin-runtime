@@ -11,17 +11,17 @@ governing permissions and limitations under the License.
 */
 
 const PackageCreate = require('./create')
+const { Args } = require('@oclif/core')
 
 class PackageUpdate extends PackageCreate {
   isUpdate () { return true }
 }
 
-PackageUpdate.args = [
-  {
-    name: 'packageName',
+PackageUpdate.args = {
+  packageName: Args.string({
     required: true
-  }
-]
+  })
+}
 
 PackageUpdate.flags = PackageCreate.flags
 

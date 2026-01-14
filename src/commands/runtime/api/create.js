@@ -10,7 +10,7 @@ governing permissions and limitations under the License.
 */
 
 const DeployServiceCommand = require('../../../DeployServiceCommand')
-const { Flags } = require('@oclif/core')
+const { Args, Flags } = require('@oclif/core')
 const fs = require('fs')
 
 class ApiCreate extends DeployServiceCommand {
@@ -48,29 +48,25 @@ class ApiCreate extends DeployServiceCommand {
   }
 }
 
-ApiCreate.args = [
-  {
-    name: 'basePath',
+ApiCreate.args = {
+  basePath: Args.string({
     required: false,
     description: 'The base path of the api'
-  },
-  {
-    name: 'relPath',
+  }),
+  relPath: Args.string({
     required: false,
     description: 'The path of the api relative to the base path'
-  },
-  {
-    name: 'apiVerb',
+  }),
+  apiVerb: Args.string({
     required: false,
     description: 'The http verb',
     options: ['get', 'post', 'put', 'patch', 'delete', 'head', 'options']
-  },
-  {
-    name: 'action',
+  }),
+  action: Args.string({
     required: false,
     description: 'The action to call'
-  }
-]
+  })
+}
 
 ApiCreate.flags = {
   ...DeployServiceCommand.flags,

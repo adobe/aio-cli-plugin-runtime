@@ -10,7 +10,7 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const { Flags } = require('@oclif/core')
+const { Args, Flags } = require('@oclif/core')
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 
 class ActivationResult extends RuntimeBaseCommand {
@@ -35,11 +35,11 @@ class ActivationResult extends RuntimeBaseCommand {
   }
 }
 
-ActivationResult.args = [
-  {
-    name: 'activationID'
-  }
-]
+ActivationResult.args = {
+  activationID: Args.string({
+    required: false
+  })
+}
 
 ActivationResult.flags = {
   ...RuntimeBaseCommand.flags,

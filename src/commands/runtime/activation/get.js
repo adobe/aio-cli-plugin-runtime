@@ -9,7 +9,7 @@ the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTA
 OF ANY KIND, either express or implied. See the License for the specific language
 governing permissions and limitations under the License.
 */
-const { Flags } = require('@oclif/core')
+const { Args, Flags } = require('@oclif/core')
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 const { printLogs } = require('@adobe/aio-lib-runtime').utils
 
@@ -45,11 +45,11 @@ class ActivationGet extends RuntimeBaseCommand {
   }
 }
 
-ActivationGet.args = [
-  {
-    name: 'activationID'
-  }
-]
+ActivationGet.args = {
+  activationID: Args.string({
+    required: false
+  })
+}
 
 ActivationGet.flags = {
   ...RuntimeBaseCommand.flags,

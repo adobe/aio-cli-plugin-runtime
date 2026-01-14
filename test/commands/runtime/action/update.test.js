@@ -62,13 +62,11 @@ test('flags', async () => {
 })
 
 test('args', async () => {
-  const actionName = TheCommand.args[0]
-  expect(actionName.name).toBeDefined()
-  expect(actionName.name).toEqual('actionName')
-  expect(actionName.required).toEqual(true)
-  const actionPath = TheCommand.args[1]
-  expect(actionPath.name).toBeDefined()
-  expect(actionPath.name).toEqual('actionPath')
+  const args = TheCommand.args
+  expect(args).toBeDefined()
+  expect(args.actionName).toBeDefined()
+  expect(args.actionName.required).toEqual(true)
+  expect(args.actionPath).toBeDefined()
 })
 
 describe('instance methods', () => {
@@ -114,7 +112,7 @@ describe('instance methods', () => {
     test('updates an action with action name and action path', () => {
       const name = 'hello'
       const cmd = rtLib.mockResolved(rtAction, { res: 'fake' })
-      command.argv = [name, '/action/actionFile.js']
+      command.argv = [name, 'action/actionFile.js']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalledWith({ name, action: { name, exec: { code: jsFile, kind: 'nodejs:default' } } })
@@ -125,7 +123,7 @@ describe('instance methods', () => {
     test('updates an action with action name and action path --json', () => {
       const name = 'hello'
       const cmd = rtLib.mockResolved(rtAction, { res: 'fake' })
-      command.argv = [name, '/action/actionFile.js', '--json']
+      command.argv = [name, 'action/actionFile.js', '--json']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalledWith({ name, action: { name, exec: { code: jsFile, kind: 'nodejs:default' } } })
@@ -137,7 +135,7 @@ describe('instance methods', () => {
       const name = 'hello'
       const zipFile = Buffer.from('fakezipfile').toString('base64')
       const cmd = rtLib.mockResolved(rtAction, { res: 'fake' })
-      command.argv = [name, '/action/zipAction.zip', '--kind', 'nodejs:10']
+      command.argv = [name, 'action/zipAction.zip', '--kind', 'nodejs:10']
       return command.run()
         .then(() => {
           expect(cmd).toHaveBeenCalledWith({ name, action: { name, exec: { code: zipFile, kind: 'nodejs:10' } } })
@@ -148,7 +146,7 @@ describe('instance methods', () => {
     test('updates an action with action name, action path and --param flag', () => {
       const name = 'hello'
       const cmd = rtLib.mockResolved(rtAction, { res: 'fake' })
-      command.argv = [name, '/action/actionFile.js', '--param', 'a', 'b', '--param', 'c', 'd']
+      command.argv = [name, 'action/actionFile.js', '--param', 'a', 'b', '--param', 'c', 'd']
       rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation(params => params && [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }])
       return command.run()
         .then(() => {
@@ -206,11 +204,11 @@ describe('instance methods', () => {
     test('updates an action with action name, action path and --param-file flag', () => {
       const name = 'hello'
       const cmd = rtLib.mockResolved(rtAction, { res: 'fake' })
-      command.argv = [name, '/action/actionFile.js', '--param-file', '/action/parameters.json']
+      command.argv = [name, 'action/actionFile.js', '--param-file', 'action/parameters.json']
       rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation((flags, file) => file && [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }])
       return command.run()
         .then(() => {
-          expect(rtUtils.getKeyValueArrayFromMergedParameters).toHaveBeenCalledWith(undefined, '/action/parameters.json')
+          expect(rtUtils.getKeyValueArrayFromMergedParameters).toHaveBeenCalledWith(undefined, 'action/parameters.json')
           expect(cmd).toHaveBeenCalledWith({
             action: {
               exec: { code: jsFile, kind: 'nodejs:default' },
@@ -226,11 +224,11 @@ describe('instance methods', () => {
     test('updates an action with action name and --param-file flag', () => {
       const name = 'hello'
       const cmd = rtLib.mockResolved(rtAction, { res: 'fake' })
-      command.argv = [name, '--param-file', '/action/parameters.json']
+      command.argv = [name, '--param-file', 'action/parameters.json']
       rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation((flags, file) => file && [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }])
       return command.run()
         .then(() => {
-          expect(rtUtils.getKeyValueArrayFromMergedParameters).toHaveBeenCalledWith(undefined, '/action/parameters.json')
+          expect(rtUtils.getKeyValueArrayFromMergedParameters).toHaveBeenCalledWith(undefined, 'action/parameters.json')
           expect(cmd).toHaveBeenCalledWith({
             action: {
               name,
@@ -245,7 +243,7 @@ describe('instance methods', () => {
     test('update an action with action name, action path, --param-file and param flag (precedence)', () => {
       const name = 'hello'
       const cmd = rtLib.mockResolved(rtAction, '')
-      command.argv = [name, '/action/actionFile.js', '--param', 'param1', 'fromcmdline1', '--param', 'cmdparam', 'fromcmdline2', '--param-file', '/action/parameters.json']
+      command.argv = [name, 'action/actionFile.js', '--param', 'param1', 'fromcmdline1', '--param', 'cmdparam', 'fromcmdline2', '--param-file', 'action/parameters.json']
       rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation((flags, file) => flags && file && [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }])
 
       return command.run()
@@ -268,7 +266,7 @@ describe('instance methods', () => {
     test('updates an action with action name, action path, --params flag and limits', () => {
       const name = 'hello'
       const cmd = rtLib.mockResolved(rtAction, { res: 'fake' })
-      command.argv = [name, '/action/actionFile.js', '--param', 'a', 'b', '--param', 'c', 'd', '--logsize', '8', '--memory', '128', '--timeout', '20000']
+      command.argv = [name, 'action/actionFile.js', '--param', 'a', 'b', '--param', 'c', 'd', '--logsize', '8', '--memory', '128', '--timeout', '20000']
       rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation((flags, file) => flags && [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }])
       return command.run()
         .then(() => {
@@ -353,7 +351,7 @@ describe('instance methods', () => {
     test('updates an action with action name, action path, --params flag, limits and kind', () => {
       const name = 'hello'
       const cmd = rtLib.mockResolved(rtAction, { res: 'fake' })
-      command.argv = [name, '/action/actionFile.js', '--param', 'a', 'b', '--param', 'c', 'd', '--logsize', '8', '--memory', '128', '--kind', 'nodejs:10']
+      command.argv = [name, 'action/actionFile.js', '--param', 'a', 'b', '--param', 'c', 'd', '--logsize', '8', '--memory', '128', '--kind', 'nodejs:10']
       rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation((flags, file) => flags && [{ key: 'fakeParam', value: 'aaa' }, { key: 'fakeParam2', value: 'bbb' }])
       return command.run()
         .then(() => {
@@ -478,7 +476,7 @@ describe('instance methods', () => {
     test('update an action with action name and overlapping --env and --param keys', async () => {
       rtLib.mockRejected(rtAction, '')
       const name = 'hello'
-      command.argv = [name, '/action/actionFile.js', '--env', 'a', 'b', '--param', 'a', 'd']
+      command.argv = [name, 'action/actionFile.js', '--env', 'a', 'b', '--param', 'a', 'd']
       rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation((flags, file) => flags && [{ key: 'same', value: 'kv' }])
       rtUtils.createKeyValueArrayFromFlag.mockReturnValue([{ key: 'same', value: 'abc' }])
       const error = ['failed to update the action', new Error('Invalid argument(s). Environment variables and function parameters may not overlap')]
@@ -488,11 +486,11 @@ describe('instance methods', () => {
     test('update an action with action name, action path and --env-file flag', () => {
       const name = 'hello'
       const cmd = rtLib.mockResolved(rtAction, { res: 'fake' })
-      command.argv = [name, '/action/actionFile.js', '--env-file', '/action/parameters.json']
+      command.argv = [name, 'action/actionFile.js', '--env-file', 'action/parameters.json']
       rtUtils.createKeyValueArrayFromFile.mockReturnValue([{ key: 'fakeEnv', value: 'abc' }])
       return command.run()
         .then(() => {
-          expect(rtUtils.createKeyValueArrayFromFile).toHaveBeenCalledWith('/action/parameters.json')
+          expect(rtUtils.createKeyValueArrayFromFile).toHaveBeenCalledWith('action/parameters.json')
           expect(cmd).toHaveBeenCalledWith({
             name,
             action: {
@@ -572,7 +570,7 @@ describe('instance methods', () => {
     test('updates an action with action name, action path, --params flag and annotation flag', () => {
       const name = 'hello'
       const cmd = rtLib.mockResolved(rtAction, { res: 'fake' })
-      command.argv = [name, '/action/actionFile.js', '--param', 'a', 'b', '--param', 'c', 'd', '--annotation', 'desc', 'Description']
+      command.argv = [name, 'action/actionFile.js', '--param', 'a', 'b', '--param', 'c', 'd', '--annotation', 'desc', 'Description']
       rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation((flags, file) => [{ key: 'fake', value: 'abc' }])
       return command.run()
         .then(() => {
@@ -652,12 +650,12 @@ describe('instance methods', () => {
     test('updates an action with action name, action path, --params flag and annotation-file flag', () => {
       const name = 'hello'
       const cmd = rtLib.mockResolved(rtAction, { res: 'fake' })
-      command.argv = [name, '/action/actionFile.js', '-p', 'a', 'b', '-p', 'c', 'd', '-A', '/action/parameters.json']
+      command.argv = [name, 'action/actionFile.js', '-p', 'a', 'b', '-p', 'c', 'd', '-A', 'action/parameters.json']
       rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation((flags, file) => (flags && [{ key: 'fake', value: 'abc' }]) || (file && [{ key: 'fakeAnno', value: 'tation' }]))
       return command.run()
         .then(() => {
           expect(rtUtils.getKeyValueArrayFromMergedParameters).toHaveBeenCalledWith(['a', 'b', 'c', 'd'], undefined)
-          expect(rtUtils.getKeyValueArrayFromMergedParameters).toHaveBeenCalledWith(undefined, '/action/parameters.json')
+          expect(rtUtils.getKeyValueArrayFromMergedParameters).toHaveBeenCalledWith(undefined, 'action/parameters.json')
           expect(cmd).toHaveBeenCalledWith({
             name,
             action: {
@@ -683,12 +681,12 @@ describe('instance methods', () => {
     test('updates an action with action name, --params flag and annotation-file flag', () => {
       const name = 'hello'
       const cmd = rtLib.mockResolved(rtAction, { res: 'fake' })
-      command.argv = [name, '-p', 'a', 'b', '-p', 'c', 'd', '-A', '/action/parameters.json']
+      command.argv = [name, '-p', 'a', 'b', '-p', 'c', 'd', '-A', 'action/parameters.json']
       rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation((flags, file) => (flags && [{ key: 'fake', value: 'abc' }]) || (file && [{ key: 'fakeAnno', value: 'tation' }]))
       return command.run()
         .then(() => {
           expect(rtUtils.getKeyValueArrayFromMergedParameters).toHaveBeenCalledWith(['a', 'b', 'c', 'd'], undefined)
-          expect(rtUtils.getKeyValueArrayFromMergedParameters).toHaveBeenCalledWith(undefined, '/action/parameters.json')
+          expect(rtUtils.getKeyValueArrayFromMergedParameters).toHaveBeenCalledWith(undefined, 'action/parameters.json')
           expect(cmd).toHaveBeenCalledWith({
             name,
             action: {
@@ -710,11 +708,11 @@ describe('instance methods', () => {
     test('updates an action with action name and annotation-file flag', () => {
       const name = 'hello'
       const cmd = rtLib.mockResolved(rtAction, { res: 'fake' })
-      command.argv = [name, '-A', '/action/parameters.json']
+      command.argv = [name, '-A', 'action/parameters.json']
       rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation((flags, file) => (flags && [{ key: 'fake', value: 'abc' }]) || (file && [{ key: 'fakeAnno', value: 'tation' }]))
       return command.run()
         .then(() => {
-          expect(rtUtils.getKeyValueArrayFromMergedParameters).toHaveBeenCalledWith(undefined, '/action/parameters.json')
+          expect(rtUtils.getKeyValueArrayFromMergedParameters).toHaveBeenCalledWith(undefined, 'action/parameters.json')
           expect(cmd).toHaveBeenCalledWith({
             name,
             action: {
@@ -732,7 +730,7 @@ describe('instance methods', () => {
     test('updates an action with action name, action path, --params flag and web flag as raw', () => {
       const name = 'hello'
       const cmd = rtLib.mockResolved(rtAction, { res: 'fake' })
-      command.argv = [name, '/action/actionFile.js', '-p', 'a', 'b', '-p', 'c', 'd', '--web', 'raw']
+      command.argv = [name, 'action/actionFile.js', '-p', 'a', 'b', '-p', 'c', 'd', '--web', 'raw']
       rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation((flags, file) => (flags && [{ key: 'fake', value: 'abc' }]))
       return command.run()
         .then(() => {
@@ -763,7 +761,7 @@ describe('instance methods', () => {
     test('updates an action with action name, action path, --params flag and web flag as false', () => {
       const name = 'hello'
       const cmd = rtLib.mockResolved(rtAction, { res: 'fake' })
-      command.argv = [name, '/action/actionFile.js', '-p', 'a', 'b', '-p', 'c', 'd', '--web', 'false']
+      command.argv = [name, 'action/actionFile.js', '-p', 'a', 'b', '-p', 'c', 'd', '--web', 'false']
       rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation((flags, file) => (flags && [{ key: 'fake', value: 'abc' }]))
       return command.run()
         .then(() => {
@@ -792,7 +790,7 @@ describe('instance methods', () => {
     test('updates an action with action name, action path, --params flag, annotations and web flag as true', () => {
       const name = 'hello'
       const cmd = rtLib.mockResolved(rtAction, { res: 'fake' })
-      command.argv = [name, '/action/actionFile.js', '-p', 'a', 'b', '-p', 'c', 'd', '-a', 'desc', 'Description', '--web', 'true']
+      command.argv = [name, 'action/actionFile.js', '-p', 'a', 'b', '-p', 'c', 'd', '-a', 'desc', 'Description', '--web', 'true']
       rtUtils.getKeyValueArrayFromMergedParameters.mockImplementation((flags, file) => (flags && [{ key: 'fake', value: 'abc' }]))
       return command.run()
         .then(() => {
@@ -837,21 +835,21 @@ describe('instance methods', () => {
 
     test('tests for incorrect action path', async () => {
       rtLib.mockRejected(rtAction, '')
-      command.argv = ['hello', '/action/file.js', '--kind', 'nodejs:10']
+      command.argv = ['hello', 'action/file.js', '--kind', 'nodejs:10']
       const error = ['failed to update the action', new Error('Provide a valid path for ACTION')]
       expect(await rejectWithError(command, error, handleError)).toBeTruthy()
     })
 
     test('tests for incorrect action zip path', async () => {
       rtLib.mockRejected(rtAction, '')
-      command.argv = ['hello', '/action/file.zip', '--kind', 'nodejs:10']
+      command.argv = ['hello', 'action/file.zip', '--kind', 'nodejs:10']
       const error = ['failed to update the action', new Error('Provide a valid path for ACTION')]
       expect(await rejectWithError(command, error, handleError)).toBeTruthy()
     })
 
     test('error out if a zip file is deployed without the --kind flag', async () => {
       rtLib.mockRejected(rtAction, '')
-      command.argv = ['hello', '/action/zipAction.zip']
+      command.argv = ['hello', 'action/zipAction.zip']
       const error = ['failed to update the action', new Error('Invalid argument(s). Creating an action from a zip/binary artifact requires specifying the action kind explicitly')]
       expect(await rejectWithError(command, error, handleError)).toBeTruthy()
     })
@@ -872,21 +870,21 @@ describe('instance methods', () => {
 
     test('tests for incorrect update with file artifact and --sequence', async () => {
       rtLib.mockRejected(rtAction, '')
-      command.argv = ['hello', '/action/actionFile.js', '--sequence', 'a,b,c']
+      command.argv = ['hello', 'action/actionFile.js', '--sequence', 'a,b,c']
       const error = ['failed to update the action', new Error('Cannot specify sequence and a code artifact at the same time')]
       expect(await rejectWithError(command, error, handleError)).toBeTruthy()
     })
 
     test('tests for incorrect update with file artifact and --sequence and --main', async () => {
       rtLib.mockRejected(rtAction, '')
-      command.argv = ['hello', '/action/actionFile.js', '--main', 'maynard', '--sequence', 'a,b,c']
+      command.argv = ['hello', 'action/actionFile.js', '--main', 'maynard', '--sequence', 'a,b,c']
       const error = ['failed to update the action', new Error('Cannot specify sequence and a code artifact at the same time')]
       expect(await rejectWithError(command, error, handleError)).toBeTruthy()
     })
 
     test('errors out on api error', async () => {
       rtLib.mockRejected(rtAction, new Error('an error'))
-      command.argv = ['hello', '/action/actionFile.js']
+      command.argv = ['hello', 'action/actionFile.js']
       const error = ['failed to update the action', new Error('an error')]
       expect(await rejectWithError(command, error, handleError)).toBeTruthy()
     })
