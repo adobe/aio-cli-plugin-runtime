@@ -40,7 +40,13 @@ function processApi (api) {
 
 class ApiList extends RuntimeBaseCommand {
   async run () {
+    // Workaround for oclif v2 parsing issue: capture argv before parse() when multiple optional args are present
+    // oclif v2 doesn't properly parse --json flag when command has 3+ optional positional arguments
+    // Related: https://github.com/oclif/core/issues/854 (workaround: search argv directly)
+    const argvBeforeParse = this.argv ? [...this.argv] : []
     const { args, flags } = await this.parse(ApiList)
+    const hasJsonInArgv = argvBeforeParse.includes('--json')
+    const shouldOutputJson = flags.json || hasJsonInArgv
 
     try {
       const ow = await this.wsk()
@@ -54,7 +60,7 @@ class ApiList extends RuntimeBaseCommand {
 
       const result = await ow.routes.list(options)
 
-      if (flags.json) {
+      if (shouldOutputJson) {
         this.logJSON('', result.apis[0].value.apidoc)
         return
       }

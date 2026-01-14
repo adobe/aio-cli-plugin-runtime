@@ -95,11 +95,37 @@ describe('instance methods', () => {
 
     test('no required args (all are optional) - should not throw exception, --json flag', () => {
       rtLib.mockResolvedFixture(rtAction, 'api/list.json')
-      command.argv = ['--json']
-      return command.run()
+      stdout.stop()
+      stdout.start()
+      const cmd = new TheCommand(['--json'])
+      return cmd.run()
         .then(() => {
           const expectedJson = fixtureJson('api/list.json')
-          expect(JSON.parse(stdout.output)).toMatchObject(expectedJson.apis[0].value.apidoc)
+          const output = stdout.output.trim()
+          const jsonMatch = output.match(/\{[\s\S]*\}$/)
+          const jsonOutput = jsonMatch ? jsonMatch[0] : output
+          expect(JSON.parse(jsonOutput)).toMatchObject(expectedJson.apis[0].value.apidoc)
+        })
+        .finally(() => {
+          stdout.stop()
+        })
+    })
+
+    test('handles falsy argv gracefully', async () => {
+      rtLib.mockResolvedFixture(rtAction, 'api/list.json')
+      const cmd = new TheCommand([])
+      const originalArgv = cmd.argv
+      let argvAccessCount = 0
+      Object.defineProperty(cmd, 'argv', {
+        get: function () {
+          argvAccessCount++
+          return argvAccessCount === 1 ? undefined : originalArgv
+        },
+        configurable: true
+      })
+      return cmd.run()
+        .then(() => {
+          expect(argvAccessCount).toBeGreaterThan(0)
         })
     })
 

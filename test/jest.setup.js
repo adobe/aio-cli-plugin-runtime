@@ -22,7 +22,7 @@ jest.mock('fs', () => {
   return {
     ...actualFs,
     readFileSync: jest.fn((path, options) => {
-      if (global.__mockFs.hasOwnProperty(path)) {
+      if (Object.prototype.hasOwnProperty.call(global.__mockFs, path)) {
         const content = global.__mockFs[path]
         if (content === '') {
           return Buffer.from('')
@@ -51,7 +51,7 @@ jest.mock('fs', () => {
       global.__mockFs[path] = data
     }),
     existsSync: jest.fn((path) => {
-      if (global.__mockFs.hasOwnProperty(path)) {
+      if (Object.prototype.hasOwnProperty.call(global.__mockFs, path)) {
         return true
       }
       if (path.endsWith('.wskprops')) {
@@ -63,7 +63,7 @@ jest.mock('fs', () => {
       return actualFs.existsSync(path)
     }),
     statSync: jest.fn((path) => {
-      if (global.__mockFs.hasOwnProperty(path)) {
+      if (Object.prototype.hasOwnProperty.call(global.__mockFs, path)) {
         const content = global.__mockFs[path]
         const isDirectory = content === null
         return {
@@ -83,7 +83,6 @@ jest.mock('fs', () => {
           if (relativePath && !relativePath.includes('/')) {
             files.push(relativePath)
           }
-        } else if (filePath === path && global.__mockFs[filePath] === null) {
         }
       }
       return files.length > 0 ? files : actualFs.readdirSync(path)
@@ -97,7 +96,7 @@ jest.mock('fs', () => {
         let currentPath = ''
         for (const part of parts) {
           currentPath = currentPath ? `${currentPath}/${part}` : part
-          if (!global.__mockFs.hasOwnProperty(currentPath)) {
+          if (!Object.prototype.hasOwnProperty.call(global.__mockFs, currentPath)) {
             global.__mockFs[currentPath] = null
           }
         }
