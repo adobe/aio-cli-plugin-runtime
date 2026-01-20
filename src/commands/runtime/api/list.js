@@ -43,7 +43,7 @@ class ApiList extends RuntimeBaseCommand {
     // Workaround for oclif v2 parsing issue: capture argv before parse() when multiple optional args are present
     // oclif v2 doesn't properly parse --json flag when command has 3+ optional positional arguments
     // Related: https://github.com/oclif/core/issues/854 (workaround: search argv directly)
-    const argvBeforeParse = this.argv ? [...this.argv] : []
+    const argvBeforeParse = [...(this.argv ?? [])]
     const { args, flags } = await this.parse(ApiList)
     const hasJsonInArgv = argvBeforeParse.includes('--json')
     const shouldOutputJson = flags.json || hasJsonInArgv
