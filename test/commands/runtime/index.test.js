@@ -33,14 +33,12 @@ test('flags', async () => {
   expect(Object.keys(TheCommand.flags)).toMatchObject(Object.keys(RuntimeBaseCommand.flags))
 })
 
-test('args', async () => {
-  /* eslint-disable jest/no-conditional-expect */
-  if (TheCommand.args === undefined) {
-    expect(TheCommand.args).toBeUndefined()
-  } else {
-    expect(Object.keys(TheCommand.args).length).toEqual(0)
-  }
-  /* eslint-enable jest/no-conditional-expect */
+test('args is defined', async () => {
+  expect(TheCommand.args).toBeDefined()
+})
+
+test('args is empty object', async () => {
+  expect(Object.keys(TheCommand.args).length).toEqual(0)
 })
 
 describe('instance methods', () => {

@@ -53,14 +53,12 @@ test('flags', async () => {
     ['cert', 'key', 'apiversion', 'apihost', 'auth', 'insecure', 'debug', 'verbose', 'version', 'help', 'useragent']))
 })
 
-test('args', async () => {
-  /* eslint-disable jest/no-conditional-expect */
-  if (TheCommand.args === undefined) {
-    expect(TheCommand.args).toBeUndefined()
-  } else {
-    expect(Object.keys(TheCommand.args).length).toEqual(0)
-  }
-  /* eslint-enable jest/no-conditional-expect */
+test('args is defined', async () => {
+  expect(TheCommand.args).toBeDefined()
+})
+
+test('args is empty object', async () => {
+  expect(Object.keys(TheCommand.args).length).toEqual(0)
 })
 
 describe('instance methods', () => {
