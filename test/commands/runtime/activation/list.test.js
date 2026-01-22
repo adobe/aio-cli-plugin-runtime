@@ -41,9 +41,9 @@ test('flags', async () => {
 })
 
 test('args', async () => {
-  const logName = TheCommand.args[0]
-  expect(logName.name).toBeDefined()
-  expect(logName.name).toEqual('action_name')
+  const args = TheCommand.args
+  expect(args).toBeDefined()
+  expect(args.action_name).toBeDefined()
 })
 
 describe('instance methods', () => {

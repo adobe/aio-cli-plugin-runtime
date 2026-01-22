@@ -10,6 +10,7 @@ governing permissions and limitations under the License.
 */
 
 const DeployServiceCommand = require('../../../DeployServiceCommand')
+const { Args } = require('@oclif/core')
 
 class RuleEnable extends DeployServiceCommand {
   async run () {
@@ -27,13 +28,12 @@ class RuleEnable extends DeployServiceCommand {
 
 RuleEnable.description = 'Enable a Rule'
 
-RuleEnable.args = [
-  {
-    name: 'name',
+RuleEnable.args = {
+  name: Args.string({
     required: true,
     description: 'Name of the rule'
-  }
-]
+  })
+}
 
 RuleEnable.flags = {
   ...DeployServiceCommand.flags

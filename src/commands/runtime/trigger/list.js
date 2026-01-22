@@ -12,7 +12,7 @@ governing permissions and limitations under the License.
 
 const moment = require('dayjs')
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
-const { Flags, CliUx: cli } = require('@oclif/core')
+const { Flags, ux } = require('@oclif/core')
 
 class TriggerList extends RuntimeBaseCommand {
   async run () {
@@ -84,7 +84,7 @@ class TriggerList extends RuntimeBaseCommand {
               get: row => row.name
             }
           }
-          cli.ux.table(resultsWithStatus, columns)
+          ux.table(resultsWithStatus, columns)
         }
       })
     } catch (err) {

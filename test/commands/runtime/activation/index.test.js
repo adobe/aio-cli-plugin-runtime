@@ -29,8 +29,12 @@ test('aliases', async () => {
   expect(TheCommand.aliases.length).toBeGreaterThan(0)
 })
 
-test('args', async () => {
-  expect(TheCommand.args).toBeUndefined()
+test('args is defined', async () => {
+  expect(TheCommand.args).toBeDefined()
+})
+
+test('args is empty object', async () => {
+  expect(Object.keys(TheCommand.args).length).toEqual(0)
 })
 
 describe('instance methods', () => {

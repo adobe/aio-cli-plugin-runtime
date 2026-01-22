@@ -34,11 +34,11 @@ test('aliases', async () => {
 test('args', async () => {
   const args = TheCommand.args
   expect(args).toBeDefined()
-  expect(args.length).toEqual(1)
+  expect(Object.keys(args).length).toEqual(1)
 
-  expect(args[0].name).toEqual('basePathOrApiName')
-  expect(args[0].required).toBeTruthy()
-  expect(args[0].description).toBeDefined()
+  expect(args.basePathOrApiName).toBeDefined()
+  expect(args.basePathOrApiName.required).toBeTruthy()
+  expect(args.basePathOrApiName.description).toBeDefined()
 })
 
 // eslint-disable-next-line jest/expect-expect
