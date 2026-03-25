@@ -10,7 +10,8 @@ governing permissions and limitations under the License.
 */
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
-const { Args, Flags, ux } = require('@oclif/core')
+const { Args, Flags } = require('@oclif/core')
+const { table } = require('../../../ux-table')
 
 /** @private */
 function processApi (api) {
@@ -40,13 +41,8 @@ function processApi (api) {
 
 class ApiList extends RuntimeBaseCommand {
   async run () {
-    // Workaround for oclif v2 parsing issue: capture argv before parse() when multiple optional args are present
-    // oclif v2 doesn't properly parse --json flag when command has 3+ optional positional arguments
-    // Related: https://github.com/oclif/core/issues/854 (workaround: search argv directly)
-    const argvBeforeParse = [...(this.argv ?? [])]
     const { args, flags } = await this.parse(ApiList)
-    const hasJsonInArgv = argvBeforeParse.includes('--json')
-    const shouldOutputJson = flags.json || hasJsonInArgv
+    const shouldOutputJson = flags.json
 
     try {
       const ow = await this.wsk()
@@ -74,7 +70,7 @@ class ApiList extends RuntimeBaseCommand {
         }, data)
       })
 
-      ux.table(data, {
+      table(data, {
         Action: { minWidth: 10 },
         Verb: { minWidth: 10 },
         APIName: { header: 'API Name', minWidth: 10 },

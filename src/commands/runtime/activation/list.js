@@ -12,7 +12,8 @@ governing permissions and limitations under the License.
 
 const moment = require('dayjs')
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
-const { Args, Flags, ux } = require('@oclif/core')
+const { Args, Flags } = require('@oclif/core')
+const { table } = require('../../../ux-table')
 const decorators = require('../../../decorators').decorators()
 const statusStrings = ['success', 'app error', 'dev error', 'sys error']
 
@@ -187,7 +188,7 @@ class ActivationList extends RuntimeBaseCommand {
           }
         }
         if (listActivation) {
-          ux.table(listActivation, columns, {
+          table(listActivation, columns, {
             'no-truncate': true
           })
         }

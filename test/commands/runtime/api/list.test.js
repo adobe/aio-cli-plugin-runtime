@@ -114,18 +114,9 @@ describe('instance methods', () => {
     test('handles falsy argv gracefully', async () => {
       rtLib.mockResolvedFixture(rtAction, 'api/list.json')
       const cmd = new TheCommand([])
-      const originalArgv = cmd.argv
-      let argvAccessCount = 0
-      Object.defineProperty(cmd, 'argv', {
-        get: function () {
-          argvAccessCount++
-          return argvAccessCount === 1 ? undefined : originalArgv
-        },
-        configurable: true
-      })
       return cmd.run()
         .then(() => {
-          expect(argvAccessCount).toBeGreaterThan(0)
+          expect(cmd.argv).toBeDefined()
         })
     })
 

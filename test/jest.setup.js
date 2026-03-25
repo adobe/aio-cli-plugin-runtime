@@ -16,6 +16,19 @@ const eol = require('eol')
 
 jest.setTimeout(30000)
 
+// oclif v4 requires this.config.runHook in Command.parse().
+// Patch the prototype so unit tests that instantiate commands directly still work.
+const { Command } = require('@oclif/core')
+const _originalParse = Command.prototype.parse
+Command.prototype.parse = async function (options, argv) {
+  if (!this.config) {
+    this.config = { runHook: async () => ({ successes: [], failures: [] }), bin: 'aio', userAgent: 'test/0.0.0', findCommand: () => null, pjson: { oclif: {} } }
+  } else if (!this.config.runHook) {
+    this.config.runHook = async () => ({ successes: [], failures: [] })
+  }
+  return _originalParse.call(this, options, argv)
+}
+
 global.__mockFs = {}
 jest.mock('fs', () => {
   const actualFs = jest.requireActual('fs')
@@ -240,7 +253,8 @@ global.createTestFlagsFunction = (TheCommand, Flags) => {
   return () => {
     // every command needs to override .flags (for global flags)
     // eslint: see https://eslint.org/docs/rules/no-prototype-builtins
-    expect(Object.prototype.hasOwnProperty.call(TheCommand, '_flags')).toBeTruthy()
+    // In oclif v4, flags are stored as 'flags' (not '_flags' as in v1)
+    expect(Object.prototype.hasOwnProperty.call(TheCommand, 'flags')).toBeTruthy()
 
     const flagsKeys = Object.keys(Flags)
     const theCommandFlagKeys = Object.keys(TheCommand.flags)
