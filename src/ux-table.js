@@ -55,16 +55,20 @@ function table (data, columns, options = {}) {
 
   const rowStart = ' '
 
-  // Print header and divider
-  let header = rowStart
-  let divider = rowStart
-  for (const col of cols) {
-    const w = widths[col.key]
-    header += col.header.padEnd(w)
-    divider += ''.padEnd(w - 1, '─') + ' '
+  const noHeader = options['no-header']
+
+  // Print header and divider (unless suppressed)
+  if (!noHeader) {
+    let header = rowStart
+    let divider = rowStart
+    for (const col of cols) {
+      const w = widths[col.key]
+      header += col.header.padEnd(w)
+      divider += ''.padEnd(w - 1, '─') + ' '
+    }
+    printLine(header)
+    printLine(divider)
   }
-  printLine(header)
-  printLine(divider)
 
   // Print rows
   for (const row of rows) {
