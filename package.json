@@ -13,7 +13,7 @@
     "@adobe/aio-lib-env": "^3.0.1",
     "@adobe/aio-lib-ims": "^8.0.1",
     "@adobe/aio-lib-runtime": "^7.1.0",
-    "@oclif/core": "^2.8.12",
+    "@oclif/core": "^4.10.5",
     "@types/jest": "^29.5.3",
     "chalk": "^4.1.2",
     "dayjs": "^1.10.4",
