@@ -12,7 +12,8 @@ governing permissions and limitations under the License.
 
 const moment = require('dayjs')
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
-const { Args, Flags, ux } = require('@oclif/core')
+const { Args, Flags } = require('@oclif/core')
+const { table } = require('../../../ux-table')
 
 class PackageList extends RuntimeBaseCommand {
   async run () {
@@ -78,7 +79,7 @@ class PackageList extends RuntimeBaseCommand {
             get: row => row.name
           }
         }
-        ux.table(result, columns)
+        table(result, columns)
       }
     } catch (err) {
       await this.handleError('failed to list the packages', err)
