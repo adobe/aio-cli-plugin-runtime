@@ -115,6 +115,7 @@ class ActivationList extends RuntimeBaseCommand {
           },
           Topmost: {
             header: '',
+            minWidth: 2,
             maxWidth: 2,
             get: row => {
               if (row.annotations && row.annotations.length) {

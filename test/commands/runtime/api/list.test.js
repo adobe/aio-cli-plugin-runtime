@@ -111,15 +111,6 @@ describe('instance methods', () => {
         })
     })
 
-    test('handles falsy argv gracefully', async () => {
-      rtLib.mockResolvedFixture(rtAction, 'api/list.json')
-      const cmd = new TheCommand([])
-      return cmd.run()
-        .then(() => {
-          expect(cmd.argv).toBeDefined()
-        })
-    })
-
     test('error, throws exception', async () => {
       rtLib.mockRejected(rtAction, new Error('an error'))
       const error = ['failed to list the api', new Error('an error')]

@@ -29,6 +29,11 @@ module.exports = [
     ignores: ['node_modules/**', 'coverage/**']
   },
   {
+    rules: {
+      'jsdoc/tag-lines': ['error', 'never', { startLines: null }]
+    }
+  },
+  {
     files: ['test/**/*.js', 'e2e/**/*.js'],
     ...jestPlugin.configs['flat/recommended'],
     languageOptions: {
