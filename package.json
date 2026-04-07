@@ -30,7 +30,7 @@
     "@adobe/eslint-config-aio-lib-config": "5.0.0",
     "@babel/core": "^7.16.12",
     "@babel/preset-env": "^7.16.11",
-    "babel-jest": "^29.5.0",
+    "babel-jest": "^30.3.0",
     "babel-runtime": "^6.26.0",
     "dedent-js": "^1.0.1",
     "eol": "^0.10.0",
