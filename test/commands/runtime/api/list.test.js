@@ -119,6 +119,44 @@ describe('instance methods', () => {
         })
     })
 
+    test('--json flag, operation without x-openwhisk leaves url unchanged', () => {
+      rtLib.mockResolved(rtAction, {
+        apis: [{
+          value: {
+            gwApiUrl: 'https://example.com/api',
+            apidoc: {
+              basePath: '/test',
+              info: { title: 'test', version: '1.0.0' },
+              swagger: '2.0',
+              paths: {
+                '/mypath': {
+                  get: {
+                    operationId: 'testOp',
+                    responses: { default: { description: 'Default response' } }
+                    // no x-openwhisk field
+                  }
+                }
+              }
+            }
+          }
+        }]
+      })
+      stdout.stop()
+      stdout.start()
+      const cmd = new TheCommand(['--json'])
+      return cmd.run()
+        .then(() => {
+          const output = stdout.output.trim()
+          const jsonMatch = output.match(/\{[\s\S]*\}$/)
+          const parsed = JSON.parse(jsonMatch ? jsonMatch[0] : output)
+          // operation without x-openwhisk should be left intact
+          expect(parsed.paths['/mypath'].get).not.toHaveProperty('x-openwhisk')
+        })
+        .finally(() => {
+          stdout.stop()
+        })
+    })
+
     test('error, throws exception', async () => {
       rtLib.mockRejected(rtAction, new Error('an error'))
       const error = ['failed to list the api', new Error('an error')]
