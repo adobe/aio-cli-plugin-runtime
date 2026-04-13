@@ -9,9 +9,10 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
+const DeployServiceCommand = require('../../../DeployServiceCommand')
+const { Args } = require('@oclif/core')
 
-class RuleDisable extends RuntimeBaseCommand {
+class RuleDisable extends DeployServiceCommand {
   async run () {
     const { args } = await this.parse(RuleDisable)
     try {
@@ -27,16 +28,15 @@ class RuleDisable extends RuntimeBaseCommand {
 
 RuleDisable.description = 'Disable a Rule'
 
-RuleDisable.args = [
-  {
-    name: 'name',
+RuleDisable.args = {
+  name: Args.string({
     required: true,
     description: 'Name of the rule'
-  }
-]
+  })
+}
 
 RuleDisable.flags = {
-  ...RuntimeBaseCommand.flags
+  ...DeployServiceCommand.flags
 }
 
 RuleDisable.aliases = [

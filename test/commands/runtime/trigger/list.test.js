@@ -31,8 +31,12 @@ test('aliases', async () => {
   expect(TheCommand.aliases.length).toBeGreaterThan(0)
 })
 
-test('args', async () => {
-  expect(TheCommand.args).not.toBeDefined()
+test('args is defined', async () => {
+  expect(TheCommand.args).toBeDefined()
+})
+
+test('args is empty object', async () => {
+  expect(Object.keys(TheCommand.args).length).toEqual(0)
 })
 
 // eslint-disable-next-line jest/expect-expect

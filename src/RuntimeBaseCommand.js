@@ -31,7 +31,8 @@ class RuntimeBaseCommand extends Command {
       apihost: flags.apihost || config.get('runtime.apihost') || properties.get('APIHOST') || PropertyDefault.APIHOST,
       namespace: config.get('runtime.namespace') || properties.get('NAMESPACE'),
       api_key: flags.auth || config.get('runtime.auth') || properties.get('AUTH'),
-      ignore_certs: flags.insecure || config.get('runtime.insecure')
+      ignore_certs: flags.insecure || config.get('runtime.insecure'),
+      'use-runtime-auth': process.env.USE_RUNTIME_AUTH || flags['use-runtime-auth']
     }
 
     // remove any null or undefined keys
@@ -63,10 +64,11 @@ class RuntimeBaseCommand extends Command {
   }
 
   async wsk (options) {
-    if (!options) {
-      options = await this.getOptions()
+    let _options = structuredClone(options)
+    if (!_options) {
+      _options = await this.getOptions()
     }
-    return runtimeLib.init(options)
+    return runtimeLib.init(_options)
   }
 
   getImsOrgId () {

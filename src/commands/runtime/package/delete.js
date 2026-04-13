@@ -12,7 +12,7 @@ governing permissions and limitations under the License.
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 const { parsePackageName } = require('@adobe/aio-lib-runtime').utils
-const { Flags } = require('@oclif/core')
+const { Args, Flags } = require('@oclif/core')
 
 class PackageDelete extends RuntimeBaseCommand {
   async run () {
@@ -74,12 +74,11 @@ async function recursivelyDeletePackage (ow, pkg) {
   return ow.packages.delete(pkg)
 }
 
-PackageDelete.args = [
-  {
-    name: 'packageName',
+PackageDelete.args = {
+  packageName: Args.string({
     required: true
-  }
-]
+  })
+}
 
 PackageDelete.flags = {
   json: Flags.boolean({

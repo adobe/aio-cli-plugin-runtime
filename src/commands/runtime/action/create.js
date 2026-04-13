@@ -11,12 +11,12 @@ governing permissions and limitations under the License.
 */
 
 const fs = require('fs')
-const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 const { createKeyValueArrayFromFlag, createKeyValueArrayFromFile, createComponentsfromSequence, getKeyValueArrayFromMergedParameters } = require('@adobe/aio-lib-runtime').utils
 const { kindForFileExtension } = require('../../../kinds')
-const { Flags } = require('@oclif/core')
+const { Args, Flags } = require('@oclif/core')
+const DeployServiceCommand = require('../../../DeployServiceCommand')
 
-class ActionCreate extends RuntimeBaseCommand {
+class ActionCreate extends DeployServiceCommand {
   isUpdate () { return false }
 
   async run () {
@@ -224,18 +224,18 @@ class ActionCreate extends RuntimeBaseCommand {
   }
 }
 
-ActionCreate.args = [
-  {
-    name: 'actionName',
+ActionCreate.args = {
+  actionName: Args.string({
     required: true
-  },
-  {
-    name: 'actionPath'
-  }
-]
+  }),
+  actionPath: Args.string({
+    required: false
+  })
+}
 
 ActionCreate.flags = {
-  ...RuntimeBaseCommand.flags,
+  ...DeployServiceCommand.flags,
+
   param: Flags.string({
     char: 'p',
     description: 'parameter values in KEY VALUE format', // help description for flag

@@ -16,6 +16,21 @@ const { PropertyEnv } = require('../src/properties')
 const RuntimeLib = require('@adobe/aio-lib-runtime')
 const OpenWhiskError = require('openwhisk/lib/openwhisk_error')
 
+jest.mock('@adobe/aio-lib-ims', () => ({
+  getToken: jest.fn(),
+  context: {
+    setCli: jest.fn()
+  }
+}))
+
+jest.mock('@adobe/aio-lib-env', () => ({
+  getCliEnv: jest.fn()
+}))
+
+jest.mock('@adobe/aio-lib-runtime', () => ({
+  init: jest.fn()
+}))
+
 beforeEach(() => {
   fakeFileSystem.reset()
 })
@@ -38,8 +53,12 @@ test('flags', async () => {
     ['cert', 'key', 'apiversion', 'apihost', 'auth', 'insecure', 'debug', 'verbose', 'version', 'help', 'useragent']))
 })
 
-test('args', async () => {
-  expect(TheCommand.args).toBeUndefined()
+test('args is defined', async () => {
+  expect(TheCommand.args).toBeDefined()
+})
+
+test('args is empty object', async () => {
+  expect(Object.keys(TheCommand.args).length).toEqual(0)
 })
 
 describe('instance methods', () => {
@@ -50,6 +69,11 @@ describe('instance methods', () => {
   })
 
   describe('init', () => {
+    const response = {
+      apihost: 'https://adobeioruntime.net',
+      api_key: 1234,
+      apiversion: 'v1'
+    }
     test('is a function', async () => {
       expect(command.init).toBeInstanceOf(Function)
     })
@@ -60,9 +84,7 @@ describe('instance methods', () => {
       fakeFileSystem.addJson(files)
 
       return command.wsk().then(() => {
-        expect(RuntimeLib.init).toHaveBeenLastCalledWith(
-          { apihost: 'https://adobeioruntime.net', api_key: 1234, apiversion: 'v1' }
-        )
+        expect(RuntimeLib.init).toHaveBeenLastCalledWith(response)
       })
     })
 
@@ -92,9 +114,7 @@ describe('instance methods', () => {
       fakeFileSystem.addJson(files)
 
       return command.wsk().then(() => {
-        expect(RuntimeLib.init).toHaveBeenLastCalledWith(
-          { api_key: 1234, apihost: 'https://adobeioruntime.net', apiversion: 'v1' }
-        )
+        expect(RuntimeLib.init).toHaveBeenLastCalledWith(response)
         delete process.env[PropertyEnv.APIHOST]
       })
     })
@@ -106,7 +126,11 @@ describe('instance methods', () => {
 
       return command.wsk().then(() => {
         expect(RuntimeLib.init).toHaveBeenLastCalledWith(
-          { api_key: 123, apihost: 'https://adobeioruntime.net', apiversion: 'v1' }
+          {
+            api_key: 123,
+            apihost: 'https://adobeioruntime.net',
+            apiversion: 'v1'
+          }
         )
         delete process.env[PropertyEnv.APIHOST]
       })
@@ -201,13 +225,26 @@ describe('instance methods', () => {
   })
 
   describe('ow', () => {
+    beforeEach(() => {
+      RuntimeLib.init.mockClear()
+    })
+
     test('is a function', async () => {
       expect(command.wsk).toBeInstanceOf(Function)
     })
 
     test('returns a promise', () => {
+      RuntimeLib.init.mockReturnValue({})
       return command.wsk().then((ow) => {
-        expect(ow).toBe(ow)
+        expect(ow).toBeDefined()
+      })
+    })
+
+    test('returns a promise (pass options)', () => {
+      RuntimeLib.init.mockReturnValue({})
+      const options = {}
+      return command.wsk(options).then((ow) => {
+        expect(ow).toBeDefined()
       })
     })
 

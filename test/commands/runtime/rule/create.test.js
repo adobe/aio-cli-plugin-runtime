@@ -34,19 +34,19 @@ test('aliases', async () => {
 test('args', async () => {
   const args = TheCommand.args
   expect(args).toBeDefined()
-  expect(args.length).toEqual(3)
+  expect(Object.keys(args).length).toEqual(3)
 
-  expect(args[0].name).toEqual('name')
-  expect(args[0].required).toBeTruthy()
-  expect(args[0].description).toBeDefined()
+  expect(args.name).toBeDefined()
+  expect(args.name.required).toBeTruthy()
+  expect(args.name.description).toBeDefined()
 
-  expect(args[1].name).toEqual('trigger')
-  expect(args[1].required).toBeTruthy()
-  expect(args[1].description).toBeDefined()
+  expect(args.trigger).toBeDefined()
+  expect(args.trigger.required).toBeTruthy()
+  expect(args.trigger.description).toBeDefined()
 
-  expect(args[2].name).toEqual('action')
-  expect(args[2].required).toBeTruthy()
-  expect(args[2].description).toBeDefined()
+  expect(args.action).toBeDefined()
+  expect(args.action.required).toBeTruthy()
+  expect(args.action.description).toBeDefined()
 })
 
 // eslint-disable-next-line jest/expect-expect

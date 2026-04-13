@@ -41,7 +41,12 @@ test('flags', async () => {
 // some expected fake values
 const expectedEntities = { fake: 'entities' }
 const expectedEntitiesFromGet = { fakeGet: 'getentities' }
-const expectedOWOptions = { api_key: 'some-gibberish-not-a-real-key', apihost: 'some.host', apiversion: 'v1', namespace: 'some_namespace' }
+const expectedOWOptions = {
+  api_key: 'some-gibberish-not-a-real-key',
+  apihost: 'some.host',
+  apiversion: 'v1',
+  namespace: 'some_namespace'
+}
 const expectedDepPackages = { fake: 'dep-packages' }
 const expectedDepTriggers = [{ fake: 'dep-triggers' }]
 const expectedPackages = { fake: 'packages' }
@@ -75,7 +80,10 @@ describe('instance methods', () => {
     test('run with no flags', async () => {
       command.argv = []
       await command.run()
-      expect(utils.setPaths).toHaveBeenCalledWith({ useragent: pkgNameVersion })
+      expect(utils.setPaths).toHaveBeenCalledWith({
+        'use-runtime-auth': false,
+        useragent: pkgNameVersion
+      })
 
       expect(utils.processPackage).toHaveBeenCalledWith(expectedPackages, {}, {}, {}, true, expectedOWOptions)
       expect(utils.getProjectEntities).not.toHaveBeenCalled()
@@ -88,7 +96,11 @@ describe('instance methods', () => {
     test('run with manifest flag', async () => {
       command.argv = ['-m', 'fake-manifest.yml']
       await command.run()
-      expect(utils.setPaths).toHaveBeenCalledWith({ manifest: 'fake-manifest.yml', useragent: pkgNameVersion })
+      expect(utils.setPaths).toHaveBeenCalledWith({
+        'use-runtime-auth': false,
+        manifest: 'fake-manifest.yml',
+        useragent: pkgNameVersion
+      })
 
       expect(utils.processPackage).toHaveBeenCalledWith(expectedPackages, {}, {}, {}, true, expectedOWOptions)
       expect(utils.getProjectEntities).not.toHaveBeenCalled()

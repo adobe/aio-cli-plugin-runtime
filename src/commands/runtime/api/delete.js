@@ -9,10 +9,10 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
-// eslint-disable-next-line no-unused-vars
+const DeployServiceCommand = require('../../../DeployServiceCommand')
+const { Args } = require('@oclif/core')
 
-class ApiDelete extends RuntimeBaseCommand {
+class ApiDelete extends DeployServiceCommand {
   async run () {
     const { args } = await this.parse(ApiDelete)
 
@@ -31,25 +31,24 @@ class ApiDelete extends RuntimeBaseCommand {
   }
 }
 
-ApiDelete.args = [
-  {
-    name: 'basePathOrApiName',
+ApiDelete.args = {
+  basePathOrApiName: Args.string({
     required: true,
     description: 'The base path or api name'
-  },
-  {
-    name: 'relPath',
+  }),
+  relPath: Args.string({
+    required: false,
     description: 'The path of the api relative to the base path'
-  },
-  {
-    name: 'apiVerb',
+  }),
+  apiVerb: Args.string({
+    required: false,
     description: 'The http verb',
     options: ['get', 'post', 'put', 'patch', 'delete', 'head', 'options']
-  }
-]
+  })
+}
 
 ApiDelete.flags = {
-  ...RuntimeBaseCommand.flags
+  ...DeployServiceCommand.flags
 }
 
 ApiDelete.description = 'delete an API'

@@ -16,7 +16,7 @@ const RuntimeBaseCommand = require('../../RuntimeBaseCommand')
 class IndexCommand extends RuntimeBaseCommand {
   async run () {
     const help = new Help(this.config)
-    await help.showHelp(['runtime', '--help'])
+    await help.showHelp([this.id])
   }
 }
 

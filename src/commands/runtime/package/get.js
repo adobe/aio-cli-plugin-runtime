@@ -11,6 +11,7 @@ governing permissions and limitations under the License.
 */
 
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
+const { Args } = require('@oclif/core')
 const { parsePackageName } = require('@adobe/aio-lib-runtime').utils
 
 class PackageGet extends RuntimeBaseCommand {
@@ -27,12 +28,11 @@ class PackageGet extends RuntimeBaseCommand {
   }
 }
 
-PackageGet.args = [
-  {
-    name: 'packageName',
+PackageGet.args = {
+  packageName: Args.string({
     required: true
-  }
-]
+  })
+}
 
 PackageGet.flags = {
   ...RuntimeBaseCommand.flags

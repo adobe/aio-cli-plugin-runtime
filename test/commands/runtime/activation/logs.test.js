@@ -32,9 +32,9 @@ test('aliases', async () => {
 })
 
 test('args', async () => {
-  const logName = TheCommand.args[0]
-  expect(logName.name).toBeDefined()
-  expect(logName.name).toEqual('activationId')
+  const args = TheCommand.args
+  expect(args).toBeDefined()
+  expect(args.activationId).toBeDefined()
 })
 
 test('flags', async () => {

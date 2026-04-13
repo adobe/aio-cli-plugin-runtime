@@ -15,10 +15,108 @@ const fs = jest.requireActual('fs')
 const eol = require('eol')
 
 jest.setTimeout(30000)
-jest.useFakeTimers()
 
-// dont touch the real fs
-jest.mock('fs', () => require('jest-plugin-fs/mock'))
+// oclif v4 requires this.config.runHook in Command.parse().
+// Patch the prototype so unit tests that instantiate commands directly still work.
+const { Command } = require('@oclif/core')
+const _originalParse = Command.prototype.parse
+Command.prototype.parse = async function (options, argv) {
+  if (!this.config) {
+    this.config = { runHook: async () => ({ successes: [], failures: [] }), bin: 'aio', userAgent: 'test/0.0.0', findCommand: () => null, pjson: { oclif: {} } }
+  } else if (!this.config.runHook) {
+    this.config.runHook = async () => ({ successes: [], failures: [] })
+  }
+  return _originalParse.call(this, options, argv)
+}
+
+global.__mockFs = {}
+jest.mock('fs', () => {
+  const actualFs = jest.requireActual('fs')
+  return {
+    ...actualFs,
+    readFileSync: jest.fn((path, options) => {
+      if (Object.prototype.hasOwnProperty.call(global.__mockFs, path)) {
+        const content = global.__mockFs[path]
+        if (content === '') {
+          return Buffer.from('')
+        }
+        if (options && options.encoding) {
+          return typeof content === 'string' ? content : Buffer.from(content).toString(options.encoding)
+        }
+        if (path.endsWith('.zip') || path.endsWith('.bin')) {
+          return Buffer.from(typeof content === 'string' ? content : content)
+        }
+        return typeof content === 'string' ? content : Buffer.from(content)
+      }
+      if (path.endsWith('.wskprops')) {
+        const wskPropsKey = Object.keys(global.__mockFs).find(key => key.endsWith('.wskprops'))
+        if (wskPropsKey) {
+          const content = global.__mockFs[wskPropsKey]
+          if (content === '') {
+            return Buffer.from('')
+          }
+          return typeof content === 'string' ? content : Buffer.from(content)
+        }
+      }
+      return actualFs.readFileSync(path, options)
+    }),
+    writeFileSync: jest.fn((path, data) => {
+      global.__mockFs[path] = data
+    }),
+    existsSync: jest.fn((path) => {
+      if (Object.prototype.hasOwnProperty.call(global.__mockFs, path)) {
+        return true
+      }
+      if (path.endsWith('.wskprops')) {
+        const wskPropsKey = Object.keys(global.__mockFs).find(key => key.endsWith('.wskprops'))
+        if (wskPropsKey) {
+          return true
+        }
+      }
+      return actualFs.existsSync(path)
+    }),
+    statSync: jest.fn((path) => {
+      if (Object.prototype.hasOwnProperty.call(global.__mockFs, path)) {
+        const content = global.__mockFs[path]
+        const isDirectory = content === null
+        return {
+          isFile: () => !isDirectory,
+          isDirectory: () => isDirectory,
+          size: isDirectory ? 0 : (typeof content === 'string' ? Buffer.byteLength(content) : (content ? content.length : 0))
+        }
+      }
+      return actualFs.statSync(path)
+    }),
+    readdirSync: jest.fn((path) => {
+      const files = []
+      const normalizedPath = path.endsWith('/') ? path : `${path}/`
+      for (const filePath in global.__mockFs) {
+        if (filePath.startsWith(normalizedPath)) {
+          const relativePath = filePath.substring(normalizedPath.length)
+          if (relativePath && !relativePath.includes('/')) {
+            files.push(relativePath)
+          }
+        }
+      }
+      return files.length > 0 ? files : actualFs.readdirSync(path)
+    }),
+    mkdirSync: jest.fn((path, options) => {
+      if (!global.__mockFs[path]) {
+        global.__mockFs[path] = null
+      }
+      if (options && options.recursive) {
+        const parts = path.split('/').filter(p => p)
+        let currentPath = ''
+        for (const part of parts) {
+          currentPath = currentPath ? `${currentPath}/${part}` : part
+          if (!Object.prototype.hasOwnProperty.call(global.__mockFs, currentPath)) {
+            global.__mockFs[currentPath] = null
+          }
+        }
+      }
+    })
+  }
+})
 
 // ensure a mocked openwhisk module for unit-tests
 jest.mock('openwhisk')
@@ -120,36 +218,28 @@ const emptyWskPropsFs = {
   [wskprops]: global.fixtureFile('empty-wsk.properties')
 }
 
-// set the fake filesystem
-const ffs = require('jest-plugin-fs').default
-
 global.fakeFileSystem = {
   addJson: (json) => {
     // add to existing
-    ffs.mock(json)
+    Object.assign(global.__mockFs, json)
   },
   removeKeys: (arr) => {
     // remove from existing
-    const files = ffs.files()
-    for (const prop in files) {
-      if (arr.includes(prop)) {
-        delete files[prop]
-      }
+    for (const prop of arr) {
+      delete global.__mockFs[prop]
     }
-    ffs.restore()
-    ffs.mock(files)
   },
   clear: () => {
     // reset to empty
-    ffs.restore()
+    Object.keys(global.__mockFs).forEach(key => delete global.__mockFs[key])
   },
   reset: ({ emptyWskProps = false } = {}) => {
     // reset to file system with wskprops
-    ffs.restore()
-    ffs.mock(emptyWskProps ? emptyWskPropsFs : wskPropsFs)
+    Object.keys(global.__mockFs).forEach(key => delete global.__mockFs[key])
+    Object.assign(global.__mockFs, emptyWskProps ? emptyWskPropsFs : wskPropsFs)
   },
   files: () => {
-    return ffs.files()
+    return { ...global.__mockFs }
   }
 }
 // seed the fake filesystem
@@ -163,7 +253,8 @@ global.createTestFlagsFunction = (TheCommand, Flags) => {
   return () => {
     // every command needs to override .flags (for global flags)
     // eslint: see https://eslint.org/docs/rules/no-prototype-builtins
-    expect(Object.prototype.hasOwnProperty.call(TheCommand, '_flags')).toBeTruthy()
+    // In oclif v4, flags are stored as 'flags' (not '_flags' as in v1)
+    expect(Object.prototype.hasOwnProperty.call(TheCommand, 'flags')).toBeTruthy()
 
     const flagsKeys = Object.keys(Flags)
     const theCommandFlagKeys = Object.keys(TheCommand.flags)
