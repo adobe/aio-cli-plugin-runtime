@@ -56,6 +56,23 @@ class ApiList extends RuntimeBaseCommand {
 
       const result = await ow.routes.list(options)
 
+      if (shouldOutputJson) {
+        const api = result.apis[0]
+        const apidoc = api.value.apidoc
+        const gwApiUrl = api.value.gwApiUrl
+        Object.keys(apidoc.paths).forEach(path => {
+          if (!path.startsWith('/')) return
+          Object.keys(apidoc.paths[path]).forEach(verb => {
+            const operation = apidoc.paths[path][verb]
+            if (operation['x-openwhisk']) {
+              operation['x-openwhisk'].url = `${gwApiUrl}${path}`
+            }
+          })
+        })
+        this.logJSON('', apidoc)
+        return
+      }
+
       let data = []
       result.apis.forEach(api => {
         // join the two arrays by reduce
@@ -64,11 +81,6 @@ class ApiList extends RuntimeBaseCommand {
           return coll
         }, data)
       })
-
-      if (shouldOutputJson) {
-        this.logJSON('', data)
-        return
-      }
 
       table(data, {
         Action: { minWidth: 10 },

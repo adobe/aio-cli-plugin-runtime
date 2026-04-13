@@ -102,13 +102,17 @@ describe('instance methods', () => {
         .then(() => {
           const expectedJson = fixtureJson('api/list.json')
           const output = stdout.output.trim()
-          const jsonMatch = output.match(/\[[\s\S]*\]$/)
+          const jsonMatch = output.match(/\{[\s\S]*\}$/)
           const jsonOutput = jsonMatch ? jsonMatch[0] : output
           const parsed = JSON.parse(jsonOutput)
-          // should include URL field built from gwApiUrl
-          expect(parsed).toBeInstanceOf(Array)
-          expect(parsed[0]).toHaveProperty('URL')
-          expect(parsed[0].URL).toContain(expectedJson.apis[0].value.gwApiUrl)
+          const { apis } = expectedJson
+          const gwApiUrl = apis[0].value.gwApiUrl
+          // apidoc structure preserved
+          expect(parsed.basePath).toEqual(apis[0].value.apidoc.basePath)
+          expect(parsed.info).toMatchObject(apis[0].value.apidoc.info)
+          expect(parsed.swagger).toEqual(apis[0].value.apidoc.swagger)
+          // x-openwhisk.url updated with actual gateway URL (was "not-used")
+          expect(parsed.paths['/mypath'].get['x-openwhisk'].url).toEqual(`${gwApiUrl}/mypath`)
         })
         .finally(() => {
           stdout.stop()
