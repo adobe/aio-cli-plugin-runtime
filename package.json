@@ -34,7 +34,7 @@
     "babel-runtime": "^6.26.0",
     "dedent-js": "^1.0.1",
     "eol": "^0.10.0",
-    "eslint": "^9.0.0",
+    "eslint": "^10.2.0",
     "eslint-plugin-jest": "^29.0.0",
     "eslint-plugin-jsdoc": "^48.11.0",
     "execa": "^4.0.0",
