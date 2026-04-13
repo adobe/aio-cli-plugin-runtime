@@ -102,9 +102,13 @@ describe('instance methods', () => {
         .then(() => {
           const expectedJson = fixtureJson('api/list.json')
           const output = stdout.output.trim()
-          const jsonMatch = output.match(/\{[\s\S]*\}$/)
+          const jsonMatch = output.match(/\[[\s\S]*\]$/)
           const jsonOutput = jsonMatch ? jsonMatch[0] : output
-          expect(JSON.parse(jsonOutput)).toMatchObject(expectedJson.apis[0].value.apidoc)
+          const parsed = JSON.parse(jsonOutput)
+          // should include URL field built from gwApiUrl
+          expect(parsed).toBeInstanceOf(Array)
+          expect(parsed[0]).toHaveProperty('URL')
+          expect(parsed[0].URL).toContain(expectedJson.apis[0].value.gwApiUrl)
         })
         .finally(() => {
           stdout.stop()

@@ -56,11 +56,6 @@ class ApiList extends RuntimeBaseCommand {
 
       const result = await ow.routes.list(options)
 
-      if (shouldOutputJson) {
-        this.logJSON('', result.apis[0].value.apidoc)
-        return
-      }
-
       let data = []
       result.apis.forEach(api => {
         // join the two arrays by reduce
@@ -69,6 +64,11 @@ class ApiList extends RuntimeBaseCommand {
           return coll
         }, data)
       })
+
+      if (shouldOutputJson) {
+        this.logJSON('', data)
+        return
+      }
 
       table(data, {
         Action: { minWidth: 10 },
