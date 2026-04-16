@@ -93,7 +93,7 @@ class RuntimeBaseCommand extends Command {
     process.env.__OW_USER_AGENT =
       `aio-cli-plugin-runtime/${vs?.cliVersion} (${vs?.architecture}; ${vs?.nodeVersion}; ${vs?.shell})`
 
-    console.log('init ', process.env.__OW_USER_AGENT)
+    debug('init ', process.env.__OW_USER_AGENT)
   }
 
   async handleError (msg, err) {
