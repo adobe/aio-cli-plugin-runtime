@@ -85,6 +85,19 @@ class RuntimeBaseCommand extends Command {
     } else if (flags.debug) {
       createDebug.enable(flags.debug)
     }
+
+    // set User-Agent for runtime calls
+    // ex. aio-cli-plugin-runtime/@adobe/aio-cli/10.3.1 (darwin-arm64; node-v18.20.4; zsh)
+    const vs = this.config.versionDetails
+    const baseUserAgent = `aio-cli-plugin-runtime/${vs?.cliVersion || 'unknown'}`
+    const userAgentDetails = [vs?.architecture, vs?.nodeVersion, vs?.shell]
+      .filter(detail => typeof detail === 'string' && detail.trim())
+    // console.log('init ', this.config.versionDetails)
+    process.env.__OW_USER_AGENT = userAgentDetails.length > 0
+      ? `${baseUserAgent} (${userAgentDetails.join('; ')})`
+      : baseUserAgent
+
+    debug('init ', process.env.__OW_USER_AGENT)
   }
 
   async handleError (msg, err) {
