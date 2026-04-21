@@ -13,7 +13,16 @@ governing permissions and limitations under the License.
 const { Flags } = require('@oclif/core')
 const config = require('@adobe/aio-lib-core-config')
 const chalk = require('chalk')
-const inquirer = require('inquirer')
+/*
+ * inquirer v9+ is ESM-first and, when `require`d from a CommonJS caller,
+ * surfaces its public API under a `.default` namespace instead of the
+ * bare module.exports it used to in v8. We use `.default ?? module`
+ * so this command keeps working against either shape — the fallback
+ * matters for tests that mock `inquirer` with a plain `{ prompt: fn }`
+ * object.
+ */
+const inquirerMod = require('inquirer')
+const inquirer = inquirerMod.default || inquirerMod
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 const { getToken, context } = require('@adobe/aio-lib-ims')
 const { CLI } = require('@adobe/aio-lib-ims/src/context')

@@ -19,7 +19,17 @@ jest.mock('@adobe/aio-lib-ims', () => ({
   }
 }))
 jest.mock('@adobe/aio-lib-ims/src/context', () => ({ CLI: 'cli' }))
-jest.mock('inquirer')
+// inquirer v9+ exposes `.prompt` under `.default` when required from CJS.
+// Our command normalizes that (`.default || module`). Mock the module in a
+// way that works for both shapes so tests stay agnostic to the inquirer
+// major version: `inquirer.prompt` and `inquirer.default.prompt` are the
+// same jest.fn() instance.
+jest.mock('inquirer', () => {
+  const prompt = jest.fn()
+  const mod = { prompt }
+  mod.default = mod
+  return mod
+})
 
 const { stdout, stderr } = require('stdout-stderr')
 const config = require('@adobe/aio-lib-core-config')
