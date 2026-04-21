@@ -214,7 +214,15 @@ function formatHumanOutput (data) {
   }
   const longest = regionKeys.reduce((m, r) => Math.max(m, r.length), 0)
   for (const region of regionKeys) {
-    const cidrs = [...(regions[region].cidrs || [])].sort()
+    /*
+     * The service returns regions as { [region]: string[] }, a flat
+     * array of CIDR strings. We also tolerate a legacy { cidrs: [] }
+     * shape in case the payload ever gets re-enveloped — no other
+     * client has to care about the difference.
+     */
+    const raw = regions[region]
+    const cidrList = Array.isArray(raw) ? raw : (raw && raw.cidrs) || []
+    const cidrs = [...cidrList].sort()
     lines.push(chalk.bold(region.toUpperCase().padEnd(longest + 2)) + `(${cidrs.length} CIDR${cidrs.length === 1 ? '' : 's'})`)
     for (const cidr of cidrs) {
       lines.push(`  ${cidr}`)

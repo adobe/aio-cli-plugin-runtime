@@ -62,10 +62,13 @@ function makeCommand (argv = []) {
   })
 }
 
+// Matches the wire shape returned by `get-ip-list` on Stage — regions map
+// to a flat array of CIDR strings (not a nested { cidrs: [...] } object).
+// Verified against a real Stage response on 2026-04-21.
 const IP_LIST_OK = {
   regions: {
-    amer: { cidrs: ['44.207.149.158/32', '44.208.197.195/32'], version: 3, updatedAt: '2026-04-19T08:00:00Z' },
-    emea: { cidrs: ['52.18.22.1/32'], version: 2, updatedAt: '2026-04-19T08:00:00Z' }
+    amer: ['44.207.149.158/32', '44.208.197.195/32'],
+    emea: ['52.18.22.1/32']
   },
   version: 3,
   lastUpdated: '2026-04-19T08:00:00Z',
@@ -223,6 +226,16 @@ describe('formatHumanOutput', () => {
   test('handles a freshly-deployed (empty) service gracefully', () => {
     const out = TheCommand.formatHumanOutput({ regions: {}, version: 0, lastUpdated: null })
     expect(out).toMatch(/no regions populated/)
+  })
+
+  test('tolerates the legacy { cidrs: [...] } region envelope', () => {
+    // Defense in depth for a re-enveloped future wire shape.
+    const out = TheCommand.formatHumanOutput({
+      regions: { amer: { cidrs: ['10.0.0.1/32'] } },
+      version: 1,
+      lastUpdated: '2026-04-21T00:00:00Z'
+    })
+    expect(out).toContain('10.0.0.1/32')
   })
 })
 
