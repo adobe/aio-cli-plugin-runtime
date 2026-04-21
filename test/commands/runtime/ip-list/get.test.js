@@ -158,10 +158,9 @@ describe('resolveHost', () => {
 })
 
 describe('callService', () => {
-  test('adds Authorization / x-gw-ims-org-id headers and posts JSON', async () => {
+  test('POSTs JSON with token + imsOrgId merged into the body', async () => {
     const fetchImpl = jest.fn().mockResolvedValue(fetchResponse(200, { ok: true }))
     const result = await TheCommand.callService({
-      method: 'POST',
       host: 'host.adobeioruntime.net',
       path: '/api/v1/web/ip-list/accept-terms',
       token: 'abc',
@@ -175,24 +174,45 @@ describe('callService', () => {
       'https://host.adobeioruntime.net/api/v1/web/ip-list/accept-terms',
       expect.objectContaining({
         method: 'POST',
-        body: JSON.stringify({ contactEmail: 'a@b.com' }),
         headers: expect.objectContaining({
-          Authorization: 'Bearer abc',
-          'x-gw-ims-org-id': 'BA3E@AdobeOrg',
           'Content-Type': 'application/json'
         })
       })
     )
+    const sent = JSON.parse(fetchImpl.mock.calls[0][1].body)
+    expect(sent).toEqual({
+      contactEmail: 'a@b.com',
+      token: 'abc',
+      imsOrgId: 'BA3E@AdobeOrg'
+    })
+  })
+
+  test('does NOT send Authorization / x-gw-ims-org-id headers', async () => {
+    // The cross-org refactor moved the token + org id into the body so the
+    // service can be called by any authenticated Adobe user, independent
+    // of the require-adobe-auth gateway. Guardrail against regressions.
+    const fetchImpl = jest.fn().mockResolvedValue(fetchResponse(200, { ok: true }))
+    await TheCommand.callService({
+      host: 'h.adobeioruntime.net',
+      path: '/p',
+      token: 't',
+      orgId: 'o',
+      body: {},
+      fetchImpl
+    })
+    const sentHeaders = fetchImpl.mock.calls[0][1].headers
+    expect(sentHeaders.Authorization).toBeUndefined()
+    expect(sentHeaders['x-gw-ims-org-id']).toBeUndefined()
   })
 
   test('strips protocol / trailing slashes from host', async () => {
     const fetchImpl = jest.fn().mockResolvedValue(fetchResponse(200, {}))
     await TheCommand.callService({
-      method: 'GET',
       host: 'https://host.adobeioruntime.net///',
       path: '/api/v1/web/ip-list/get-ip-list',
       token: 't',
       orgId: 'o',
+      body: { surface: 'cli' },
       fetchImpl
     })
     expect(fetchImpl.mock.calls[0][0]).toBe('https://host.adobeioruntime.net/api/v1/web/ip-list/get-ip-list')
@@ -201,7 +221,7 @@ describe('callService', () => {
   test('tolerates non-JSON bodies by returning the raw text', async () => {
     const fetchImpl = jest.fn().mockResolvedValue(fetchResponse(503, '<html>503</html>'))
     const result = await TheCommand.callService({
-      method: 'GET', host: 'h', path: '/p', token: 't', orgId: 'o', fetchImpl
+      host: 'h', path: '/p', token: 't', orgId: 'o', body: {}, fetchImpl
     })
     expect(result.status).toBe(503)
     expect(result.body).toBeNull()
@@ -248,9 +268,16 @@ describe('run() — happy path', () => {
     expect(stdout.output).toContain('44.207.149.158/32')
     // no accept-terms call
     expect(global.fetch).toHaveBeenCalledTimes(1)
-    const calledUrl = global.fetch.mock.calls[0][0]
-    expect(calledUrl).toMatch(/\/get-ip-list\?/)
-    expect(calledUrl).toMatch(/surface=cli/)
+    const call = global.fetch.mock.calls[0]
+    expect(call[0]).toMatch(/\/get-ip-list$/)
+    expect(call[1].method).toBe('POST')
+    const body = JSON.parse(call[1].body)
+    expect(body).toMatchObject({
+      surface: 'cli',
+      token: 'fake-token',
+      imsOrgId: 'BA3E111222@AdobeOrg'
+    })
+    expect(body.region).toBeUndefined()
   })
 
   test('--json emits a parseable JSON document', async () => {
@@ -265,8 +292,9 @@ describe('run() — happy path', () => {
     global.fetch.mockResolvedValueOnce(fetchResponse(200, IP_LIST_OK))
     const cmd = makeCommand(['--region', 'amer'])
     await cmd.run()
-    const url = global.fetch.mock.calls[0][0]
-    expect(url).toMatch(/region=amer/)
+    const body = JSON.parse(global.fetch.mock.calls[0][1].body)
+    expect(body.region).toBe('amer')
+    expect(body.surface).toBe('cli')
   })
 
   test('--service-host overrides the default', async () => {
@@ -274,6 +302,23 @@ describe('run() — happy path', () => {
     const cmd = makeCommand(['--service-host', 'custom.adobeioruntime.net'])
     await cmd.run()
     expect(global.fetch.mock.calls[0][0]).toMatch(/^https:\/\/custom\.adobeioruntime\.net\//)
+  })
+
+  test('sends token + imsOrgId in every request body', async () => {
+    // Belt-and-braces cross-org-refactor guard: the IMS token must travel
+    // in the POST body so the in-action auth helper can validate it
+    // regardless of which org the caller belongs to.
+    global.fetch
+      .mockResolvedValueOnce(fetchResponse(403, TERMS_REQUIRED_BODY))
+      .mockResolvedValueOnce(fetchResponse(200, { ok: true }))
+      .mockResolvedValueOnce(fetchResponse(200, IP_LIST_OK))
+    const cmd = makeCommand(['--accept-terms', '--contact-email', 'ops@example.com'])
+    await cmd.run()
+    for (const call of global.fetch.mock.calls) {
+      const body = JSON.parse(call[1].body)
+      expect(body.token).toBe('fake-token')
+      expect(body.imsOrgId).toBe('BA3E111222@AdobeOrg')
+    }
   })
 })
 
@@ -310,14 +355,17 @@ describe('run() — terms acceptance flow', () => {
 
     expect(global.fetch).toHaveBeenCalledTimes(3)
 
-    // Second call is the POST to accept-terms with the right body + surface=cli.
+    // Second call is the POST to accept-terms with the right body + surface=cli
+    // plus the token/imsOrgId the service needs to validate the caller.
     const acceptCall = global.fetch.mock.calls[1]
     expect(acceptCall[0]).toMatch(/\/accept-terms$/)
     expect(acceptCall[1].method).toBe('POST')
     expect(JSON.parse(acceptCall[1].body)).toEqual({
       contactEmail: 'ops@example.com',
       termsVersion: 1,
-      surface: 'cli'
+      surface: 'cli',
+      token: 'fake-token',
+      imsOrgId: 'BA3E111222@AdobeOrg'
     })
 
     // The human-readable IP list is printed after acceptance.

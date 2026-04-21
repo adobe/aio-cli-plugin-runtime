@@ -78,10 +78,10 @@ async function getAccessToken () {
 
 /**
  * Resolve the caller's IMS organization id from local aio config. The
- * require-adobe-auth sequence keys the caller's org off the
- * x-gw-ims-org-id header we attach to every request, so if the CLI
- * has not been bound to an IMS org we fail fast rather than letting
- * the server return a confusing 401.
+ * service validates the IMS token and checks that the claimed imsOrgId
+ * is one the token-holder actually belongs to, so if the CLI has not
+ * been bound to an IMS org (i.e. no `aio console org select`) we fail
+ * fast rather than sending a request that would be rejected with 400.
  *
  * @returns {string} IMS org id in `...@AdobeOrg` form.
  * @throws {Error} if no org id has been configured.
@@ -105,29 +105,35 @@ function getImsOrgIdOrError () {
  * caller can present a useful message when the origin returns non-JSON
  * (e.g. the CloudFront 503 HTML page — tracked in ACNA-4547).
  *
+ * As of the cross-org refactor the service's web actions run with
+ * `require-adobe-auth: false` and perform their own IMS validation inside
+ * the action (see actions/auth.js in OneAdobe/ip-list-service). The
+ * canonical request shape is therefore POST + JSON body with `token` and
+ * `imsOrgId` carried *in the body* rather than in headers; the Authorization
+ * / x-gw-ims-org-id header shape is a deprecated fallback only still
+ * supported for backward compatibility.
+ *
  * @param {object} opts - Request options.
- * @param {string} opts.method - HTTP method.
  * @param {string} opts.host - ip-list service host.
  * @param {string} opts.path - Request path.
+ * @param {object} opts.body - JSON body; token + imsOrgId are merged in here.
  * @param {string} opts.token - IMS bearer token.
- * @param {string} opts.orgId - IMS org id (sent as x-gw-ims-org-id).
- * @param {object} [opts.body] - JSON body (omit for GET).
+ * @param {string} opts.orgId - IMS org id (`<ident>@AdobeOrg`).
  * @param {Function} [opts.fetchImpl] - fetch override, used by tests.
  * @returns {Promise<{status: number, body: object|null, rawBody: string}>}
  *   response envelope.
  */
-async function callService ({ method, host, path, token, orgId, body, fetchImpl }) {
+async function callService ({ host, path, body, token, orgId, fetchImpl }) {
   const f = fetchImpl || global.fetch
   const url = joinUrl(host, path)
-  const headers = {
-    Authorization: `Bearer ${token}`,
-    'x-gw-ims-org-id': orgId,
-    Accept: 'application/json'
-  }
-  const init = { method, headers }
-  if (body !== undefined) {
-    headers['Content-Type'] = 'application/json'
-    init.body = JSON.stringify(body)
+  const payload = { ...(body || {}), token, imsOrgId: orgId }
+  const init = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json'
+    },
+    body: JSON.stringify(payload)
   }
   const res = await f(url, init)
   const text = await res.text()
@@ -154,11 +160,12 @@ async function callService ({ method, host, path, token, orgId, body, fetchImpl 
  * @returns {Promise<object>} response envelope from {@link callService}.
  */
 async function getIpList ({ host, token, orgId, region, fetchImpl }) {
-  const query = region ? `?region=${encodeURIComponent(region)}&surface=${SURFACE}` : `?surface=${SURFACE}`
+  const body = { surface: SURFACE }
+  if (region) body.region = region
   return callService({
-    method: 'GET',
     host,
-    path: `${SERVICE_PATH}/get-ip-list${query}`,
+    path: `${SERVICE_PATH}/get-ip-list`,
+    body,
     token,
     orgId,
     fetchImpl
@@ -179,12 +186,11 @@ async function getIpList ({ host, token, orgId, region, fetchImpl }) {
  */
 async function postAcceptTerms ({ host, token, orgId, contactEmail, termsVersion, fetchImpl }) {
   return callService({
-    method: 'POST',
     host,
     path: `${SERVICE_PATH}/accept-terms`,
+    body: { contactEmail, termsVersion, surface: SURFACE },
     token,
     orgId,
-    body: { contactEmail, termsVersion, surface: SURFACE },
     fetchImpl
   })
 }
