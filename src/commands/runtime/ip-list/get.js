@@ -193,11 +193,33 @@ async function getIpList ({ host, token, orgId, region, fetchImpl }) {
  * @param {Function} [opts.fetchImpl] - fetch override for tests.
  * @returns {Promise<object>} response envelope from {@link callService}.
  */
-async function postAcceptTerms ({ host, token, orgId, contactEmail, termsVersion, fetchImpl }) {
+/**
+ * POST a terms acceptance record for the current CLI user.
+ *
+ * `acceptanceMode` distinguishes whether the user saw + confirmed the
+ * terms at an interactive prompt ("interactive") or passed the
+ * `--accept-terms` flag non-interactively from a script / CI
+ * ("programmatic"). The admin dashboard uses this signal to help
+ * customer-support triage contacts: a human-attested acceptance is a
+ * stronger audit signal than a flag-driven one.
+ *
+ * @param {object} opts - request options.
+ * @param {string} opts.host - ip-list service host.
+ * @param {string} opts.token - IMS bearer token.
+ * @param {string} opts.orgId - IMS org id.
+ * @param {string} opts.contactEmail - email to record for notifications.
+ * @param {number} opts.termsVersion - version the caller is accepting.
+ * @param {'interactive'|'programmatic'} opts.acceptanceMode - how the
+ *   user expressed consent. The server validates this against its own
+ *   whitelist and rejects anything else with 400.
+ * @param {Function} [opts.fetchImpl] - fetch override for tests.
+ * @returns {Promise<object>} response envelope from {@link callService}.
+ */
+async function postAcceptTerms ({ host, token, orgId, contactEmail, termsVersion, acceptanceMode, fetchImpl }) {
   return callService({
     host,
     path: `${SERVICE_PATH}/accept-terms`,
-    body: { contactEmail, termsVersion, surface: SURFACE },
+    body: { contactEmail, termsVersion, surface: SURFACE, acceptanceMode },
     token,
     orgId,
     fetchImpl
@@ -313,6 +335,14 @@ class IpListGet extends RuntimeBaseCommand {
 
     let contactEmail = flags['contact-email']
     let accepted = flags['accept-terms']
+    /*
+     * If --accept-terms was passed on the command line we never hit the
+     * inquirer branch, so the acceptance is by definition programmatic.
+     * Capture the decision up front rather than inferring it later —
+     * this mirrors what the server stores and keeps the two code paths
+     * symmetric.
+     */
+    const acceptanceMode = accepted ? 'programmatic' : 'interactive'
 
     if (!accepted) {
       /*
@@ -343,7 +373,7 @@ class IpListGet extends RuntimeBaseCommand {
     }
 
     const acceptRes = await postAcceptTerms({
-      host, token, orgId, contactEmail, termsVersion
+      host, token, orgId, contactEmail, termsVersion, acceptanceMode
     })
     if (acceptRes.status !== 200 && acceptRes.status !== 201) {
       const detail = (acceptRes.body && (acceptRes.body.error || acceptRes.body.message)) ||

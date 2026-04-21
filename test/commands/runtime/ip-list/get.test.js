@@ -374,6 +374,7 @@ describe('run() — terms acceptance flow', () => {
       contactEmail: 'ops@example.com',
       termsVersion: 1,
       surface: 'cli',
+      acceptanceMode: 'programmatic',
       token: 'fake-token',
       imsOrgId: 'BA3E111222@AdobeOrg'
     })
@@ -401,6 +402,10 @@ describe('run() — terms acceptance flow', () => {
     expect(inquirer.prompt).toHaveBeenCalledTimes(1)
     const acceptBody = JSON.parse(global.fetch.mock.calls[1][1].body)
     expect(acceptBody.contactEmail).toBe('ops@example.com')
+    // A prompt-driven acceptance must be tagged "interactive" so the
+    // admin dashboard can distinguish it from flag-driven runs.
+    expect(acceptBody.acceptanceMode).toBe('interactive')
+    expect(acceptBody.surface).toBe('cli')
   })
 
   test('bails out if the user declines at the interactive prompt', async () => {
