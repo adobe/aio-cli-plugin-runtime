@@ -157,6 +157,40 @@ describe('instance methods', () => {
         })
     })
 
+    test('--json flag, api.value.apidoc is missing returns {}', () => {
+      rtLib.mockResolved(rtAction, { apis: [{ value: {} }] })
+      stdout.stop()
+      stdout.start()
+      const cmd = new TheCommand(['--json'])
+      return cmd.run()
+        .then(() => {
+          const output = stdout.output.trim()
+          const jsonMatch = output.match(/\{[\s\S]*\}$/)
+          const parsed = JSON.parse(jsonMatch ? jsonMatch[0] : output)
+          expect(parsed).toEqual({})
+        })
+        .finally(() => {
+          stdout.stop()
+        })
+    })
+
+    test('--json flag, api.value.apidoc.paths is missing returns apidoc without paths', () => {
+      rtLib.mockResolved(rtAction, { apis: [{ value: { gwApiUrl: 'https://example.com', apidoc: { basePath: '/test' } } }] })
+      stdout.stop()
+      stdout.start()
+      const cmd = new TheCommand(['--json'])
+      return cmd.run()
+        .then(() => {
+          const output = stdout.output.trim()
+          const jsonMatch = output.match(/\{[\s\S]*\}$/)
+          const parsed = JSON.parse(jsonMatch ? jsonMatch[0] : output)
+          expect(parsed.basePath).toEqual('/test')
+        })
+        .finally(() => {
+          stdout.stop()
+        })
+    })
+
     test('--json flag, empty result.apis returns {}', () => {
       rtLib.mockResolved(rtAction, { apis: [] })
       stdout.stop()
