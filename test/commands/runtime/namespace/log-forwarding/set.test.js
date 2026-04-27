@@ -41,7 +41,7 @@ let command, prompt, rtLib
 beforeEach(async () => {
   command = new TheCommand([])
   prompt = jest.fn()
-  inquirer.prompt = prompt
+  inquirer.default.prompt = prompt
   rtLib = await RuntimeLib.init({ apihost: 'fakehost', api_key: 'fakekey' })
   rtLib.logForwarding.getSupportedDestinations = jest.fn().mockReturnValue([{ value: 'destination', name: 'Destination' }])
   rtLib.logForwarding.getDestinationSettings = jest.fn().mockReturnValue({ key: 'value' })
