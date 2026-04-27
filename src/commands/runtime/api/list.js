@@ -57,6 +57,11 @@ class ApiList extends RuntimeBaseCommand {
       const result = await ow.routes.list(options)
 
       if (shouldOutputJson) {
+        if (!result.apis || result.apis.length === 0) {
+          this.logJSON('', {})
+          return
+        }
+
         const api = result.apis[0]
         const apidoc = api.value.apidoc
         const gwApiUrl = api.value.gwApiUrl
