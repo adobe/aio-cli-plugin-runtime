@@ -59,8 +59,8 @@ class ApiList extends RuntimeBaseCommand {
       if (shouldOutputJson) {
         if (!result.apis || result.apis.length === 0) {
           this.logJSON('', {})
-          return
-        }
+        const api = result.apis[0]
+        if (!api || !api.value) {
 
         const api = result.apis[0]
         const apidoc = api.value.apidoc
