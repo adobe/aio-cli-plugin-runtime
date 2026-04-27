@@ -119,6 +119,23 @@ describe('instance methods', () => {
         })
     })
 
+    test('--json flag, empty apis array returns empty object', () => {
+      rtLib.mockResolved(rtAction, { apis: [] })
+      stdout.stop()
+      stdout.start()
+      const cmd = new TheCommand(['--json'])
+      return cmd.run()
+        .then(() => {
+          const output = stdout.output.trim()
+          const jsonMatch = output.match(/\{[\s\S]*\}$/)
+          const parsed = JSON.parse(jsonMatch ? jsonMatch[0] : output)
+          expect(parsed).toEqual({})
+        })
+        .finally(() => {
+          stdout.stop()
+        })
+    })
+
     test('--json flag, operation without x-openwhisk leaves url unchanged', () => {
       rtLib.mockResolved(rtAction, {
         apis: [{
