@@ -60,7 +60,7 @@ class ApiList extends RuntimeBaseCommand {
         const api = result.apis && result.apis[0]
         if (!api || !api.value) {
           this.logJSON('', {})
-          return
+        Object.keys(apidoc.paths || {}).forEach(path => {
         }
         const apidoc = api.value.apidoc
         const gwApiUrl = api.value.gwApiUrl
