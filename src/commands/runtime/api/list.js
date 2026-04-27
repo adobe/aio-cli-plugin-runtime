@@ -57,7 +57,7 @@ class ApiList extends RuntimeBaseCommand {
       const result = await ow.routes.list(options)
 
       if (shouldOutputJson) {
-        const api = result.apis[0]
+        const api = result.apis?.[0]
         if (!api) {
           this.logJSON('', {})
           return
@@ -68,7 +68,7 @@ class ApiList extends RuntimeBaseCommand {
           if (!path.startsWith('/')) return
           Object.keys(apidoc.paths[path]).forEach(verb => {
             const operation = apidoc.paths[path][verb]
-            if (operation['x-openwhisk']) {
+            if (operation && typeof operation === 'object' && operation['x-openwhisk']) {
               operation['x-openwhisk'].url = `${gwApiUrl}${path}`
             }
           })
