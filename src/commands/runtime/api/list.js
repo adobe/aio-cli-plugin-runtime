@@ -58,8 +58,12 @@ class ApiList extends RuntimeBaseCommand {
 
       if (shouldOutputJson) {
         const api = result.apis[0]
-        const apidoc = api.value.apidoc
+        if (!api) {
+          this.logJSON('', {})
+          return
+        }
         const gwApiUrl = api.value.gwApiUrl
+        const apidoc = structuredClone(api.value.apidoc)
         Object.keys(apidoc.paths).forEach(path => {
           if (!path.startsWith('/')) return
           Object.keys(apidoc.paths[path]).forEach(verb => {

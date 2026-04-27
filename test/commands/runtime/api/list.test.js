@@ -157,6 +157,39 @@ describe('instance methods', () => {
         })
     })
 
+    test('--json flag, empty result.apis returns {}', () => {
+      rtLib.mockResolved(rtAction, { apis: [] })
+      stdout.stop()
+      stdout.start()
+      const cmd = new TheCommand(['--json'])
+      return cmd.run()
+        .then(() => {
+          const output = stdout.output.trim()
+          const jsonMatch = output.match(/\{[\s\S]*\}$/)
+          const parsed = JSON.parse(jsonMatch ? jsonMatch[0] : output)
+          expect(parsed).toEqual({})
+        })
+        .finally(() => {
+          stdout.stop()
+        })
+    })
+
+    test('--json flag, does not mutate the SDK response object', () => {
+      const fixture = fixtureJson('api/list.json')
+      rtLib.mockResolved(rtAction, fixture)
+      const originalUrl = fixture.apis[0].value.apidoc.paths['/mypath'].get['x-openwhisk'].url
+      stdout.stop()
+      stdout.start()
+      const cmd = new TheCommand(['--json'])
+      return cmd.run()
+        .then(() => {
+          expect(fixture.apis[0].value.apidoc.paths['/mypath'].get['x-openwhisk'].url).toEqual(originalUrl)
+        })
+        .finally(() => {
+          stdout.stop()
+        })
+    })
+
     test('error, throws exception', async () => {
       rtLib.mockRejected(rtAction, new Error('an error'))
       const error = ['failed to list the api', new Error('an error')]
