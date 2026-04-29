@@ -57,7 +57,23 @@ class ApiList extends RuntimeBaseCommand {
       const result = await ow.routes.list(options)
 
       if (shouldOutputJson) {
-        this.logJSON('', result.apis[0].value.apidoc)
+        const api = result.apis?.[0]
+        if (!api) {
+          this.logJSON('', {})
+          return
+        }
+        const gwApiUrl = api.value?.gwApiUrl
+        const apidoc = structuredClone(api.value?.apidoc ?? {})
+        Object.keys(apidoc.paths ?? {}).forEach(path => {
+          if (!path.startsWith('/')) return
+          Object.keys(apidoc.paths[path]).forEach(verb => {
+            const operation = apidoc.paths[path][verb]
+            if (operation && typeof operation === 'object' && operation['x-openwhisk']) {
+              operation['x-openwhisk'].url = `${gwApiUrl}${path}`
+            }
+          })
+        })
+        this.logJSON('', apidoc)
         return
       }
 
