@@ -164,10 +164,6 @@ class SandboxRun extends RuntimeBaseCommand {
       if (!trimmed) {
         continue
       }
-      if (trimmed === '.help') {
-        this._printHelp()
-        continue
-      }
 
       try {
         if (trimmed.includes(' <<< ')) {
@@ -213,25 +209,18 @@ class SandboxRun extends RuntimeBaseCommand {
     this.log(`[exit: ${result.exitCode}]\n`)
   }
 
-  _printHelp () {
-    this.log('')
-    this.log('How it works:')
-    this.log('  Each command runs in a fresh process on the sandbox.')
-    this.log('  Shell state (working directory, exports) does not persist between commands.')
-    this.log('  To run multi-step workflows, chain commands: cd mydir && npm install')
-    this.log('')
-    this.log('Stdin:')
-    this.log('  command <<< "text"        Send inline text as stdin')
-    this.log('                            cat -n <<< "hello world"')
-    this.log('')
-    this.log('Other:')
-    this.log('  exit / quit               Destroy sandbox and exit')
-    this.log('  .help                     Show this help')
-    this.log('')
-  }
 }
 
-SandboxRun.description = 'Create a sandbox and run an interactive REPL against it'
+SandboxRun.description = `Create a sandbox and run an interactive REPL against it.
+
+Each command you enter runs in a fresh process; shell state (working directory,
+environment exports) does not persist between prompts. Chain commands to work
+around this: cd mydir && npm install
+
+Send text to stdin with the here-string operator:
+  command <<< "text"
+
+Type exit or quit to destroy the sandbox and leave.`
 
 SandboxRun.flags = {
   ...RuntimeBaseCommand.flags,
@@ -258,6 +247,13 @@ SandboxRun.flags = {
     default: 3600
   })
 }
+
+SandboxRun.examples = [
+  '<%= config.bin %> <%= command.id %>',
+  '<%= config.bin %> <%= command.id %> -e allow-all',
+  '<%= config.bin %> <%= command.id %> -e "pypi.org:443" -e "api.github.com:443|GET:/repos/**"',
+  '<%= config.bin %> <%= command.id %> --size LARGE --type cpu:nodejs'
+]
 
 SandboxRun.aliases = ['rt:sandbox:run']
 

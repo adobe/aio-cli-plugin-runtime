@@ -74,6 +74,18 @@ test('aliases', async () => {
   expect(TheCommand.aliases.length).toBeGreaterThan(0)
 })
 
+test('examples', async () => {
+  expect(TheCommand.examples).toBeDefined()
+  expect(TheCommand.examples).toBeInstanceOf(Array)
+  expect(TheCommand.examples.length).toBeGreaterThan(0)
+})
+
+test('description includes REPL usage notes', async () => {
+  expect(TheCommand.description).toMatch(/fresh process/)
+  expect(TheCommand.description).toMatch(/<<</)
+  expect(TheCommand.description).toMatch(/exit/)
+})
+
 test('flags', async () => {
   expect(typeof TheCommand.flags.name).toBe('object')
   expect(TheCommand.flags.name.default).toBe('aio-sandbox')
@@ -270,8 +282,8 @@ describe('run', () => {
     expect(rtLib.compute.sandbox.create).not.toHaveBeenCalled()
   })
 
-  test('REPL: blank input is ignored, .help prints help, command runs exec', async () => {
-    readline.createInterface.mockReturnValue(makeRl(['', '.help', 'ls -la', 'exit']))
+  test('REPL: blank input is ignored and command runs exec', async () => {
+    readline.createInterface.mockReturnValue(makeRl(['', 'ls -la', 'exit']))
     sandbox.exec
       .mockResolvedValueOnce({ stdout: 'v20.0.0\n', stderr: '', exitCode: 0 }) // probe
       .mockResolvedValueOnce({ stdout: 'total 0\n', stderr: '', exitCode: 0 }) // ls
@@ -280,7 +292,6 @@ describe('run', () => {
     await command.run()
 
     expect(sandbox.exec).toHaveBeenCalledWith('ls -la', { timeout: 30000 })
-    expect(stdout.output).toMatch('How it works:')
     expect(stdout.output).toMatch('total 0')
     expect(stdout.output).toMatch('[exit: 0]')
   })
