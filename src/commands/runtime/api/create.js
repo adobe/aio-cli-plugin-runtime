@@ -32,7 +32,7 @@ class ApiCreate extends DeployServiceCommand {
           operation: args.apiVerb,
           action: args.action,
           responsetype: flags['response-type'], // has a default
-          name: flags.apiname
+          name: flags.apiname || args.basePath
         }
       }
 
