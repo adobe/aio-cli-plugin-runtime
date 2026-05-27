@@ -104,7 +104,168 @@ describe('instance methods', () => {
           const output = stdout.output.trim()
           const jsonMatch = output.match(/\{[\s\S]*\}$/)
           const jsonOutput = jsonMatch ? jsonMatch[0] : output
-          expect(JSON.parse(jsonOutput)).toMatchObject(expectedJson.apis[0].value.apidoc)
+          const parsed = JSON.parse(jsonOutput)
+          const { apis } = expectedJson
+          const gwApiUrl = apis[0].value.gwApiUrl
+          // apidoc structure preserved
+          expect(parsed.basePath).toEqual(apis[0].value.apidoc.basePath)
+          expect(parsed.info).toMatchObject(apis[0].value.apidoc.info)
+          expect(parsed.swagger).toEqual(apis[0].value.apidoc.swagger)
+          // x-openwhisk.url updated with actual gateway URL (was "not-used")
+          expect(parsed.paths['/mypath'].get['x-openwhisk'].url).toEqual(`${gwApiUrl}/mypath`)
+        })
+        .finally(() => {
+          stdout.stop()
+        })
+    })
+
+    test('--json flag, operation without x-openwhisk leaves url unchanged', () => {
+      rtLib.mockResolved(rtAction, {
+        apis: [{
+          value: {
+            gwApiUrl: 'https://example.com/api',
+            apidoc: {
+              basePath: '/test',
+              info: { title: 'test', version: '1.0.0' },
+              swagger: '2.0',
+              paths: {
+                '/mypath': {
+                  get: {
+                    operationId: 'testOp',
+                    responses: { default: { description: 'Default response' } }
+                    // no x-openwhisk field
+                  }
+                }
+              }
+            }
+          }
+        }]
+      })
+      stdout.stop()
+      stdout.start()
+      const cmd = new TheCommand(['--json'])
+      return cmd.run()
+        .then(() => {
+          const output = stdout.output.trim()
+          const jsonMatch = output.match(/\{[\s\S]*\}$/)
+          const parsed = JSON.parse(jsonMatch ? jsonMatch[0] : output)
+          // operation without x-openwhisk should be left intact
+          expect(parsed.paths['/mypath'].get).not.toHaveProperty('x-openwhisk')
+        })
+        .finally(() => {
+          stdout.stop()
+        })
+    })
+
+    test('--json flag, result.apis is null returns {}', () => {
+      rtLib.mockResolved(rtAction, { apis: null })
+      stdout.stop()
+      stdout.start()
+      const cmd = new TheCommand(['--json'])
+      return cmd.run()
+        .then(() => {
+          const output = stdout.output.trim()
+          const jsonMatch = output.match(/\{[\s\S]*\}$/)
+          const parsed = JSON.parse(jsonMatch ? jsonMatch[0] : output)
+          expect(parsed).toEqual({})
+        })
+        .finally(() => {
+          stdout.stop()
+        })
+    })
+
+    test('--json flag, non-object operation value is skipped safely', () => {
+      rtLib.mockResolved(rtAction, {
+        apis: [{
+          value: {
+            gwApiUrl: 'https://example.com/api',
+            apidoc: {
+              basePath: '/test',
+              paths: {
+                '/mypath': {
+                  get: true
+                }
+              }
+            }
+          }
+        }]
+      })
+      stdout.stop()
+      stdout.start()
+      const cmd = new TheCommand(['--json'])
+      return cmd.run()
+        .then(() => {
+          const output = stdout.output.trim()
+          const jsonMatch = output.match(/\{[\s\S]*\}$/)
+          const parsed = JSON.parse(jsonMatch ? jsonMatch[0] : output)
+          expect(parsed.paths['/mypath'].get).toEqual(true)
+        })
+        .finally(() => {
+          stdout.stop()
+        })
+    })
+
+    test('--json flag, api.value.apidoc is missing returns {}', () => {
+      rtLib.mockResolved(rtAction, { apis: [{ value: {} }] })
+      stdout.stop()
+      stdout.start()
+      const cmd = new TheCommand(['--json'])
+      return cmd.run()
+        .then(() => {
+          const output = stdout.output.trim()
+          const jsonMatch = output.match(/\{[\s\S]*\}$/)
+          const parsed = JSON.parse(jsonMatch ? jsonMatch[0] : output)
+          expect(parsed).toEqual({})
+        })
+        .finally(() => {
+          stdout.stop()
+        })
+    })
+
+    test('--json flag, api.value.apidoc.paths is missing returns apidoc without paths', () => {
+      rtLib.mockResolved(rtAction, { apis: [{ value: { gwApiUrl: 'https://example.com', apidoc: { basePath: '/test' } } }] })
+      stdout.stop()
+      stdout.start()
+      const cmd = new TheCommand(['--json'])
+      return cmd.run()
+        .then(() => {
+          const output = stdout.output.trim()
+          const jsonMatch = output.match(/\{[\s\S]*\}$/)
+          const parsed = JSON.parse(jsonMatch ? jsonMatch[0] : output)
+          expect(parsed.basePath).toEqual('/test')
+        })
+        .finally(() => {
+          stdout.stop()
+        })
+    })
+
+    test('--json flag, empty result.apis returns {}', () => {
+      rtLib.mockResolved(rtAction, { apis: [] })
+      stdout.stop()
+      stdout.start()
+      const cmd = new TheCommand(['--json'])
+      return cmd.run()
+        .then(() => {
+          const output = stdout.output.trim()
+          const jsonMatch = output.match(/\{[\s\S]*\}$/)
+          const parsed = JSON.parse(jsonMatch ? jsonMatch[0] : output)
+          expect(parsed).toEqual({})
+        })
+        .finally(() => {
+          stdout.stop()
+        })
+    })
+
+    test('--json flag, does not mutate the SDK response object', () => {
+      const fixture = fixtureJson('api/list.json')
+      rtLib.mockResolved(rtAction, fixture)
+      const originalUrl = fixture.apis[0].value.apidoc.paths['/mypath'].get['x-openwhisk'].url
+      stdout.stop()
+      stdout.start()
+      const cmd = new TheCommand(['--json'])
+      return cmd.run()
+        .then(() => {
+          expect(fixture.apis[0].value.apidoc.paths['/mypath'].get['x-openwhisk'].url).toEqual(originalUrl)
         })
         .finally(() => {
           stdout.stop()
