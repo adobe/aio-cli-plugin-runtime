@@ -26,4 +26,9 @@ IndexCommand.aliases = [
   'rt:ip-list'
 ]
 
+IndexCommand.examples = [
+  '$ aio runtime ip-list get',
+  '$ aio runtime ip-list --help'
+]
+
 module.exports = IndexCommand

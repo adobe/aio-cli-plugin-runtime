@@ -13,16 +13,6 @@ governing permissions and limitations under the License.
 const { Flags } = require('@oclif/core')
 const config = require('@adobe/aio-lib-core-config')
 const chalk = require('chalk')
-/*
- * inquirer v9+ is ESM-first and, when `require`d from a CommonJS caller,
- * surfaces its public API under a `.default` namespace instead of the
- * bare module.exports it used to in v8. We use `.default ?? module`
- * so this command keeps working against either shape — the fallback
- * matters for tests that mock `inquirer` with a plain `{ prompt: fn }`
- * object.
- */
-const inquirerMod = require('inquirer')
-const inquirer = inquirerMod.default || inquirerMod
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 const { getToken, context } = require('@adobe/aio-lib-ims')
 const { CLI } = require('@adobe/aio-lib-ims/src/context')
@@ -34,6 +24,7 @@ const { CLI } = require('@adobe/aio-lib-ims/src/context')
  * clobber the 403 TERMS_REQUIRED flow this command depends on. Tracked as
  * ACNA-4547. The runtime host preserves the underlying status code + JSON
  * body and exercises the same require-adobe-auth sequence + IMS validation.
+ *
  */
 const DEFAULT_SERVICE_HOST = '53444-iplistservice-stage.adobeioruntime.net'
 const SERVICE_PATH = '/api/v1/web/ip-list'
@@ -86,26 +77,39 @@ async function getAccessToken () {
 }
 
 /**
- * Resolve the caller's IMS organization id from local aio config. The
- * service validates the IMS token and checks that the claimed imsOrgId
- * is one the token-holder actually belongs to, so if the CLI has not
- * been bound to an IMS org (i.e. no `aio console org select`) we fail
- * fast rather than sending a request that would be rejected with 400.
+ * Resolve the caller's IMS organization id from local aio config, or
+ * return null if no binding is configured. The service validates the
+ * IMS token and checks that the claimed imsOrgId is one the token-holder
+ * actually belongs to, so the caller fails fast on null rather than
+ * sending a request that would be rejected with 400. Returning null
+ * (instead of throwing) lets run() render a friendly, stack-free message
+ * via this.error() above the try/catch that routes real exceptions
+ * through RuntimeBaseCommand.handleError.
  *
- * @returns {string} IMS org id in `...@AdobeOrg` form.
- * @throws {Error} if no org id has been configured.
+ * @returns {string|null} IMS org id in `...@AdobeOrg` form, or null.
  */
-function getImsOrgIdOrError () {
-  const orgId = config.get('project.org.ims_org_id') ||
-    config.get('console.org.ims_org_id') ||
-    config.get('ims.org_id')
-  if (!orgId) {
-    throw new Error(
-      'IMS org id not found in aio config. Run `aio console org select` ' +
-      'or `aio app use` to bind this shell to an Adobe IMS org.'
-    )
-  }
-  return orgId
+function resolveImsOrgId () {
+  /*
+   * Key order matters and reflects what each `aio` flow actually writes:
+   *
+   *   - `aio app use` writes the IMS org id to `project.org.ims_org_id`
+   *     in the local project config (.aio / .env). When present this is
+   *     the most specific binding — the user explicitly imported a
+   *     workspace into the cwd — so we prefer it.
+   *   - `aio console org select` writes the IMS org id to
+   *     `console.org.code` (NOT `console.org.ims_org_id`, despite the
+   *     name). `console.org.id` next to it is the Console *numeric* org
+   *     id, which the ip-list service does not accept.
+   *   - `ims.org_id` is a legacy key kept for back-compat with very old
+   *     aio configs.
+   *
+   * Returning null (rather than throwing) lets run() render a friendly,
+   * stack-free message via this.error() above its try/catch.
+   */
+  return config.get('project.org.ims_org_id') ||
+    config.get('console.org.code') ||
+    config.get('ims.org_id') ||
+    null
 }
 
 /**
@@ -116,11 +120,9 @@ function getImsOrgIdOrError () {
  *
  * As of the cross-org refactor the service's web actions run with
  * `require-adobe-auth: false` and perform their own IMS validation inside
- * the action (see actions/auth.js in OneAdobe/ip-list-service). The
- * canonical request shape is therefore POST + JSON body with `token` and
- * `imsOrgId` carried *in the body* rather than in headers; the Authorization
- * / x-gw-ims-org-id header shape is a deprecated fallback only still
- * supported for backward compatibility.
+ * the action (see actions/auth.js in adobe-developer-platform/app-builder-ip-list-service).
+ * The canonical request shape is therefore POST + JSON body with `token`
+ * and `imsOrgId` carried *in the body* rather than in headers.
  *
  * @param {object} opts - Request options.
  * @param {string} opts.host - ip-list service host.
@@ -181,18 +183,6 @@ async function getIpList ({ host, token, orgId, region, fetchImpl }) {
   })
 }
 
-/**
- * POST a terms acceptance record for the current CLI user.
- *
- * @param {object} opts - request options.
- * @param {string} opts.host - ip-list service host.
- * @param {string} opts.token - IMS bearer token.
- * @param {string} opts.orgId - IMS org id.
- * @param {string} opts.contactEmail - email to record for notifications.
- * @param {number} opts.termsVersion - version the caller is accepting.
- * @param {Function} [opts.fetchImpl] - fetch override for tests.
- * @returns {Promise<object>} response envelope from {@link callService}.
- */
 /**
  * POST a terms acceptance record for the current CLI user.
  *
@@ -277,23 +267,44 @@ class IpListGet extends RuntimeBaseCommand {
    */
   async run () {
     const { flags } = await this.parse(IpListGet)
+
+    /*
+     * Cheap, deterministic precondition checks. These are expected
+     * user-input states — bad flag values, an unbound shell — not
+     * exceptions, so we call this.error() directly here instead of
+     * routing through RuntimeBaseCommand.handleError. handleError
+     * re-wraps and re-throws without setting `code`, which causes
+     * oclif to print the full stack trace; for a customer-facing
+     * command that's ugly and unhelpful. The try/catch below still
+     * funnels real exceptions (network, 5xx, JSON parse) through the
+     * shared error path so they look like the rest of the plugin.
+     */
+    if (flags.region && !VALID_REGIONS.includes(flags.region)) {
+      this.error(`invalid region "${flags.region}". Expected one of: ${VALID_REGIONS.join(', ')}`, { exit: 1 })
+    }
+    if (flags['accept-terms'] && !flags['contact-email']) {
+      this.error('--accept-terms requires --contact-email', { exit: 1 })
+    }
+    const orgId = resolveImsOrgId()
+    if (!orgId) {
+      this.error(
+        'IMS org id not found in aio config.\n\n' +
+        'Run one of the following and try again:\n' +
+        '  aio console org select\n' +
+        '  aio app use',
+        { exit: 1 }
+      )
+    }
+
     try {
-      await this.runPipeline(flags)
+      await this.runPipeline(flags, orgId)
     } catch (err) {
       await this.handleError('failed to fetch the egress IP list', err)
     }
   }
 
-  async runPipeline (flags) {
-    if (flags.region && !VALID_REGIONS.includes(flags.region)) {
-      this.error(`invalid region "${flags.region}". Expected one of: ${VALID_REGIONS.join(', ')}`)
-    }
-    if (flags['accept-terms'] && !flags['contact-email']) {
-      this.error('--accept-terms requires --contact-email')
-    }
-
+  async runPipeline (flags, orgId) {
     const host = resolveHost(flags)
-    const orgId = getImsOrgIdOrError()
     const token = await getAccessToken()
 
     // First attempt. Most repeat callers already have terms accepted
@@ -324,13 +335,21 @@ class IpListGet extends RuntimeBaseCommand {
   async handleTermsRequired ({ flags, res, host, token, orgId }) {
     const { termsText, termsUrl, termsVersion } = res.body
 
-    this.log('')
-    this.log(chalk.yellow.bold('This service requires terms acceptance before first use.'))
-    if (termsUrl) this.log(chalk.dim(`Full terms: ${termsUrl}`))
-    this.log('')
+    /*
+     * Informational output goes to stderr so that `--json` consumers get
+     * clean, parseable JSON on stdout even on the first-use path (where
+     * the terms text, prompt, and "accepted" notice would otherwise be
+     * interleaved with the eventual JSON payload).
+     */
+    const info = (msg) => process.stderr.write(msg + '\n')
+
+    info('')
+    info(chalk.yellow.bold('This service requires terms acceptance before first use.'))
+    if (termsUrl) info(chalk.dim(`Full terms: ${termsUrl}`))
+    info('')
     if (termsText) {
-      this.log(termsText)
-      this.log('')
+      info(termsText)
+      info('')
     }
 
     let contactEmail = flags['contact-email']
@@ -346,11 +365,14 @@ class IpListGet extends RuntimeBaseCommand {
 
     if (!accepted) {
       /*
-       * istanbul ignore next -- interactive branch; exercised in manual
-       * demo runs. Unit tests route through --accept-terms to keep the
-       * test path deterministic, matching the way aio-cli-plugin-runtime
-       * tests its other inquirer-backed flows.
+       * Lazy-load inquirer so non-interactive runs (--accept-terms or
+       * pre-accepted users) don't pay the ESM-import cost. inquirer v9+
+       * is ESM-first and, when `require`d from a CommonJS caller, exposes
+       * its public API on `.default`; v12 follows the same shape (see
+       * `node -e 'console.log(Object.keys(require("inquirer")))'` →
+       * `['createPromptModule','default']`).
        */
+      const inquirer = require('inquirer').default
       const answers = await inquirer.prompt([
         { name: 'accept', type: 'confirm', message: `Accept terms v${termsVersion}?`, default: false },
         {
@@ -380,12 +402,24 @@ class IpListGet extends RuntimeBaseCommand {
         acceptRes.rawBody || `http ${acceptRes.status}`
       this.error(`failed to record terms acceptance (${acceptRes.status}): ${detail}`)
     }
-    this.log(chalk.green(`Terms v${termsVersion} accepted. Fetching the IP list...`))
+    info(chalk.green(`Terms v${termsVersion} accepted. Fetching the IP list...`))
   }
 }
 
+/*
+ * Flags. This command does not talk to OpenWhisk, so it deliberately does
+ * NOT spread `RuntimeBaseCommand.flags` — that would expose --apihost,
+ * --auth, --cert, --key, --insecure, which would be silently ignored here
+ * and confusing in `--help`. We inherit only --debug / --verbose so the
+ * standard plugin-wide logging knobs still work.
+ *
+ * --service-host is a `hidden: true` escape hatch for stage / manual
+ * testing, not a customer-supported endpoint override (see AIO_IP_LIST_HOST
+ * env var for test validation).
+ */
 IpListGet.flags = {
-  ...RuntimeBaseCommand.flags,
+  debug: RuntimeBaseCommand.flags.debug,
+  verbose: RuntimeBaseCommand.flags.verbose,
   region: Flags.string({
     description: `restrict output to one region (${VALID_REGIONS.join(', ')})`
   }),
@@ -396,7 +430,8 @@ IpListGet.flags = {
     description: 'contact email used when accepting terms and subscribing to change notifications'
   }),
   'service-host': Flags.string({
-    description: 'override the ip-list service host (also: AIO_IP_LIST_HOST env var)'
+    hidden: true,
+    description: 'override the ip-list service host (escape hatch; also AIO_IP_LIST_HOST env var)'
   }),
   json: Flags.boolean({
     description: 'output raw JSON instead of a formatted table'
