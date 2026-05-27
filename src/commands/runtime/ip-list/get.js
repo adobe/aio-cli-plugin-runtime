@@ -77,7 +77,7 @@ async function getAccessToken () {
 }
 
 /**
- * Resolve the caller's IMS organization id from local aio config, or
+ * Resolve the caller's IMS org id from local aio config, or
  * return null if no binding is configured. The service validates the
  * IMS token and checks that the claimed imsOrgId is one the token-holder
  * actually belongs to, so the caller fails fast on null rather than
@@ -90,18 +90,13 @@ async function getAccessToken () {
  */
 function resolveImsOrgId () {
   /*
-   * Key order matters and reflects what each `aio` flow actually writes:
-   *
    *   - `aio app use` writes the IMS org id to `project.org.ims_org_id`
    *     in the local project config (.aio / .env). When present this is
    *     the most specific binding — the user explicitly imported a
    *     workspace into the cwd — so we prefer it.
-   *   - `aio console org select` writes the IMS org id to
-   *     `console.org.code` (NOT `console.org.ims_org_id`, despite the
-   *     name). `console.org.id` next to it is the Console *numeric* org
-   *     id, which the ip-list service does not accept.
-   *   - `ims.org_id` is a legacy key kept for back-compat with very old
-   *     aio configs.
+   *   - `aio console org select` writes the IMS org id to `console.org.code`.
+   *   -  ip-list service does not accept`console.org.id` which is the amsOrgId
+   *   - `ims.org_id` is a legacy key kept for back-compat with very old aio configs.
    *
    * Returning null (rather than throwing) lets run() render a friendly,
    * stack-free message via this.error() above its try/catch.
@@ -132,7 +127,7 @@ function resolveImsOrgId () {
  * @param {string} opts.orgId - IMS org id (`<ident>@AdobeOrg`).
  * @param {Function} [opts.fetchImpl] - fetch override, used by tests.
  * @returns {Promise<{status: number, body: object|null, rawBody: string}>}
- *   response envelope.
+ *   response envelope
  */
 async function callService ({ host, path, body, token, orgId, fetchImpl }) {
   const f = fetchImpl || global.fetch
@@ -267,18 +262,6 @@ class IpListGet extends RuntimeBaseCommand {
    */
   async run () {
     const { flags } = await this.parse(IpListGet)
-
-    /*
-     * Cheap, deterministic precondition checks. These are expected
-     * user-input states — bad flag values, an unbound shell — not
-     * exceptions, so we call this.error() directly here instead of
-     * routing through RuntimeBaseCommand.handleError. handleError
-     * re-wraps and re-throws without setting `code`, which causes
-     * oclif to print the full stack trace; for a customer-facing
-     * command that's ugly and unhelpful. The try/catch below still
-     * funnels real exceptions (network, 5xx, JSON parse) through the
-     * shared error path so they look like the rest of the plugin.
-     */
     if (flags.region && !VALID_REGIONS.includes(flags.region)) {
       this.error(`invalid region "${flags.region}". Expected one of: ${VALID_REGIONS.join(', ')}`, { exit: 1 })
     }
@@ -290,7 +273,7 @@ class IpListGet extends RuntimeBaseCommand {
       this.error(
         'IMS org id not found in aio config.\n\n' +
         'Run one of the following and try again:\n' +
-        '  aio console org select\n' +
+        '  aio console org select\n' + 'or' +
         '  aio app use',
         { exit: 1 }
       )
@@ -365,9 +348,9 @@ class IpListGet extends RuntimeBaseCommand {
 
     if (!accepted) {
       /*
-       * Lazy-load inquirer so non-interactive runs (--accept-terms or
-       * pre-accepted users) don't pay the ESM-import cost. inquirer v9+
-       * is ESM-first and, when `require`d from a CommonJS caller, exposes
+       * Lazy-load inquirer so non-interactive runs like --accept-terms or
+       * pre-accepted users don't pay the ESM-import cost. inquirer v9+
+       * is ESM-first and, when `require`d from a CommonJS caller, it exposes
        * its public API on `.default`; v12 follows the same shape (see
        * `node -e 'console.log(Object.keys(require("inquirer")))'` →
        * `['createPromptModule','default']`).
