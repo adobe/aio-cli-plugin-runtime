@@ -22,6 +22,11 @@ class IndexCommand extends RuntimeBaseCommand {
 
 IndexCommand.description = 'Fetch the Adobe I/O Runtime egress IP allowlist'
 
+// Topic command — delegates to Help and accepts no input, so the
+// OpenWhisk-targeted flags inherited from RuntimeBaseCommand are
+// excluded from --help.
+IndexCommand.flags = {}
+
 IndexCommand.aliases = [
   'rt:ip-list'
 ]

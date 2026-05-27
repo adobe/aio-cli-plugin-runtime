@@ -19,11 +19,9 @@ jest.mock('@adobe/aio-lib-ims', () => ({
   }
 }))
 jest.mock('@adobe/aio-lib-ims/src/context', () => ({ CLI: 'cli' }))
-// inquirer v9+ exposes `.prompt` under `.default` when required from CJS.
-// Our command normalizes that (`.default || module`). Mock the module in a
-// way that works for both shapes so tests stay agnostic to the inquirer
-// major version: `inquirer.prompt` and `inquirer.default.prompt` are the
-// same jest.fn() instance.
+// inquirer v9+ exposes `.prompt` under `.default` when required from
+// CommonJS. The mock exports the same jest.fn() under both shapes so
+// tests remain agnostic to the inquirer major version.
 jest.mock('inquirer', () => {
   const prompt = jest.fn()
   const mod = { prompt }
@@ -41,13 +39,12 @@ const IndexCommand = require('../../../../src/commands/runtime/ip-list/index')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand')
 
 /**
- * Builds a mock fetch-like response. The command reads both res.status and
- * res.text() — it never re-parses as JSON itself — so we need a minimal
- * Response shape that satisfies both.
+ * Builds a minimal fetch-like Response shape that satisfies the command's
+ * usage of `res.status` and `res.text()`.
  *
  * @param {number} status - HTTP status to simulate.
- * @param {any} body - Object serialized as the JSON response body, or string
- *   to send raw. Pass undefined to simulate an empty body.
+ * @param {any} body - Object serialized as the JSON response body, a
+ *   string to send raw, or undefined for an empty body.
  * @returns {{status: number, text: () => Promise<string>}} fetch-like stub.
  */
 function fetchResponse (status, body) {
@@ -56,11 +53,10 @@ function fetchResponse (status, body) {
 }
 
 /**
- * Instantiate the command with parsed argv and injected globals.
- * Mirrors the approach other runtime plugin tests take.
+ * Instantiate the command with parsed argv and a minimal oclif config.
  *
  * @param {string[]} argv - CLI args to pass to the command.
- * @returns {TheCommand} ready-to-run command instance.
+ * @returns {TheCommand} Ready-to-run command instance.
  */
 function makeCommand (argv = []) {
   return new TheCommand(argv, {
@@ -72,9 +68,8 @@ function makeCommand (argv = []) {
   })
 }
 
-// Matches the wire shape returned by `get-ip-list` on Stage — regions map
-// to a flat array of CIDR strings (not a nested { cidrs: [...] } object).
-// Verified against a real Stage response on 2026-04-21.
+// Mirrors the current wire shape returned by `get-ip-list`: each region
+// maps to a flat array of CIDR strings.
 const IP_LIST_OK = {
   regions: {
     amer: ['44.207.149.158/32', '44.208.197.195/32'],
@@ -107,9 +102,8 @@ beforeEach(() => {
   context.setCli.mockResolvedValue()
   getToken.mockResolvedValue('fake-token')
 
-  // jest.mock('inquirer') replaces the module with an auto-mock whose exports
-  // are undefined. Install a jest.fn() here so tests can assert call counts
-  // even when they never route through the interactive branch.
+  // Re-install a fresh jest.fn() so tests can assert call counts even
+  // when they never enter the interactive branch.
   inquirer.prompt = jest.fn()
 
   origFetch = global.fetch
@@ -143,11 +137,9 @@ test('examples are non-empty', () => {
 })
 
 test('exposes only the shared logging flags from RuntimeBaseCommand', () => {
-  // This command does not talk to OpenWhisk, so it deliberately does NOT
-  // spread the full RuntimeBaseCommand.flags set. Inherits only --debug
-  // and --verbose; the OW-specific connection flags (--apihost, --auth,
-  // --cert, --key, --insecure) would be confusing in `--help` because
-  // this command silently ignores them.
+  // Inherits --debug and --verbose only; OpenWhisk-targeted flags
+  // (--apihost, --auth, --cert, --key, --insecure) are excluded because
+  // this command does not call OpenWhisk.
   expect(TheCommand.flags.debug).toBe(RuntimeBaseCommand.flags.debug)
   expect(TheCommand.flags.verbose).toBe(RuntimeBaseCommand.flags.verbose)
   expect(TheCommand.flags.apihost).toBeUndefined()
@@ -156,9 +148,8 @@ test('exposes only the shared logging flags from RuntimeBaseCommand', () => {
 })
 
 test('--service-host is hidden from public help', () => {
-  // Useful escape hatch for stage / manual testing; we don't advertise
-  // it in `--help` because that would make it look like a customer-
-  // supported endpoint override.
+  // Internal escape hatch for stage testing; not a supported endpoint
+  // override, so it is hidden from --help.
   expect(TheCommand.flags['service-host'].hidden).toBe(true)
 })
 
@@ -213,9 +204,8 @@ describe('callService', () => {
   })
 
   test('does NOT send Authorization / x-gw-ims-org-id headers', async () => {
-    // The cross-org refactor moved the token + org id into the body so the
-    // service can be called by any authenticated Adobe user, independent
-    // of the require-adobe-auth gateway. Guardrail against regressions.
+    // The token and imsOrgId travel in the JSON body so the service
+    // can validate the caller in-action rather than at the gateway.
     const fetchImpl = jest.fn().mockResolvedValue(fetchResponse(200, { ok: true }))
     await TheCommand.callService({
       host: 'h.adobeioruntime.net',
@@ -274,7 +264,7 @@ describe('formatHumanOutput', () => {
   })
 
   test('tolerates the legacy { cidrs: [...] } region envelope', () => {
-    // Defense in depth for a re-enveloped future wire shape.
+    // Forward-compat: a re-enveloped future wire shape must still render.
     const out = TheCommand.formatHumanOutput({
       regions: { amer: { cidrs: ['10.0.0.1/32'] } },
       version: 1,
@@ -291,7 +281,7 @@ describe('run() — happy path', () => {
     await cmd.run()
     expect(stdout.output).toContain('AMER')
     expect(stdout.output).toContain('44.207.149.158/32')
-    // no accept-terms call
+    // No accept-terms call is made when the user already has acceptance on file.
     expect(global.fetch).toHaveBeenCalledTimes(1)
     const call = global.fetch.mock.calls[0]
     expect(call[0]).toMatch(/\/get-ip-list$/)
@@ -330,9 +320,8 @@ describe('run() — happy path', () => {
   })
 
   test('sends token + imsOrgId in every request body', async () => {
-    // Belt-and-braces cross-org-refactor guard: the IMS token must travel
-    // in the POST body so the in-action auth helper can validate it
-    // regardless of which org the caller belongs to.
+    // Every outbound POST must carry the IMS token and org id in the
+    // body so the service can validate the caller in-action.
     global.fetch
       .mockResolvedValueOnce(fetchResponse(403, TERMS_REQUIRED_BODY))
       .mockResolvedValueOnce(fetchResponse(200, { ok: true }))
@@ -350,29 +339,34 @@ describe('run() — happy path', () => {
 describe('run() — input validation', () => {
   test('rejects an unknown region before making any HTTP call', async () => {
     const cmd = makeCommand(['--region', 'mars'])
-    await expect(cmd.run()).rejects.toThrow()
+    await expect(cmd.run()).rejects.toThrow(/invalid region "mars"/)
     expect(global.fetch).not.toHaveBeenCalled()
   })
 
   test('rejects --accept-terms without --contact-email', async () => {
     const cmd = makeCommand(['--accept-terms'])
-    await expect(cmd.run()).rejects.toThrow()
+    await expect(cmd.run()).rejects.toThrow(/--accept-terms requires --contact-email/)
     expect(global.fetch).not.toHaveBeenCalled()
   })
 
   test('errors out if no IMS org id is configured', async () => {
+    // Locks the exact multi-line wording so a future copy edit cannot
+    // silently regress the customer-facing first-use error.
     config.get.mockReturnValue(undefined)
     const cmd = makeCommand([])
-    await expect(cmd.run()).rejects.toThrow()
+    await expect(cmd.run()).rejects.toThrow(
+      'IMS org id not found in aio config.\n\n' +
+      'Run one of the following and try again:\n' +
+      '  aio console org select\n' +
+      '  aio app use'
+    )
     expect(global.fetch).not.toHaveBeenCalled()
   })
 
   test('falls back to console.org.code when project.org.ims_org_id is not set', async () => {
-    // Reproduces the post-`aio console org select` state: the user picked
-    // an org + project + workspace via `aio console`, but never ran
-    // `aio app use`. In that state the IMS org id lives at console.org.code
-    // (the `@AdobeOrg` value), not at console.org.ims_org_id or
-    // project.org.ims_org_id. The command must pick it up from there.
+    // After `aio console org select` without a subsequent `aio app use`,
+    // the IMS org id is stored at console.org.code rather than
+    // project.org.ims_org_id; the command must resolve it from there.
     config.get.mockImplementation((key) => {
       if (key === 'project.org.ims_org_id') return undefined
       if (key === 'console.org.code') return 'C74F69D7594880280A495D09@AdobeOrg'
@@ -386,10 +380,8 @@ describe('run() — input validation', () => {
   })
 
   test('prefers project.org.ims_org_id over console.org.code when both are set', async () => {
-    // Precedence: an explicit `aio app use` binding (local project) wins
-    // over a global `aio console org select` binding. Keeps the local
-    // workspace acceptance trail consistent for users who switch between
-    // multiple projects in the same shell.
+    // An explicit `aio app use` binding (project-local) takes precedence
+    // over the global `aio console org select` binding.
     config.get.mockImplementation((key) => {
       if (key === 'project.org.ims_org_id') return 'PROJECT111@AdobeOrg'
       if (key === 'console.org.code') return 'CONSOLE222@AdobeOrg'
@@ -429,22 +421,21 @@ describe('run() — terms acceptance flow', () => {
       imsOrgId: 'BA3E111222@AdobeOrg'
     })
 
-    // The human-readable IP list is printed after acceptance.
+    // The human-readable IP list is printed on stdout after acceptance.
     expect(stdout.output).toContain('AMER')
-    // Informational messages (terms text + acceptance notice) go to
-    // stderr so that `--json` consumers get clean, parseable stdout.
+    // Informational messages (terms text and acceptance notice) are
+    // written to stderr so --json consumers receive clean stdout.
     expect(stderr.output).toMatch(/Terms v1 accepted/)
     expect(stderr.output).toMatch(/agree to the terms/)
 
-    // inquirer was NOT prompted because we supplied non-interactive flags.
+    // inquirer is not invoked when non-interactive flags are supplied.
     expect(inquirer.prompt).not.toHaveBeenCalled()
   })
 
   test('`--json` first-use produces parseable JSON (terms text on stderr only)', async () => {
-    // Regression guard for: on first use with --json + --accept-terms,
-    // info messages like the terms text and "accepted" notice must not
-    // leak onto stdout, or `aio runtime ip-list get --json | jq ...`
-    // breaks for scripted consumers.
+    // With --json + --accept-terms on first use, informational output
+    // must remain on stderr so stdout stays a valid JSON document for
+    // scripted consumers (e.g. `aio runtime ip-list get --json | jq`).
     global.fetch
       .mockResolvedValueOnce(fetchResponse(403, TERMS_REQUIRED_BODY))
       .mockResolvedValueOnce(fetchResponse(200, { ok: true }))
@@ -474,8 +465,8 @@ describe('run() — terms acceptance flow', () => {
     expect(inquirer.prompt).toHaveBeenCalledTimes(1)
     const acceptBody = JSON.parse(global.fetch.mock.calls[1][1].body)
     expect(acceptBody.contactEmail).toBe('ops@example.com')
-    // A prompt-driven acceptance must be tagged "interactive" so the
-    // admin dashboard can distinguish it from flag-driven runs.
+    // Prompt-driven acceptance is recorded as "interactive" so the
+    // server can distinguish it from flag-driven runs.
     expect(acceptBody.acceptanceMode).toBe('interactive')
     expect(acceptBody.surface).toBe('cli')
   })
@@ -486,7 +477,7 @@ describe('run() — terms acceptance flow', () => {
 
     const cmd = makeCommand([])
     await expect(cmd.run()).rejects.toThrow()
-    // no accept-terms POST made
+    // The accept-terms POST is never sent on a declined prompt.
     expect(global.fetch).toHaveBeenCalledTimes(1)
   })
 
@@ -513,10 +504,9 @@ describe('run() — terms acceptance flow', () => {
 
 describe('IMS context selection', () => {
   test('uses the active IMS context name when one is set (non-CLI)', async () => {
-    // When the user has already selected an IMS context (e.g. via
-    // `aio auth login`), the command must use *that* token rather than
-    // forcing the bare CLI context. Guards against accidentally signing
-    // requests as the wrong identity.
+    // When an IMS context is already active (for example via
+    // `aio auth login`), the command must request a token for that
+    // context rather than forcing the bare CLI context.
     context.getCurrent.mockResolvedValue('user-context')
     global.fetch.mockResolvedValueOnce(fetchResponse(200, IP_LIST_OK))
 
@@ -524,13 +514,13 @@ describe('IMS context selection', () => {
     await cmd.run()
 
     expect(getToken).toHaveBeenCalledWith('user-context')
-    // setCli is only invoked when we fall back to the CLI default.
+    // setCli runs only on the no-current-context fallback path.
     expect(context.setCli).not.toHaveBeenCalled()
   })
 
   test('falls back to setCli when no current context exists', async () => {
-    // beforeEach sets getCurrent -> null; this test pins that behaviour
-    // and asserts the fallback wires the bare CLI output flag.
+    // When no IMS context is active, the command falls back to the
+    // bare CLI context with `cli.bare-output: true`.
     context.getCurrent.mockResolvedValue(null)
     global.fetch.mockResolvedValueOnce(fetchResponse(200, IP_LIST_OK))
 
@@ -544,10 +534,9 @@ describe('IMS context selection', () => {
 
 describe('interactive terms prompt config', () => {
   test('email prompt validate + when callbacks exercise the regex and gating', async () => {
-    // The prompt config builds two callbacks inquirer invokes against
-    // user input. Mocked inquirer.prompt skips them by default, so we
-    // assert from inside the mock implementation (where the closure
-    // variables match what the real prompt would see).
+    // The prompt config builds `validate` and `when` callbacks that
+    // inquirer invokes against user input. The mock invokes them
+    // directly so the closure variables match what inquirer would see.
     global.fetch
       .mockResolvedValueOnce(fetchResponse(403, TERMS_REQUIRED_BODY))
       .mockResolvedValueOnce(fetchResponse(200, { ok: true }))
@@ -555,11 +544,11 @@ describe('interactive terms prompt config', () => {
 
     inquirer.prompt = jest.fn().mockImplementation(async (questions) => {
       const emailQ = questions.find((q) => q.name === 'contactEmail')
-      // validate(): rejects malformed, accepts well-formed.
+      // validate(): rejects malformed input, accepts well-formed.
       expect(emailQ.validate('not-an-email')).toBe('enter a valid email address')
       expect(emailQ.validate('user@example.com')).toBe(true)
-      // when(): asks iff accepted AND no contact email already supplied.
-      // Closure variable contactEmail is currently undefined (no flag passed).
+      // when(): asks for the email iff `accept` is true and no
+      // --contact-email was supplied on the command line.
       expect(emailQ.when({ accept: true })).toBe(true)
       expect(emailQ.when({ accept: false })).toBe(false)
       return { accept: true, contactEmail: 'ops@example.com' }
@@ -570,8 +559,8 @@ describe('interactive terms prompt config', () => {
   })
 
   test('email prompt is skipped when --contact-email is already supplied', async () => {
-    // when() must be false in this case so inquirer never asks for the
-    // email a second time.
+    // when() must return false so inquirer does not re-prompt for an
+    // email that was already provided on the command line.
     global.fetch
       .mockResolvedValueOnce(fetchResponse(403, TERMS_REQUIRED_BODY))
       .mockResolvedValueOnce(fetchResponse(200, { ok: true }))
@@ -588,24 +577,22 @@ describe('interactive terms prompt config', () => {
   })
 
   test('errors if the user accepts at the prompt but provides no contact email', async () => {
-    // If the prompt returns accept=true and an empty contactEmail (e.g.
-    // the user dismissed the email input), we fail fast rather than
-    // sending a malformed accept-terms request.
+    // If the prompt returns accept=true with an empty contactEmail,
+    // the command exits before sending a malformed accept-terms request.
     inquirer.prompt = jest.fn().mockResolvedValue({ accept: true })
     global.fetch.mockResolvedValueOnce(fetchResponse(403, TERMS_REQUIRED_BODY))
 
     const cmd = makeCommand([])
     await expect(cmd.run()).rejects.toThrow()
-    // accept-terms POST never happened — we bailed out first.
+    // The accept-terms POST is never sent when the email is missing.
     expect(global.fetch).toHaveBeenCalledTimes(1)
   })
 })
 
 describe('IndexCommand', () => {
   test('run() invokes Help.showHelp for the ip-list command group', async () => {
-    // The parent `aio runtime ip-list` (no subcommand) is just a help
-    // wrapper. Spy on oclif's Help.prototype.showHelp to confirm the
-    // class wires through correctly.
+    // `aio runtime ip-list` with no subcommand delegates to oclif Help;
+    // spy on Help.prototype.showHelp to confirm the wiring.
     const oclif = require('@oclif/core')
     const showHelpSpy = jest.spyOn(oclif.Help.prototype, 'showHelp').mockResolvedValue()
 
@@ -625,12 +612,43 @@ describe('IndexCommand', () => {
     expect(IndexCommand.examples).toBeDefined()
     expect(IndexCommand.examples.length).toBeGreaterThan(0)
   })
+
+  test('overrides flags to {} so the topic --help does not list OpenWhisk flags', () => {
+    // The topic command accepts no input, so OpenWhisk-targeted flags
+    // inherited from RuntimeBaseCommand must not appear in --help.
+    expect(IndexCommand.flags).toEqual({})
+    for (const owFlag of ['apihost', 'auth', 'cert', 'key', 'insecure']) {
+      expect(IndexCommand.flags).not.toHaveProperty(owFlag)
+    }
+  })
+})
+
+describe('customer-visible help text', () => {
+  test('IpListGet description does not reference auth mechanism in --help', () => {
+    // The authentication mechanism is an implementation detail that
+    // does not belong in the customer-facing description.
+    expect(TheCommand.description).toMatch(/Adobe I\/O Runtime egress IP allowlist/)
+    expect(TheCommand.description).not.toMatch(/IMS-authenticated/i)
+    expect(TheCommand.description).not.toMatch(/OAuth/i)
+    expect(TheCommand.description).not.toMatch(/JWT/i)
+  })
+
+  test('IpListGet flags do not expose RuntimeBaseCommand OpenWhisk flags', () => {
+    // --apihost / --auth / --cert / --key / --insecure are silently
+    // ignored by this command and must not appear in --help.
+    for (const owFlag of ['apihost', 'auth', 'cert', 'key', 'insecure']) {
+      expect(TheCommand.flags).not.toHaveProperty(owFlag)
+    }
+    // --service-host is the internal escape hatch: present in flags
+    // but hidden from --help output.
+    expect(TheCommand.flags['service-host']).toBeDefined()
+    expect(TheCommand.flags['service-host'].hidden).toBe(true)
+  })
 })
 
 describe('branch-coverage edge cases', () => {
   test('callService tolerates an undefined body', async () => {
-    // Guards the `body || {}` short-circuit when callers omit body
-    // entirely (e.g. a future GET-style helper).
+    // Exercises the `body || {}` short-circuit when callers omit body.
     const fetchImpl = jest.fn().mockResolvedValue(fetchResponse(200, { ok: true }))
     await TheCommand.callService({
       host: 'h', path: '/p', token: 't', orgId: 'o', fetchImpl
@@ -640,8 +658,8 @@ describe('branch-coverage edge cases', () => {
   })
 
   test('callService surfaces an empty response body cleanly', async () => {
-    // `if (text)` short-circuits JSON parse when the server returns no
-    // body at all (e.g. 204 No Content). body must be null, rawBody ''.
+    // For an empty body (e.g. 204 No Content), `body` must be null and
+    // `rawBody` must be the empty string — never undefined.
     const fetchImpl = jest.fn().mockResolvedValue(fetchResponse(204, undefined))
     const r = await TheCommand.callService({
       host: 'h', path: '/p', token: 't', orgId: 'o', body: {}, fetchImpl
@@ -658,9 +676,8 @@ describe('branch-coverage edge cases', () => {
   })
 
   test('formatHumanOutput tolerates a falsy `raw` value for a region', () => {
-    // Defensive: if the server ever returns `{ regions: { amer: null } }`,
-    // we must not throw. `Array.isArray(raw) ? raw : (raw && raw.cidrs) || []`
-    // — null short-circuits to []; the region just renders as "(0 CIDRs)".
+    // A null region value (e.g. `{ regions: { amer: null } }`) must
+    // not throw; the region renders as "(0 CIDRs)".
     const out = TheCommand.formatHumanOutput({
       regions: { amer: null },
       version: 1,
@@ -713,8 +730,8 @@ describe('branch-coverage edge cases', () => {
   })
 
   test('accept-terms accepts a 201 Created response as success (not just 200)', async () => {
-    // The status guard `status !== 200 && status !== 201` must treat 201
-    // the same as 200; the second clause is otherwise never exercised.
+    // The success guard treats 200 and 201 as equivalent; this
+    // exercises the 201 branch.
     global.fetch
       .mockResolvedValueOnce(fetchResponse(403, TERMS_REQUIRED_BODY))
       .mockResolvedValueOnce(fetchResponse(201, { ok: true }))
