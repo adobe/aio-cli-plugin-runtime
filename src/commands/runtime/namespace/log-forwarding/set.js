@@ -10,7 +10,7 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const inquirer = require('inquirer')
+const { default: inquirer } = require('inquirer')
 const RuntimeBaseCommand = require('../../../../RuntimeBaseCommand')
 
 class SetCommand extends RuntimeBaseCommand {
