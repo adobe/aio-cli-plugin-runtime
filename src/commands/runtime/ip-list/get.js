@@ -43,19 +43,6 @@ function resolveHost (flags) {
 }
 
 /**
- * Build a canonical HTTPS URL from a host and path, stripping any scheme
- * / trailing slashes the caller may have supplied on the host.
- *
- * @param {string} host - Hostname, with or without protocol / trailing slash.
- * @param {string} path - Request path starting with `/`.
- * @returns {string} Fully-qualified `https://` URL.
- */
-function joinUrl (host, path) {
-  const cleanHost = host.replace(/^https?:\/\//, '').replace(/\/+$/, '')
-  return `https://${cleanHost}${path}`
-}
-
-/**
  * Resolve an IMS access token for the current CLI context. Uses the
  * active IMS context if one is set; otherwise falls back to the bare
  * CLI context, matching how `aio app deploy` selects its token.
@@ -120,7 +107,10 @@ function resolveImsOrgId () {
  */
 async function callService ({ host, path, body, token, orgId, fetchImpl }) {
   const f = fetchImpl || global.fetch
-  const url = joinUrl(host, path)
+  // Normalize the host: tolerate a scheme prefix or trailing slashes so
+  // callers can pass either `host.example.com` or `https://host.example.com/`.
+  const cleanHost = host.replace(/^https?:\/\//, '').replace(/\/+$/, '')
+  const url = `https://${cleanHost}${path}`
   const payload = { ...(body || {}), token, imsOrgId: orgId }
   const init = {
     method: 'POST',

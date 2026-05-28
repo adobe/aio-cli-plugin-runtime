@@ -2341,7 +2341,70 @@ ALIASES
 _See code: [src/commands/runtime/trigger/update.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.2.0/src/commands/runtime/trigger/update.js)_
 <!-- commandsstop -->
 
+### Using `aio runtime ip-list get` across multiple Adobe orgs
 
+The `aio runtime ip-list get` command returns the egress IP allowlist for whichever Adobe org you have selected via `aio console org select`. If you belong to multiple Adobe orgs and want to retrieve the list for a different one, switch the CLI's selected org first and then re-run the command:
+
+```bash
+aio console org select   # pick the target org
+aio runtime ip-list get
+```
+
+#### First-use terms acceptance
+
+The first time a given Adobe user runs the command against a given Adobe org, the service requires acceptance of the terms of use for that org and prompts for a contact email used for IP-change notifications:
+
+```bash
+aio runtime ip-list get
+# ? Accept terms v1? (Y/n)
+# ? Contact email (for IP-change notifications): you@example.com
+```
+
+For non-interactive contexts (CI, scripts, automation), supply the acceptance flag and a contact email directly:
+
+```bash
+aio runtime ip-list get --accept-terms --contact-email ops@example.com
+```
+
+Once acceptance is recorded for that (org, user) pair, subsequent calls are non-interactive and return the IP list immediately.
+
+#### Switching orgs
+
+Terms acceptance is stored per `(org, user)`. After accepting terms in org A, switching to org B will prompt for acceptance again the first time you call the command against org B. This is by design — each Adobe org accepts terms independently. After acceptance, you can flip back and forth between orgs without further prompts:
+
+```bash
+aio console org select       # pick org A
+aio runtime ip-list get      # first call against A: terms prompt, then IPs
+aio console org select       # pick org B
+aio runtime ip-list get      # first call against B: terms prompt, then IPs
+aio console org select       # back to A
+aio runtime ip-list get      # no prompt — IPs returned directly
+```
+
+#### If you previously ran `aio app use`
+
+`aio app use` writes an IMS org id binding to `project.org.ims_org_id` (in both the global aio config and a local `.aio` file in the project directory). That binding takes precedence over `aio console org select` for this command. To target a different org:
+
+```bash
+# Option 1 — rebind the project to a workspace in the new org:
+aio console org select          # new org
+aio console project select      # a project you belong to in that org
+aio console workspace select
+aio app use
+
+# Option 2 — drop the project binding entirely and use the console org selection:
+aio config delete project.org.ims_org_id
+# If a local .aio file exists in your current directory, also remove it
+# (or run the command from a different directory).
+```
+
+#### Common errors and how to resolve them
+
+| Symptom | Likely cause | Resolution |
+| --- | --- | --- |
+| `IMS org id not found in aio config.` | No org has been bound to the CLI. | Run `aio console org select` or `aio app use`. |
+| `ip-list service returned 403: token does not grant access to org X@AdobeOrg` | Your IMS token does not grant access to the org id the CLI is sending. Common after switching Adobe accounts. | Verify which org the CLI is using with `aio config get console.org.code` and `aio config get project.org.ims_org_id`; update whichever is stale (see "Switching orgs" above). |
+| Stuck on terms prompt in CI. | Non-interactive context cannot answer the prompt. | Re-run with `--accept-terms --contact-email <email>`. |
 
 ### Contributing
 
