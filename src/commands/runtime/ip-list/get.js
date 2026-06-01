@@ -24,7 +24,7 @@ const { CLI } = require('@adobe/aio-lib-ims/src/context')
  * this command relies on. The runtime host preserves the original status
  * code and JSON body.
  */
-const DEFAULT_SERVICE_HOST = '53444-iplistservice-stage.adobeioruntime.net'
+const DEFAULT_SERVICE_HOST = '53444-iplistservice.adobeioruntime.net'
 const SERVICE_PATH = '/api/v1/web/ip-list'
 const SURFACE = 'cli'
 const VALID_REGIONS = ['amer', 'emea', 'apac', 'aus']
