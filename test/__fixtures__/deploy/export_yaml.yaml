@@ -23,7 +23,7 @@ project:
             logSize: 10
       triggers:
         meetPerson:
-          namespace: '53444_51981'
+          namespace: 53444_51981
           inputs:
             name: Sam
             place: ''
