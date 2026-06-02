@@ -60,28 +60,33 @@ async function getAccessToken () {
   return getToken(contextName)
 }
 
+const ORG_ID_KEYS = ['project.org.ims_org_id', 'console.org.code', 'ims.org_id']
+
 /**
- * Resolve the caller's IMS org id from local aio config, or null if no
- * binding is configured. The service validates the IMS token against
- * the claimed imsOrgId and rejects mismatches with 400, so an unbound
- * shell must short-circuit before any network call.
+ * Resolve the caller's IMS org id from aio config, returning the value
+ * along with the key and scope it was read from so error paths can
+ * route remediation to the right config surface.
  *
- * Key precedence reflects what each aio flow actually writes:
- *   - `project.org.ims_org_id` — populated by `aio app use` in the
- *     local project config; most specific binding.
- *   - `console.org.code` — populated by `aio console org select`. Note
- *     this is the `@AdobeOrg` value despite the field name; the sibling
- *     `console.org.id` is the Developer Console numeric id, which the
- *     service does not accept.
- *   - `ims.org_id` — legacy key retained for back-compat.
+ * Key precedence:
+ *   - `project.org.ims_org_id` — written by `aio app use` to both global
+ *     config and the project's local `.aio` file; scope is probed
+ *     explicitly since the key name alone is ambiguous.
+ *   - `console.org.code` — written by `aio console org select` (global).
+ *   - `ims.org_id` — legacy, retained for back-compat.
  *
- * @returns {string|null} IMS org id in `...@AdobeOrg` form, or null.
+ * Scope precedence matches aio-lib-core-config's merge order:
+ * env > local > global.
+ *
+ * @returns {{orgId: string|null, key: string|null, scope: 'local'|'global'|'env'|null}}
  */
 function resolveImsOrgId () {
-  return config.get('project.org.ims_org_id') ||
-    config.get('console.org.code') ||
-    config.get('ims.org_id') ||
-    null
+  for (const key of ORG_ID_KEYS) {
+    for (const scope of ['env', 'local', 'global']) {
+      const value = config.get(key, scope)
+      if (value) return { orgId: value, key, scope }
+    }
+  }
+  return { orgId: null, key: null, scope: null }
 }
 
 /**
@@ -188,6 +193,48 @@ async function postAcceptTerms ({ host, token, orgId, contactEmail, termsVersion
 }
 
 /**
+ * Build the error message shown when the service returns 403 because the IMS token does not grant access to the org id we sent. The
+ * remediation depends on where the org id came from: if it was read from the local .aio config, the user needs to update that config
+ * (e.g. by re-running `aio app use`). But if it came from the global config or env, the user needs to save their saved org selection (e.g. by re-running `aio console org select`).
+ *
+ * @param {object} opts
+ * @param {string} opts.orgId - org id rejected by the service.
+ * @param {string} opts.orgIdKey - aio config key it was read from.
+ * @param {'local'|'global'|'env'} opts.orgIdScope - source surface.
+ * @returns {string} multi-line message for this.error().
+ */
+function formatStaleOrgError ({ orgId, orgIdKey, orgIdScope }) {
+  if (orgIdScope === 'local') {
+    return (
+      "Unable to fetch Runtime egress IPs for this project's Adobe org.\n\n" +
+      "This project's local .aio is configured to use:\n" +
+      `  ${orgId}\n` +
+      `  (from '${orgIdKey}')\n\n` +
+      'but your current Adobe I/O login does not appear to have access to that org.\n\n' +
+      'To see the orgs available to your current login, run:\n' +
+      '  aio console org list\n\n' +
+      `Then either log in as an account with access to ${orgId}, ` +
+      'or re-bind this project to an accessible org with:\n' +
+      '  aio app use'
+    )
+  }
+  // global, env, or unknown — all read as a "saved" CLI selection.
+  return (
+    'Unable to fetch Runtime egress IPs for the saved Adobe org.\n\n' +
+    'The CLI is using the saved org:\n' +
+    `  ${orgId}\n` +
+    `  (from '${orgIdKey}'${orgIdScope === 'env' ? ' env var' : ''})\n\n` +
+    'but your current Adobe I/O login does not appear to have access to it.\n\n' +
+    'To see the orgs available to your current login, run:\n' +
+    '  aio console org list\n\n' +
+    'Then update the saved org selection:\n' +
+    '  aio console org select\n\n' +
+    'After that, retry:\n' +
+    '  aio runtime ip-list get'
+  )
+}
+
+/**
  * Render the ip-list service response as a terminal-friendly block
  * grouped by region.
  *
@@ -231,13 +278,15 @@ class IpListGet extends RuntimeBaseCommand {
   // or this.wsk().
   async run () {
     const { flags } = await this.parse(IpListGet)
-    if (flags.region && !VALID_REGIONS.includes(flags.region)) {
+    const region = flags.region && flags.region.toLowerCase()
+    if (region && !VALID_REGIONS.includes(region)) {
       this.error(`invalid region "${flags.region}". Expected one of: ${VALID_REGIONS.join(', ')}`, { exit: 1 })
     }
+    flags.region = region
     if (flags['accept-terms'] && !flags['contact-email']) {
       this.error('--accept-terms requires --contact-email', { exit: 1 })
     }
-    const orgId = resolveImsOrgId()
+    const { orgId, key: orgIdKey, scope: orgIdScope } = resolveImsOrgId()
     if (!orgId) {
       this.error(
         'IMS org id not found in aio config.\n\n' +
@@ -249,13 +298,15 @@ class IpListGet extends RuntimeBaseCommand {
     }
 
     try {
-      await this.runPipeline(flags, orgId)
+      await this.runPipeline(flags, orgId, orgIdKey, orgIdScope)
     } catch (err) {
+      // re-throw them as-is so the customer sees only the friendly message, no prefix or stack trace
+      if (err && err.oclif) throw err
       await this.handleError('failed to fetch the egress IP list', err)
     }
   }
 
-  async runPipeline (flags, orgId) {
+  async runPipeline (flags, orgId, orgIdKey, orgIdScope) {
     const host = resolveHost(flags)
     const token = await getAccessToken()
 
@@ -270,6 +321,11 @@ class IpListGet extends RuntimeBaseCommand {
       if (res.status === 403 && res.body && res.body.error === 'TERMS_REQUIRED') {
         this.error('terms were not accepted; try again with --accept-terms --contact-email you@example.com')
       }
+    }
+
+    if (res.status === 403 && res.body && /does not grant access/i.test(res.body.error || '')) {
+      // The token is valid, but the resolved org is not accessible to the current login
+      this.error(formatStaleOrgError({ orgId, orgIdKey, orgIdScope }), { exit: 1 })
     }
 
     if (res.status !== 200) {
