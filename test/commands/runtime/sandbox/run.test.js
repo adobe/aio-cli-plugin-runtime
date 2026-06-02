@@ -31,7 +31,7 @@ function fakeSandbox (overrides = {}) {
   return {
     id: 'sandbox-123',
     exec: jest.fn(),
-    getUrl: jest.fn(port => `https://sandbox-${port}.example.net`),
+    getUrl: jest.fn(({ port }) => Promise.resolve(`https://sandbox-${port}.example.net`)),
     destroy: jest.fn().mockResolvedValue({ status: 'destroyed' }),
     ...overrides
   }
@@ -86,6 +86,15 @@ test('description includes REPL usage notes', async () => {
   expect(TheCommand.description).toMatch(/exit/)
   expect(TheCommand.description).toMatch(/-- <command>/)
   expect(TheCommand.description).toMatch(/\.detached <command>/)
+})
+
+describe('init', () => {
+  test('ignores sandbox command args after -- during oclif parsing', async () => {
+    const command = new TheCommand(['--', 'node', '--version'])
+
+    await expect(command.init()).resolves.toBeUndefined()
+    expect(command.argv).toEqual(['--', 'node', '--version'])
+  })
 })
 
 test('flags', async () => {
@@ -383,8 +392,8 @@ describe('run', () => {
     expect(Sandbox.create).toHaveBeenCalledWith(expect.objectContaining({
       ports: [3000, 8080]
     }))
-    expect(sandbox.getUrl).toHaveBeenCalledWith(3000)
-    expect(sandbox.getUrl).toHaveBeenCalledWith(8080)
+    expect(sandbox.getUrl).toHaveBeenCalledWith({ port: 3000 })
+    expect(sandbox.getUrl).toHaveBeenCalledWith({ port: 8080 })
     expect(stdout.output).toMatch('Preview URLs:')
     expect(stdout.output).toMatch('3000: https://sandbox-3000.example.net')
     expect(stdout.output).toMatch('8080: https://sandbox-8080.example.net')

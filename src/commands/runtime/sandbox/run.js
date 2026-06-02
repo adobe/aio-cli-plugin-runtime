@@ -36,6 +36,14 @@ function streamOutput (data, stream) {
 }
 
 class SandboxRun extends RuntimeBaseCommand {
+  async init () {
+    const rawArgv = [...this.argv]
+    const { cliArgs } = splitArgvAtDoubleDash(rawArgv)
+
+    await this.parse(SandboxRun, cliArgs)
+    this.argv = rawArgv
+  }
+
   async run () {
     const { cliArgs, commandArgs } = splitArgvAtDoubleDash(this.argv)
     const { flags } = await this.parse(SandboxRun, cliArgs)
@@ -62,7 +70,7 @@ class SandboxRun extends RuntimeBaseCommand {
       this.log(`Created: ${sandbox.id}`)
 
       this._logPolicy(policy)
-      this._logPreviewUrls(sandbox, ports)
+      await this._logPreviewUrls(sandbox, ports)
 
       if (command) {
         await this._runOnce(sandbox, command)
@@ -108,15 +116,15 @@ class SandboxRun extends RuntimeBaseCommand {
     })
   }
 
-  _logPreviewUrls (sandbox, ports) {
+  async _logPreviewUrls (sandbox, ports) {
     if (!ports) {
       return
     }
 
     this.log('Preview URLs:')
-    ports.forEach(port => {
-      this.log(`  - ${port}: ${sandbox.getUrl(port)}`)
-    })
+    for (const port of ports) {
+      this.log(`  - ${port}: ${await sandbox.getUrl({ port })}`)
+    }
   }
 
   async _repl (rl, sandbox) {
