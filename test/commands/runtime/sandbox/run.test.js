@@ -97,7 +97,7 @@ test('flags', async () => {
   expect(TheCommand.flags.port.char).toBe('p')
   expect(TheCommand.flags.port.multiple).toBe(true)
   expect(TheCommand.flags['max-lifetime'].default).toBe(3600)
-  expect(TheCommand.flags.interactive).toBeDefined()
+  expect(TheCommand.flags.interactive).toBeUndefined()
   // inherits base flags
   expect(TheCommand.flags.apihost).toBeDefined()
   expect(TheCommand.flags.auth).toBeDefined()
@@ -313,9 +313,9 @@ describe('run', () => {
     process.exitCode = previousExitCode
   })
 
-  test('--interactive keeps the REPL behavior', async () => {
+  test('omitting a command enters the REPL', async () => {
     readline.createInterface.mockReturnValue(makeRl(['exit']))
-    command.argv = ['--interactive']
+    command.argv = []
     await command.run()
 
     expect(readline.createInterface).toHaveBeenCalled()
@@ -323,25 +323,15 @@ describe('run', () => {
     expect(stdout.output).toMatch('Sandbox ready.')
   })
 
-  test('--interactive with a command runs the command before entering the REPL', async () => {
+  test('bare -- without a command enters the REPL', async () => {
     readline.createInterface.mockReturnValue(makeRl(['exit']))
-    command.argv = ['--interactive', '--', 'node', '--version']
-    await command.run()
-
-    expect(sandbox.exec).toHaveBeenCalledWith('node --version', { timeout: 30000 })
-    expect(readline.createInterface).toHaveBeenCalled()
-    expect(stdout.output.indexOf('v20.0.0')).toBeLessThan(stdout.output.indexOf('Sandbox ready.'))
-    expect(sandbox.destroy).toHaveBeenCalled()
-  })
-
-  test('rejects bare -- without a command unless interactive is requested', async () => {
     command.argv = ['--']
     await command.run()
 
-    expect(handleError).toHaveBeenCalledWith('failed to run sandbox', expect.objectContaining({
-      message: expect.stringMatching(/Missing command/)
-    }))
-    expect(Sandbox.create).not.toHaveBeenCalled()
+    expect(readline.createInterface).toHaveBeenCalled()
+    expect(sandbox.exec).not.toHaveBeenCalled()
+    expect(stdout.output).toMatch('Sandbox ready.')
+    expect(sandbox.destroy).toHaveBeenCalled()
   })
 
   test('forwards --name and --max-lifetime', async () => {

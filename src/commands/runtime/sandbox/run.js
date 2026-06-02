@@ -37,16 +37,12 @@ function streamOutput (data, stream) {
 
 class SandboxRun extends RuntimeBaseCommand {
   async run () {
-    const { cliArgs, commandArgs, hasSeparator } = splitArgvAtDoubleDash(this.argv)
+    const { cliArgs, commandArgs } = splitArgvAtDoubleDash(this.argv)
     const { flags } = await this.parse(SandboxRun, cliArgs)
 
     let sandbox
     let rl
     try {
-      if (commandArgs.length === 0 && !flags.interactive && hasSeparator) {
-        throw new Error('Missing command after --. Use --interactive for an interactive session.')
-      }
-
       const policy = buildNetworkPolicy(flags.egress)
       const ports = parsePortFlags(flags.port)
       const options = await this.getOptions()
@@ -72,7 +68,7 @@ class SandboxRun extends RuntimeBaseCommand {
         await this._runOnce(sandbox, command)
       }
 
-      if (flags.interactive || !command) {
+      if (!command) {
         this.log('\nSandbox ready. Type "exit" to destroy and quit.\n')
 
         rl = readline.createInterface({ input: process.stdin, output: process.stdout })
@@ -201,16 +197,12 @@ class SandboxRun extends RuntimeBaseCommand {
   }
 }
 
-SandboxRun.description = `Create a sandbox and run a command against it.
+SandboxRun.description = `Create a sandbox and run commands against it.
 
-Pass -- <command> to run one command, print its output, destroy the sandbox,
-and exit with the command's status.
+Pass -- <command> to run one command and destroy the sandbox.
 
-Use --interactive, or omit -- <command>, to enter a REPL. When --interactive
-is combined with -- <command>, the command runs before the REPL starts.
-
-Each command you enter runs in a fresh process; shell state (working directory,
-environment exports) does not persist between prompts. Chain commands to work
+Each command you enter runs in a fresh process. Shell state (working directory,
+env exports) does not persist between prompts. Chain commands to work
 around this: cd mydir && npm install
 
 During interactive sessions: 
@@ -218,7 +210,7 @@ During interactive sessions:
   command <<< "text"
 - Start a background command and stream its output with:
   .detached <command>
-- Type exit or quit to destroy the sandbox and leave.`
+- Type exit or quit to destroy the sandbox.`
 
 SandboxRun.flags = {
   ...RuntimeBaseCommand.flags,
@@ -239,17 +231,13 @@ SandboxRun.flags = {
   'max-lifetime': Flags.integer({
     description: 'maximum sandbox lifetime in seconds',
     default: 3600
-  }),
-  interactive: Flags.boolean({
-    description: 'enter an interactive command loop instead of running a one-shot command'
   })
 }
 
 SandboxRun.examples = [
   '<%= config.bin %> <%= command.id %>',
-  '<%= config.bin %> <%= command.id %> --interactive',
   '<%= config.bin %> <%= command.id %> -- node --version',
-  '<%= config.bin %> <%= command.id %> -p 3000 -p 8080 --interactive',
+  '<%= config.bin %> <%= command.id %> -p 3000 -p 8080',
   '<%= config.bin %> <%= command.id %> -e allow-all',
   '<%= config.bin %> <%= command.id %> -e "pypi.org:443" -e "api.github.com:443|GET:/repos/**"'
 ]
