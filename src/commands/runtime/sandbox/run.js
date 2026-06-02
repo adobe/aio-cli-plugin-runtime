@@ -230,7 +230,12 @@ class SandboxRun extends RuntimeBaseCommand {
   }
 }
 
-SandboxRun.description = `Create a sandbox and run commands against it.
+SandboxRun.description = `
+[Alpha] Sandboxes are in a closed alpha. Your namespace must have
+sandboxes enabled before you can use this command; contact Adobe to request
+access.
+
+Create a sandbox and run commands against it.
 
 Pass -- <command> to run one command and destroy the sandbox.
 
