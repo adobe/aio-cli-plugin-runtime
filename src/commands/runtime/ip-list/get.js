@@ -300,6 +300,8 @@ class IpListGet extends RuntimeBaseCommand {
     try {
       await this.runPipeline(flags, orgId, orgIdKey, orgIdScope)
     } catch (err) {
+      // re-throw them as-is so the customer sees only the friendly message, no prefix or stack trace
+      if (err && err.oclif) throw err
       await this.handleError('failed to fetch the egress IP list', err)
     }
   }

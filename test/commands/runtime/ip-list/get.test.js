@@ -514,6 +514,41 @@ describe('run() — stale org id (403 token/org mismatch)', () => {
     const cmd = makeCommand([])
     await expect(cmd.run()).rejects.toThrow(/ip-list service returned 403: forbidden/)
   })
+
+  test('unexpected (non-CLIError) exceptions are wrapped by handleError', async () => {
+    // Inverse of the regression test below: a plain Error from inside
+    // runPipeline (e.g. IMS unreachable) should be wrapped with the
+    // "failed to fetch the egress IP list:" prefix so the user gets
+    // context rather than a bare stack trace.
+    getToken.mockRejectedValueOnce(new Error('IMS unreachable'))
+    let caught
+    try { await makeCommand([]).run() } catch (e) { caught = e }
+    expect(caught).toBeDefined()
+    expect(caught.message).toMatch(/failed to fetch the egress IP list/)
+    expect(caught.message).toMatch(/IMS unreachable/)
+  })
+
+  test('friendly stale-org error is not re-wrapped by the outer error handler', async () => {
+    // RuntimeBaseCommand#handleError prefixes inner errors with
+    // "failed to fetch the egress IP list:" and appends a
+    // "--verbose flag for more information" hint. That wrapping is
+    // appropriate for unexpected exceptions, not for messages the
+    // command crafted on purpose; the stale-org message must reach
+    // the user verbatim.
+    config.get.mockImplementation((key, scope) => {
+      if (scope !== undefined && scope !== 'global') return undefined
+      if (key === 'console.org.code') return 'STALE111@AdobeOrg'
+      return undefined
+    })
+    global.fetch.mockResolvedValueOnce(fetchResponse(403, {
+      error: 'token does not grant access to org STALE111@AdobeOrg'
+    }))
+    let caught
+    try { await makeCommand([]).run() } catch (e) { caught = e }
+    expect(caught).toBeDefined()
+    expect(caught.message).not.toMatch(/failed to fetch the egress IP list/)
+    expect(caught.message).not.toMatch(/--verbose flag for more information/)
+  })
 })
 
 describe('run() — terms acceptance flow', () => {
