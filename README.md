@@ -28,6 +28,12 @@ Adobe I/O Runtime plugin for the Adobe I/O CLI
 * [aio-cli-plugin-runtime](#aio-cli-plugin-runtime)
 * [Usage](#usage)
 * [Commands](#commands)
+* [? Accept terms v1? (Y/n)](#-accept-terms-v1-yn)
+* [? Contact email (for IP-change notifications): you@example.com](#-contact-email-for-ip-change-notifications-youexamplecom)
+* [Option 1 — rebind the project to a workspace in the new org:](#option-1--rebind-the-project-to-a-workspace-in-the-new-org)
+* [Option 2 — drop the project binding entirely and use the console org selection:](#option-2--drop-the-project-binding-entirely-and-use-the-console-org-selection)
+* [If a local .aio file exists in your current directory, also remove it](#if-a-local-aio-file-exists-in-your-current-directory-also-remove-it)
+* [(or run the command from a different directory).](#or-run-the-command-from-a-different-directory)
 <!-- tocstop -->
 
 # Usage
@@ -64,6 +70,8 @@ $ aio runtime --help
 * [`aio runtime deploy sync`](#aio-runtime-deploy-sync)
 * [`aio runtime deploy undeploy`](#aio-runtime-deploy-undeploy)
 * [`aio runtime deploy version`](#aio-runtime-deploy-version)
+* [`aio runtime ip-list`](#aio-runtime-ip-list)
+* [`aio runtime ip-list get`](#aio-runtime-ip-list-get)
 * [`aio runtime namespace`](#aio-runtime-namespace)
 * [`aio runtime namespace get`](#aio-runtime-namespace-get)
 * [`aio runtime namespace list`](#aio-runtime-namespace-list)
@@ -113,16 +121,16 @@ USAGE
     [--help]
 
 FLAGS
-  -i, --insecure   bypass certificate check
-  -u, --auth       whisk auth
-  -v, --verbose    Verbose output
-  --apihost        whisk API host
-  --apiversion     whisk API version
-  --cert           client cert
-  --debug=<value>  Debug level output
-  --help           Show help
-  --key            client key
-  --version        Show version
+  -i, --insecure       bypass certificate check
+  -u, --auth           [env: WHISK_AUTH] whisk auth
+  -v, --verbose        Verbose output
+      --apihost        [env: WHISK_APIHOST] whisk API host
+      --apiversion     [env: WHISK_APIVERSION] whisk API version
+      --cert           client cert
+      --debug=<value>  Debug level output
+      --help           Show help
+      --key            client key
+      --version        Show version
 
 DESCRIPTION
   Execute runtime commands
@@ -131,7 +139,7 @@ ALIASES
   $ aio rt
 ```
 
-_See code: [src/commands/runtime/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/index.js)_
+_See code: [src/commands/runtime/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/index.js)_
 
 ## `aio runtime action`
 
@@ -143,16 +151,16 @@ USAGE
     [--help]
 
 FLAGS
-  -i, --insecure   bypass certificate check
-  -u, --auth       whisk auth
-  -v, --verbose    Verbose output
-  --apihost        whisk API host
-  --apiversion     whisk API version
-  --cert           client cert
-  --debug=<value>  Debug level output
-  --help           Show help
-  --key            client key
-  --version        Show version
+  -i, --insecure       bypass certificate check
+  -u, --auth           [env: WHISK_AUTH] whisk auth
+  -v, --verbose        Verbose output
+      --apihost        [env: WHISK_APIHOST] whisk API host
+      --apiversion     [env: WHISK_APIVERSION] whisk API version
+      --cert           client cert
+      --debug=<value>  Debug level output
+      --help           Show help
+      --key            client key
+      --version        Show version
 
 DESCRIPTION
   Manage your actions
@@ -161,7 +169,7 @@ ALIASES
   $ aio rt action
 ```
 
-_See code: [src/commands/runtime/action/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/action/index.js)_
+_See code: [src/commands/runtime/action/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/action/index.js)_
 
 ## `aio runtime action create ACTIONNAME [ACTIONPATH]`
 
@@ -170,10 +178,10 @@ Creates an Action
 ```
 USAGE
   $ aio runtime action create ACTIONNAME [ACTIONPATH] [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost
-    <value>] [-u <value>] [-i] [--debug <value>] [-v] [--version] [--help] [-r] [-p <value>] [--copy <value>] [-e
-    <value>] [--web-secure <value> --web true|yes|false|no|raw] [-P <value>] [-E <value>] [-t <value>] [-m <value>] [-l
-    <value>] [-c <value>] [--kind <value>] [-a <value>] [-A <value>] [--sequence <value>] [--docker <value>] [--main
-    <value>] [--binary] [--json]
+    <value>] [-u <value>] [-i] [--debug <value>] [-v] [--version] [--help] [-r] [-p <value>...] [--copy <value>] [-e
+    <value>...] [--web-secure <value> --web true|yes|false|no|raw] [-P <value>] [-E <value>] [-t <value>] [-m <value>]
+    [-l <value>] [-c <value>] [--kind <value>] [-a <value>...] [-A <value>] [--sequence <value>] [--docker <value>]
+    [--main <value>] [--binary] [--json]
 
 FLAGS
   -A, --annotation-file=<value>  FILE containing annotation values in JSON format
@@ -190,26 +198,26 @@ FLAGS
   -r, --use-runtime-auth         use Runtime auth [default: false]
   -t, --timeout=<value>          the timeout LIMIT in milliseconds after which the action is terminated (default 60000,
                                  min: 100, max: 3600000)
-  -u, --auth=<value>             whisk auth
+  -u, --auth=<value>             [env: WHISK_AUTH] whisk auth
   -v, --verbose                  Verbose output
-  --apihost=<value>              whisk API host
-  --apiversion=<value>           whisk API version
-  --binary                       treat code artifact as binary
-  --cert=<value>                 client cert
-  --copy=<value>                 copy an existing action
-  --debug=<value>                Debug level output
-  --docker=<value>               [Restricted Access] use provided Docker image (a path on DockerHub) to run the action
-  --help                         Show help
-  --json                         output raw json
-  --key=<value>                  client key
-  --kind=<value>                 the KIND of the action runtime (example: swift:default, nodejs:default)
-  --main=<value>                 the name of the action entry point (function or fully-qualified method name when
+      --apihost=<value>          [env: WHISK_APIHOST] whisk API host
+      --apiversion=<value>       [env: WHISK_APIVERSION] whisk API version
+      --binary                   treat code artifact as binary
+      --cert=<value>             client cert
+      --copy=<value>             copy an existing action
+      --debug=<value>            Debug level output
+      --docker=<value>           [Restricted Access] use provided Docker image (a path on DockerHub) to run the action
+      --help                     Show help
+      --json                     output raw json
+      --key=<value>              client key
+      --kind=<value>             the KIND of the action runtime (example: swift:default, nodejs:default)
+      --main=<value>             the name of the action entry point (function or fully-qualified method name when
                                  applicable)
-  --sequence=<value>             treat ACTION as comma separated sequence of actions to invoke
-  --version                      Show version
-  --web=<option>                 treat ACTION as a web action or as a raw HTTP web action
+      --sequence=<value>         treat ACTION as comma separated sequence of actions to invoke
+      --version                  Show version
+      --web=<option>             treat ACTION as a web action or as a raw HTTP web action
                                  <options: true|yes|false|no|raw>
-  --web-secure=<value>           secure the web action (valid values are true, false, or any string)
+      --web-secure=<value>       secure the web action (valid values are true, false, or any string)
 
 DESCRIPTION
   Creates an Action
@@ -218,7 +226,7 @@ ALIASES
   $ aio rt action create
 ```
 
-_See code: [src/commands/runtime/action/create.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/action/create.js)_
+_See code: [src/commands/runtime/action/create.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/action/create.js)_
 
 ## `aio runtime action delete ACTIONNAME`
 
@@ -230,18 +238,18 @@ USAGE
     <value>] [-i] [--debug <value>] [-v] [--version] [--help] [-r] [--json]
 
 FLAGS
-  -i, --insecure          bypass certificate check
-  -r, --use-runtime-auth  use Runtime auth [default: false]
-  -u, --auth=<value>      whisk auth
-  -v, --verbose           Verbose output
-  --apihost=<value>       whisk API host
-  --apiversion=<value>    whisk API version
-  --cert=<value>          client cert
-  --debug=<value>         Debug level output
-  --help                  Show help
-  --json                  output raw json
-  --key=<value>           client key
-  --version               Show version
+  -i, --insecure            bypass certificate check
+  -r, --use-runtime-auth    use Runtime auth [default: false]
+  -u, --auth=<value>        [env: WHISK_AUTH] whisk auth
+  -v, --verbose             Verbose output
+      --apihost=<value>     [env: WHISK_APIHOST] whisk API host
+      --apiversion=<value>  [env: WHISK_APIVERSION] whisk API version
+      --cert=<value>        client cert
+      --debug=<value>       Debug level output
+      --help                Show help
+      --json                output raw json
+      --key=<value>         client key
+      --version             Show version
 
 DESCRIPTION
   Deletes an Action
@@ -252,7 +260,7 @@ ALIASES
   $ aio rt action del
 ```
 
-_See code: [src/commands/runtime/action/delete.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/action/delete.js)_
+_See code: [src/commands/runtime/action/delete.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/action/delete.js)_
 
 ## `aio runtime action get ACTIONNAME`
 
@@ -264,20 +272,20 @@ USAGE
     <value>] [-i] [--debug <value>] [-v] [--version] [--help] [-r] [-c] [--save] [--save-as <value>]
 
 FLAGS
-  -c, --code            show action code (only works if code is not a zip file)
-  -i, --insecure        bypass certificate check
-  -r, --url             get action url
-  -u, --auth=<value>    whisk auth
-  -v, --verbose         Verbose output
-  --apihost=<value>     whisk API host
-  --apiversion=<value>  whisk API version
-  --cert=<value>        client cert
-  --debug=<value>       Debug level output
-  --help                Show help
-  --key=<value>         client key
-  --save                save action code to file corresponding with action name
-  --save-as=<value>     file to save action code to
-  --version             Show version
+  -c, --code                show action code (only works if code is not a zip file)
+  -i, --insecure            bypass certificate check
+  -r, --url                 get action url
+  -u, --auth=<value>        [env: WHISK_AUTH] whisk auth
+  -v, --verbose             Verbose output
+      --apihost=<value>     [env: WHISK_APIHOST] whisk API host
+      --apiversion=<value>  [env: WHISK_APIVERSION] whisk API version
+      --cert=<value>        client cert
+      --debug=<value>       Debug level output
+      --help                Show help
+      --key=<value>         client key
+      --save                save action code to file corresponding with action name
+      --save-as=<value>     file to save action code to
+      --version             Show version
 
 DESCRIPTION
   Retrieves an Action
@@ -286,7 +294,7 @@ ALIASES
   $ aio rt action get
 ```
 
-_See code: [src/commands/runtime/action/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/action/get.js)_
+_See code: [src/commands/runtime/action/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/action/get.js)_
 
 ## `aio runtime action invoke ACTIONNAME`
 
@@ -295,7 +303,7 @@ Invokes an Action
 ```
 USAGE
   $ aio runtime action invoke ACTIONNAME [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
-    <value>] [-i] [--debug <value>] [-v] [--version] [--help] [-p <value>] [-P <value>] [-b] [-r]
+    <value>] [-i] [--debug <value>] [-v] [--version] [--help] [-p <value>...] [-P <value>] [-b] [-r]
 
 FLAGS
   -P, --param-file=<value>  FILE containing parameter values in JSON format
@@ -303,15 +311,15 @@ FLAGS
   -i, --insecure            bypass certificate check
   -p, --param=<value>...    parameter values in KEY VALUE format
   -r, --result              blocking invoke; show only activation result (unless there is a failure)
-  -u, --auth=<value>        whisk auth
+  -u, --auth=<value>        [env: WHISK_AUTH] whisk auth
   -v, --verbose             Verbose output
-  --apihost=<value>         whisk API host
-  --apiversion=<value>      whisk API version
-  --cert=<value>            client cert
-  --debug=<value>           Debug level output
-  --help                    Show help
-  --key=<value>             client key
-  --version                 Show version
+      --apihost=<value>     [env: WHISK_APIHOST] whisk API host
+      --apiversion=<value>  [env: WHISK_APIVERSION] whisk API version
+      --cert=<value>        client cert
+      --debug=<value>       Debug level output
+      --help                Show help
+      --key=<value>         client key
+      --version             Show version
 
 DESCRIPTION
   Invokes an Action
@@ -320,7 +328,7 @@ ALIASES
   $ aio rt action invoke
 ```
 
-_See code: [src/commands/runtime/action/invoke.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/action/invoke.js)_
+_See code: [src/commands/runtime/action/invoke.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/action/invoke.js)_
 
 ## `aio runtime action list [PACKAGENAME]`
 
@@ -332,22 +340,22 @@ USAGE
     <value>] [-i] [--debug <value>] [-v] [--version] [--help] [-l <value>] [-s <value>] [-c] [--json] [--name-sort] [-n]
 
 FLAGS
-  -c, --count           show only the total number of actions
-  -i, --insecure        bypass certificate check
-  -l, --limit=<value>   only return LIMIT number of actions (min: 0, max: 50)
-  -n, --name            sort results by name
-  -s, --skip=<value>    exclude the first SKIP number of actions from the result
-  -u, --auth=<value>    whisk auth
-  -v, --verbose         Verbose output
-  --apihost=<value>     whisk API host
-  --apiversion=<value>  whisk API version
-  --cert=<value>        client cert
-  --debug=<value>       Debug level output
-  --help                Show help
-  --json                output raw json
-  --key=<value>         client key
-  --name-sort           sort results by name
-  --version             Show version
+  -c, --count               show only the total number of actions
+  -i, --insecure            bypass certificate check
+  -l, --limit=<value>       only return LIMIT number of actions (min: 0, max: 50)
+  -n, --name                sort results by name
+  -s, --skip=<value>        exclude the first SKIP number of actions from the result
+  -u, --auth=<value>        [env: WHISK_AUTH] whisk auth
+  -v, --verbose             Verbose output
+      --apihost=<value>     [env: WHISK_APIHOST] whisk API host
+      --apiversion=<value>  [env: WHISK_APIVERSION] whisk API version
+      --cert=<value>        client cert
+      --debug=<value>       Debug level output
+      --help                Show help
+      --json                output raw json
+      --key=<value>         client key
+      --name-sort           sort results by name
+      --version             Show version
 
 DESCRIPTION
   Lists all the Actions
@@ -362,7 +370,7 @@ ALIASES
   $ aio rt actions ls
 ```
 
-_See code: [src/commands/runtime/action/list.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/action/list.js)_
+_See code: [src/commands/runtime/action/list.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/action/list.js)_
 
 ## `aio runtime action update ACTIONNAME [ACTIONPATH]`
 
@@ -371,10 +379,10 @@ Updates an Action
 ```
 USAGE
   $ aio runtime action update ACTIONNAME [ACTIONPATH] [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost
-    <value>] [-u <value>] [-i] [--debug <value>] [-v] [--version] [--help] [-r] [-p <value>] [--copy <value>] [-e
-    <value>] [--web-secure <value> --web true|yes|false|no|raw] [-P <value>] [-E <value>] [-t <value>] [-m <value>] [-l
-    <value>] [-c <value>] [--kind <value>] [-a <value>] [-A <value>] [--sequence <value>] [--docker <value>] [--main
-    <value>] [--binary] [--json]
+    <value>] [-u <value>] [-i] [--debug <value>] [-v] [--version] [--help] [-r] [-p <value>...] [--copy <value>] [-e
+    <value>...] [--web-secure <value> --web true|yes|false|no|raw] [-P <value>] [-E <value>] [-t <value>] [-m <value>]
+    [-l <value>] [-c <value>] [--kind <value>] [-a <value>...] [-A <value>] [--sequence <value>] [--docker <value>]
+    [--main <value>] [--binary] [--json]
 
 FLAGS
   -A, --annotation-file=<value>  FILE containing annotation values in JSON format
@@ -391,26 +399,26 @@ FLAGS
   -r, --use-runtime-auth         use Runtime auth [default: false]
   -t, --timeout=<value>          the timeout LIMIT in milliseconds after which the action is terminated (default 60000,
                                  min: 100, max: 3600000)
-  -u, --auth=<value>             whisk auth
+  -u, --auth=<value>             [env: WHISK_AUTH] whisk auth
   -v, --verbose                  Verbose output
-  --apihost=<value>              whisk API host
-  --apiversion=<value>           whisk API version
-  --binary                       treat code artifact as binary
-  --cert=<value>                 client cert
-  --copy=<value>                 copy an existing action
-  --debug=<value>                Debug level output
-  --docker=<value>               [Restricted Access] use provided Docker image (a path on DockerHub) to run the action
-  --help                         Show help
-  --json                         output raw json
-  --key=<value>                  client key
-  --kind=<value>                 the KIND of the action runtime (example: swift:default, nodejs:default)
-  --main=<value>                 the name of the action entry point (function or fully-qualified method name when
+      --apihost=<value>          [env: WHISK_APIHOST] whisk API host
+      --apiversion=<value>       [env: WHISK_APIVERSION] whisk API version
+      --binary                   treat code artifact as binary
+      --cert=<value>             client cert
+      --copy=<value>             copy an existing action
+      --debug=<value>            Debug level output
+      --docker=<value>           [Restricted Access] use provided Docker image (a path on DockerHub) to run the action
+      --help                     Show help
+      --json                     output raw json
+      --key=<value>              client key
+      --kind=<value>             the KIND of the action runtime (example: swift:default, nodejs:default)
+      --main=<value>             the name of the action entry point (function or fully-qualified method name when
                                  applicable)
-  --sequence=<value>             treat ACTION as comma separated sequence of actions to invoke
-  --version                      Show version
-  --web=<option>                 treat ACTION as a web action or as a raw HTTP web action
+      --sequence=<value>         treat ACTION as comma separated sequence of actions to invoke
+      --version                  Show version
+      --web=<option>             treat ACTION as a web action or as a raw HTTP web action
                                  <options: true|yes|false|no|raw>
-  --web-secure=<value>           secure the web action (valid values are true, false, or any string)
+      --web-secure=<value>       secure the web action (valid values are true, false, or any string)
 
 DESCRIPTION
   Updates an Action
@@ -419,7 +427,7 @@ ALIASES
   $ aio rt action update
 ```
 
-_See code: [src/commands/runtime/action/update.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/action/update.js)_
+_See code: [src/commands/runtime/action/update.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/action/update.js)_
 
 ## `aio runtime activation`
 
@@ -431,16 +439,16 @@ USAGE
     [--help]
 
 FLAGS
-  -i, --insecure   bypass certificate check
-  -u, --auth       whisk auth
-  -v, --verbose    Verbose output
-  --apihost        whisk API host
-  --apiversion     whisk API version
-  --cert           client cert
-  --debug=<value>  Debug level output
-  --help           Show help
-  --key            client key
-  --version        Show version
+  -i, --insecure       bypass certificate check
+  -u, --auth           [env: WHISK_AUTH] whisk auth
+  -v, --verbose        Verbose output
+      --apihost        [env: WHISK_APIHOST] whisk API host
+      --apiversion     [env: WHISK_APIVERSION] whisk API version
+      --cert           client cert
+      --debug=<value>  Debug level output
+      --help           Show help
+      --key            client key
+      --version        Show version
 
 DESCRIPTION
   Manage your activations
@@ -449,7 +457,7 @@ ALIASES
   $ aio rt activation
 ```
 
-_See code: [src/commands/runtime/activation/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/activation/index.js)_
+_See code: [src/commands/runtime/activation/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/activation/index.js)_
 
 ## `aio runtime activation get [ACTIVATIONID]`
 
@@ -461,18 +469,18 @@ USAGE
     [-u <value>] [-i] [--debug <value>] [-v] [--version] [--help] [-l] [-g]
 
 FLAGS
-  -g, --logs            emit only the logs, stripped of time stamps and stream identifier
-  -i, --insecure        bypass certificate check
-  -l, --last            retrieves the most recent activation
-  -u, --auth=<value>    whisk auth
-  -v, --verbose         Verbose output
-  --apihost=<value>     whisk API host
-  --apiversion=<value>  whisk API version
-  --cert=<value>        client cert
-  --debug=<value>       Debug level output
-  --help                Show help
-  --key=<value>         client key
-  --version             Show version
+  -g, --logs                emit only the logs, stripped of time stamps and stream identifier
+  -i, --insecure            bypass certificate check
+  -l, --last                retrieves the most recent activation
+  -u, --auth=<value>        [env: WHISK_AUTH] whisk auth
+  -v, --verbose             Verbose output
+      --apihost=<value>     [env: WHISK_APIHOST] whisk API host
+      --apiversion=<value>  [env: WHISK_APIVERSION] whisk API version
+      --cert=<value>        client cert
+      --debug=<value>       Debug level output
+      --help                Show help
+      --key=<value>         client key
+      --version             Show version
 
 DESCRIPTION
   Retrieves an Activation
@@ -481,7 +489,7 @@ ALIASES
   $ aio rt activation get
 ```
 
-_See code: [src/commands/runtime/activation/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/activation/get.js)_
+_See code: [src/commands/runtime/activation/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/activation/get.js)_
 
 ## `aio runtime activation list [ACTION_NAME]`
 
@@ -494,25 +502,25 @@ USAGE
     <value>] [-c] [--json] [-f]
 
 FLAGS
-  -c, --count           show only the total number of activations
-  -f, --full            include full activation description
-  -i, --insecure        bypass certificate check
-  -l, --limit=<value>   only return LIMIT number of activations (min: 0, max: 50)
-  -s, --skip=<value>    exclude the first SKIP number of activations from the result
-  -u, --auth=<value>    whisk auth
-  -v, --verbose         Verbose output
-  --apihost=<value>     whisk API host
-  --apiversion=<value>  whisk API version
-  --cert=<value>        client cert
-  --debug=<value>       Debug level output
-  --help                Show help
-  --json                output raw json
-  --key=<value>         client key
-  --since=<value>       return activations with timestamps later than SINCE; measured in milliseconds since Th, 01, Jan
-                        1970
-  --upto=<value>        return activations with timestamps earlier than UPTO; measured in milliseconds since Th, 01, Jan
-                        1970
-  --version             Show version
+  -c, --count               show only the total number of activations
+  -f, --full                include full activation description
+  -i, --insecure            bypass certificate check
+  -l, --limit=<value>       only return LIMIT number of activations (min: 0, max: 50)
+  -s, --skip=<value>        exclude the first SKIP number of activations from the result
+  -u, --auth=<value>        [env: WHISK_AUTH] whisk auth
+  -v, --verbose             Verbose output
+      --apihost=<value>     [env: WHISK_APIHOST] whisk API host
+      --apiversion=<value>  [env: WHISK_APIVERSION] whisk API version
+      --cert=<value>        client cert
+      --debug=<value>       Debug level output
+      --help                Show help
+      --json                output raw json
+      --key=<value>         client key
+      --since=<value>       return activations with timestamps later than SINCE; measured in milliseconds since Th, 01,
+                            Jan 1970
+      --upto=<value>        return activations with timestamps earlier than UPTO; measured in milliseconds since Th, 01,
+                            Jan 1970
+      --version             Show version
 
 DESCRIPTION
   Lists all the Activations
@@ -527,7 +535,7 @@ ALIASES
   $ aio rt activations ls
 ```
 
-_See code: [src/commands/runtime/activation/list.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/activation/list.js)_
+_See code: [src/commands/runtime/activation/list.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/activation/list.js)_
 
 ## `aio runtime activation logs [ACTIVATIONID]`
 
@@ -540,26 +548,26 @@ USAGE
     <value> | -l] [-t | -w | -o]
 
 FLAGS
-  -a, --action=<value>   Fetch logs for a specific action
-  -d, --deployed         Fetch logs for all actions deployed under a specific package
-  -i, --insecure         bypass certificate check
-  -l, --last             retrieves the most recent activation logs
-  -m, --manifest         Fetch logs for all actions in the manifest
-  -o, --poll             Fetch logs continuously
-  -p, --package=<value>  Fetch logs for a specific package in the manifest
-  -r, --strip            strip timestamp information and output first line only
-  -t, --tail             Fetch logs continuously
-  -u, --auth=<value>     whisk auth
-  -v, --verbose          Verbose output
-  -w, --watch            Fetch logs continuously
-  --apihost=<value>      whisk API host
-  --apiversion=<value>   whisk API version
-  --cert=<value>         client cert
-  --debug=<value>        Debug level output
-  --help                 Show help
-  --key=<value>          client key
-  --limit=<value>        return logs only from last LIMIT number of activations (min: 0, max: 50)
-  --version              Show version
+  -a, --action=<value>      Fetch logs for a specific action
+  -d, --deployed            Fetch logs for all actions deployed under a specific package
+  -i, --insecure            bypass certificate check
+  -l, --last                retrieves the most recent activation logs
+  -m, --manifest            Fetch logs for all actions in the manifest
+  -o, --poll                Fetch logs continuously
+  -p, --package=<value>     Fetch logs for a specific package in the manifest
+  -r, --strip               strip timestamp information and output first line only
+  -t, --tail                Fetch logs continuously
+  -u, --auth=<value>        [env: WHISK_AUTH] whisk auth
+  -v, --verbose             Verbose output
+  -w, --watch               Fetch logs continuously
+      --apihost=<value>     [env: WHISK_APIHOST] whisk API host
+      --apiversion=<value>  [env: WHISK_APIVERSION] whisk API version
+      --cert=<value>        client cert
+      --debug=<value>       Debug level output
+      --help                Show help
+      --key=<value>         client key
+      --limit=<value>       return logs only from last LIMIT number of activations (min: 0, max: 50)
+      --version             Show version
 
 DESCRIPTION
   Retrieves the Logs for an Activation
@@ -574,7 +582,7 @@ ALIASES
   $ aio rt logs
 ```
 
-_See code: [src/commands/runtime/activation/logs.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/activation/logs.js)_
+_See code: [src/commands/runtime/activation/logs.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/activation/logs.js)_
 
 ## `aio runtime activation result [ACTIVATIONID]`
 
@@ -586,17 +594,17 @@ USAGE
     [-u <value>] [-i] [--debug <value>] [-v] [--version] [--help] [-l]
 
 FLAGS
-  -i, --insecure        bypass certificate check
-  -l, --last            retrieves the most recent activation result
-  -u, --auth=<value>    whisk auth
-  -v, --verbose         Verbose output
-  --apihost=<value>     whisk API host
-  --apiversion=<value>  whisk API version
-  --cert=<value>        client cert
-  --debug=<value>       Debug level output
-  --help                Show help
-  --key=<value>         client key
-  --version             Show version
+  -i, --insecure            bypass certificate check
+  -l, --last                retrieves the most recent activation result
+  -u, --auth=<value>        [env: WHISK_AUTH] whisk auth
+  -v, --verbose             Verbose output
+      --apihost=<value>     [env: WHISK_APIHOST] whisk API host
+      --apiversion=<value>  [env: WHISK_APIVERSION] whisk API version
+      --cert=<value>        client cert
+      --debug=<value>       Debug level output
+      --help                Show help
+      --key=<value>         client key
+      --version             Show version
 
 DESCRIPTION
   Retrieves the Results for an Activation
@@ -605,7 +613,7 @@ ALIASES
   $ aio rt activation result
 ```
 
-_See code: [src/commands/runtime/activation/result.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/activation/result.js)_
+_See code: [src/commands/runtime/activation/result.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/activation/result.js)_
 
 ## `aio runtime api`
 
@@ -617,16 +625,16 @@ USAGE
     [--help]
 
 FLAGS
-  -i, --insecure   bypass certificate check
-  -u, --auth       whisk auth
-  -v, --verbose    Verbose output
-  --apihost        whisk API host
-  --apiversion     whisk API version
-  --cert           client cert
-  --debug=<value>  Debug level output
-  --help           Show help
-  --key            client key
-  --version        Show version
+  -i, --insecure       bypass certificate check
+  -u, --auth           [env: WHISK_AUTH] whisk auth
+  -v, --verbose        Verbose output
+      --apihost        [env: WHISK_APIHOST] whisk API host
+      --apiversion     [env: WHISK_APIVERSION] whisk API version
+      --cert           client cert
+      --debug=<value>  Debug level output
+      --help           Show help
+      --key            client key
+      --version        Show version
 
 DESCRIPTION
   Manage your api routes
@@ -637,7 +645,7 @@ ALIASES
   $ aio rt route
 ```
 
-_See code: [src/commands/runtime/api/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/api/index.js)_
+_See code: [src/commands/runtime/api/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/api/index.js)_
 
 ## `aio runtime api create [BASEPATH] [RELPATH] [APIVERB] [ACTION]`
 
@@ -650,10 +658,10 @@ USAGE
     <value>] [-r html|http|json|text|svg|json | ]
 
 ARGUMENTS
-  BASEPATH  The base path of the api
-  RELPATH   The path of the api relative to the base path
-  APIVERB   (get|post|put|patch|delete|head|options) The http verb
-  ACTION    The action to call
+  [BASEPATH]  The base path of the api
+  [RELPATH]   The path of the api relative to the base path
+  [APIVERB]   (get|post|put|patch|delete|head|options) The http verb
+  [ACTION]    The action to call
 
 FLAGS
   -c, --config-file=<value>     file containing API configuration in swagger JSON format
@@ -662,15 +670,15 @@ FLAGS
   -r, --response-type=<option>  [default: json] Set the web action response TYPE.
                                 <options: html|http|json|text|svg|json>
   -r, --use-runtime-auth        use Runtime auth [default: false]
-  -u, --auth=<value>            whisk auth
+  -u, --auth=<value>            [env: WHISK_AUTH] whisk auth
   -v, --verbose                 Verbose output
-  --apihost=<value>             whisk API host
-  --apiversion=<value>          whisk API version
-  --cert=<value>                client cert
-  --debug=<value>               Debug level output
-  --help                        Show help
-  --key=<value>                 client key
-  --version                     Show version
+      --apihost=<value>         [env: WHISK_APIHOST] whisk API host
+      --apiversion=<value>      [env: WHISK_APIVERSION] whisk API version
+      --cert=<value>            client cert
+      --debug=<value>           Debug level output
+      --help                    Show help
+      --key=<value>             client key
+      --version                 Show version
 
 DESCRIPTION
   create a new api route
@@ -681,7 +689,7 @@ ALIASES
   $ aio rt api create
 ```
 
-_See code: [src/commands/runtime/api/create.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/api/create.js)_
+_See code: [src/commands/runtime/api/create.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/api/create.js)_
 
 ## `aio runtime api delete BASEPATHORAPINAME [RELPATH] [APIVERB]`
 
@@ -694,21 +702,21 @@ USAGE
 
 ARGUMENTS
   BASEPATHORAPINAME  The base path or api name
-  RELPATH            The path of the api relative to the base path
-  APIVERB            (get|post|put|patch|delete|head|options) The http verb
+  [RELPATH]          The path of the api relative to the base path
+  [APIVERB]          (get|post|put|patch|delete|head|options) The http verb
 
 FLAGS
-  -i, --insecure          bypass certificate check
-  -r, --use-runtime-auth  use Runtime auth [default: false]
-  -u, --auth=<value>      whisk auth
-  -v, --verbose           Verbose output
-  --apihost=<value>       whisk API host
-  --apiversion=<value>    whisk API version
-  --cert=<value>          client cert
-  --debug=<value>         Debug level output
-  --help                  Show help
-  --key=<value>           client key
-  --version               Show version
+  -i, --insecure            bypass certificate check
+  -r, --use-runtime-auth    use Runtime auth [default: false]
+  -u, --auth=<value>        [env: WHISK_AUTH] whisk auth
+  -v, --verbose             Verbose output
+      --apihost=<value>     [env: WHISK_APIHOST] whisk API host
+      --apiversion=<value>  [env: WHISK_APIVERSION] whisk API version
+      --cert=<value>        client cert
+      --debug=<value>       Debug level output
+      --help                Show help
+      --key=<value>         client key
+      --version             Show version
 
 DESCRIPTION
   delete an API
@@ -719,7 +727,7 @@ ALIASES
   $ aio rt api delete
 ```
 
-_See code: [src/commands/runtime/api/delete.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/api/delete.js)_
+_See code: [src/commands/runtime/api/delete.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/api/delete.js)_
 
 ## `aio runtime api get BASEPATHORAPINAME`
 
@@ -734,16 +742,16 @@ ARGUMENTS
   BASEPATHORAPINAME  The base path or api name
 
 FLAGS
-  -i, --insecure        bypass certificate check
-  -u, --auth=<value>    whisk auth
-  -v, --verbose         Verbose output
-  --apihost=<value>     whisk API host
-  --apiversion=<value>  whisk API version
-  --cert=<value>        client cert
-  --debug=<value>       Debug level output
-  --help                Show help
-  --key=<value>         client key
-  --version             Show version
+  -i, --insecure            bypass certificate check
+  -u, --auth=<value>        [env: WHISK_AUTH] whisk auth
+  -v, --verbose             Verbose output
+      --apihost=<value>     [env: WHISK_APIHOST] whisk API host
+      --apiversion=<value>  [env: WHISK_APIVERSION] whisk API version
+      --cert=<value>        client cert
+      --debug=<value>       Debug level output
+      --help                Show help
+      --key=<value>         client key
+      --version             Show version
 
 DESCRIPTION
   get API details
@@ -754,7 +762,7 @@ ALIASES
   $ aio rt api get
 ```
 
-_See code: [src/commands/runtime/api/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/api/get.js)_
+_See code: [src/commands/runtime/api/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/api/get.js)_
 
 ## `aio runtime api list [BASEPATH] [RELPATH] [APIVERB]`
 
@@ -766,24 +774,24 @@ USAGE
     [--apihost <value>] [-u <value>] [-i] [--debug <value>] [-v] [--version] [--help] [-l <value>] [-s <value>] [--json]
 
 ARGUMENTS
-  BASEPATH  The base path of the api
-  RELPATH   The path of the api relative to the base path
-  APIVERB   (get|post|put|patch|delete|head|options) The http verb
+  [BASEPATH]  The base path of the api
+  [RELPATH]   The path of the api relative to the base path
+  [APIVERB]   (get|post|put|patch|delete|head|options) The http verb
 
 FLAGS
-  -i, --insecure        bypass certificate check
-  -l, --limit=<value>   only return LIMIT number of triggers
-  -s, --skip=<value>    exclude the first SKIP number of triggers from the result
-  -u, --auth=<value>    whisk auth
-  -v, --verbose         Verbose output
-  --apihost=<value>     whisk API host
-  --apiversion=<value>  whisk API version
-  --cert=<value>        client cert
-  --debug=<value>       Debug level output
-  --help                Show help
-  --json                output raw json
-  --key=<value>         client key
-  --version             Show version
+  -i, --insecure            bypass certificate check
+  -l, --limit=<value>       only return LIMIT number of triggers
+  -s, --skip=<value>        exclude the first SKIP number of triggers from the result
+  -u, --auth=<value>        [env: WHISK_AUTH] whisk auth
+  -v, --verbose             Verbose output
+      --apihost=<value>     [env: WHISK_APIHOST] whisk API host
+      --apiversion=<value>  [env: WHISK_APIVERSION] whisk API version
+      --cert=<value>        client cert
+      --debug=<value>       Debug level output
+      --help                Show help
+      --json                output raw json
+      --key=<value>         client key
+      --version             Show version
 
 DESCRIPTION
   list route/apis for Adobe I/O Runtime
@@ -798,7 +806,7 @@ ALIASES
   $ aio rt route ls
 ```
 
-_See code: [src/commands/runtime/api/list.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/api/list.js)_
+_See code: [src/commands/runtime/api/list.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/api/list.js)_
 
 ## `aio runtime deploy`
 
@@ -807,23 +815,23 @@ The Runtime Deployment Tool
 ```
 USAGE
   $ aio runtime deploy [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u <value>] [-i]
-    [--debug <value>] [-v] [--version] [--help] [-m <value>] [-d <value>] [--param <value>] [-P <value>]
+    [--debug <value>] [-v] [--version] [--help] [-m <value>] [-d <value>] [--param <value>...] [-P <value>]
 
 FLAGS
   -P, --param-file=<value>  FILE containing parameter values in JSON format
   -d, --deployment=<value>  the path to the deployment file
   -i, --insecure            bypass certificate check
   -m, --manifest=<value>    the manifest file location
-  -u, --auth=<value>        whisk auth
+  -u, --auth=<value>        [env: WHISK_AUTH] whisk auth
   -v, --verbose             Verbose output
-  --apihost=<value>         whisk API host
-  --apiversion=<value>      whisk API version
-  --cert=<value>            client cert
-  --debug=<value>           Debug level output
-  --help                    Show help
-  --key=<value>             client key
-  --param=<value>...        parameter values in KEY VALUE format
-  --version                 Show version
+      --apihost=<value>     [env: WHISK_APIHOST] whisk API host
+      --apiversion=<value>  [env: WHISK_APIVERSION] whisk API version
+      --cert=<value>        client cert
+      --debug=<value>       Debug level output
+      --help                Show help
+      --key=<value>         client key
+      --param=<value>...    parameter values in KEY VALUE format
+      --version             Show version
 
 DESCRIPTION
   The Runtime Deployment Tool
@@ -832,7 +840,7 @@ ALIASES
   $ aio rt deploy
 ```
 
-_See code: [src/commands/runtime/deploy/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/deploy/index.js)_
+_See code: [src/commands/runtime/deploy/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/deploy/index.js)_
 
 ## `aio runtime deploy export`
 
@@ -844,18 +852,18 @@ USAGE
     [--apihost <value>] [-u <value>] [-i] [--debug <value>] [-v] [--version] [--help]
 
 FLAGS
-  -i, --insecure          bypass certificate check
-  -m, --manifest=<value>  (required) the manifest file location
-  -u, --auth=<value>      whisk auth
-  -v, --verbose           Verbose output
-  --apihost=<value>       whisk API host
-  --apiversion=<value>    whisk API version
-  --cert=<value>          client cert
-  --debug=<value>         Debug level output
-  --help                  Show help
-  --key=<value>           client key
-  --projectname=<value>   (required) the name of the project to be undeployed
-  --version               Show version
+  -i, --insecure             bypass certificate check
+  -m, --manifest=<value>     (required) the manifest file location
+  -u, --auth=<value>         [env: WHISK_AUTH] whisk auth
+  -v, --verbose              Verbose output
+      --apihost=<value>      [env: WHISK_APIHOST] whisk API host
+      --apiversion=<value>   [env: WHISK_APIVERSION] whisk API version
+      --cert=<value>         client cert
+      --debug=<value>        Debug level output
+      --help                 Show help
+      --key=<value>          client key
+      --projectname=<value>  (required) the name of the project to be undeployed
+      --version              Show version
 
 DESCRIPTION
   Exports managed project assets from Runtime to manifest and function files
@@ -864,7 +872,7 @@ ALIASES
   $ aio rt deploy export
 ```
 
-_See code: [src/commands/runtime/deploy/export.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/deploy/export.js)_
+_See code: [src/commands/runtime/deploy/export.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/deploy/export.js)_
 
 ## `aio runtime deploy report`
 
@@ -879,15 +887,15 @@ FLAGS
   -d, --deployment=<value>  the deployment file location
   -i, --insecure            bypass certificate check
   -m, --manifest=<value>    the manifest file location
-  -u, --auth=<value>        whisk auth
+  -u, --auth=<value>        [env: WHISK_AUTH] whisk auth
   -v, --verbose             Verbose output
-  --apihost=<value>         whisk API host
-  --apiversion=<value>      whisk API version
-  --cert=<value>            client cert
-  --debug=<value>           Debug level output
-  --help                    Show help
-  --key=<value>             client key
-  --version                 Show version
+      --apihost=<value>     [env: WHISK_APIHOST] whisk API host
+      --apiversion=<value>  [env: WHISK_APIVERSION] whisk API version
+      --cert=<value>        client cert
+      --debug=<value>       Debug level output
+      --help                Show help
+      --key=<value>         client key
+      --version             Show version
 
 DESCRIPTION
   Provides a summary report of Runtime assets being deployed/undeployed based on manifest/deployment YAML
@@ -896,7 +904,7 @@ ALIASES
   $ aio rt deploy report
 ```
 
-_See code: [src/commands/runtime/deploy/report.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/deploy/report.js)_
+_See code: [src/commands/runtime/deploy/report.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/deploy/report.js)_
 
 ## `aio runtime deploy sync`
 
@@ -912,15 +920,15 @@ FLAGS
   -i, --insecure            bypass certificate check
   -m, --manifest=<value>    the manifest file location
   -r, --use-runtime-auth    use Runtime auth [default: false]
-  -u, --auth=<value>        whisk auth
+  -u, --auth=<value>        [env: WHISK_AUTH] whisk auth
   -v, --verbose             Verbose output
-  --apihost=<value>         whisk API host
-  --apiversion=<value>      whisk API version
-  --cert=<value>            client cert
-  --debug=<value>           Debug level output
-  --help                    Show help
-  --key=<value>             client key
-  --version                 Show version
+      --apihost=<value>     [env: WHISK_APIHOST] whisk API host
+      --apiversion=<value>  [env: WHISK_APIVERSION] whisk API version
+      --cert=<value>        client cert
+      --debug=<value>       Debug level output
+      --help                Show help
+      --key=<value>         client key
+      --version             Show version
 
 DESCRIPTION
   A tool to sync deployment and undeployment of Runtime packages using a manifest and optional deployment files using
@@ -930,7 +938,7 @@ ALIASES
   $ aio rt deploy sync
 ```
 
-_See code: [src/commands/runtime/deploy/sync.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/deploy/sync.js)_
+_See code: [src/commands/runtime/deploy/sync.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/deploy/sync.js)_
 
 ## `aio runtime deploy undeploy`
 
@@ -942,19 +950,19 @@ USAGE
     [--debug <value>] [-v] [--version] [--help] [-r] [-m <value>] [--projectname <value>]
 
 FLAGS
-  -i, --insecure          bypass certificate check
-  -m, --manifest=<value>  the manifest file location
-  -r, --use-runtime-auth  use Runtime auth [default: false]
-  -u, --auth=<value>      whisk auth
-  -v, --verbose           Verbose output
-  --apihost=<value>       whisk API host
-  --apiversion=<value>    whisk API version
-  --cert=<value>          client cert
-  --debug=<value>         Debug level output
-  --help                  Show help
-  --key=<value>           client key
-  --projectname=<value>   the name of the project to be undeployed
-  --version               Show version
+  -i, --insecure             bypass certificate check
+  -m, --manifest=<value>     the manifest file location
+  -r, --use-runtime-auth     use Runtime auth [default: false]
+  -u, --auth=<value>         [env: WHISK_AUTH] whisk auth
+  -v, --verbose              Verbose output
+      --apihost=<value>      [env: WHISK_APIHOST] whisk API host
+      --apiversion=<value>   [env: WHISK_APIVERSION] whisk API version
+      --cert=<value>         client cert
+      --debug=<value>        Debug level output
+      --help                 Show help
+      --key=<value>          client key
+      --projectname=<value>  the name of the project to be undeployed
+      --version              Show version
 
 DESCRIPTION
   Undeploy removes Runtime assets which were deployed from the manifest and deployment YAML
@@ -963,7 +971,7 @@ ALIASES
   $ aio rt deploy undeploy
 ```
 
-_See code: [src/commands/runtime/deploy/undeploy.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/deploy/undeploy.js)_
+_See code: [src/commands/runtime/deploy/undeploy.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/deploy/undeploy.js)_
 
 ## `aio runtime deploy version`
 
@@ -975,16 +983,16 @@ USAGE
     [--help]
 
 FLAGS
-  -i, --insecure   bypass certificate check
-  -u, --auth       whisk auth
-  -v, --verbose    Verbose output
-  --apihost        whisk API host
-  --apiversion     whisk API version
-  --cert           client cert
-  --debug=<value>  Debug level output
-  --help           Show help
-  --key            client key
-  --version        Show version
+  -i, --insecure       bypass certificate check
+  -u, --auth           [env: WHISK_AUTH] whisk auth
+  -v, --verbose        Verbose output
+      --apihost        [env: WHISK_APIHOST] whisk API host
+      --apiversion     [env: WHISK_APIVERSION] whisk API version
+      --cert           client cert
+      --debug=<value>  Debug level output
+      --help           Show help
+      --key            client key
+      --version        Show version
 
 DESCRIPTION
   Prints the version number of aio runtime deploy
@@ -993,7 +1001,66 @@ ALIASES
   $ aio rt deploy version
 ```
 
-_See code: [src/commands/runtime/deploy/version.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/deploy/version.js)_
+_See code: [src/commands/runtime/deploy/version.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/deploy/version.js)_
+
+## `aio runtime ip-list`
+
+Fetch the Adobe I/O Runtime egress IP allowlist
+
+```
+USAGE
+  $ aio runtime ip-list
+
+DESCRIPTION
+  Fetch the Adobe I/O Runtime egress IP allowlist
+
+ALIASES
+  $ aio rt ip-list
+
+EXAMPLES
+  $ aio runtime ip-list get
+
+  $ aio runtime ip-list --help
+```
+
+_See code: [src/commands/runtime/ip-list/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/ip-list/index.js)_
+
+## `aio runtime ip-list get`
+
+Fetch the current Adobe I/O Runtime egress IP allowlist.
+
+```
+USAGE
+  $ aio runtime ip-list get [--debug <value>] [-v] [--region <value>] [--accept-terms] [--contact-email <value>]
+  [--json]
+
+FLAGS
+  -v, --verbose                Verbose output
+      --accept-terms           accept the terms non-interactively; requires --contact-email
+      --contact-email=<value>  contact email used when accepting terms and subscribing to change notifications
+      --debug=<value>          Debug level output
+      --json                   output raw JSON instead of a formatted table
+      --region=<value>         restrict output to one region (amer, emea, apac, aus)
+
+DESCRIPTION
+  Fetch the current Adobe I/O Runtime egress IP allowlist.
+  On first use the service returns the terms of service and the command prompts for acceptance; pass --accept-terms
+  --contact-email to do that non-interactively.
+
+ALIASES
+  $ aio rt ip-list get
+
+EXAMPLES
+  $ aio runtime ip-list get
+
+  $ aio runtime ip-list get --region amer
+
+  $ aio runtime ip-list get --json
+
+  $ aio runtime ip-list get --accept-terms --contact-email platform-ops@example.com
+```
+
+_See code: [src/commands/runtime/ip-list/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/ip-list/get.js)_
 
 ## `aio runtime namespace`
 
@@ -1005,16 +1072,16 @@ USAGE
     [--help]
 
 FLAGS
-  -i, --insecure   bypass certificate check
-  -u, --auth       whisk auth
-  -v, --verbose    Verbose output
-  --apihost        whisk API host
-  --apiversion     whisk API version
-  --cert           client cert
-  --debug=<value>  Debug level output
-  --help           Show help
-  --key            client key
-  --version        Show version
+  -i, --insecure       bypass certificate check
+  -u, --auth           [env: WHISK_AUTH] whisk auth
+  -v, --verbose        Verbose output
+      --apihost        [env: WHISK_APIHOST] whisk API host
+      --apiversion     [env: WHISK_APIVERSION] whisk API version
+      --cert           client cert
+      --debug=<value>  Debug level output
+      --help           Show help
+      --key            client key
+      --version        Show version
 
 DESCRIPTION
   Manage your namespaces
@@ -1025,7 +1092,7 @@ ALIASES
   $ aio rt ns
 ```
 
-_See code: [src/commands/runtime/namespace/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/namespace/index.js)_
+_See code: [src/commands/runtime/namespace/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/namespace/index.js)_
 
 ## `aio runtime namespace get`
 
@@ -1037,19 +1104,19 @@ USAGE
     [--debug <value>] [-v] [--version] [--help] [--json] [--name-sort] [-n]
 
 FLAGS
-  -i, --insecure        bypass certificate check
-  -n, --name            sort results by name
-  -u, --auth=<value>    whisk auth
-  -v, --verbose         Verbose output
-  --apihost=<value>     whisk API host
-  --apiversion=<value>  whisk API version
-  --cert=<value>        client cert
-  --debug=<value>       Debug level output
-  --help                Show help
-  --json                output raw json
-  --key=<value>         client key
-  --name-sort           sort results by name
-  --version             Show version
+  -i, --insecure            bypass certificate check
+  -n, --name                sort results by name
+  -u, --auth=<value>        [env: WHISK_AUTH] whisk auth
+  -v, --verbose             Verbose output
+      --apihost=<value>     [env: WHISK_APIHOST] whisk API host
+      --apiversion=<value>  [env: WHISK_APIVERSION] whisk API version
+      --cert=<value>        client cert
+      --debug=<value>       Debug level output
+      --help                Show help
+      --json                output raw json
+      --key=<value>         client key
+      --name-sort           sort results by name
+      --version             Show version
 
 DESCRIPTION
   Get triggers, actions, and rules in the registry for namespace
@@ -1062,7 +1129,7 @@ ALIASES
   $ aio rt ls
 ```
 
-_See code: [src/commands/runtime/namespace/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/namespace/get.js)_
+_See code: [src/commands/runtime/namespace/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/namespace/get.js)_
 
 ## `aio runtime namespace list`
 
@@ -1074,17 +1141,17 @@ USAGE
     [--debug <value>] [-v] [--version] [--help] [--json]
 
 FLAGS
-  -i, --insecure        bypass certificate check
-  -u, --auth=<value>    whisk auth
-  -v, --verbose         Verbose output
-  --apihost=<value>     whisk API host
-  --apiversion=<value>  whisk API version
-  --cert=<value>        client cert
-  --debug=<value>       Debug level output
-  --help                Show help
-  --json                output raw json
-  --key=<value>         client key
-  --version             Show version
+  -i, --insecure            bypass certificate check
+  -u, --auth=<value>        [env: WHISK_AUTH] whisk auth
+  -v, --verbose             Verbose output
+      --apihost=<value>     [env: WHISK_APIHOST] whisk API host
+      --apiversion=<value>  [env: WHISK_APIVERSION] whisk API version
+      --cert=<value>        client cert
+      --debug=<value>       Debug level output
+      --help                Show help
+      --json                output raw json
+      --key=<value>         client key
+      --version             Show version
 
 DESCRIPTION
   Lists all of your namespaces for Adobe I/O Runtime
@@ -1099,7 +1166,7 @@ ALIASES
   $ aio rt ns ls
 ```
 
-_See code: [src/commands/runtime/namespace/list.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/namespace/list.js)_
+_See code: [src/commands/runtime/namespace/list.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/namespace/list.js)_
 
 ## `aio runtime namespace log-forwarding`
 
@@ -1111,16 +1178,16 @@ USAGE
     [--help]
 
 FLAGS
-  -i, --insecure   bypass certificate check
-  -u, --auth       whisk auth
-  -v, --verbose    Verbose output
-  --apihost        whisk API host
-  --apiversion     whisk API version
-  --cert           client cert
-  --debug=<value>  Debug level output
-  --help           Show help
-  --key            client key
-  --version        Show version
+  -i, --insecure       bypass certificate check
+  -u, --auth           [env: WHISK_AUTH] whisk auth
+  -v, --verbose        Verbose output
+      --apihost        [env: WHISK_APIHOST] whisk API host
+      --apiversion     [env: WHISK_APIVERSION] whisk API version
+      --cert           client cert
+      --debug=<value>  Debug level output
+      --help           Show help
+      --key            client key
+      --version        Show version
 
 DESCRIPTION
   Manage log forwarding settings
@@ -1135,7 +1202,7 @@ ALIASES
   $ aio rt ns lf
 ```
 
-_See code: [src/commands/runtime/namespace/log-forwarding/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/namespace/log-forwarding/index.js)_
+_See code: [src/commands/runtime/namespace/log-forwarding/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/namespace/log-forwarding/index.js)_
 
 ## `aio runtime namespace log-forwarding errors`
 
@@ -1147,16 +1214,16 @@ USAGE
     [--help]
 
 FLAGS
-  -i, --insecure   bypass certificate check
-  -u, --auth       whisk auth
-  -v, --verbose    Verbose output
-  --apihost        whisk API host
-  --apiversion     whisk API version
-  --cert           client cert
-  --debug=<value>  Debug level output
-  --help           Show help
-  --key            client key
-  --version        Show version
+  -i, --insecure       bypass certificate check
+  -u, --auth           [env: WHISK_AUTH] whisk auth
+  -v, --verbose        Verbose output
+      --apihost        [env: WHISK_APIHOST] whisk API host
+      --apiversion     [env: WHISK_APIVERSION] whisk API version
+      --cert           client cert
+      --debug=<value>  Debug level output
+      --help           Show help
+      --key            client key
+      --version        Show version
 
 DESCRIPTION
   Get log forwarding errors
@@ -1171,7 +1238,7 @@ ALIASES
   $ aio rt ns lf errors
 ```
 
-_See code: [src/commands/runtime/namespace/log-forwarding/errors.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/namespace/log-forwarding/errors.js)_
+_See code: [src/commands/runtime/namespace/log-forwarding/errors.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/namespace/log-forwarding/errors.js)_
 
 ## `aio runtime namespace log-forwarding get`
 
@@ -1183,16 +1250,16 @@ USAGE
     [--help]
 
 FLAGS
-  -i, --insecure   bypass certificate check
-  -u, --auth       whisk auth
-  -v, --verbose    Verbose output
-  --apihost        whisk API host
-  --apiversion     whisk API version
-  --cert           client cert
-  --debug=<value>  Debug level output
-  --help           Show help
-  --key            client key
-  --version        Show version
+  -i, --insecure       bypass certificate check
+  -u, --auth           [env: WHISK_AUTH] whisk auth
+  -v, --verbose        Verbose output
+      --apihost        [env: WHISK_APIHOST] whisk API host
+      --apiversion     [env: WHISK_APIVERSION] whisk API version
+      --cert           client cert
+      --debug=<value>  Debug level output
+      --help           Show help
+      --key            client key
+      --version        Show version
 
 DESCRIPTION
   Get log forwarding destination configuration
@@ -1207,7 +1274,7 @@ ALIASES
   $ aio rt ns lf get
 ```
 
-_See code: [src/commands/runtime/namespace/log-forwarding/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/namespace/log-forwarding/get.js)_
+_See code: [src/commands/runtime/namespace/log-forwarding/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/namespace/log-forwarding/get.js)_
 
 ## `aio runtime namespace log-forwarding set`
 
@@ -1219,16 +1286,16 @@ USAGE
     [--help]
 
 FLAGS
-  -i, --insecure   bypass certificate check
-  -u, --auth       whisk auth
-  -v, --verbose    Verbose output
-  --apihost        whisk API host
-  --apiversion     whisk API version
-  --cert           client cert
-  --debug=<value>  Debug level output
-  --help           Show help
-  --key            client key
-  --version        Show version
+  -i, --insecure       bypass certificate check
+  -u, --auth           [env: WHISK_AUTH] whisk auth
+  -v, --verbose        Verbose output
+      --apihost        [env: WHISK_APIHOST] whisk API host
+      --apiversion     [env: WHISK_APIVERSION] whisk API version
+      --cert           client cert
+      --debug=<value>  Debug level output
+      --help           Show help
+      --key            client key
+      --version        Show version
 
 DESCRIPTION
   Configure log forwarding destination (interactive)
@@ -1243,7 +1310,7 @@ ALIASES
   $ aio rt ns lf set
 ```
 
-_See code: [src/commands/runtime/namespace/log-forwarding/set.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/namespace/log-forwarding/set.js)_
+_See code: [src/commands/runtime/namespace/log-forwarding/set.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/namespace/log-forwarding/set.js)_
 
 ## `aio runtime namespace log-forwarding set adobe-io-runtime`
 
@@ -1255,16 +1322,16 @@ USAGE
     [--help]
 
 FLAGS
-  -i, --insecure   bypass certificate check
-  -u, --auth       whisk auth
-  -v, --verbose    Verbose output
-  --apihost        whisk API host
-  --apiversion     whisk API version
-  --cert           client cert
-  --debug=<value>  Debug level output
-  --help           Show help
-  --key            client key
-  --version        Show version
+  -i, --insecure       bypass certificate check
+  -u, --auth           [env: WHISK_AUTH] whisk auth
+  -v, --verbose        Verbose output
+      --apihost        [env: WHISK_APIHOST] whisk API host
+      --apiversion     [env: WHISK_APIVERSION] whisk API version
+      --cert           client cert
+      --debug=<value>  Debug level output
+      --help           Show help
+      --key            client key
+      --version        Show version
 
 DESCRIPTION
   Set log forwarding destination to Adobe I/O Runtime (Logs will be accessible via aio CLI)
@@ -1279,7 +1346,7 @@ ALIASES
   $ aio rt ns lf set adobe-io-runtime
 ```
 
-_See code: [src/commands/runtime/namespace/log-forwarding/set/adobe-io-runtime.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/namespace/log-forwarding/set/adobe-io-runtime.js)_
+_See code: [src/commands/runtime/namespace/log-forwarding/set/adobe-io-runtime.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/namespace/log-forwarding/set/adobe-io-runtime.js)_
 
 ## `aio runtime namespace log-forwarding set azure-log-analytics`
 
@@ -1291,19 +1358,19 @@ USAGE
     [--apihost] [-u] [-i] [--debug <value>] [-v] [--version] [--help]
 
 FLAGS
-  -i, --insecure         bypass certificate check
-  -u, --auth             whisk auth
-  -v, --verbose          Verbose output
-  --apihost              whisk API host
-  --apiversion           whisk API version
-  --cert                 client cert
-  --customer-id=<value>  (required) Customer ID
-  --debug=<value>        Debug level output
-  --help                 Show help
-  --key                  client key
-  --log-type=<value>     (required) Log type
-  --shared-key=<value>   (required) Shared key
-  --version              Show version
+  -i, --insecure             bypass certificate check
+  -u, --auth                 [env: WHISK_AUTH] whisk auth
+  -v, --verbose              Verbose output
+      --apihost              [env: WHISK_APIHOST] whisk API host
+      --apiversion           [env: WHISK_APIVERSION] whisk API version
+      --cert                 client cert
+      --customer-id=<value>  (required) Customer ID
+      --debug=<value>        Debug level output
+      --help                 Show help
+      --key                  client key
+      --log-type=<value>     (required) Log type
+      --shared-key=<value>   (required) Shared key
+      --version              Show version
 
 DESCRIPTION
   Set log forwarding destination to Azure Log Analytics
@@ -1318,7 +1385,7 @@ ALIASES
   $ aio rt ns lf set azure-log-analytics
 ```
 
-_See code: [src/commands/runtime/namespace/log-forwarding/set/azure-log-analytics.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/namespace/log-forwarding/set/azure-log-analytics.js)_
+_See code: [src/commands/runtime/namespace/log-forwarding/set/azure-log-analytics.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/namespace/log-forwarding/set/azure-log-analytics.js)_
 
 ## `aio runtime namespace log-forwarding set new-relic`
 
@@ -1330,18 +1397,18 @@ USAGE
     [-i] [--debug <value>] [-v] [--version] [--help]
 
 FLAGS
-  -i, --insecure         bypass certificate check
-  -u, --auth             whisk auth
-  -v, --verbose          Verbose output
-  --apihost              whisk API host
-  --apiversion           whisk API version
-  --base-uri=<value>     (required) Base URI
-  --cert                 client cert
-  --debug=<value>        Debug level output
-  --help                 Show help
-  --key                  client key
-  --license-key=<value>  (required) License Key
-  --version              Show version
+  -i, --insecure             bypass certificate check
+  -u, --auth                 [env: WHISK_AUTH] whisk auth
+  -v, --verbose              Verbose output
+      --apihost              [env: WHISK_APIHOST] whisk API host
+      --apiversion           [env: WHISK_APIVERSION] whisk API version
+      --base-uri=<value>     (required) Base URI
+      --cert                 client cert
+      --debug=<value>        Debug level output
+      --help                 Show help
+      --key                  client key
+      --license-key=<value>  (required) License Key
+      --version              Show version
 
 DESCRIPTION
   Set log forwarding destination to New Relic
@@ -1356,7 +1423,7 @@ ALIASES
   $ aio rt ns lf set new-relic
 ```
 
-_See code: [src/commands/runtime/namespace/log-forwarding/set/new-relic.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/namespace/log-forwarding/set/new-relic.js)_
+_See code: [src/commands/runtime/namespace/log-forwarding/set/new-relic.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/namespace/log-forwarding/set/new-relic.js)_
 
 ## `aio runtime namespace log-forwarding set splunk-hec`
 
@@ -1368,20 +1435,20 @@ USAGE
     [--apiversion] [--apihost] [-u] [-i] [--debug <value>] [-v] [--version] [--help]
 
 FLAGS
-  -i, --insecure       bypass certificate check
-  -u, --auth           whisk auth
-  -v, --verbose        Verbose output
-  --apihost            whisk API host
-  --apiversion         whisk API version
-  --cert               client cert
-  --debug=<value>      Debug level output
-  --hec-token=<value>  (required) HEC token
-  --help               Show help
-  --host=<value>       (required) Host
-  --index=<value>      (required) Index
-  --key                client key
-  --port=<value>       (required) Port
-  --version            Show version
+  -i, --insecure           bypass certificate check
+  -u, --auth               [env: WHISK_AUTH] whisk auth
+  -v, --verbose            Verbose output
+      --apihost            [env: WHISK_APIHOST] whisk API host
+      --apiversion         [env: WHISK_APIVERSION] whisk API version
+      --cert               client cert
+      --debug=<value>      Debug level output
+      --hec-token=<value>  (required) HEC token
+      --help               Show help
+      --host=<value>       (required) Host
+      --index=<value>      (required) Index
+      --key                client key
+      --port=<value>       (required) Port
+      --version            Show version
 
 DESCRIPTION
   Set log forwarding destination to Splunk HEC
@@ -1396,7 +1463,7 @@ ALIASES
   $ aio rt ns lf set splunk-hec
 ```
 
-_See code: [src/commands/runtime/namespace/log-forwarding/set/splunk-hec.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/namespace/log-forwarding/set/splunk-hec.js)_
+_See code: [src/commands/runtime/namespace/log-forwarding/set/splunk-hec.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/namespace/log-forwarding/set/splunk-hec.js)_
 
 ## `aio runtime package`
 
@@ -1408,16 +1475,16 @@ USAGE
     [--help]
 
 FLAGS
-  -i, --insecure   bypass certificate check
-  -u, --auth       whisk auth
-  -v, --verbose    Verbose output
-  --apihost        whisk API host
-  --apiversion     whisk API version
-  --cert           client cert
-  --debug=<value>  Debug level output
-  --help           Show help
-  --key            client key
-  --version        Show version
+  -i, --insecure       bypass certificate check
+  -u, --auth           [env: WHISK_AUTH] whisk auth
+  -v, --verbose        Verbose output
+      --apihost        [env: WHISK_APIHOST] whisk API host
+      --apiversion     [env: WHISK_APIVERSION] whisk API version
+      --cert           client cert
+      --debug=<value>  Debug level output
+      --help           Show help
+      --key            client key
+      --version        Show version
 
 DESCRIPTION
   Manage your packages
@@ -1428,7 +1495,7 @@ ALIASES
   $ aio rt pkg
 ```
 
-_See code: [src/commands/runtime/package/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/package/index.js)_
+_See code: [src/commands/runtime/package/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/package/index.js)_
 
 ## `aio runtime package bind PACKAGENAME BINDPACKAGENAME`
 
@@ -1436,9 +1503,8 @@ Bind parameters to a package
 
 ```
 USAGE
-  $ aio runtime package bind PACKAGENAME BINDPACKAGENAME [--cert <value>] [--key <value>] [--apiversion <value>]
-    [--apihost <value>] [-u <value>] [-i] [--debug <value>] [-v] [--version] [--help] [-p <value>] [-P <value>] [-a
-    <value>] [-A <value>] [--json]
+  $ aio runtime package bind PACKAGENAME BINDPACKAGENAME [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug
+    <value>] [-v] [--version] [--help] [-p <value>...] [-P <value>] [-a <value>...] [-A <value>] [--json]
 
 FLAGS
   -A, --annotation-file=<value>  FILE containing annotation values in JSON format
@@ -1446,16 +1512,16 @@ FLAGS
   -a, --annotation=<value>...    annotation values in KEY VALUE format
   -i, --insecure                 bypass certificate check
   -p, --param=<value>...         parameters in key value pairs to be passed to the package
-  -u, --auth=<value>             whisk auth
+  -u, --auth                     [env: WHISK_AUTH] whisk auth
   -v, --verbose                  Verbose output
-  --apihost=<value>              whisk API host
-  --apiversion=<value>           whisk API version
-  --cert=<value>                 client cert
-  --debug=<value>                Debug level output
-  --help                         Show help
-  --json                         output raw json
-  --key=<value>                  client key
-  --version                      Show version
+      --apihost                  [env: WHISK_APIHOST] whisk API host
+      --apiversion               [env: WHISK_APIVERSION] whisk API version
+      --cert                     client cert
+      --debug=<value>            Debug level output
+      --help                     Show help
+      --json                     output raw json
+      --key                      client key
+      --version                  Show version
 
 DESCRIPTION
   Bind parameters to a package
@@ -1466,7 +1532,7 @@ ALIASES
   $ aio rt pkg bind
 ```
 
-_See code: [src/commands/runtime/package/bind.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/package/bind.js)_
+_See code: [src/commands/runtime/package/bind.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/package/bind.js)_
 
 ## `aio runtime package create PACKAGENAME`
 
@@ -1474,9 +1540,8 @@ Creates a Package
 
 ```
 USAGE
-  $ aio runtime package create PACKAGENAME [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
-    <value>] [-i] [--debug <value>] [-v] [--version] [--help] [-p <value>] [-P <value>] [--shared true|yes|false|no] [-a
-    <value>] [-A <value>] [--json]
+  $ aio runtime package create PACKAGENAME [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>] [-v]
+    [--version] [--help] [-p <value>...] [-P <value>] [--shared true|yes|false|no] [-a <value>...] [-A <value>] [--json]
 
 FLAGS
   -A, --annotation-file=<value>  FILE containing annotation values in JSON format
@@ -1484,18 +1549,18 @@ FLAGS
   -a, --annotation=<value>...    annotation values in KEY VALUE format
   -i, --insecure                 bypass certificate check
   -p, --param=<value>...         parameters in key value pairs to be passed to the package
-  -u, --auth=<value>             whisk auth
+  -u, --auth                     [env: WHISK_AUTH] whisk auth
   -v, --verbose                  Verbose output
-  --apihost=<value>              whisk API host
-  --apiversion=<value>           whisk API version
-  --cert=<value>                 client cert
-  --debug=<value>                Debug level output
-  --help                         Show help
-  --json                         output raw json
-  --key=<value>                  client key
-  --shared=<option>              parameter to be passed to indicate whether package is shared or private
+      --apihost                  [env: WHISK_APIHOST] whisk API host
+      --apiversion               [env: WHISK_APIVERSION] whisk API version
+      --cert                     client cert
+      --debug=<value>            Debug level output
+      --help                     Show help
+      --json                     output raw json
+      --key                      client key
+      --shared=<option>          parameter to be passed to indicate whether package is shared or private
                                  <options: true|yes|false|no>
-  --version                      Show version
+      --version                  Show version
 
 DESCRIPTION
   Creates a Package
@@ -1506,7 +1571,7 @@ ALIASES
   $ aio rt pkg create
 ```
 
-_See code: [src/commands/runtime/package/create.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/package/create.js)_
+_See code: [src/commands/runtime/package/create.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/package/create.js)_
 
 ## `aio runtime package delete PACKAGENAME`
 
@@ -1514,22 +1579,11 @@ Deletes a Package
 
 ```
 USAGE
-  $ aio runtime package delete PACKAGENAME [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
-    <value>] [-i] [--debug <value>] [-v] [--version] [--help] [--json] [-r]
+  $ aio runtime package delete PACKAGENAME [--json] [-r]
 
 FLAGS
-  -i, --insecure        bypass certificate check
-  -r, --recursive       Deletes all associated actions (and rules & triggers associated with the actions)
-  -u, --auth=<value>    whisk auth
-  -v, --verbose         Verbose output
-  --apihost=<value>     whisk API host
-  --apiversion=<value>  whisk API version
-  --cert=<value>        client cert
-  --debug=<value>       Debug level output
-  --help                Show help
-  --json                output raw json
-  --key=<value>         client key
-  --version             Show version
+  -r, --recursive  Deletes all associated actions (and rules & triggers associated with the actions)
+      --json       output raw json
 
 DESCRIPTION
   Deletes a Package
@@ -1540,7 +1594,7 @@ ALIASES
   $ aio rt pkg delete
 ```
 
-_See code: [src/commands/runtime/package/delete.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/package/delete.js)_
+_See code: [src/commands/runtime/package/delete.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/package/delete.js)_
 
 ## `aio runtime package get PACKAGENAME`
 
@@ -1548,20 +1602,20 @@ Retrieves a Package
 
 ```
 USAGE
-  $ aio runtime package get PACKAGENAME [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
-    <value>] [-i] [--debug <value>] [-v] [--version] [--help]
+  $ aio runtime package get PACKAGENAME [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>] [-v]
+    [--version] [--help]
 
 FLAGS
-  -i, --insecure        bypass certificate check
-  -u, --auth=<value>    whisk auth
-  -v, --verbose         Verbose output
-  --apihost=<value>     whisk API host
-  --apiversion=<value>  whisk API version
-  --cert=<value>        client cert
-  --debug=<value>       Debug level output
-  --help                Show help
-  --key=<value>         client key
-  --version             Show version
+  -i, --insecure       bypass certificate check
+  -u, --auth           [env: WHISK_AUTH] whisk auth
+  -v, --verbose        Verbose output
+      --apihost        [env: WHISK_APIHOST] whisk API host
+      --apiversion     [env: WHISK_APIVERSION] whisk API version
+      --cert           client cert
+      --debug=<value>  Debug level output
+      --help           Show help
+      --key            client key
+      --version        Show version
 
 DESCRIPTION
   Retrieves a Package
@@ -1572,7 +1626,7 @@ ALIASES
   $ aio rt pkg get
 ```
 
-_See code: [src/commands/runtime/package/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/package/get.js)_
+_See code: [src/commands/runtime/package/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/package/get.js)_
 
 ## `aio runtime package list [NAMESPACE]`
 
@@ -1580,26 +1634,26 @@ Lists all the Packages
 
 ```
 USAGE
-  $ aio runtime package list [NAMESPACE] [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
-    <value>] [-i] [--debug <value>] [-v] [--version] [--help] [-l <value>] [-s <value>] [-c] [--json] [--name-sort] [-n]
+  $ aio runtime package list [NAMESPACE] [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>] [-v]
+    [--version] [--help] [-l <value>] [-s <value>] [-c] [--json] [--name-sort] [-n]
 
 FLAGS
-  -c, --count           show only the total number of packages
-  -i, --insecure        bypass certificate check
-  -l, --limit=<value>   only return LIMIT number of packages (min: 0, max: 50)
-  -n, --name            sort results by name
-  -s, --skip=<value>    exclude the first SKIP number of packages from the result
-  -u, --auth=<value>    whisk auth
-  -v, --verbose         Verbose output
-  --apihost=<value>     whisk API host
-  --apiversion=<value>  whisk API version
-  --cert=<value>        client cert
-  --debug=<value>       Debug level output
-  --help                Show help
-  --json                output raw json
-  --key=<value>         client key
-  --name-sort           sort results by name
-  --version             Show version
+  -c, --count          show only the total number of packages
+  -i, --insecure       bypass certificate check
+  -l, --limit=<value>  only return LIMIT number of packages (min: 0, max: 50)
+  -n, --name           sort results by name
+  -s, --skip=<value>   exclude the first SKIP number of packages from the result
+  -u, --auth           [env: WHISK_AUTH] whisk auth
+  -v, --verbose        Verbose output
+      --apihost        [env: WHISK_APIHOST] whisk API host
+      --apiversion     [env: WHISK_APIVERSION] whisk API version
+      --cert           client cert
+      --debug=<value>  Debug level output
+      --help           Show help
+      --json           output raw json
+      --key            client key
+      --name-sort      sort results by name
+      --version        Show version
 
 DESCRIPTION
   Lists all the Packages
@@ -1614,7 +1668,7 @@ ALIASES
   $ aio rt pkg ls
 ```
 
-_See code: [src/commands/runtime/package/list.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/package/list.js)_
+_See code: [src/commands/runtime/package/list.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/package/list.js)_
 
 ## `aio runtime package update PACKAGENAME`
 
@@ -1622,9 +1676,8 @@ Updates a Package
 
 ```
 USAGE
-  $ aio runtime package update PACKAGENAME [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
-    <value>] [-i] [--debug <value>] [-v] [--version] [--help] [-p <value>] [-P <value>] [--shared true|yes|false|no] [-a
-    <value>] [-A <value>] [--json]
+  $ aio runtime package update PACKAGENAME [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>] [-v]
+    [--version] [--help] [-p <value>...] [-P <value>] [--shared true|yes|false|no] [-a <value>...] [-A <value>] [--json]
 
 FLAGS
   -A, --annotation-file=<value>  FILE containing annotation values in JSON format
@@ -1632,18 +1685,18 @@ FLAGS
   -a, --annotation=<value>...    annotation values in KEY VALUE format
   -i, --insecure                 bypass certificate check
   -p, --param=<value>...         parameters in key value pairs to be passed to the package
-  -u, --auth=<value>             whisk auth
+  -u, --auth                     [env: WHISK_AUTH] whisk auth
   -v, --verbose                  Verbose output
-  --apihost=<value>              whisk API host
-  --apiversion=<value>           whisk API version
-  --cert=<value>                 client cert
-  --debug=<value>                Debug level output
-  --help                         Show help
-  --json                         output raw json
-  --key=<value>                  client key
-  --shared=<option>              parameter to be passed to indicate whether package is shared or private
+      --apihost                  [env: WHISK_APIHOST] whisk API host
+      --apiversion               [env: WHISK_APIVERSION] whisk API version
+      --cert                     client cert
+      --debug=<value>            Debug level output
+      --help                     Show help
+      --json                     output raw json
+      --key                      client key
+      --shared=<option>          parameter to be passed to indicate whether package is shared or private
                                  <options: true|yes|false|no>
-  --version                      Show version
+      --version                  Show version
 
 DESCRIPTION
   Updates a Package
@@ -1654,7 +1707,7 @@ ALIASES
   $ aio rt pkg update
 ```
 
-_See code: [src/commands/runtime/package/update.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/package/update.js)_
+_See code: [src/commands/runtime/package/update.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/package/update.js)_
 
 ## `aio runtime property`
 
@@ -1666,16 +1719,16 @@ USAGE
     [--help]
 
 FLAGS
-  -i, --insecure   bypass certificate check
-  -u, --auth       whisk auth
-  -v, --verbose    Verbose output
-  --apihost        whisk API host
-  --apiversion     whisk API version
-  --cert           client cert
-  --debug=<value>  Debug level output
-  --help           Show help
-  --key            client key
-  --version        Show version
+  -i, --insecure       bypass certificate check
+  -u, --auth           [env: WHISK_AUTH] whisk auth
+  -v, --verbose        Verbose output
+      --apihost        [env: WHISK_APIHOST] whisk API host
+      --apiversion     [env: WHISK_APIVERSION] whisk API version
+      --cert           client cert
+      --debug=<value>  Debug level output
+      --help           Show help
+      --key            client key
+      --version        Show version
 
 DESCRIPTION
   Execute property commands
@@ -1686,7 +1739,7 @@ ALIASES
   $ aio rt property
 ```
 
-_See code: [src/commands/runtime/property/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/property/index.js)_
+_See code: [src/commands/runtime/property/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/property/index.js)_
 
 ## `aio runtime property get`
 
@@ -1698,21 +1751,21 @@ USAGE
     [--help] [--namespace] [--all] [--apibuild] [--apibuildno] [--cliversion]
 
 FLAGS
-  -i, --insecure   bypass certificate check
-  -u, --auth       whisk auth
-  -v, --verbose    Verbose output
-  --all            all properties
-  --apibuild       whisk API build version
-  --apibuildno     whisk API build number
-  --apihost        whisk API host
-  --apiversion     whisk API version
-  --cert           client cert
-  --cliversion     whisk CLI version
-  --debug=<value>  Debug level output
-  --help           Show help
-  --key            client key
-  --namespace      whisk namespace
-  --version        Show version
+  -i, --insecure       bypass certificate check
+  -u, --auth           [env: WHISK_AUTH] whisk auth
+  -v, --verbose        Verbose output
+      --all            all properties
+      --apibuild       whisk API build version
+      --apibuildno     whisk API build number
+      --apihost        [env: WHISK_APIHOST] whisk API host
+      --apiversion     [env: WHISK_APIVERSION] whisk API version
+      --cert           client cert
+      --cliversion     whisk CLI version
+      --debug=<value>  Debug level output
+      --help           Show help
+      --key            client key
+      --namespace      whisk namespace
+      --version        Show version
 
 DESCRIPTION
   get property
@@ -1723,7 +1776,7 @@ ALIASES
   $ aio rt prop get
 ```
 
-_See code: [src/commands/runtime/property/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/property/get.js)_
+_See code: [src/commands/runtime/property/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/property/get.js)_
 
 ## `aio runtime property set`
 
@@ -1735,17 +1788,17 @@ USAGE
     [--help] [--namespace <value>]
 
 FLAGS
-  -i, --insecure       bypass certificate check
-  -u, --auth           whisk auth
-  -v, --verbose        Verbose output
-  --apihost            whisk API host
-  --apiversion         whisk API version
-  --cert               client cert
-  --debug=<value>      Debug level output
-  --help               Show help
-  --key                client key
-  --namespace=<value>  whisk namespace
-  --version            Show version
+  -i, --insecure           bypass certificate check
+  -u, --auth               [env: WHISK_AUTH] whisk auth
+  -v, --verbose            Verbose output
+      --apihost            [env: WHISK_APIHOST] whisk API host
+      --apiversion         [env: WHISK_APIVERSION] whisk API version
+      --cert               client cert
+      --debug=<value>      Debug level output
+      --help               Show help
+      --key                client key
+      --namespace=<value>  [env: WHISK_NAMESPACE] whisk namespace
+      --version            Show version
 
 DESCRIPTION
   set property
@@ -1756,7 +1809,7 @@ ALIASES
   $ aio rt prop set
 ```
 
-_See code: [src/commands/runtime/property/set.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/property/set.js)_
+_See code: [src/commands/runtime/property/set.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/property/set.js)_
 
 ## `aio runtime property unset`
 
@@ -1768,17 +1821,17 @@ USAGE
     [--help] [--namespace]
 
 FLAGS
-  -i, --insecure   bypass certificate check
-  -u, --auth       whisk auth
-  -v, --verbose    Verbose output
-  --apihost        whisk API host
-  --apiversion     whisk API version
-  --cert           client cert
-  --debug=<value>  Debug level output
-  --help           Show help
-  --key            client key
-  --namespace      whisk namespace
-  --version        Show version
+  -i, --insecure       bypass certificate check
+  -u, --auth           [env: WHISK_AUTH] whisk auth
+  -v, --verbose        Verbose output
+      --apihost        [env: WHISK_APIHOST] whisk API host
+      --apiversion     [env: WHISK_APIVERSION] whisk API version
+      --cert           client cert
+      --debug=<value>  Debug level output
+      --help           Show help
+      --key            client key
+      --namespace      whisk namespace
+      --version        Show version
 
 DESCRIPTION
   unset property
@@ -1789,7 +1842,7 @@ ALIASES
   $ aio rt prop unset
 ```
 
-_See code: [src/commands/runtime/property/unset.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/property/unset.js)_
+_See code: [src/commands/runtime/property/unset.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/property/unset.js)_
 
 ## `aio runtime rule`
 
@@ -1801,16 +1854,16 @@ USAGE
     [--help]
 
 FLAGS
-  -i, --insecure   bypass certificate check
-  -u, --auth       whisk auth
-  -v, --verbose    Verbose output
-  --apihost        whisk API host
-  --apiversion     whisk API version
-  --cert           client cert
-  --debug=<value>  Debug level output
-  --help           Show help
-  --key            client key
-  --version        Show version
+  -i, --insecure       bypass certificate check
+  -u, --auth           [env: WHISK_AUTH] whisk auth
+  -v, --verbose        Verbose output
+      --apihost        [env: WHISK_APIHOST] whisk API host
+      --apiversion     [env: WHISK_APIVERSION] whisk API version
+      --cert           client cert
+      --debug=<value>  Debug level output
+      --help           Show help
+      --key            client key
+      --version        Show version
 
 DESCRIPTION
   Manage your rules
@@ -1819,7 +1872,7 @@ ALIASES
   $ aio rt rule
 ```
 
-_See code: [src/commands/runtime/rule/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/rule/index.js)_
+_See code: [src/commands/runtime/rule/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/rule/index.js)_
 
 ## `aio runtime rule create NAME TRIGGER ACTION`
 
@@ -1836,18 +1889,18 @@ ARGUMENTS
   ACTION   Name of the action
 
 FLAGS
-  -i, --insecure          bypass certificate check
-  -r, --use-runtime-auth  use Runtime auth [default: false]
-  -u, --auth=<value>      whisk auth
-  -v, --verbose           Verbose output
-  --apihost=<value>       whisk API host
-  --apiversion=<value>    whisk API version
-  --cert=<value>          client cert
-  --debug=<value>         Debug level output
-  --help                  Show help
-  --json                  output raw json
-  --key=<value>           client key
-  --version               Show version
+  -i, --insecure            bypass certificate check
+  -r, --use-runtime-auth    use Runtime auth [default: false]
+  -u, --auth=<value>        [env: WHISK_AUTH] whisk auth
+  -v, --verbose             Verbose output
+      --apihost=<value>     [env: WHISK_APIHOST] whisk API host
+      --apiversion=<value>  [env: WHISK_APIVERSION] whisk API version
+      --cert=<value>        client cert
+      --debug=<value>       Debug level output
+      --help                Show help
+      --json                output raw json
+      --key=<value>         client key
+      --version             Show version
 
 DESCRIPTION
   Create a Rule
@@ -1856,7 +1909,7 @@ ALIASES
   $ aio rt rule create
 ```
 
-_See code: [src/commands/runtime/rule/create.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/rule/create.js)_
+_See code: [src/commands/runtime/rule/create.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/rule/create.js)_
 
 ## `aio runtime rule delete NAME`
 
@@ -1871,18 +1924,18 @@ ARGUMENTS
   NAME  Name of the rule
 
 FLAGS
-  -i, --insecure          bypass certificate check
-  -r, --use-runtime-auth  use Runtime auth [default: false]
-  -u, --auth=<value>      whisk auth
-  -v, --verbose           Verbose output
-  --apihost=<value>       whisk API host
-  --apiversion=<value>    whisk API version
-  --cert=<value>          client cert
-  --debug=<value>         Debug level output
-  --help                  Show help
-  --json                  output raw json
-  --key=<value>           client key
-  --version               Show version
+  -i, --insecure            bypass certificate check
+  -r, --use-runtime-auth    use Runtime auth [default: false]
+  -u, --auth=<value>        [env: WHISK_AUTH] whisk auth
+  -v, --verbose             Verbose output
+      --apihost=<value>     [env: WHISK_APIHOST] whisk API host
+      --apiversion=<value>  [env: WHISK_APIVERSION] whisk API version
+      --cert=<value>        client cert
+      --debug=<value>       Debug level output
+      --help                Show help
+      --json                output raw json
+      --key=<value>         client key
+      --version             Show version
 
 DESCRIPTION
   Delete a Rule
@@ -1891,7 +1944,7 @@ ALIASES
   $ aio rt rule delete
 ```
 
-_See code: [src/commands/runtime/rule/delete.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/rule/delete.js)_
+_See code: [src/commands/runtime/rule/delete.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/rule/delete.js)_
 
 ## `aio runtime rule disable NAME`
 
@@ -1906,17 +1959,17 @@ ARGUMENTS
   NAME  Name of the rule
 
 FLAGS
-  -i, --insecure          bypass certificate check
-  -r, --use-runtime-auth  use Runtime auth [default: false]
-  -u, --auth=<value>      whisk auth
-  -v, --verbose           Verbose output
-  --apihost=<value>       whisk API host
-  --apiversion=<value>    whisk API version
-  --cert=<value>          client cert
-  --debug=<value>         Debug level output
-  --help                  Show help
-  --key=<value>           client key
-  --version               Show version
+  -i, --insecure            bypass certificate check
+  -r, --use-runtime-auth    use Runtime auth [default: false]
+  -u, --auth=<value>        [env: WHISK_AUTH] whisk auth
+  -v, --verbose             Verbose output
+      --apihost=<value>     [env: WHISK_APIHOST] whisk API host
+      --apiversion=<value>  [env: WHISK_APIVERSION] whisk API version
+      --cert=<value>        client cert
+      --debug=<value>       Debug level output
+      --help                Show help
+      --key=<value>         client key
+      --version             Show version
 
 DESCRIPTION
   Disable a Rule
@@ -1925,7 +1978,7 @@ ALIASES
   $ aio rt rule disable
 ```
 
-_See code: [src/commands/runtime/rule/disable.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/rule/disable.js)_
+_See code: [src/commands/runtime/rule/disable.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/rule/disable.js)_
 
 ## `aio runtime rule enable NAME`
 
@@ -1940,17 +1993,17 @@ ARGUMENTS
   NAME  Name of the rule
 
 FLAGS
-  -i, --insecure          bypass certificate check
-  -r, --use-runtime-auth  use Runtime auth [default: false]
-  -u, --auth=<value>      whisk auth
-  -v, --verbose           Verbose output
-  --apihost=<value>       whisk API host
-  --apiversion=<value>    whisk API version
-  --cert=<value>          client cert
-  --debug=<value>         Debug level output
-  --help                  Show help
-  --key=<value>           client key
-  --version               Show version
+  -i, --insecure            bypass certificate check
+  -r, --use-runtime-auth    use Runtime auth [default: false]
+  -u, --auth=<value>        [env: WHISK_AUTH] whisk auth
+  -v, --verbose             Verbose output
+      --apihost=<value>     [env: WHISK_APIHOST] whisk API host
+      --apiversion=<value>  [env: WHISK_APIVERSION] whisk API version
+      --cert=<value>        client cert
+      --debug=<value>       Debug level output
+      --help                Show help
+      --key=<value>         client key
+      --version             Show version
 
 DESCRIPTION
   Enable a Rule
@@ -1959,7 +2012,7 @@ ALIASES
   $ aio rt rule enable
 ```
 
-_See code: [src/commands/runtime/rule/enable.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/rule/enable.js)_
+_See code: [src/commands/runtime/rule/enable.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/rule/enable.js)_
 
 ## `aio runtime rule get NAME`
 
@@ -1974,16 +2027,16 @@ ARGUMENTS
   NAME  Name of the rule
 
 FLAGS
-  -i, --insecure   bypass certificate check
-  -u, --auth       whisk auth
-  -v, --verbose    Verbose output
-  --apihost        whisk API host
-  --apiversion     whisk API version
-  --cert           client cert
-  --debug=<value>  Debug level output
-  --help           Show help
-  --key            client key
-  --version        Show version
+  -i, --insecure       bypass certificate check
+  -u, --auth           [env: WHISK_AUTH] whisk auth
+  -v, --verbose        Verbose output
+      --apihost        [env: WHISK_APIHOST] whisk API host
+      --apiversion     [env: WHISK_APIVERSION] whisk API version
+      --cert           client cert
+      --debug=<value>  Debug level output
+      --help           Show help
+      --key            client key
+      --version        Show version
 
 DESCRIPTION
   Retrieves a Rule
@@ -1992,7 +2045,7 @@ ALIASES
   $ aio rt rule get
 ```
 
-_See code: [src/commands/runtime/rule/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/rule/get.js)_
+_See code: [src/commands/runtime/rule/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/rule/get.js)_
 
 ## `aio runtime rule list`
 
@@ -2009,17 +2062,17 @@ FLAGS
   -l, --limit=<value>  Limit number of rules returned (min: 0, max: 50)
   -n, --name           sort results by name
   -s, --skip=<value>   Skip number of rules returned
-  -u, --auth           whisk auth
+  -u, --auth           [env: WHISK_AUTH] whisk auth
   -v, --verbose        Verbose output
-  --apihost            whisk API host
-  --apiversion         whisk API version
-  --cert               client cert
-  --debug=<value>      Debug level output
-  --help               Show help
-  --json               output raw json
-  --key                client key
-  --name-sort          sort results by name
-  --version            Show version
+      --apihost        [env: WHISK_APIHOST] whisk API host
+      --apiversion     [env: WHISK_APIVERSION] whisk API version
+      --cert           client cert
+      --debug=<value>  Debug level output
+      --help           Show help
+      --json           output raw json
+      --key            client key
+      --name-sort      sort results by name
+      --version        Show version
 
 DESCRIPTION
   Retrieves a list of Rules
@@ -2030,7 +2083,7 @@ ALIASES
   $ aio rt rule ls
 ```
 
-_See code: [src/commands/runtime/rule/list.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/rule/list.js)_
+_See code: [src/commands/runtime/rule/list.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/rule/list.js)_
 
 ## `aio runtime rule status NAME`
 
@@ -2045,16 +2098,16 @@ ARGUMENTS
   NAME  Name of the rule
 
 FLAGS
-  -i, --insecure   bypass certificate check
-  -u, --auth       whisk auth
-  -v, --verbose    Verbose output
-  --apihost        whisk API host
-  --apiversion     whisk API version
-  --cert           client cert
-  --debug=<value>  Debug level output
-  --help           Show help
-  --key            client key
-  --version        Show version
+  -i, --insecure       bypass certificate check
+  -u, --auth           [env: WHISK_AUTH] whisk auth
+  -v, --verbose        Verbose output
+      --apihost        [env: WHISK_APIHOST] whisk API host
+      --apiversion     [env: WHISK_APIVERSION] whisk API version
+      --cert           client cert
+      --debug=<value>  Debug level output
+      --help           Show help
+      --key            client key
+      --version        Show version
 
 DESCRIPTION
   Gets the status of a rule
@@ -2063,7 +2116,7 @@ ALIASES
   $ aio rt rule status
 ```
 
-_See code: [src/commands/runtime/rule/status.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/rule/status.js)_
+_See code: [src/commands/runtime/rule/status.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/rule/status.js)_
 
 ## `aio runtime rule update NAME TRIGGER ACTION`
 
@@ -2080,18 +2133,18 @@ ARGUMENTS
   ACTION   Name of the action
 
 FLAGS
-  -i, --insecure          bypass certificate check
-  -r, --use-runtime-auth  use Runtime auth [default: false]
-  -u, --auth=<value>      whisk auth
-  -v, --verbose           Verbose output
-  --apihost=<value>       whisk API host
-  --apiversion=<value>    whisk API version
-  --cert=<value>          client cert
-  --debug=<value>         Debug level output
-  --help                  Show help
-  --json                  output raw json
-  --key=<value>           client key
-  --version               Show version
+  -i, --insecure            bypass certificate check
+  -r, --use-runtime-auth    use Runtime auth [default: false]
+  -u, --auth=<value>        [env: WHISK_AUTH] whisk auth
+  -v, --verbose             Verbose output
+      --apihost=<value>     [env: WHISK_APIHOST] whisk API host
+      --apiversion=<value>  [env: WHISK_APIVERSION] whisk API version
+      --cert=<value>        client cert
+      --debug=<value>       Debug level output
+      --help                Show help
+      --json                output raw json
+      --key=<value>         client key
+      --version             Show version
 
 DESCRIPTION
   Update a Rule
@@ -2100,7 +2153,7 @@ ALIASES
   $ aio rt rule update
 ```
 
-_See code: [src/commands/runtime/rule/update.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/rule/update.js)_
+_See code: [src/commands/runtime/rule/update.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/rule/update.js)_
 
 ## `aio runtime trigger`
 
@@ -2112,16 +2165,16 @@ USAGE
     [--help]
 
 FLAGS
-  -i, --insecure   bypass certificate check
-  -u, --auth       whisk auth
-  -v, --verbose    Verbose output
-  --apihost        whisk API host
-  --apiversion     whisk API version
-  --cert           client cert
-  --debug=<value>  Debug level output
-  --help           Show help
-  --key            client key
-  --version        Show version
+  -i, --insecure       bypass certificate check
+  -u, --auth           [env: WHISK_AUTH] whisk auth
+  -v, --verbose        Verbose output
+      --apihost        [env: WHISK_APIHOST] whisk API host
+      --apiversion     [env: WHISK_APIVERSION] whisk API version
+      --cert           client cert
+      --debug=<value>  Debug level output
+      --help           Show help
+      --key            client key
+      --version        Show version
 
 DESCRIPTION
   Manage your triggers
@@ -2130,7 +2183,7 @@ ALIASES
   $ aio rt trigger
 ```
 
-_See code: [src/commands/runtime/trigger/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/trigger/index.js)_
+_See code: [src/commands/runtime/trigger/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/trigger/index.js)_
 
 ## `aio runtime trigger create TRIGGERNAME`
 
@@ -2139,8 +2192,8 @@ Create a trigger for Adobe I/O Runtime
 ```
 USAGE
   $ aio runtime trigger create TRIGGERNAME [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
-    <value>] [-i] [--debug <value>] [-v] [--version] [--help] [-r] [-p <value>] [-P <value>] [-a <value>] [-A <value>]
-    [-f <value>]
+    <value>] [-i] [--debug <value>] [-v] [--version] [--help] [-r] [-p <value>...] [-P <value>] [-a <value>...] [-A
+    <value>] [-f <value>]
 
 ARGUMENTS
   TRIGGERNAME  The name of the trigger
@@ -2153,15 +2206,15 @@ FLAGS
   -i, --insecure                 bypass certificate check
   -p, --param=<value>...         parameter values in KEY VALUE format
   -r, --use-runtime-auth         use Runtime auth [default: false]
-  -u, --auth=<value>             whisk auth
+  -u, --auth=<value>             [env: WHISK_AUTH] whisk auth
   -v, --verbose                  Verbose output
-  --apihost=<value>              whisk API host
-  --apiversion=<value>           whisk API version
-  --cert=<value>                 client cert
-  --debug=<value>                Debug level output
-  --help                         Show help
-  --key=<value>                  client key
-  --version                      Show version
+      --apihost=<value>          [env: WHISK_APIHOST] whisk API host
+      --apiversion=<value>       [env: WHISK_APIVERSION] whisk API version
+      --cert=<value>             client cert
+      --debug=<value>            Debug level output
+      --help                     Show help
+      --key=<value>              client key
+      --version                  Show version
 
 DESCRIPTION
   Create a trigger for Adobe I/O Runtime
@@ -2170,7 +2223,7 @@ ALIASES
   $ aio rt trigger create
 ```
 
-_See code: [src/commands/runtime/trigger/create.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/trigger/create.js)_
+_See code: [src/commands/runtime/trigger/create.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/trigger/create.js)_
 
 ## `aio runtime trigger delete TRIGGERPATH`
 
@@ -2185,17 +2238,17 @@ ARGUMENTS
   TRIGGERPATH  The name of the trigger, in the format /NAMESPACE/NAME
 
 FLAGS
-  -i, --insecure          bypass certificate check
-  -r, --use-runtime-auth  use Runtime auth [default: false]
-  -u, --auth=<value>      whisk auth
-  -v, --verbose           Verbose output
-  --apihost=<value>       whisk API host
-  --apiversion=<value>    whisk API version
-  --cert=<value>          client cert
-  --debug=<value>         Debug level output
-  --help                  Show help
-  --key=<value>           client key
-  --version               Show version
+  -i, --insecure            bypass certificate check
+  -r, --use-runtime-auth    use Runtime auth [default: false]
+  -u, --auth=<value>        [env: WHISK_AUTH] whisk auth
+  -v, --verbose             Verbose output
+      --apihost=<value>     [env: WHISK_APIHOST] whisk API host
+      --apiversion=<value>  [env: WHISK_APIVERSION] whisk API version
+      --cert=<value>        client cert
+      --debug=<value>       Debug level output
+      --help                Show help
+      --key=<value>         client key
+      --version             Show version
 
 DESCRIPTION
   Delete a trigger for Adobe I/O Runtime
@@ -2204,7 +2257,7 @@ ALIASES
   $ aio rt trigger delete
 ```
 
-_See code: [src/commands/runtime/trigger/delete.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/trigger/delete.js)_
+_See code: [src/commands/runtime/trigger/delete.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/trigger/delete.js)_
 
 ## `aio runtime trigger fire TRIGGERNAME`
 
@@ -2213,7 +2266,7 @@ Fire a trigger for Adobe I/O Runtime
 ```
 USAGE
   $ aio runtime trigger fire TRIGGERNAME [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>] [-v]
-    [--version] [--help] [-p <value>] [-P <value>]
+    [--version] [--help] [-p <value>...] [-P <value>]
 
 ARGUMENTS
   TRIGGERNAME  The name of the trigger
@@ -2222,15 +2275,15 @@ FLAGS
   -P, --param-file=<value>  FILE containing parameter values in JSON format
   -i, --insecure            bypass certificate check
   -p, --param=<value>...    parameter values in KEY VALUE format
-  -u, --auth                whisk auth
+  -u, --auth                [env: WHISK_AUTH] whisk auth
   -v, --verbose             Verbose output
-  --apihost                 whisk API host
-  --apiversion              whisk API version
-  --cert                    client cert
-  --debug=<value>           Debug level output
-  --help                    Show help
-  --key                     client key
-  --version                 Show version
+      --apihost             [env: WHISK_APIHOST] whisk API host
+      --apiversion          [env: WHISK_APIVERSION] whisk API version
+      --cert                client cert
+      --debug=<value>       Debug level output
+      --help                Show help
+      --key                 client key
+      --version             Show version
 
 DESCRIPTION
   Fire a trigger for Adobe I/O Runtime
@@ -2239,7 +2292,7 @@ ALIASES
   $ aio rt trigger fire
 ```
 
-_See code: [src/commands/runtime/trigger/fire.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/trigger/fire.js)_
+_See code: [src/commands/runtime/trigger/fire.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/trigger/fire.js)_
 
 ## `aio runtime trigger get TRIGGERPATH`
 
@@ -2254,16 +2307,16 @@ ARGUMENTS
   TRIGGERPATH  The name/path of the trigger, in the format /NAMESPACE/NAME
 
 FLAGS
-  -i, --insecure   bypass certificate check
-  -u, --auth       whisk auth
-  -v, --verbose    Verbose output
-  --apihost        whisk API host
-  --apiversion     whisk API version
-  --cert           client cert
-  --debug=<value>  Debug level output
-  --help           Show help
-  --key            client key
-  --version        Show version
+  -i, --insecure       bypass certificate check
+  -u, --auth           [env: WHISK_AUTH] whisk auth
+  -v, --verbose        Verbose output
+      --apihost        [env: WHISK_APIHOST] whisk API host
+      --apiversion     [env: WHISK_APIVERSION] whisk API version
+      --cert           client cert
+      --debug=<value>  Debug level output
+      --help           Show help
+      --key            client key
+      --version        Show version
 
 DESCRIPTION
   Get a trigger for Adobe I/O Runtime
@@ -2272,7 +2325,7 @@ ALIASES
   $ aio rt trigger get
 ```
 
-_See code: [src/commands/runtime/trigger/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/trigger/get.js)_
+_See code: [src/commands/runtime/trigger/get.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/trigger/get.js)_
 
 ## `aio runtime trigger list`
 
@@ -2289,17 +2342,17 @@ FLAGS
   -l, --limit=<value>  [default: 30] only return LIMIT number of triggers (min: 0, max: 50)
   -n, --name           sort results by name
   -s, --skip=<value>   exclude the first SKIP number of triggers from the result
-  -u, --auth           whisk auth
+  -u, --auth           [env: WHISK_AUTH] whisk auth
   -v, --verbose        Verbose output
-  --apihost            whisk API host
-  --apiversion         whisk API version
-  --cert               client cert
-  --debug=<value>      Debug level output
-  --help               Show help
-  --json               output raw json
-  --key                client key
-  --name-sort          sort results by name
-  --version            Show version
+      --apihost        [env: WHISK_APIHOST] whisk API host
+      --apiversion     [env: WHISK_APIVERSION] whisk API version
+      --cert           client cert
+      --debug=<value>  Debug level output
+      --help           Show help
+      --json           output raw json
+      --key            client key
+      --name-sort      sort results by name
+      --version        Show version
 
 DESCRIPTION
   Lists all of your triggers for Adobe I/O Runtime
@@ -2310,7 +2363,7 @@ ALIASES
   $ aio rt trigger ls
 ```
 
-_See code: [src/commands/runtime/trigger/list.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/trigger/list.js)_
+_See code: [src/commands/runtime/trigger/list.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/trigger/list.js)_
 
 ## `aio runtime trigger update TRIGGERNAME`
 
@@ -2319,7 +2372,8 @@ Update or create a trigger for Adobe I/O Runtime
 ```
 USAGE
   $ aio runtime trigger update TRIGGERNAME [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
-    <value>] [-i] [--debug <value>] [-v] [--version] [--help] [-r] [-p <value>] [-P <value>] [-a <value>] [-A <value>]
+    <value>] [-i] [--debug <value>] [-v] [--version] [--help] [-r] [-p <value>...] [-P <value>] [-a <value>...] [-A
+    <value>]
 
 ARGUMENTS
   TRIGGERNAME  The name of the trigger
@@ -2331,15 +2385,15 @@ FLAGS
   -i, --insecure                 bypass certificate check
   -p, --param=<value>...         parameter values in KEY VALUE format
   -r, --use-runtime-auth         use Runtime auth [default: false]
-  -u, --auth=<value>             whisk auth
+  -u, --auth=<value>             [env: WHISK_AUTH] whisk auth
   -v, --verbose                  Verbose output
-  --apihost=<value>              whisk API host
-  --apiversion=<value>           whisk API version
-  --cert=<value>                 client cert
-  --debug=<value>                Debug level output
-  --help                         Show help
-  --key=<value>                  client key
-  --version                      Show version
+      --apihost=<value>          [env: WHISK_APIHOST] whisk API host
+      --apiversion=<value>       [env: WHISK_APIVERSION] whisk API version
+      --cert=<value>             client cert
+      --debug=<value>            Debug level output
+      --help                     Show help
+      --key=<value>              client key
+      --version                  Show version
 
 DESCRIPTION
   Update or create a trigger for Adobe I/O Runtime
@@ -2348,10 +2402,73 @@ ALIASES
   $ aio rt trigger update
 ```
 
-_See code: [src/commands/runtime/trigger/update.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.1.0/src/commands/runtime/trigger/update.js)_
+_See code: [src/commands/runtime/trigger/update.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.3.0/src/commands/runtime/trigger/update.js)_
 <!-- commandsstop -->
 
+### Using `aio runtime ip-list get` across multiple Adobe orgs
 
+The `aio runtime ip-list get` command returns the egress IP allowlist for whichever Adobe org you have selected via `aio console org select`. If you belong to multiple Adobe orgs and want to retrieve the list for a different one, switch the CLI's selected org first and then re-run the command:
+
+```bash
+aio console org select   # pick the target org
+aio runtime ip-list get
+```
+
+#### First-use terms acceptance
+
+The first time a given Adobe user runs the command against a given Adobe org, the service requires acceptance of the terms of use for that org and prompts for a contact email used for IP-change notifications:
+
+```bash
+aio runtime ip-list get
+# ? Accept terms v1? (Y/n)
+# ? Contact email (for IP-change notifications): you@example.com
+```
+
+For non-interactive contexts (CI, scripts, automation), supply the acceptance flag and a contact email directly:
+
+```bash
+aio runtime ip-list get --accept-terms --contact-email ops@example.com
+```
+
+Once acceptance is recorded for that (org, user) pair, subsequent calls are non-interactive and return the IP list immediately.
+
+#### Switching orgs
+
+Terms acceptance is stored per `(org, user)`. After accepting terms in org A, switching to org B will prompt for acceptance again the first time you call the command against org B. This is by design — each Adobe org accepts terms independently. After acceptance, you can flip back and forth between orgs without further prompts:
+
+```bash
+aio console org select       # pick org A
+aio runtime ip-list get      # first call against A: terms prompt, then IPs
+aio console org select       # pick org B
+aio runtime ip-list get      # first call against B: terms prompt, then IPs
+aio console org select       # back to A
+aio runtime ip-list get      # no prompt — IPs returned directly
+```
+
+#### If you previously ran `aio app use`
+
+`aio app use` writes an IMS org id binding to `project.org.ims_org_id` (in both the global aio config and a local `.aio` file in the project directory). That binding takes precedence over `aio console org select` for this command. To target a different org:
+
+```bash
+# Option 1 — rebind the project to a workspace in the new org:
+aio console org select          # new org
+aio console project select      # a project you belong to in that org
+aio console workspace select
+aio app use
+
+# Option 2 — drop the project binding entirely and use the console org selection:
+aio config delete project.org.ims_org_id
+# If a local .aio file exists in your current directory, also remove it
+# (or run the command from a different directory).
+```
+
+#### Common errors and how to resolve them
+
+| Symptom | Likely cause | Resolution |
+| --- | --- | --- |
+| `IMS org id not found in aio config.` | No org has been bound to the CLI. | Run `aio console org select` or `aio app use`. |
+| `ip-list service returned 403: token does not grant access to org X@AdobeOrg` | Your IMS token does not grant access to the org id the CLI is sending. Common after switching Adobe accounts. | Verify which org the CLI is using with `aio config get console.org.code` and `aio config get project.org.ims_org_id`; update whichever is stale (see "Switching orgs" above). |
+| Stuck on terms prompt in CI. | Non-interactive context cannot answer the prompt. | Re-run with `--accept-terms --contact-email <email>`. |
 
 ### Contributing
 
