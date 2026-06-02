@@ -31,7 +31,7 @@ function fakeSandbox (overrides = {}) {
   return {
     id: 'sandbox-123',
     exec: jest.fn(),
-    getUrl: jest.fn(({ port }) => Promise.resolve(`https://sandbox-${port}.example.net`)),
+    getUrl: jest.fn(port => Promise.resolve(`https://sandbox-${port}.example.net`)),
     destroy: jest.fn().mockResolvedValue({ status: 'destroyed' }),
     ...overrides
   }
@@ -54,6 +54,8 @@ function makeRl (answers) {
       // can settle before the next prompt arrives
       setImmediate(() => cb(next))
     }),
+    setPrompt: jest.fn(),
+    prompt: jest.fn(),
     close: jest.fn()
   }
 }
@@ -274,6 +276,8 @@ describe('run', () => {
     Sandbox.create.mockResolvedValue(sandbox)
     sandbox.exec.mockResolvedValue({ stdout: 'v20.0.0\n', stderr: '', exitCode: 0 })
     readline.createInterface.mockClear()
+    readline.clearLine = jest.fn()
+    readline.cursorTo = jest.fn()
     readline.createInterface.mockReturnValue(makeRl(['exit']))
   })
 
@@ -392,8 +396,8 @@ describe('run', () => {
     expect(Sandbox.create).toHaveBeenCalledWith(expect.objectContaining({
       ports: [3000, 8080]
     }))
-    expect(sandbox.getUrl).toHaveBeenCalledWith({ port: 3000 })
-    expect(sandbox.getUrl).toHaveBeenCalledWith({ port: 8080 })
+    expect(sandbox.getUrl).toHaveBeenCalledWith(3000)
+    expect(sandbox.getUrl).toHaveBeenCalledWith(8080)
     expect(stdout.output).toMatch('Preview URLs:')
     expect(stdout.output).toMatch('3000: https://sandbox-3000.example.net')
     expect(stdout.output).toMatch('8080: https://sandbox-8080.example.net')
@@ -484,7 +488,8 @@ describe('run', () => {
   })
 
   test('REPL: detached command starts in background and streams output', async () => {
-    readline.createInterface.mockReturnValue(makeRl(['.detached npm run dev', 'exit']))
+    const rl = makeRl(['.detached npm run dev', 'exit'])
+    readline.createInterface.mockReturnValue(rl)
     sandbox.exec.mockImplementationOnce(async (cmd, options) => {
       options.onOutput('server ready\n', 'stdout')
       options.onOutput('debug line\n', 'stderr')
@@ -502,6 +507,27 @@ describe('run', () => {
     expect(stderr.output).toMatch('debug line')
     expect(stdout.output).toMatch('[detached: exec-abc pid: 1234]')
     expect(stdout.output).not.toMatch('[exit:')
+    expect(readline.clearLine).toHaveBeenCalledWith(process.stdout, 0)
+    expect(readline.cursorTo).toHaveBeenCalledWith(process.stdout, 0)
+    expect(rl.prompt).toHaveBeenCalledWith(true)
+  })
+
+  test('REPL: detached output normalizes partial lines', async () => {
+    const rl = makeRl(['.detached npm run dev', 'exit'])
+    readline.createInterface.mockReturnValue(rl)
+    sandbox.exec.mockImplementationOnce(async (cmd, options) => {
+      options.onOutput('partial stdout', 'stdout')
+      options.onOutput(Buffer.from('partial stderr'), 'stderr')
+      return { execId: 'exec-partial', pid: 1234, detached: true }
+    })
+
+    command.argv = []
+    await command.run()
+
+    expect(stdout.output).toMatch('partial stdout\n')
+    expect(stderr.output).toMatch('partial stderr\n')
+    expect(rl.prompt).toHaveBeenCalledWith(true)
+    expect(stdout.output).toMatch('[detached: exec-partial pid: 1234]')
   })
 
   test('REPL: detached command without a command prints usage', async () => {

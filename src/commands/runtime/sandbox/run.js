@@ -23,6 +23,7 @@ const {
 } = require('../../../sandbox-helpers')
 
 const EXEC_TIMEOUT_MS = 30000
+const REPL_PROMPT = 'Enter command to run on sandbox: '
 
 /**
  * Write live command output to the matching local stream.
@@ -33,6 +34,29 @@ const EXEC_TIMEOUT_MS = 30000
 function streamOutput (data, stream) {
   const sink = stream === 'stderr' ? process.stderr : process.stdout
   sink.write(data)
+}
+
+/**
+ * Write detached command output without permanently displacing the REPL prompt.
+ *
+ * @param {object} rl readline interface
+ * @returns {Function} output handler
+ */
+function streamOutputWithPromptRedraw (rl) {
+  return (data, stream) => {
+    readline.clearLine(process.stdout, 0)
+    readline.cursorTo(process.stdout, 0)
+
+    streamOutput(data, stream)
+
+    const text = Buffer.isBuffer(data) ? data.toString() : String(data)
+    if (text && !text.endsWith('\n')) {
+      const sink = stream === 'stderr' ? process.stderr : process.stdout
+      sink.write('\n')
+    }
+
+    rl.prompt(true)
+  }
 }
 
 class SandboxRun extends RuntimeBaseCommand {
@@ -80,6 +104,7 @@ class SandboxRun extends RuntimeBaseCommand {
         this.log('\nSandbox ready. Type "exit" to destroy and quit.\n')
 
         rl = readline.createInterface({ input: process.stdin, output: process.stdout })
+        rl.setPrompt(REPL_PROMPT)
         await this._repl(rl, sandbox)
       }
     } catch (err) {
@@ -123,13 +148,13 @@ class SandboxRun extends RuntimeBaseCommand {
 
     this.log('Preview URLs:')
     for (const port of ports) {
-      this.log(`  - ${port}: ${await sandbox.getUrl({ port })}`)
+      this.log(`  - ${port}: ${await sandbox.getUrl(port)}`)
     }
   }
 
   async _repl (rl, sandbox) {
     while (true) {
-      const cmd = await this._ask(rl, 'Enter command to run on sandbox: ')
+      const cmd = await this._ask(rl)
       const trimmed = (cmd || '').trim()
       if (trimmed === 'exit' || trimmed === 'quit') {
         break
@@ -140,7 +165,7 @@ class SandboxRun extends RuntimeBaseCommand {
 
       try {
         if (trimmed.startsWith('.detached')) {
-          await this._handleDetached(sandbox, trimmed)
+          await this._handleDetached(sandbox, trimmed, rl)
         } else if (trimmed.includes(' <<< ')) {
           await this._handleHereString(sandbox, trimmed)
         } else {
@@ -152,8 +177,8 @@ class SandboxRun extends RuntimeBaseCommand {
     }
   }
 
-  _ask (rl, question) {
-    return new Promise(resolve => rl.question(question, resolve))
+  _ask (rl) {
+    return new Promise(resolve => rl.question(REPL_PROMPT, resolve))
   }
 
   async _handleExec (sandbox, cmd) {
@@ -163,14 +188,14 @@ class SandboxRun extends RuntimeBaseCommand {
     this.log(`[exit: ${result.exitCode}]`)
   }
 
-  async _handleDetached (sandbox, input) {
+  async _handleDetached (sandbox, input, rl) {
     const commandText = input.slice('.detached'.length).trim()
     if (!commandText) {
       this.log('Usage: .detached <command>')
       return
     }
 
-    const command = await sandbox.exec(commandText, { detached: true, onOutput: streamOutput })
+    const command = await sandbox.exec(commandText, { detached: true, onOutput: streamOutputWithPromptRedraw(rl) })
     this.log(`[detached: ${command.execId} pid: ${command.pid || 'unknown'}]`)
   }
 
