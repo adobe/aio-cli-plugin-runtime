@@ -215,6 +215,7 @@ During interactive sessions:
 SandboxRun.flags = {
   ...RuntimeBaseCommand.flags,
   name: Flags.string({
+    char: 'n',
     description: 'sandbox name',
     default: 'aio-sandbox'
   }),
@@ -237,6 +238,7 @@ SandboxRun.flags = {
 SandboxRun.examples = [
   '<%= config.bin %> <%= command.id %>',
   '<%= config.bin %> <%= command.id %> -- node --version',
+  '<%= config.bin %> <%= command.id %> -n my-sandbox -- node --version',
   '<%= config.bin %> <%= command.id %> -p 3000 -p 8080',
   '<%= config.bin %> <%= command.id %> -e allow-all',
   '<%= config.bin %> <%= command.id %> -e "pypi.org:443" -e "api.github.com:443|GET:/repos/**"'

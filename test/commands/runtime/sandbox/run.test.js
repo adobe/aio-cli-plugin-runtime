@@ -77,6 +77,7 @@ test('examples', async () => {
   expect(TheCommand.examples).toBeDefined()
   expect(TheCommand.examples).toBeInstanceOf(Array)
   expect(TheCommand.examples.length).toBeGreaterThan(0)
+  expect(TheCommand.examples).toContain('<%= config.bin %> <%= command.id %> -n my-sandbox -- node --version')
 })
 
 test('description includes REPL usage notes', async () => {
@@ -89,6 +90,7 @@ test('description includes REPL usage notes', async () => {
 
 test('flags', async () => {
   expect(typeof TheCommand.flags.name).toBe('object')
+  expect(TheCommand.flags.name.char).toBe('n')
   expect(TheCommand.flags.name.default).toBe('aio-sandbox')
   expect(TheCommand.flags.type).toBeUndefined()
   expect(TheCommand.flags.size).toBeUndefined()
@@ -345,6 +347,17 @@ describe('run', () => {
       type: expect.anything(),
       size: expect.anything()
     }))
+  })
+
+  test('forwards -n when running a one-shot command', async () => {
+    command.argv = ['-n', 'my-sandbox', '--', 'node', '--version']
+    await command.run()
+
+    expect(Sandbox.create).toHaveBeenCalledWith(expect.objectContaining({
+      name: 'my-sandbox'
+    }))
+    expect(sandbox.exec).toHaveBeenCalledWith('node --version', { timeout: 30000 })
+    expect(readline.createInterface).not.toHaveBeenCalled()
   })
 
   test('quit also destroys the sandbox', async () => {
