@@ -94,8 +94,12 @@ beforeEach(() => {
   stdout.start()
   stderr.start()
 
-  config.get.mockImplementation((key) => {
-    if (key === 'project.org.ims_org_id') return 'BA3E111222@AdobeOrg'
+  // Default binding: project.org.ims_org_id in global scope. Tests that
+  // need a local-.aio or env binding override this in-place.
+  config.get.mockImplementation((key, scope) => {
+    if (key === 'project.org.ims_org_id' && (scope === undefined || scope === 'global')) {
+      return 'BA3E111222@AdobeOrg'
+    }
     return undefined
   })
   context.getCurrent.mockResolvedValue(null)
@@ -312,6 +316,22 @@ describe('run() — happy path', () => {
     expect(body.surface).toBe('cli')
   })
 
+  test('--region accepts uppercase and forwards lowercase', async () => {
+    global.fetch.mockResolvedValueOnce(fetchResponse(200, IP_LIST_OK))
+    const cmd = makeCommand(['--region', 'AUS'])
+    await cmd.run()
+    const body = JSON.parse(global.fetch.mock.calls[0][1].body)
+    expect(body.region).toBe('aus')
+  })
+
+  test('--region accepts mixed case and forwards lowercase', async () => {
+    global.fetch.mockResolvedValueOnce(fetchResponse(200, IP_LIST_OK))
+    const cmd = makeCommand(['--region', 'Aus'])
+    await cmd.run()
+    const body = JSON.parse(global.fetch.mock.calls[0][1].body)
+    expect(body.region).toBe('aus')
+  })
+
   test('--service-host overrides the default', async () => {
     global.fetch.mockResolvedValueOnce(fetchResponse(200, IP_LIST_OK))
     const cmd = makeCommand(['--service-host', 'custom.adobeioruntime.net'])
@@ -343,6 +363,12 @@ describe('run() — input validation', () => {
     expect(global.fetch).not.toHaveBeenCalled()
   })
 
+  test('unknown region error preserves the user-supplied casing', async () => {
+    const cmd = makeCommand(['--region', 'MARS'])
+    await expect(cmd.run()).rejects.toThrow(/invalid region "MARS"/)
+    expect(global.fetch).not.toHaveBeenCalled()
+  })
+
   test('rejects --accept-terms without --contact-email', async () => {
     const cmd = makeCommand(['--accept-terms'])
     await expect(cmd.run()).rejects.toThrow(/--accept-terms requires --contact-email/)
@@ -367,9 +393,11 @@ describe('run() — input validation', () => {
     // After `aio console org select` without a subsequent `aio app use`,
     // the IMS org id is stored at console.org.code rather than
     // project.org.ims_org_id; the command must resolve it from there.
-    config.get.mockImplementation((key) => {
+    config.get.mockImplementation((key, scope) => {
       if (key === 'project.org.ims_org_id') return undefined
-      if (key === 'console.org.code') return 'C74F69D7594880280A495D09@AdobeOrg'
+      if (key === 'console.org.code' && (scope === undefined || scope === 'global')) {
+        return 'C74F69D7594880280A495D09@AdobeOrg'
+      }
       return undefined
     })
     global.fetch.mockResolvedValueOnce(fetchResponse(200, IP_LIST_OK))
@@ -382,7 +410,8 @@ describe('run() — input validation', () => {
   test('prefers project.org.ims_org_id over console.org.code when both are set', async () => {
     // An explicit `aio app use` binding (project-local) takes precedence
     // over the global `aio console org select` binding.
-    config.get.mockImplementation((key) => {
+    config.get.mockImplementation((key, scope) => {
+      if (scope !== undefined && scope !== 'global') return undefined
       if (key === 'project.org.ims_org_id') return 'PROJECT111@AdobeOrg'
       if (key === 'console.org.code') return 'CONSOLE222@AdobeOrg'
       return undefined
@@ -392,6 +421,98 @@ describe('run() — input validation', () => {
     await cmd.run()
     const sentBody = JSON.parse(global.fetch.mock.calls[0][1].body)
     expect(sentBody.imsOrgId).toBe('PROJECT111@AdobeOrg')
+  })
+})
+
+describe('run() — stale org id (403 token/org mismatch)', () => {
+  // Service envelope: 403 with `{error: "token does not grant access to org X@AdobeOrg"}`.
+  // Remediation routes by the source scope of the resolved org id:
+  // global/env → "saved org" + `aio console org select`; local → "this
+  // project" + `aio app use`.
+
+  test('global-config scope surfaces the "saved org" remediation', async () => {
+    config.get.mockImplementation((key, scope) => {
+      if (scope !== undefined && scope !== 'global') return undefined
+      if (key === 'console.org.code') return 'STALE111@AdobeOrg'
+      return undefined
+    })
+    global.fetch.mockResolvedValueOnce(fetchResponse(403, {
+      error: 'token does not grant access to org STALE111@AdobeOrg'
+    }))
+    let caught
+    try { await makeCommand([]).run() } catch (e) { caught = e }
+    expect(caught).toBeDefined()
+    expect(caught.message).toMatch(/saved Adobe org/)
+    expect(caught.message).toMatch(/STALE111@AdobeOrg/)
+    expect(caught.message).toMatch(/console\.org\.code/)
+    expect(caught.message).toMatch(/aio console org list/)
+    expect(caught.message).toMatch(/aio console org select/)
+    // `aio app use` is the local-binding remediation; it must not
+    // appear on the global-scope path.
+    expect(caught.message).not.toMatch(/aio app use/)
+  })
+
+  test('local .aio scope surfaces the project-binding remediation', async () => {
+    config.get.mockImplementation((key, scope) => {
+      if (key === 'project.org.ims_org_id' && (scope === undefined || scope === 'local')) {
+        return 'PROJBOUND@AdobeOrg'
+      }
+      return undefined
+    })
+    global.fetch.mockResolvedValueOnce(fetchResponse(403, {
+      error: 'token does not grant access to org PROJBOUND@AdobeOrg'
+    }))
+    let caught
+    try { await makeCommand([]).run() } catch (e) { caught = e }
+    expect(caught).toBeDefined()
+    expect(caught.message).toMatch(/this project's Adobe org/)
+    expect(caught.message).toMatch(/PROJBOUND@AdobeOrg/)
+    expect(caught.message).toMatch(/project\.org\.ims_org_id/)
+    expect(caught.message).toMatch(/aio app use/)
+    expect(caught.message).toMatch(/aio console org list/)
+    // `aio console org select` would mutate the global selection
+    // without fixing the local .aio binding that resolved here.
+    expect(caught.message).not.toMatch(/aio console org select/)
+  })
+
+  test('env-var scope surfaces the "saved org" remediation and labels the source as env', async () => {
+    config.get.mockImplementation((key, scope) => {
+      if (key === 'project.org.ims_org_id' && scope === 'env') return 'ENVORG@AdobeOrg'
+      return undefined
+    })
+    global.fetch.mockResolvedValueOnce(fetchResponse(403, {
+      error: 'token does not grant access to org ENVORG@AdobeOrg'
+    }))
+    let caught
+    try { await makeCommand([]).run() } catch (e) { caught = e }
+    expect(caught).toBeDefined()
+    expect(caught.message).toMatch(/saved Adobe org/)
+    expect(caught.message).toMatch(/env var/)
+  })
+
+  test('non-matching 403 body falls through to the generic error', async () => {
+    // Unrelated 403s (auth failures, etc.) must not be misclassified.
+    // TERMS_REQUIRED is matched earlier and covered separately.
+    global.fetch.mockResolvedValueOnce(fetchResponse(403, { error: 'something else' }))
+    const cmd = makeCommand([])
+    await expect(cmd.run()).rejects.toThrow(/ip-list service returned 403: something else/)
+  })
+
+  test('403 with a non-JSON body falls through to the generic error', async () => {
+    // A 403 from an upstream proxy may arrive as HTML rather than JSON;
+    // res.body is null and the stale-org matcher must short-circuit
+    // instead of throwing on the missing field.
+    global.fetch.mockResolvedValueOnce(fetchResponse(403, '<html>forbidden</html>'))
+    const cmd = makeCommand([])
+    await expect(cmd.run()).rejects.toThrow(/ip-list service returned 403/)
+  })
+
+  test('403 with a JSON body missing `error` falls through to the generic error', async () => {
+    // res.body is present but does not carry an `error` field, so the
+    // matcher exercises the `res.body.error || ''` fallback and short-circuits.
+    global.fetch.mockResolvedValueOnce(fetchResponse(403, { message: 'forbidden' }))
+    const cmd = makeCommand([])
+    await expect(cmd.run()).rejects.toThrow(/ip-list service returned 403: forbidden/)
   })
 })
 
