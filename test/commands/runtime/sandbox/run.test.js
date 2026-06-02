@@ -31,6 +31,7 @@ function fakeSandbox (overrides = {}) {
   return {
     id: 'sandbox-123',
     exec: jest.fn(),
+    getUrl: jest.fn(port => `https://sandbox-${port}.example.net`),
     destroy: jest.fn().mockResolvedValue({ status: 'destroyed' }),
     ...overrides
   }
@@ -93,6 +94,8 @@ test('flags', async () => {
   expect(TheCommand.flags.size).toBeUndefined()
   expect(TheCommand.flags.egress.char).toBe('e')
   expect(TheCommand.flags.egress.multiple).toBe(true)
+  expect(TheCommand.flags.port.char).toBe('p')
+  expect(TheCommand.flags.port.multiple).toBe(true)
   expect(TheCommand.flags['max-lifetime'].default).toBe(3600)
   expect(TheCommand.flags.interactive).toBeDefined()
   // inherits base flags
@@ -200,6 +203,29 @@ describe('parseEgressFlags', () => {
 
   test('rejects unknown HTTP method in L7 rule', () => {
     expect(() => TheCommand.parseEgressFlags(['a:80|FOO:/path'])).toThrow(/Invalid HTTP method/)
+  })
+})
+
+describe('parsePortFlags', () => {
+  test('returns undefined when no port flags are provided', () => {
+    expect(TheCommand.parsePortFlags(undefined)).toBeUndefined()
+    expect(TheCommand.parsePortFlags([])).toBeUndefined()
+  })
+
+  test('parses repeatable port flags', () => {
+    expect(TheCommand.parsePortFlags(['3000', '8080'])).toEqual([3000, 8080])
+  })
+
+  test('rejects non-numeric ports', () => {
+    expect(() => TheCommand.parsePortFlags(['abc'])).toThrow(/Invalid port/)
+  })
+
+  test('rejects decimal ports', () => {
+    expect(() => TheCommand.parsePortFlags(['3000.5'])).toThrow(/Invalid port/)
+  })
+
+  test('rejects out-of-range ports', () => {
+    expect(() => TheCommand.parsePortFlags(['65536'])).toThrow(/Invalid port/)
   })
 })
 
@@ -345,6 +371,30 @@ describe('run', () => {
       policy: { network: { egress: 'allow-all' } }
     }))
     expect(stdout.output).toMatch('Network policy: allow-all egress')
+  })
+
+  test('passes repeatable --port values through and logs preview URLs', async () => {
+    command.argv = ['--port', '3000', '-p', '8080']
+    await command.run()
+
+    expect(Sandbox.create).toHaveBeenCalledWith(expect.objectContaining({
+      ports: [3000, 8080]
+    }))
+    expect(sandbox.getUrl).toHaveBeenCalledWith(3000)
+    expect(sandbox.getUrl).toHaveBeenCalledWith(8080)
+    expect(stdout.output).toMatch('Preview URLs:')
+    expect(stdout.output).toMatch('3000: https://sandbox-3000.example.net')
+    expect(stdout.output).toMatch('8080: https://sandbox-8080.example.net')
+  })
+
+  test('rejects invalid --port before creating a sandbox', async () => {
+    command.argv = ['--port', '0']
+    await command.run()
+
+    expect(handleError).toHaveBeenCalledWith('failed to run sandbox', expect.objectContaining({
+      message: expect.stringMatching(/Invalid port/)
+    }))
+    expect(Sandbox.create).not.toHaveBeenCalled()
   })
 
   test('passes custom --egress rules through to policy and logs them', async () => {

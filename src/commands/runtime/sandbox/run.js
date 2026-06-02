@@ -17,6 +17,7 @@ const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 const {
   buildNetworkPolicy,
   buildSandboxCommand,
+  parsePortFlags,
   parseEgressFlags,
   splitArgvAtDoubleDash
 } = require('../../../sandbox-helpers')
@@ -47,6 +48,7 @@ class SandboxRun extends RuntimeBaseCommand {
       }
 
       const policy = buildNetworkPolicy(flags.egress)
+      const ports = parsePortFlags(flags.port)
       const options = await this.getOptions()
       const command = buildSandboxCommand(commandArgs)
 
@@ -58,11 +60,13 @@ class SandboxRun extends RuntimeBaseCommand {
         name: flags.name,
         maxLifetime: flags['max-lifetime'],
         envs: {},
+        ...(ports && { ports }),
         ...(policy && { policy })
       })
       this.log(`Created: ${sandbox.id}`)
 
       this._logPolicy(policy)
+      this._logPreviewUrls(sandbox, ports)
 
       if (command) {
         await this._runOnce(sandbox, command)
@@ -105,6 +109,17 @@ class SandboxRun extends RuntimeBaseCommand {
       const proto = rule.protocol || 'TCP'
       const l7 = rule.rules ? ' ' + rule.rules.map(r => `${r.methods.join(',')}:${r.pathPattern}`).join(' ') : ''
       this.log(`  - ${rule.host}:${rule.port} (${proto})${l7}`)
+    })
+  }
+
+  _logPreviewUrls (sandbox, ports) {
+    if (!ports) {
+      return
+    }
+
+    this.log('Preview URLs:')
+    ports.forEach(port => {
+      this.log(`  - ${port}: ${sandbox.getUrl(port)}`)
     })
   }
 
@@ -216,6 +231,11 @@ SandboxRun.flags = {
     description: 'egress rule in host:port[:protocol][|METHOD:path] format, or "allow-all" (repeatable)',
     multiple: true
   }),
+  port: Flags.string({
+    char: 'p',
+    description: 'Port to expose via a preview URL (repeatable)',
+    multiple: true
+  }),
   'max-lifetime': Flags.integer({
     description: 'maximum sandbox lifetime in seconds',
     default: 3600
@@ -229,6 +249,7 @@ SandboxRun.examples = [
   '<%= config.bin %> <%= command.id %>',
   '<%= config.bin %> <%= command.id %> --interactive',
   '<%= config.bin %> <%= command.id %> -- node --version',
+  '<%= config.bin %> <%= command.id %> -p 3000 -p 8080 --interactive',
   '<%= config.bin %> <%= command.id %> -e allow-all',
   '<%= config.bin %> <%= command.id %> -e "pypi.org:443" -e "api.github.com:443|GET:/repos/**"'
 ]
@@ -237,6 +258,7 @@ SandboxRun.aliases = ['rt:sandbox:run']
 
 // exposed for testing
 SandboxRun.parseEgressFlags = parseEgressFlags
+SandboxRun.parsePortFlags = parsePortFlags
 SandboxRun.buildNetworkPolicy = buildNetworkPolicy
 SandboxRun.splitArgvAtDoubleDash = splitArgvAtDoubleDash
 SandboxRun.buildSandboxCommand = buildSandboxCommand

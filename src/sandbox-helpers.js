@@ -13,6 +13,25 @@ governing permissions and limitations under the License.
 const VALID_HTTP_METHODS = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS']
 
 /**
+ * Parse a sandbox preview URL port value.
+ *
+ * @param {string|number} value raw port value
+ * @returns {number} parsed port
+ */
+function parsePort (value) {
+  const raw = String(value)
+  if (!/^\d+$/.test(raw)) {
+    throw new Error(`Invalid port "${value}". Port must be an integer between 1 and 65535`)
+  }
+
+  const port = Number(raw)
+  if (!Number.isInteger(port) || port < 1 || port > 65535) {
+    throw new Error(`Invalid port "${value}". Port must be an integer between 1 and 65535`)
+  }
+  return port
+}
+
+/**
  * Split oclif arguments at `--`. Everything after it belongs to the sandbox
  * command and must not be parsed as aio CLI flags.
  *
@@ -56,6 +75,19 @@ function buildSandboxCommand (commandArgs) {
     return commandArgs[0]
   }
   return commandArgs.map(shellQuote).join(' ')
+}
+
+/**
+ * Parse repeatable `--port` flag values for sandbox preview URLs.
+ *
+ * @param {Array<string|number>} [portArgs] raw port flag values
+ * @returns {number[]|undefined} parsed ports, or undefined when omitted
+ */
+function parsePortFlags (portArgs) {
+  if (!portArgs || portArgs.length === 0) {
+    return undefined
+  }
+  return portArgs.map(parsePort)
 }
 
 /**
@@ -132,6 +164,7 @@ function buildNetworkPolicy (egressArgs) {
 module.exports = {
   buildNetworkPolicy,
   buildSandboxCommand,
+  parsePortFlags,
   parseEgressFlags,
   splitArgvAtDoubleDash
 }
