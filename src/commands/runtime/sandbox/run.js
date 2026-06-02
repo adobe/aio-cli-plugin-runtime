@@ -11,98 +11,51 @@ governing permissions and limitations under the License.
 */
 
 const readline = require('node:readline')
+const { Sandbox } = require('@adobe/aio-lib-sandbox')
 const { Flags } = require('@oclif/core')
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
+const {
+  buildNetworkPolicy,
+  buildSandboxCommand,
+  parseEgressFlags,
+  splitArgvAtDoubleDash
+} = require('../../../sandbox-helpers')
 
-const VALID_HTTP_METHODS = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS']
 const EXEC_TIMEOUT_MS = 30000
-const PROBE_TIMEOUT_MS = 10000
 
 /**
- * Parse a list of `--egress` flag values into the `network.egress` rule array.
- * Throws on malformed input. The caller is responsible for handling the
- * `allow-all` shorthand separately.
+ * Write live command output to the matching local stream.
  *
- * @param {string[]} egressArgs raw flag values
- * @returns {Array<object>} parsed egress rules
+ * @param {string|Buffer} data output chunk
+ * @param {string} stream stream name from the sandbox SDK
  */
-function parseEgressFlags (egressArgs) {
-  return egressArgs.map(arg => {
-    // Split on | to separate L4 (host:port[:protocol]) from optional L7 (METHOD[,METHOD]:path)
-    const pipeIdx = arg.indexOf('|')
-    const l4Part = pipeIdx === -1 ? arg : arg.slice(0, pipeIdx)
-    const l7Part = pipeIdx === -1 ? null : arg.slice(pipeIdx + 1)
-
-    const parts = l4Part.split(':')
-    if (parts.length < 2 || parts.length > 3) {
-      throw new Error(`Invalid egress format: "${arg}". Expected host:port[:protocol][|METHOD:path]`)
-    }
-    const port = parseInt(parts[1], 10)
-    if (Number.isNaN(port) || port < 1 || port > 65535) {
-      throw new Error(`Invalid port in egress rule: "${arg}". Port must be 1-65535`)
-    }
-    const rule = { host: parts[0], port }
-    if (parts[2]) {
-      const proto = parts[2].toUpperCase()
-      if (proto !== 'TCP' && proto !== 'UDP') {
-        throw new Error(`Invalid protocol in egress rule: "${arg}". Must be TCP or UDP`)
-      }
-      rule.protocol = proto
-    }
-
-    if (l7Part) {
-      const colonIdx = l7Part.indexOf(':')
-      if (colonIdx === -1 || !l7Part.slice(colonIdx + 1).startsWith('/')) {
-        throw new Error(`Invalid L7 rule: "${arg}". Expected METHOD[,METHOD]:/ after |`)
-      }
-      const methods = l7Part.slice(0, colonIdx).split(',').map(m => m.trim().toUpperCase())
-      const pathPattern = l7Part.slice(colonIdx + 1)
-      for (const method of methods) {
-        if (!VALID_HTTP_METHODS.includes(method)) {
-          throw new Error(`Invalid HTTP method "${method}" in "${arg}". Must be one of: ${VALID_HTTP_METHODS.join(', ')}`)
-        }
-      }
-      rule.rules = [{ methods, pathPattern }]
-    }
-
-    return rule
-  })
-}
-
-/**
- * Build the sandbox `policy` object from `--egress` flag values, or return
- * `undefined` if no egress flags were provided.
- *
- * @param {string[]} [egressArgs] raw `--egress` flag values
- * @returns {object|undefined} sandbox policy
- */
-function buildPolicy (egressArgs) {
-  if (!egressArgs || egressArgs.length === 0) {
-    return undefined
-  }
-  if (egressArgs.length === 1 && egressArgs[0] === 'allow-all') {
-    return { network: { egress: 'allow-all' } }
-  }
-  if (egressArgs.includes('allow-all')) {
-    throw new Error('allow-all cannot be combined with other egress rules.')
-  }
-  return { network: { egress: parseEgressFlags(egressArgs) } }
+function streamOutput (data, stream) {
+  const sink = stream === 'stderr' ? process.stderr : process.stdout
+  sink.write(data)
 }
 
 class SandboxRun extends RuntimeBaseCommand {
   async run () {
-    const { flags } = await this.parse(SandboxRun)
+    const { cliArgs, commandArgs, hasSeparator } = splitArgvAtDoubleDash(this.argv)
+    const { flags } = await this.parse(SandboxRun, cliArgs)
 
     let sandbox
     let rl
     try {
-      const policy = buildPolicy(flags.egress)
-      const ow = await this.wsk()
+      if (commandArgs.length === 0 && !flags.interactive && hasSeparator) {
+        throw new Error('Missing command after --. Use --interactive for an interactive session.')
+      }
+
+      const policy = buildNetworkPolicy(flags.egress)
+      const options = await this.getOptions()
+      const command = buildSandboxCommand(commandArgs)
 
       this.log('\nCreating sandbox...')
-      sandbox = await ow.compute.sandbox.create({
+      sandbox = await Sandbox.create({
+        apiHost: options.apihost,
+        namespace: options.namespace,
+        auth: options.api_key,
         name: flags.name,
-        workspace: 'workspace',
         maxLifetime: flags['max-lifetime'],
         envs: {},
         ...(policy && { policy })
@@ -111,10 +64,16 @@ class SandboxRun extends RuntimeBaseCommand {
 
       this._logPolicy(policy)
 
-      this.log('\nSandbox ready. Type ".help" for commands, or "exit" to destroy and quit.\n')
+      if (command) {
+        await this._runOnce(sandbox, command)
+      }
 
-      rl = readline.createInterface({ input: process.stdin, output: process.stdout })
-      await this._repl(rl, sandbox)
+      if (flags.interactive || !command) {
+        this.log('\nSandbox ready. Type "exit" to destroy and quit.\n')
+
+        rl = readline.createInterface({ input: process.stdin, output: process.stdout })
+        await this._repl(rl, sandbox)
+      }
     } catch (err) {
       await this.handleError('failed to run sandbox', err)
     } finally {
@@ -161,7 +120,9 @@ class SandboxRun extends RuntimeBaseCommand {
       }
 
       try {
-        if (trimmed.includes(' <<< ')) {
+        if (trimmed.startsWith('.detached')) {
+          await this._handleDetached(sandbox, trimmed)
+        } else if (trimmed.includes(' <<< ')) {
           await this._handleHereString(sandbox, trimmed)
         } else {
           await this._handleExec(sandbox, trimmed)
@@ -181,6 +142,26 @@ class SandboxRun extends RuntimeBaseCommand {
     if (result.stdout) process.stdout.write(result.stdout)
     if (result.stderr) process.stderr.write(result.stderr)
     this.log(`[exit: ${result.exitCode}]`)
+  }
+
+  async _handleDetached (sandbox, input) {
+    const commandText = input.slice('.detached'.length).trim()
+    if (!commandText) {
+      this.log('Usage: .detached <command>')
+      return
+    }
+
+    const command = await sandbox.exec(commandText, { detached: true, onOutput: streamOutput })
+    this.log(`[detached: ${command.execId} pid: ${command.pid || 'unknown'}]`)
+  }
+
+  async _runOnce (sandbox, cmd) {
+    const result = await sandbox.exec(cmd, { timeout: EXEC_TIMEOUT_MS })
+    if (result.stdout) process.stdout.write(result.stdout)
+    if (result.stderr) process.stderr.write(result.stderr)
+    if (result.exitCode) {
+      process.exitCode = result.exitCode
+    }
   }
 
   async _handleHereString (sandbox, input) {
@@ -203,19 +184,26 @@ class SandboxRun extends RuntimeBaseCommand {
     }
     this.log(`[exit: ${result.exitCode}]\n`)
   }
-
 }
 
-SandboxRun.description = `Create a sandbox and run an interactive REPL against it.
+SandboxRun.description = `Create a sandbox and run a command against it.
+
+Pass -- <command> to run one command, print its output, destroy the sandbox,
+and exit with the command's status.
+
+Use --interactive, or omit -- <command>, to enter a REPL. When --interactive
+is combined with -- <command>, the command runs before the REPL starts.
 
 Each command you enter runs in a fresh process; shell state (working directory,
 environment exports) does not persist between prompts. Chain commands to work
 around this: cd mydir && npm install
 
-Send text to stdin with the here-string operator:
+During interactive sessions: 
+- Send text to stdin with the here-string operator:
   command <<< "text"
-
-Type exit or quit to destroy the sandbox and leave.`
+- Start a background command and stream its output with:
+  .detached <command>
+- Type exit or quit to destroy the sandbox and leave.`
 
 SandboxRun.flags = {
   ...RuntimeBaseCommand.flags,
@@ -231,11 +219,16 @@ SandboxRun.flags = {
   'max-lifetime': Flags.integer({
     description: 'maximum sandbox lifetime in seconds',
     default: 3600
+  }),
+  interactive: Flags.boolean({
+    description: 'enter an interactive command loop instead of running a one-shot command'
   })
 }
 
 SandboxRun.examples = [
   '<%= config.bin %> <%= command.id %>',
+  '<%= config.bin %> <%= command.id %> --interactive',
+  '<%= config.bin %> <%= command.id %> -- node --version',
   '<%= config.bin %> <%= command.id %> -e allow-all',
   '<%= config.bin %> <%= command.id %> -e "pypi.org:443" -e "api.github.com:443|GET:/repos/**"'
 ]
@@ -244,6 +237,8 @@ SandboxRun.aliases = ['rt:sandbox:run']
 
 // exposed for testing
 SandboxRun.parseEgressFlags = parseEgressFlags
-SandboxRun.buildPolicy = buildPolicy
+SandboxRun.buildNetworkPolicy = buildNetworkPolicy
+SandboxRun.splitArgvAtDoubleDash = splitArgvAtDoubleDash
+SandboxRun.buildSandboxCommand = buildSandboxCommand
 
 module.exports = SandboxRun
