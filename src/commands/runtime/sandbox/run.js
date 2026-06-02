@@ -102,8 +102,6 @@ class SandboxRun extends RuntimeBaseCommand {
       this.log('\nCreating sandbox...')
       sandbox = await ow.compute.sandbox.create({
         name: flags.name,
-        ...(flags.type && { type: flags.type }),
-        ...(flags.size && { size: flags.size }),
         workspace: 'workspace',
         maxLifetime: flags['max-lifetime'],
         envs: {},
@@ -112,9 +110,6 @@ class SandboxRun extends RuntimeBaseCommand {
       this.log(`Created: ${sandbox.id}`)
 
       this._logPolicy(policy)
-
-      const probe = await sandbox.exec('node --version', { timeout: PROBE_TIMEOUT_MS })
-      this.log(`Node version: ${(probe.stdout || '').trim()} | exit: ${probe.exitCode}`)
 
       this.log('\nSandbox ready. Type ".help" for commands, or "exit" to destroy and quit.\n')
 
@@ -228,15 +223,6 @@ SandboxRun.flags = {
     description: 'sandbox name',
     default: 'aio-sandbox'
   }),
-  type: Flags.string({
-    char: 't',
-    description: 'sandbox type (e.g. cpu:default, cpu:nodejs)'
-  }),
-  size: Flags.string({
-    char: 's',
-    description: 'sandbox size',
-    options: ['SMALL', 'MEDIUM', 'LARGE', 'XLARGE']
-  }),
   egress: Flags.string({
     char: 'e',
     description: 'egress rule in host:port[:protocol][|METHOD:path] format, or "allow-all" (repeatable)',
@@ -251,8 +237,7 @@ SandboxRun.flags = {
 SandboxRun.examples = [
   '<%= config.bin %> <%= command.id %>',
   '<%= config.bin %> <%= command.id %> -e allow-all',
-  '<%= config.bin %> <%= command.id %> -e "pypi.org:443" -e "api.github.com:443|GET:/repos/**"',
-  '<%= config.bin %> <%= command.id %> --size LARGE --type cpu:nodejs'
+  '<%= config.bin %> <%= command.id %> -e "pypi.org:443" -e "api.github.com:443|GET:/repos/**"'
 ]
 
 SandboxRun.aliases = ['rt:sandbox:run']
