@@ -20,6 +20,11 @@ const mockRtLibInstance = {
   },
   feeds: {},
   routes: {},
+  compute: {
+    sandbox: {
+      create: jest.fn()
+    }
+  },
   mockFn: function (methodName) {
     const cmd = methodName.split('.')
     let method = this
