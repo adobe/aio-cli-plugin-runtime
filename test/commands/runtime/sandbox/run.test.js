@@ -504,6 +504,16 @@ describe('run', () => {
     expect(stdout.output).toMatch('exec error: plain string error')
   })
 
+  test('REPL: timeout errors include a hint to use .detached', async () => {
+    readline.createInterface.mockReturnValue(makeRl(['sleep 35', 'exit']))
+    sandbox.exec.mockRejectedValueOnce(new Error("Command 'sleep 35' exceeded timeout of 30000ms"))
+
+    command.argv = []
+    await command.run()
+
+    expect(stdout.output).toMatch('exec error: Command \'sleep 35\' exceeded timeout of 30000ms (use .detached for long-running commands)')
+  })
+
   test('REPL: detached command starts in background and streams output', async () => {
     const rl = makeRl(['.detached npm run dev', 'exit'])
     readline.createInterface.mockReturnValue(rl)

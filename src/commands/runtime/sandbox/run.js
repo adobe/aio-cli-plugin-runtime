@@ -179,7 +179,9 @@ class SandboxRun extends RuntimeBaseCommand {
           await this._handleExec(sandbox, trimmed)
         }
       } catch (err) {
-        this.log(`exec error: ${err.message || err}`)
+        const msg = err.message || String(err)
+        const hint = msg.includes('exceeded timeout') ? ' (use .detached for long-running commands)' : ''
+        this.log(`exec error: ${msg}${hint}`)
       }
     }
   }
