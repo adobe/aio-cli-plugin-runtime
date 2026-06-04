@@ -16,7 +16,6 @@ const { Flags } = require('@oclif/core')
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 const {
   buildNetworkPolicy,
-  buildSandboxCommand,
   parsePortFlags,
   parseEgressFlags,
   splitArgvAtDoubleDash
@@ -72,13 +71,22 @@ class SandboxRun extends RuntimeBaseCommand {
     const { cliArgs, commandArgs } = splitArgvAtDoubleDash(this.argv)
     const { flags } = await this.parse(SandboxRun, cliArgs)
 
+    if (commandArgs.length > 0) {
+      this._failUsage('This command only supports interactive use. Omit "-- <command>" and type commands when prompted.')
+      return
+    }
+
+    if (process.stdin.isTTY !== true) {
+      this._failUsage('This command requires an interactive terminal. Piped stdin is not supported.')
+      return
+    }
+
     let sandbox
     let rl
     try {
       const policy = buildNetworkPolicy(flags.egress)
       const ports = parsePortFlags(flags.port)
       const options = await this.getOptions()
-      const command = buildSandboxCommand(commandArgs)
 
       this.log('\nCreating sandbox...')
       sandbox = await Sandbox.create({
@@ -96,17 +104,11 @@ class SandboxRun extends RuntimeBaseCommand {
       this._logPolicy(policy)
       await this._logPreviewUrls(sandbox, ports)
 
-      if (command) {
-        await this._runOnce(sandbox, command)
-      }
+      this.log('\nSandbox ready. Type "exit" to destroy and quit.\n')
 
-      if (!command) {
-        this.log('\nSandbox ready. Type "exit" to destroy and quit.\n')
-
-        rl = readline.createInterface({ input: process.stdin, output: process.stdout })
-        rl.setPrompt(REPL_PROMPT)
-        await this._repl(rl, sandbox)
-      }
+      rl = readline.createInterface({ input: process.stdin, output: process.stdout })
+      rl.setPrompt(REPL_PROMPT)
+      await this._repl(rl, sandbox)
     } catch (err) {
       await this.handleError('failed to run sandbox', err)
     } finally {
@@ -122,6 +124,11 @@ class SandboxRun extends RuntimeBaseCommand {
         }
       }
     }
+  }
+
+  _failUsage (message) {
+    process.stderr.write(`${message}\n`)
+    process.exitCode = 2
   }
 
   _logPolicy (policy) {
@@ -199,15 +206,6 @@ class SandboxRun extends RuntimeBaseCommand {
     this.log(`[detached: ${command.execId} pid: ${command.pid || 'unknown'}]`)
   }
 
-  async _runOnce (sandbox, cmd) {
-    const result = await sandbox.exec(cmd, { timeout: EXEC_TIMEOUT_MS })
-    if (result.stdout) process.stdout.write(result.stdout)
-    if (result.stderr) process.stderr.write(result.stderr)
-    if (result.exitCode) {
-      process.exitCode = result.exitCode
-    }
-  }
-
   async _handleHereString (sandbox, input) {
     const idx = input.indexOf(' <<< ')
     const command = input.slice(0, idx).trim()
@@ -235,9 +233,7 @@ SandboxRun.description = `
 sandboxes enabled before you can use this command; contact Adobe to request
 access.
 
-Create a sandbox and run commands against it.
-
-Pass -- <command> to run one command and destroy the sandbox.
+Create a sandbox and run commands against it interactively.
 
 Each command you enter runs in a fresh process. Shell state (working directory,
 env exports) does not persist between prompts. Chain commands to work
@@ -275,8 +271,7 @@ SandboxRun.flags = {
 
 SandboxRun.examples = [
   '<%= config.bin %> <%= command.id %>',
-  '<%= config.bin %> <%= command.id %> -- node --version',
-  '<%= config.bin %> <%= command.id %> -n my-sandbox -- node --version',
+  '<%= config.bin %> <%= command.id %> -n my-sandbox',
   '<%= config.bin %> <%= command.id %> -p 3000 -p 8080',
   '<%= config.bin %> <%= command.id %> -e allow-all',
   '<%= config.bin %> <%= command.id %> -e "pypi.org:443" -e "api.github.com:443|GET:/repos/**"'
@@ -289,6 +284,5 @@ SandboxRun.parseEgressFlags = parseEgressFlags
 SandboxRun.parsePortFlags = parsePortFlags
 SandboxRun.buildNetworkPolicy = buildNetworkPolicy
 SandboxRun.splitArgvAtDoubleDash = splitArgvAtDoubleDash
-SandboxRun.buildSandboxCommand = buildSandboxCommand
 
 module.exports = SandboxRun

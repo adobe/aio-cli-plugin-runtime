@@ -79,14 +79,14 @@ test('examples', async () => {
   expect(TheCommand.examples).toBeDefined()
   expect(TheCommand.examples).toBeInstanceOf(Array)
   expect(TheCommand.examples.length).toBeGreaterThan(0)
-  expect(TheCommand.examples).toContain('<%= config.bin %> <%= command.id %> -n my-sandbox -- node --version')
+  expect(TheCommand.examples).toContain('<%= config.bin %> <%= command.id %> -n my-sandbox')
 })
 
 test('description includes REPL usage notes', async () => {
   expect(TheCommand.description).toMatch(/fresh process/)
   expect(TheCommand.description).toMatch(/<<</)
   expect(TheCommand.description).toMatch(/exit/)
-  expect(TheCommand.description).toMatch(/-- <command>/)
+  expect(TheCommand.description).toMatch(/interactively/)
   expect(TheCommand.description).toMatch(/\.detached <command>/)
 })
 
@@ -125,26 +125,12 @@ describe('splitArgvAtDoubleDash', () => {
     })
   })
 
-  test('splits CLI args from one-shot command args', () => {
+  test('splits CLI args from rejected command args', () => {
     expect(TheCommand.splitArgvAtDoubleDash(['--name', 'box', '--', 'node', '--version'])).toEqual({
       cliArgs: ['--name', 'box'],
       commandArgs: ['node', '--version'],
       hasSeparator: true
     })
-  })
-})
-
-describe('buildSandboxCommand', () => {
-  test('joins safe command args', () => {
-    expect(TheCommand.buildSandboxCommand(['node', '--version'])).toBe('node --version')
-  })
-
-  test('preserves a single command string as-is', () => {
-    expect(TheCommand.buildSandboxCommand(['npm test -- --watch'])).toBe('npm test -- --watch')
-  })
-
-  test('quotes command args that contain shell-sensitive characters', () => {
-    expect(TheCommand.buildSandboxCommand(['node', '-e', 'console.log("hello world")'])).toBe('node -e \'console.log("hello world")\'')
   })
 })
 
@@ -267,6 +253,8 @@ describe('run', () => {
   let command
   let handleError
   let sandbox
+  const originalStdinIsTTY = process.stdin.isTTY
+  const originalExitCode = process.exitCode
 
   beforeEach(async () => {
     command = new TheCommand([])
@@ -279,6 +267,18 @@ describe('run', () => {
     readline.clearLine = jest.fn()
     readline.cursorTo = jest.fn()
     readline.createInterface.mockReturnValue(makeRl(['exit']))
+    Object.defineProperty(process.stdin, 'isTTY', {
+      value: true,
+      configurable: true
+    })
+  })
+
+  afterEach(() => {
+    process.exitCode = originalExitCode
+    Object.defineProperty(process.stdin, 'isTTY', {
+      value: originalStdinIsTTY,
+      configurable: true
+    })
   })
 
   test('creates a sandbox with default flags and destroys on exit', async () => {
@@ -299,33 +299,50 @@ describe('run', () => {
     expect(sandbox.destroy).toHaveBeenCalled()
   })
 
-  test('runs command after -- once, prints output, and destroys sandbox', async () => {
+  test('rejects command after -- before creating a sandbox', async () => {
     command.argv = ['--', 'node', '--version']
     await command.run()
 
+    expect(stderr.output).toMatch('only supports interactive use')
+    expect(stderr.output).not.toMatch('CLIError')
+    expect(process.exitCode).toBe(2)
+    expect(handleError).not.toHaveBeenCalled()
+    expect(Sandbox.create).not.toHaveBeenCalled()
     expect(readline.createInterface).not.toHaveBeenCalled()
-    expect(sandbox.exec).toHaveBeenCalledWith('node --version', { timeout: 30000 })
-    expect(stdout.output).toMatch('v20.0.0')
-    expect(sandbox.destroy).toHaveBeenCalled()
+    expect(sandbox.exec).not.toHaveBeenCalled()
+    expect(sandbox.destroy).not.toHaveBeenCalled()
   })
 
-  test('one-shot command preserves argument boundaries', async () => {
-    command.argv = ['--', 'node', '-e', 'console.log("hello world")']
+  test('rejects piped stdin before creating a sandbox', async () => {
+    Object.defineProperty(process.stdin, 'isTTY', {
+      value: false,
+      configurable: true
+    })
+    command.argv = []
     await command.run()
 
-    expect(sandbox.exec).toHaveBeenCalledWith('node -e \'console.log("hello world")\'', { timeout: 30000 })
+    expect(stderr.output).toMatch('Piped stdin is not supported')
+    expect(stderr.output).not.toMatch('CLIError')
+    expect(process.exitCode).toBe(2)
+    expect(handleError).not.toHaveBeenCalled()
+    expect(Sandbox.create).not.toHaveBeenCalled()
+    expect(readline.createInterface).not.toHaveBeenCalled()
   })
 
-  test('one-shot command writes stderr and sets process exitCode', async () => {
-    const previousExitCode = process.exitCode
-    sandbox.exec.mockResolvedValue({ stdout: '', stderr: 'boom\n', exitCode: 7 })
-
-    command.argv = ['--', 'false']
+  test('rejects file-redirected stdin before creating a sandbox', async () => {
+    Object.defineProperty(process.stdin, 'isTTY', {
+      value: undefined,
+      configurable: true
+    })
+    command.argv = []
     await command.run()
 
-    expect(stderr.output).toMatch('boom')
-    expect(process.exitCode).toBe(7)
-    process.exitCode = previousExitCode
+    expect(stderr.output).toMatch('Piped stdin is not supported')
+    expect(stderr.output).not.toMatch('CLIError')
+    expect(process.exitCode).toBe(2)
+    expect(handleError).not.toHaveBeenCalled()
+    expect(Sandbox.create).not.toHaveBeenCalled()
+    expect(readline.createInterface).not.toHaveBeenCalled()
   })
 
   test('omitting a command enters the REPL', async () => {
@@ -362,15 +379,15 @@ describe('run', () => {
     }))
   })
 
-  test('forwards -n when running a one-shot command', async () => {
-    command.argv = ['-n', 'my-sandbox', '--', 'node', '--version']
+  test('forwards -n when entering the REPL', async () => {
+    command.argv = ['-n', 'my-sandbox']
     await command.run()
 
     expect(Sandbox.create).toHaveBeenCalledWith(expect.objectContaining({
       name: 'my-sandbox'
     }))
-    expect(sandbox.exec).toHaveBeenCalledWith('node --version', { timeout: 30000 })
-    expect(readline.createInterface).not.toHaveBeenCalled()
+    expect(sandbox.exec).not.toHaveBeenCalled()
+    expect(readline.createInterface).toHaveBeenCalled()
   })
 
   test('quit also destroys the sandbox', async () => {
