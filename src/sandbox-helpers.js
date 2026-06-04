@@ -51,33 +51,6 @@ function splitArgvAtDoubleDash (argv) {
 }
 
 /**
- * Quote argv tokens so the remote shell receives the same argument boundaries
- * the local shell passed after `--`.
- *
- * @param {string} arg command argument
- * @returns {string} shell-safe argument
- */
-function shellQuote (arg) {
-  if (/^[A-Za-z0-9_./:=@%+,-]+$/.test(arg)) {
-    return arg
-  }
-  return `'${arg.replace(/'/g, "'\\''")}'`
-}
-
-/**
- * Convert args after `--` to a command string for the sandbox executor.
- *
- * @param {string[]} commandArgs raw command args
- * @returns {string} command string
- */
-function buildSandboxCommand (commandArgs) {
-  if (commandArgs.length === 1) {
-    return commandArgs[0]
-  }
-  return commandArgs.map(shellQuote).join(' ')
-}
-
-/**
  * Parse repeatable `--port` flag values for sandbox preview URLs.
  *
  * @param {Array<string|number>} [portArgs] raw port flag values
@@ -163,7 +136,6 @@ function buildNetworkPolicy (egressArgs) {
 
 module.exports = {
   buildNetworkPolicy,
-  buildSandboxCommand,
   parsePortFlags,
   parseEgressFlags,
   splitArgvAtDoubleDash
