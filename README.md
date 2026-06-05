@@ -28,12 +28,6 @@ Adobe I/O Runtime plugin for the Adobe I/O CLI
 * [aio-cli-plugin-runtime](#aio-cli-plugin-runtime)
 * [Usage](#usage)
 * [Commands](#commands)
-* [? Accept terms v1? (Y/n)](#-accept-terms-v1-yn)
-* [? Contact email (for IP-change notifications): you@example.com](#-contact-email-for-ip-change-notifications-youexamplecom)
-* [Option 1 — rebind the project to a workspace in the new org:](#option-1--rebind-the-project-to-a-workspace-in-the-new-org)
-* [Option 2 — drop the project binding entirely and use the console org selection:](#option-2--drop-the-project-binding-entirely-and-use-the-console-org-selection)
-* [If a local .aio file exists in your current directory, also remove it](#if-a-local-aio-file-exists-in-your-current-directory-also-remove-it)
-* [(or run the command from a different directory).](#or-run-the-command-from-a-different-directory)
 <!-- tocstop -->
 
 # Usage
@@ -2419,9 +2413,9 @@ aio runtime ip-list get
 The first time a given Adobe user runs the command against a given Adobe org, the service requires acceptance of the terms of use for that org and prompts for a contact email used for IP-change notifications:
 
 ```bash
-aio runtime ip-list get
-# ? Accept terms v1? (Y/n)
-# ? Contact email (for IP-change notifications): you@example.com
+$ aio runtime ip-list get
+? Accept terms v1? (Y/n)
+? Contact email (for IP-change notifications): you@example.com
 ```
 
 For non-interactive contexts (CI, scripts, automation), supply the acceptance flag and a contact email directly:
@@ -2449,18 +2443,22 @@ aio runtime ip-list get      # no prompt — IPs returned directly
 
 `aio app use` writes an IMS org id binding to `project.org.ims_org_id` (in both the global aio config and a local `.aio` file in the project directory). That binding takes precedence over `aio console org select` for this command. To target a different org:
 
+**Option 1 — rebind the project to a workspace in the new org:**
+
 ```bash
-# Option 1 — rebind the project to a workspace in the new org:
 aio console org select          # new org
 aio console project select      # a project you belong to in that org
 aio console workspace select
 aio app use
-
-# Option 2 — drop the project binding entirely and use the console org selection:
-aio config delete project.org.ims_org_id
-# If a local .aio file exists in your current directory, also remove it
-# (or run the command from a different directory).
 ```
+
+**Option 2 — drop the project binding entirely and use the console org selection:**
+
+```bash
+aio config delete project.org.ims_org_id
+```
+
+If a local `.aio` file exists in your current directory, also remove it (or run the command from a different directory).
 
 #### Common errors and how to resolve them
 
