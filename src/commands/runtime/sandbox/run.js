@@ -72,12 +72,12 @@ class SandboxRun extends RuntimeBaseCommand {
     const { flags } = await this.parse(SandboxRun, cliArgs)
 
     if (commandArgs.length > 0) {
-      this._failUsage('This command only supports interactive use. Omit "-- <command>" and type commands when prompted.')
+      this._failUsage('This command only supports interactive use. Omit "-- <command>" and type commands when prompted, or use "aio runtime sandbox exec" for one-shot or scripted commands.')
       return
     }
 
     if (process.stdin.isTTY !== true) {
-      this._failUsage('This command requires an interactive terminal. Piped stdin is not supported.')
+      this._failUsage('This command requires an interactive terminal. Piped stdin is not supported; use "aio runtime sandbox exec" to run a piped list of commands.')
       return
     }
 

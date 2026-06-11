@@ -98,6 +98,7 @@ $ aio runtime --help
 * [`aio runtime rule status NAME`](#aio-runtime-rule-status-name)
 * [`aio runtime rule update NAME TRIGGER ACTION`](#aio-runtime-rule-update-name-trigger-action)
 * [`aio runtime sandbox`](#aio-runtime-sandbox)
+* [`aio runtime sandbox exec`](#aio-runtime-sandbox-exec)
 * [`aio runtime sandbox run`](#aio-runtime-sandbox-run)
 * [`aio runtime trigger`](#aio-runtime-trigger)
 * [`aio runtime trigger create TRIGGERNAME`](#aio-runtime-trigger-create-triggername)
@@ -2183,6 +2184,73 @@ ALIASES
 ```
 
 _See code: [src/commands/runtime/sandbox/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.4.0/src/commands/runtime/sandbox/index.js)_
+
+## `aio runtime sandbox exec`
+
+[Alpha] Sandboxes are in a closed alpha. Your namespace must have
+
+```
+USAGE
+  $ aio runtime sandbox exec [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>] [-v] [--version]
+    [--help] [-n <value>] [-e <value>...] [-p <value>...] [--max-lifetime <value>] [--command-timeout <value>]
+    [--fail-fast]
+
+FLAGS
+  -e, --egress=<value>...        egress rule in host:port[:protocol][|METHOD:path] format, or "allow-all" (repeatable)
+  -i, --insecure                 bypass certificate check
+  -n, --name=<value>             [default: aio-sandbox] sandbox name
+  -p, --port=<value>...          Port to expose via a preview URL (repeatable)
+  -u, --auth                     [env: WHISK_AUTH] whisk auth
+  -v, --verbose                  Verbose output
+      --apihost                  [env: WHISK_APIHOST] whisk API host
+      --apiversion               [env: WHISK_APIVERSION] whisk API version
+      --cert                     client cert
+      --command-timeout=<value>  [default: 30000] per-command timeout in milliseconds
+      --debug=<value>            Debug level output
+      --fail-fast                stop execution when a command returns a non-zero exit code
+      --help                     Show help
+      --key                      client key
+      --max-lifetime=<value>     [default: 3600] maximum sandbox lifetime in seconds
+      --version                  Show version
+
+DESCRIPTION
+
+  [Alpha] Sandboxes are in a closed alpha. Your namespace must have
+  sandboxes enabled before you can use this command; contact Adobe to request
+  access.
+
+  Create a sandbox and run one or more commands non-interactively, then destroy it.
+
+  Provide a one-shot command after "--" and/or pipe a newline-separated list of
+  commands on stdin. When both are given, the one-shot command runs first,
+  followed by the piped commands in order.
+
+  Each command runs in a fresh process. Shell state (working directory, env
+  exports) does not persist between commands. Chain commands to work around
+  this: cd mydir && npm install
+
+  By default every command runs and the process exits with the last non-zero
+  exit code. Use --fail-fast to stop at the first failure. Each command is
+  capped at --command-timeout milliseconds (default 30000).
+
+  For an interactive session, use "aio runtime sandbox run" instead.
+
+ALIASES
+  $ aio rt sandbox exec
+
+EXAMPLES
+  $ aio runtime sandbox exec -- node --version
+
+  $ aio runtime sandbox exec < commands.txt
+
+  $ aio runtime sandbox exec -- node --version < commands.txt
+
+  $ aio runtime sandbox exec -e allow-all -p 5173 < commands.txt
+
+  $ aio runtime sandbox exec --fail-fast --command-timeout 120000 < commands.txt
+```
+
+_See code: [src/commands/runtime/sandbox/exec.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.4.0/src/commands/runtime/sandbox/exec.js)_
 
 ## `aio runtime sandbox run`
 
