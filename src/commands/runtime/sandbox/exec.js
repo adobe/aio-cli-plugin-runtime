@@ -19,10 +19,12 @@ const {
   parseEgressFlags,
   splitArgvAtDoubleDash,
   buildCommandList,
-  shellQuote
+  shellQuote,
+  logPolicy,
+  logPreviewUrls
 } = require('../../../sandbox-helpers')
 
-const COMMAND_TIMEOUT_MS = 30000
+const DEFAULT_COMMAND_TIMEOUT_MS = 30000
 
 class SandboxExec extends RuntimeBaseCommand {
   async init () {
@@ -64,8 +66,8 @@ class SandboxExec extends RuntimeBaseCommand {
       })
       this.log(`Created: ${sandbox.id}`)
 
-      this._logPolicy(policy)
-      await this._logPreviewUrls(sandbox, ports)
+      logPolicy(policy, msg => this.log(msg))
+      await logPreviewUrls(sandbox, ports, msg => this.log(msg))
 
       await this._runCommands(sandbox, commands, flags)
     } catch (err) {
@@ -94,34 +96,6 @@ class SandboxExec extends RuntimeBaseCommand {
   _failUsage (message) {
     process.stderr.write(`${message}\n`)
     process.exitCode = 2
-  }
-
-  _logPolicy (policy) {
-    if (!policy) {
-      this.log('Network policy: default-deny (DNS + NATS only)')
-      return
-    }
-    if (policy.network.egress === 'allow-all') {
-      this.log('Network policy: allow-all egress')
-      return
-    }
-    this.log('Network policy: custom egress')
-    policy.network.egress.forEach(rule => {
-      const proto = rule.protocol || 'TCP'
-      const l7 = rule.rules ? ' ' + rule.rules.map(r => `${r.methods.join(',')}:${r.pathPattern}`).join(' ') : ''
-      this.log(`  - ${rule.host}:${rule.port} (${proto})${l7}`)
-    })
-  }
-
-  async _logPreviewUrls (sandbox, ports) {
-    if (!ports) {
-      return
-    }
-
-    this.log('Preview URLs:')
-    for (const port of ports) {
-      this.log(`  - ${port}: ${await sandbox.getUrl(port)}`)
-    }
   }
 
   async _runCommands (sandbox, commands, flags) {
@@ -188,7 +162,7 @@ SandboxExec.flags = {
   }),
   'command-timeout': Flags.integer({
     description: 'per-command timeout in milliseconds',
-    default: COMMAND_TIMEOUT_MS
+    default: DEFAULT_COMMAND_TIMEOUT_MS
   }),
   'fail-fast': Flags.boolean({
     description: 'stop execution when a command returns a non-zero exit code',

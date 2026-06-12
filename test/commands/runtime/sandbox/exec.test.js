@@ -16,6 +16,7 @@ afterEach(() => { stdout.stop(); stderr.stop() })
 const TheCommand = require('../../../../src/commands/runtime/sandbox/exec.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
 const { Sandbox } = require('@adobe/aio-lib-sandbox')
+const { logPolicy, logPreviewUrls } = require('../../../../src/sandbox-helpers')
 
 /**
  * Build a fake `Sandbox` object suitable for stubbing Sandbox.create resolutions.
@@ -147,6 +148,54 @@ describe('buildCommandList', () => {
 
   test('empty when nothing provided', () => {
     expect(TheCommand.buildCommandList([], '')).toEqual([])
+  })
+})
+
+describe('logPolicy', () => {
+  test('logs default-deny when no policy', () => {
+    const log = jest.fn()
+    logPolicy(undefined, log)
+    expect(log).toHaveBeenCalledWith('Network policy: default-deny (DNS + NATS only)')
+  })
+
+  test('logs allow-all egress', () => {
+    const log = jest.fn()
+    logPolicy({ network: { egress: 'allow-all' } }, log)
+    expect(log).toHaveBeenCalledWith('Network policy: allow-all egress')
+  })
+
+  test('logs custom egress rules', () => {
+    const log = jest.fn()
+    logPolicy({
+      network: {
+        egress: [
+          { host: 'pypi.org', port: 443 },
+          { host: 'api.github.com', port: 443, rules: [{ methods: ['GET'], pathPattern: '/repos/**' }] }
+        ]
+      }
+    }, log)
+    expect(log).toHaveBeenCalledWith('Network policy: custom egress')
+    expect(log).toHaveBeenCalledWith('  - pypi.org:443 (TCP)')
+    expect(log).toHaveBeenCalledWith('  - api.github.com:443 (TCP) GET:/repos/**')
+  })
+})
+
+describe('logPreviewUrls', () => {
+  test('does nothing when no ports', async () => {
+    const log = jest.fn()
+    const sandbox = { getUrl: jest.fn() }
+    await logPreviewUrls(sandbox, undefined, log)
+    expect(log).not.toHaveBeenCalled()
+    expect(sandbox.getUrl).not.toHaveBeenCalled()
+  })
+
+  test('logs a preview URL per port', async () => {
+    const log = jest.fn()
+    const sandbox = { getUrl: jest.fn(port => Promise.resolve(`https://sandbox-${port}.example.net`)) }
+    await logPreviewUrls(sandbox, [3000, 8080], log)
+    expect(log).toHaveBeenCalledWith('Preview URLs:')
+    expect(log).toHaveBeenCalledWith('  - 3000: https://sandbox-3000.example.net')
+    expect(log).toHaveBeenCalledWith('  - 8080: https://sandbox-8080.example.net')
   })
 })
 
