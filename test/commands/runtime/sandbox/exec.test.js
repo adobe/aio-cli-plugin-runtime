@@ -41,7 +41,7 @@ test('exports', async () => {
 
 test('description', async () => {
   expect(TheCommand.description).toBeDefined()
-  expect(TheCommand.description).toMatch(/sandbox run/)
+  expect(TheCommand.description).toMatch(/non-interactively/)
 })
 
 test('aliases', async () => {
