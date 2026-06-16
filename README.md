@@ -98,7 +98,7 @@ $ aio runtime --help
 * [`aio runtime rule status NAME`](#aio-runtime-rule-status-name)
 * [`aio runtime rule update NAME TRIGGER ACTION`](#aio-runtime-rule-update-name-trigger-action)
 * [`aio runtime sandbox`](#aio-runtime-sandbox)
-* [`aio runtime sandbox exec`](#aio-runtime-sandbox-exec)
+* [`aio runtime sandbox exec [COMMAND]`](#aio-runtime-sandbox-exec-command)
 * [`aio runtime sandbox run`](#aio-runtime-sandbox-run)
 * [`aio runtime trigger`](#aio-runtime-trigger)
 * [`aio runtime trigger create TRIGGERNAME`](#aio-runtime-trigger-create-triggername)
@@ -1500,9 +1500,8 @@ Bind parameters to a package
 
 ```
 USAGE
-  $ aio runtime package bind PACKAGENAME BINDPACKAGENAME [--cert <value>] [--key <value>] [--apiversion <value>]
-    [--apihost <value>] [-u <value>] [-i] [--debug <value>] [-v] [--version] [--help] [-p <value>...] [-P <value>] [-a
-    <value>...] [-A <value>] [--json]
+  $ aio runtime package bind PACKAGENAME BINDPACKAGENAME [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug
+    <value>] [-v] [--version] [--help] [-p <value>...] [-P <value>] [-a <value>...] [-A <value>] [--json]
 
 FLAGS
   -A, --annotation-file=<value>  FILE containing annotation values in JSON format
@@ -1510,15 +1509,15 @@ FLAGS
   -a, --annotation=<value>...    annotation values in KEY VALUE format
   -i, --insecure                 bypass certificate check
   -p, --param=<value>...         parameters in key value pairs to be passed to the package
-  -u, --auth=<value>             [env: WHISK_AUTH] whisk auth
+  -u, --auth                     [env: WHISK_AUTH] whisk auth
   -v, --verbose                  Verbose output
-      --apihost=<value>          [env: WHISK_APIHOST] whisk API host
-      --apiversion=<value>       [env: WHISK_APIVERSION] whisk API version
-      --cert=<value>             client cert
+      --apihost                  [env: WHISK_APIHOST] whisk API host
+      --apiversion               [env: WHISK_APIVERSION] whisk API version
+      --cert                     client cert
       --debug=<value>            Debug level output
       --help                     Show help
       --json                     output raw json
-      --key=<value>              client key
+      --key                      client key
       --version                  Show version
 
 DESCRIPTION
@@ -1538,9 +1537,8 @@ Creates a Package
 
 ```
 USAGE
-  $ aio runtime package create PACKAGENAME [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
-    <value>] [-i] [--debug <value>] [-v] [--version] [--help] [-p <value>...] [-P <value>] [--shared true|yes|false|no]
-    [-a <value>...] [-A <value>] [--json]
+  $ aio runtime package create PACKAGENAME [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>] [-v]
+    [--version] [--help] [-p <value>...] [-P <value>] [--shared true|yes|false|no] [-a <value>...] [-A <value>] [--json]
 
 FLAGS
   -A, --annotation-file=<value>  FILE containing annotation values in JSON format
@@ -1548,15 +1546,15 @@ FLAGS
   -a, --annotation=<value>...    annotation values in KEY VALUE format
   -i, --insecure                 bypass certificate check
   -p, --param=<value>...         parameters in key value pairs to be passed to the package
-  -u, --auth=<value>             [env: WHISK_AUTH] whisk auth
+  -u, --auth                     [env: WHISK_AUTH] whisk auth
   -v, --verbose                  Verbose output
-      --apihost=<value>          [env: WHISK_APIHOST] whisk API host
-      --apiversion=<value>       [env: WHISK_APIVERSION] whisk API version
-      --cert=<value>             client cert
+      --apihost                  [env: WHISK_APIHOST] whisk API host
+      --apiversion               [env: WHISK_APIVERSION] whisk API version
+      --cert                     client cert
       --debug=<value>            Debug level output
       --help                     Show help
       --json                     output raw json
-      --key=<value>              client key
+      --key                      client key
       --shared=<option>          parameter to be passed to indicate whether package is shared or private
                                  <options: true|yes|false|no>
       --version                  Show version
@@ -1601,20 +1599,20 @@ Retrieves a Package
 
 ```
 USAGE
-  $ aio runtime package get PACKAGENAME [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
-    <value>] [-i] [--debug <value>] [-v] [--version] [--help]
+  $ aio runtime package get PACKAGENAME [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>] [-v]
+    [--version] [--help]
 
 FLAGS
-  -i, --insecure            bypass certificate check
-  -u, --auth=<value>        [env: WHISK_AUTH] whisk auth
-  -v, --verbose             Verbose output
-      --apihost=<value>     [env: WHISK_APIHOST] whisk API host
-      --apiversion=<value>  [env: WHISK_APIVERSION] whisk API version
-      --cert=<value>        client cert
-      --debug=<value>       Debug level output
-      --help                Show help
-      --key=<value>         client key
-      --version             Show version
+  -i, --insecure       bypass certificate check
+  -u, --auth           [env: WHISK_AUTH] whisk auth
+  -v, --verbose        Verbose output
+      --apihost        [env: WHISK_APIHOST] whisk API host
+      --apiversion     [env: WHISK_APIVERSION] whisk API version
+      --cert           client cert
+      --debug=<value>  Debug level output
+      --help           Show help
+      --key            client key
+      --version        Show version
 
 DESCRIPTION
   Retrieves a Package
@@ -1633,26 +1631,26 @@ Lists all the Packages
 
 ```
 USAGE
-  $ aio runtime package list [NAMESPACE] [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
-    <value>] [-i] [--debug <value>] [-v] [--version] [--help] [-l <value>] [-s <value>] [-c] [--json] [--name-sort] [-n]
+  $ aio runtime package list [NAMESPACE] [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>] [-v]
+    [--version] [--help] [-l <value>] [-s <value>] [-c] [--json] [--name-sort] [-n]
 
 FLAGS
-  -c, --count               show only the total number of packages
-  -i, --insecure            bypass certificate check
-  -l, --limit=<value>       only return LIMIT number of packages (min: 0, max: 50)
-  -n, --name                sort results by name
-  -s, --skip=<value>        exclude the first SKIP number of packages from the result
-  -u, --auth=<value>        [env: WHISK_AUTH] whisk auth
-  -v, --verbose             Verbose output
-      --apihost=<value>     [env: WHISK_APIHOST] whisk API host
-      --apiversion=<value>  [env: WHISK_APIVERSION] whisk API version
-      --cert=<value>        client cert
-      --debug=<value>       Debug level output
-      --help                Show help
-      --json                output raw json
-      --key=<value>         client key
-      --name-sort           sort results by name
-      --version             Show version
+  -c, --count          show only the total number of packages
+  -i, --insecure       bypass certificate check
+  -l, --limit=<value>  only return LIMIT number of packages (min: 0, max: 50)
+  -n, --name           sort results by name
+  -s, --skip=<value>   exclude the first SKIP number of packages from the result
+  -u, --auth           [env: WHISK_AUTH] whisk auth
+  -v, --verbose        Verbose output
+      --apihost        [env: WHISK_APIHOST] whisk API host
+      --apiversion     [env: WHISK_APIVERSION] whisk API version
+      --cert           client cert
+      --debug=<value>  Debug level output
+      --help           Show help
+      --json           output raw json
+      --key            client key
+      --name-sort      sort results by name
+      --version        Show version
 
 DESCRIPTION
   Lists all the Packages
@@ -1675,9 +1673,8 @@ Updates a Package
 
 ```
 USAGE
-  $ aio runtime package update PACKAGENAME [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
-    <value>] [-i] [--debug <value>] [-v] [--version] [--help] [-p <value>...] [-P <value>] [--shared true|yes|false|no]
-    [-a <value>...] [-A <value>] [--json]
+  $ aio runtime package update PACKAGENAME [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>] [-v]
+    [--version] [--help] [-p <value>...] [-P <value>] [--shared true|yes|false|no] [-a <value>...] [-A <value>] [--json]
 
 FLAGS
   -A, --annotation-file=<value>  FILE containing annotation values in JSON format
@@ -1685,15 +1682,15 @@ FLAGS
   -a, --annotation=<value>...    annotation values in KEY VALUE format
   -i, --insecure                 bypass certificate check
   -p, --param=<value>...         parameters in key value pairs to be passed to the package
-  -u, --auth=<value>             [env: WHISK_AUTH] whisk auth
+  -u, --auth                     [env: WHISK_AUTH] whisk auth
   -v, --verbose                  Verbose output
-      --apihost=<value>          [env: WHISK_APIHOST] whisk API host
-      --apiversion=<value>       [env: WHISK_APIVERSION] whisk API version
-      --cert=<value>             client cert
+      --apihost                  [env: WHISK_APIHOST] whisk API host
+      --apiversion               [env: WHISK_APIVERSION] whisk API version
+      --cert                     client cert
       --debug=<value>            Debug level output
       --help                     Show help
       --json                     output raw json
-      --key=<value>              client key
+      --key                      client key
       --shared=<option>          parameter to be passed to indicate whether package is shared or private
                                  <options: true|yes|false|no>
       --version                  Show version
@@ -2020,23 +2017,23 @@ Retrieves a Rule
 
 ```
 USAGE
-  $ aio runtime rule get NAME [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>] [-v] [--version]
-    [--help]
+  $ aio runtime rule get NAME [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u <value>]
+    [-i] [--debug <value>] [-v] [--version] [--help]
 
 ARGUMENTS
   NAME  Name of the rule
 
 FLAGS
-  -i, --insecure       bypass certificate check
-  -u, --auth           [env: WHISK_AUTH] whisk auth
-  -v, --verbose        Verbose output
-      --apihost        [env: WHISK_APIHOST] whisk API host
-      --apiversion     [env: WHISK_APIVERSION] whisk API version
-      --cert           client cert
-      --debug=<value>  Debug level output
-      --help           Show help
-      --key            client key
-      --version        Show version
+  -i, --insecure            bypass certificate check
+  -u, --auth=<value>        [env: WHISK_AUTH] whisk auth
+  -v, --verbose             Verbose output
+      --apihost=<value>     [env: WHISK_APIHOST] whisk API host
+      --apiversion=<value>  [env: WHISK_APIVERSION] whisk API version
+      --cert=<value>        client cert
+      --debug=<value>       Debug level output
+      --help                Show help
+      --key=<value>         client key
+      --version             Show version
 
 DESCRIPTION
   Retrieves a Rule
@@ -2053,26 +2050,26 @@ Retrieves a list of Rules
 
 ```
 USAGE
-  $ aio runtime rule list [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>] [-v] [--version]
-    [--help] [-l <value>] [-s <value>] [-c] [--json] [--name-sort] [-n]
+  $ aio runtime rule list [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u <value>] [-i]
+    [--debug <value>] [-v] [--version] [--help] [-l <value>] [-s <value>] [-c] [--json] [--name-sort] [-n]
 
 FLAGS
-  -c, --count          show only the total number of rules
-  -i, --insecure       bypass certificate check
-  -l, --limit=<value>  Limit number of rules returned (min: 0, max: 50)
-  -n, --name           sort results by name
-  -s, --skip=<value>   Skip number of rules returned
-  -u, --auth           [env: WHISK_AUTH] whisk auth
-  -v, --verbose        Verbose output
-      --apihost        [env: WHISK_APIHOST] whisk API host
-      --apiversion     [env: WHISK_APIVERSION] whisk API version
-      --cert           client cert
-      --debug=<value>  Debug level output
-      --help           Show help
-      --json           output raw json
-      --key            client key
-      --name-sort      sort results by name
-      --version        Show version
+  -c, --count               show only the total number of rules
+  -i, --insecure            bypass certificate check
+  -l, --limit=<value>       Limit number of rules returned (min: 0, max: 50)
+  -n, --name                sort results by name
+  -s, --skip=<value>        Skip number of rules returned
+  -u, --auth=<value>        [env: WHISK_AUTH] whisk auth
+  -v, --verbose             Verbose output
+      --apihost=<value>     [env: WHISK_APIHOST] whisk API host
+      --apiversion=<value>  [env: WHISK_APIVERSION] whisk API version
+      --cert=<value>        client cert
+      --debug=<value>       Debug level output
+      --help                Show help
+      --json                output raw json
+      --key=<value>         client key
+      --name-sort           sort results by name
+      --version             Show version
 
 DESCRIPTION
   Retrieves a list of Rules
@@ -2091,23 +2088,23 @@ Gets the status of a rule
 
 ```
 USAGE
-  $ aio runtime rule status NAME [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>] [-v] [--version]
-    [--help]
+  $ aio runtime rule status NAME [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u <value>]
+    [-i] [--debug <value>] [-v] [--version] [--help]
 
 ARGUMENTS
   NAME  Name of the rule
 
 FLAGS
-  -i, --insecure       bypass certificate check
-  -u, --auth           [env: WHISK_AUTH] whisk auth
-  -v, --verbose        Verbose output
-      --apihost        [env: WHISK_APIHOST] whisk API host
-      --apiversion     [env: WHISK_APIVERSION] whisk API version
-      --cert           client cert
-      --debug=<value>  Debug level output
-      --help           Show help
-      --key            client key
-      --version        Show version
+  -i, --insecure            bypass certificate check
+  -u, --auth=<value>        [env: WHISK_AUTH] whisk auth
+  -v, --verbose             Verbose output
+      --apihost=<value>     [env: WHISK_APIHOST] whisk API host
+      --apiversion=<value>  [env: WHISK_APIVERSION] whisk API version
+      --cert=<value>        client cert
+      --debug=<value>       Debug level output
+      --help                Show help
+      --key=<value>         client key
+      --version             Show version
 
 DESCRIPTION
   Gets the status of a rule
@@ -2185,31 +2182,34 @@ ALIASES
 
 _See code: [src/commands/runtime/sandbox/index.js](https://github.com/adobe/aio-cli-plugin-runtime/blob/8.4.0/src/commands/runtime/sandbox/index.js)_
 
-## `aio runtime sandbox exec`
+## `aio runtime sandbox exec [COMMAND]`
 
 [Alpha] Sandboxes are in a closed alpha. Your namespace must have
 
 ```
 USAGE
-  $ aio runtime sandbox exec [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>] [-v] [--version]
-    [--help] [-n <value>] [-e <value>...] [-p <value>...] [--max-lifetime <value>] [--command-timeout <value>]
-    [--fail-fast]
+  $ aio runtime sandbox exec [COMMAND] [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u
+    <value>] [-i] [--debug <value>] [-v] [--version] [--help] [-n <value>] [-e <value>...] [-p <value>...]
+    [--max-lifetime <value>] [--command-timeout <value>] [--fail-fast]
+
+ARGUMENTS
+  [COMMAND]  command to run in the sandbox (quote multi-word commands)
 
 FLAGS
   -e, --egress=<value>...        egress rule in host:port[:protocol][|METHOD:path] format, or "allow-all" (repeatable)
   -i, --insecure                 bypass certificate check
   -n, --name=<value>             [default: aio-sandbox] sandbox name
   -p, --port=<value>...          Port to expose via a preview URL (repeatable)
-  -u, --auth                     [env: WHISK_AUTH] whisk auth
+  -u, --auth=<value>             [env: WHISK_AUTH] whisk auth
   -v, --verbose                  Verbose output
-      --apihost                  [env: WHISK_APIHOST] whisk API host
-      --apiversion               [env: WHISK_APIVERSION] whisk API version
-      --cert                     client cert
+      --apihost=<value>          [env: WHISK_APIHOST] whisk API host
+      --apiversion=<value>       [env: WHISK_APIVERSION] whisk API version
+      --cert=<value>             client cert
       --command-timeout=<value>  [default: 30000] per-command timeout in milliseconds
       --debug=<value>            Debug level output
       --fail-fast                stop execution when a command returns a non-zero exit code
       --help                     Show help
-      --key                      client key
+      --key=<value>              client key
       --max-lifetime=<value>     [default: 3600] maximum sandbox lifetime in seconds
       --version                  Show version
 
@@ -2221,8 +2221,8 @@ DESCRIPTION
 
   Create a sandbox and run one or more commands non-interactively, then destroy it.
 
-  Provide a one-shot command after "--" and/or pipe a newline-separated list of
-  commands on stdin. When both are given, the one-shot command runs first,
+  Provide a one-shot command as a quoted argument and/or pipe a newline-separated
+  list of commands on stdin. When both are given, the one-shot command runs first,
   followed by the piped commands in order.
 
   Each command runs in a fresh process. Shell state (working directory, env
@@ -2239,11 +2239,11 @@ ALIASES
   $ aio rt sandbox exec
 
 EXAMPLES
-  $ aio runtime sandbox exec -- node --version
+  $ aio runtime sandbox exec "node --version"
 
   $ aio runtime sandbox exec < commands.txt
 
-  $ aio runtime sandbox exec -- node --version < commands.txt
+  $ aio runtime sandbox exec "node --version" < commands.txt
 
   $ aio runtime sandbox exec -e allow-all -p 5173 < commands.txt
 
@@ -2258,22 +2258,22 @@ _See code: [src/commands/runtime/sandbox/exec.js](https://github.com/adobe/aio-c
 
 ```
 USAGE
-  $ aio runtime sandbox run [--cert] [--key] [--apiversion] [--apihost] [-u] [-i] [--debug <value>] [-v] [--version]
-    [--help] [-n <value>] [-e <value>...] [-p <value>...] [--max-lifetime <value>]
+  $ aio runtime sandbox run [--cert <value>] [--key <value>] [--apiversion <value>] [--apihost <value>] [-u <value>] [-i]
+    [--debug <value>] [-v] [--version] [--help] [-n <value>] [-e <value>...] [-p <value>...] [--max-lifetime <value>]
 
 FLAGS
   -e, --egress=<value>...     egress rule in host:port[:protocol][|METHOD:path] format, or "allow-all" (repeatable)
   -i, --insecure              bypass certificate check
   -n, --name=<value>          [default: aio-sandbox] sandbox name
   -p, --port=<value>...       Port to expose via a preview URL (repeatable)
-  -u, --auth                  [env: WHISK_AUTH] whisk auth
+  -u, --auth=<value>          [env: WHISK_AUTH] whisk auth
   -v, --verbose               Verbose output
-      --apihost               [env: WHISK_APIHOST] whisk API host
-      --apiversion            [env: WHISK_APIVERSION] whisk API version
-      --cert                  client cert
+      --apihost=<value>       [env: WHISK_APIHOST] whisk API host
+      --apiversion=<value>    [env: WHISK_APIVERSION] whisk API version
+      --cert=<value>          client cert
       --debug=<value>         Debug level output
       --help                  Show help
-      --key                   client key
+      --key=<value>           client key
       --max-lifetime=<value>  [default: 3600] maximum sandbox lifetime in seconds
       --version               Show version
 

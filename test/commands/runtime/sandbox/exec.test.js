@@ -69,15 +69,6 @@ test('flags', async () => {
   expect(TheCommand.flags.apihost).toBeDefined()
 })
 
-describe('init', () => {
-  test('ignores sandbox command args after -- during oclif parsing', async () => {
-    const command = new TheCommand(['--', 'node', '--version'])
-
-    await expect(command.init()).resolves.toBeUndefined()
-    expect(command.argv).toEqual(['--', 'node', '--version'])
-  })
-})
-
 describe('_readStdin', () => {
   test('collects piped chunks until end', async () => {
     const command = new TheCommand([])
@@ -102,52 +93,29 @@ describe('_readStdin', () => {
   })
 })
 
-describe('shellQuote', () => {
-  test('leaves safe tokens untouched', () => {
-    expect(TheCommand.shellQuote('node')).toBe('node')
-    expect(TheCommand.shellQuote('--version')).toBe('--version')
-    expect(TheCommand.shellQuote('vite@latest')).toBe('vite@latest')
-    expect(TheCommand.shellQuote('a/b.c_d:e=f')).toBe('a/b.c_d:e=f')
-  })
-
-  test('single-quotes tokens with spaces', () => {
-    expect(TheCommand.shellQuote('a b')).toBe("'a b'")
-  })
-
-  test('single-quotes shell metacharacters so they stay literal', () => {
-    expect(TheCommand.shellQuote('*')).toBe("'*'")
-    expect(TheCommand.shellQuote('a && b')).toBe("'a && b'")
-  })
-
-  test('escapes embedded single quotes', () => {
-    expect(TheCommand.shellQuote("can't")).toBe("'can'\\''t'")
-  })
-})
-
 describe('buildCommandList', () => {
   test('one-shot only', () => {
-    expect(TheCommand.buildCommandList(['node', '--version'], '')).toEqual(['node --version'])
+    expect(TheCommand.buildCommandList('node --version', '')).toEqual(['node --version'])
   })
 
-  test('shell-quotes one-shot tokens that need it', () => {
-    expect(TheCommand.buildCommandList(['echo', 'a b'], '')).toEqual(["echo 'a b'"])
-    expect(TheCommand.buildCommandList(['echo', '*'], '')).toEqual(["echo '*'"])
+  test('one-shot command is passed verbatim', () => {
+    expect(TheCommand.buildCommandList('echo "a b"', '')).toEqual(['echo "a b"'])
   })
 
   test('piped only, newline-split, blanks dropped', () => {
-    expect(TheCommand.buildCommandList([], 'a\n\nb\n')).toEqual(['a', 'b'])
+    expect(TheCommand.buildCommandList(undefined, 'a\n\nb\n')).toEqual(['a', 'b'])
   })
 
-  test('piped lines are passed verbatim, not quoted', () => {
-    expect(TheCommand.buildCommandList([], 'cd app && npm install\n')).toEqual(['cd app && npm install'])
+  test('piped lines are passed verbatim', () => {
+    expect(TheCommand.buildCommandList(undefined, 'cd app && npm install\n')).toEqual(['cd app && npm install'])
   })
 
   test('one-shot runs first, then piped', () => {
-    expect(TheCommand.buildCommandList(['node', '--version'], 'a\nb')).toEqual(['node --version', 'a', 'b'])
+    expect(TheCommand.buildCommandList('node --version', 'a\nb')).toEqual(['node --version', 'a', 'b'])
   })
 
   test('empty when nothing provided', () => {
-    expect(TheCommand.buildCommandList([], '')).toEqual([])
+    expect(TheCommand.buildCommandList(undefined, '')).toEqual([])
   })
 })
 
@@ -222,7 +190,7 @@ describe('run', () => {
   })
 
   test('runs a single one-shot command and destroys', async () => {
-    command.argv = ['--', 'node', '--version']
+    command.argv = ['node --version']
     command._readStdin.mockResolvedValue('')
     sandbox.exec.mockResolvedValueOnce({ stdout: 'v25.9.0\n', stderr: '', exitCode: 0 })
 
@@ -245,7 +213,7 @@ describe('run', () => {
   })
 
   test('one-shot runs before piped commands', async () => {
-    command.argv = ['--', 'node', '--version']
+    command.argv = ['node --version']
     command._readStdin.mockResolvedValue('echo after\n')
 
     await command.run()
@@ -256,7 +224,7 @@ describe('run', () => {
 
   test('does not read stdin on a TTY', async () => {
     Object.defineProperty(process.stdin, 'isTTY', { value: true, configurable: true })
-    command.argv = ['--', 'true']
+    command.argv = ['true']
 
     await command.run()
 
@@ -265,7 +233,7 @@ describe('run', () => {
   })
 
   test('defaults the per-command timeout to 30s when --command-timeout is omitted', async () => {
-    command.argv = ['--', 'true']
+    command.argv = ['true']
 
     await command.run()
 
@@ -273,7 +241,7 @@ describe('run', () => {
   })
 
   test('--command-timeout overrides the per-command default', async () => {
-    command.argv = ['--command-timeout', '5000', '--', 'true']
+    command.argv = ['--command-timeout', '5000', 'true']
 
     await command.run()
 
@@ -333,7 +301,7 @@ describe('run', () => {
   })
 
   test('forwards name, egress, port, max-lifetime to Sandbox.create', async () => {
-    command.argv = ['-n', 'mybox', '--max-lifetime', '600', '-e', 'allow-all', '-p', '5173', '--', 'true']
+    command.argv = ['-n', 'mybox', '--max-lifetime', '600', '-e', 'allow-all', '-p', '5173', 'true']
 
     await command.run()
 
@@ -347,7 +315,7 @@ describe('run', () => {
   })
 
   test('logs custom egress rules', async () => {
-    command.argv = ['-e', 'pypi.org:443', '-e', 'api.github.com:443|GET:/repos/**', '--', 'true']
+    command.argv = ['-e', 'pypi.org:443', '-e', 'api.github.com:443|GET:/repos/**', 'true']
 
     await command.run()
 
@@ -357,7 +325,7 @@ describe('run', () => {
   })
 
   test('logs default-deny policy when no egress', async () => {
-    command.argv = ['--', 'true']
+    command.argv = ['true']
 
     await command.run()
 
@@ -365,7 +333,7 @@ describe('run', () => {
   })
 
   test('reports command stderr', async () => {
-    command.argv = ['--', 'cat', 'missing']
+    command.argv = ['cat missing']
     sandbox.exec.mockResolvedValueOnce({ stdout: '', stderr: 'no such file\n', exitCode: 1 })
 
     await command.run()
@@ -376,7 +344,7 @@ describe('run', () => {
 
   test('routes create errors through handleError and skips destroy', async () => {
     Sandbox.create.mockRejectedValue(new Error('boom'))
-    command.argv = ['--', 'true']
+    command.argv = ['true']
 
     await command.run()
 
@@ -386,7 +354,7 @@ describe('run', () => {
 
   test('logs a message when destroy fails', async () => {
     sandbox.destroy.mockRejectedValue(new Error('destroy failed'))
-    command.argv = ['--', 'true']
+    command.argv = ['true']
 
     await command.run()
 
@@ -395,7 +363,7 @@ describe('run', () => {
 
   test('logs a stringified value when destroy rejects without .message', async () => {
     sandbox.destroy.mockRejectedValue('plain reason')
-    command.argv = ['--', 'true']
+    command.argv = ['true']
 
     await command.run()
 

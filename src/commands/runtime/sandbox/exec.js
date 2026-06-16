@@ -11,15 +11,13 @@ governing permissions and limitations under the License.
 */
 
 const { Sandbox } = require('@adobe/aio-lib-sandbox')
-const { Flags } = require('@oclif/core')
+const { Args, Flags } = require('@oclif/core')
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
 const {
   buildNetworkPolicy,
   parsePortFlags,
   parseEgressFlags,
-  splitArgvAtDoubleDash,
   buildCommandList,
-  shellQuote,
   logPolicy,
   logPreviewUrls
 } = require('../../../sandbox-helpers')
@@ -27,23 +25,14 @@ const {
 const DEFAULT_COMMAND_TIMEOUT_MS = 30000
 
 class SandboxExec extends RuntimeBaseCommand {
-  async init () {
-    const rawArgv = [...this.argv]
-    const { cliArgs } = splitArgvAtDoubleDash(rawArgv)
-
-    await this.parse(SandboxExec, cliArgs)
-    this.argv = rawArgv
-  }
-
   async run () {
-    const { cliArgs, commandArgs } = splitArgvAtDoubleDash(this.argv)
-    const { flags } = await this.parse(SandboxExec, cliArgs)
+    const { args, flags } = await this.parse(SandboxExec)
 
     const stdinText = process.stdin.isTTY === true ? '' : await this._readStdin()
-    const commands = buildCommandList(commandArgs, stdinText)
+    const commands = buildCommandList(args.command, stdinText)
 
     if (commands.length === 0) {
-      this._failUsage('No commands to run. Pass a command after "--" and/or pipe a newline-separated list on stdin. For an interactive session use "aio runtime sandbox run".')
+      this._failUsage('No commands to run. Pass a quoted command (e.g. \'node --version\') and/or pipe a newline-separated list on stdin. For an interactive session use "aio runtime sandbox run".')
       return
     }
 
@@ -125,8 +114,8 @@ access.
 
 Create a sandbox and run one or more commands non-interactively, then destroy it.
 
-Provide a one-shot command after "--" and/or pipe a newline-separated list of
-commands on stdin. When both are given, the one-shot command runs first,
+Provide a one-shot command as a quoted argument and/or pipe a newline-separated
+list of commands on stdin. When both are given, the one-shot command runs first,
 followed by the piped commands in order.
 
 Each command runs in a fresh process. Shell state (working directory, env
@@ -149,12 +138,16 @@ SandboxExec.flags = {
   egress: Flags.string({
     char: 'e',
     description: 'egress rule in host:port[:protocol][|METHOD:path] format, or "allow-all" (repeatable)',
-    multiple: true
+    multiple: true,
+    // non-greedy so a trailing positional command is not swallowed as an egress value
+    multipleNonGreedy: true
   }),
   port: Flags.string({
     char: 'p',
     description: 'Port to expose via a preview URL (repeatable)',
-    multiple: true
+    multiple: true,
+    // non-greedy so a trailing positional command is not swallowed as a port value
+    multipleNonGreedy: true
   }),
   'max-lifetime': Flags.integer({
     description: 'maximum sandbox lifetime in seconds',
@@ -170,10 +163,17 @@ SandboxExec.flags = {
   })
 }
 
+SandboxExec.args = {
+  command: Args.string({
+    description: 'command to run in the sandbox (quote multi-word commands)',
+    required: false
+  })
+}
+
 SandboxExec.examples = [
-  '<%= config.bin %> <%= command.id %> -- node --version',
+  '<%= config.bin %> <%= command.id %> "node --version"',
   '<%= config.bin %> <%= command.id %> < commands.txt',
-  '<%= config.bin %> <%= command.id %> -- node --version < commands.txt',
+  '<%= config.bin %> <%= command.id %> "node --version" < commands.txt',
   '<%= config.bin %> <%= command.id %> -e allow-all -p 5173 < commands.txt',
   '<%= config.bin %> <%= command.id %> --fail-fast --command-timeout 120000 < commands.txt'
 ]
@@ -184,8 +184,6 @@ SandboxExec.aliases = ['rt:sandbox:exec']
 SandboxExec.parseEgressFlags = parseEgressFlags
 SandboxExec.parsePortFlags = parsePortFlags
 SandboxExec.buildNetworkPolicy = buildNetworkPolicy
-SandboxExec.splitArgvAtDoubleDash = splitArgvAtDoubleDash
 SandboxExec.buildCommandList = buildCommandList
-SandboxExec.shellQuote = shellQuote
 
 module.exports = SandboxExec

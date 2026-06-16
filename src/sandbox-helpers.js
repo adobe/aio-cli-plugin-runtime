@@ -135,37 +135,19 @@ function buildNetworkPolicy (egressArgs) {
 }
 
 /**
- * Quote a single argv token so it survives re-parsing by the sandbox's shell.
- * Safe tokens are returned untouched; anything else is wrapped in single quotes
- * with embedded single quotes escaped, keeping spaces and shell metacharacters
- * literal.
- *
- * @param {string} arg argv token
- * @returns {string} shell-safe token
- */
-function shellQuote (arg) {
-  if (/^[A-Za-z0-9_./:=@%+,-]+$/.test(arg)) {
-    return arg
-  }
-  return `'${arg.replace(/'/g, "'\\''")}'`
-}
-
-/**
  * Build the ordered list of commands for a non-interactive `exec` run. The
- * one-shot command (everything after `--`) runs first, followed by each
- * newline-separated command read from piped stdin; blank lines are dropped.
- * One-shot tokens are shell-quoted before joining so arguments with spaces or
- * metacharacters survive the round-trip to the sandbox's shell, while piped
- * lines are already complete command strings and are passed through verbatim.
+ * one-shot command runs first, followed by each newline-separated command read
+ * from piped stdin; blank lines are dropped. Both are complete command strings
+ * (the one-shot is quoted by the user) and are passed through verbatim.
  *
- * @param {string[]} commandArgs argv tokens after `--`
+ * @param {string|undefined} command the one-shot command, or undefined
  * @param {string} stdinText raw piped stdin contents
  * @returns {string[]} ordered commands to execute
  */
-function buildCommandList (commandArgs, stdinText) {
+function buildCommandList (command, stdinText) {
   const commands = []
-  if (commandArgs && commandArgs.length > 0) {
-    commands.push(commandArgs.map(shellQuote).join(' '))
+  if (command) {
+    commands.push(command)
   }
   if (stdinText) {
     for (const line of stdinText.split('\n')) {
@@ -226,7 +208,6 @@ module.exports = {
   parseEgressFlags,
   splitArgvAtDoubleDash,
   buildCommandList,
-  shellQuote,
   logPolicy,
   logPreviewUrls
 }
