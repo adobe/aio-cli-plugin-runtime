@@ -91,6 +91,31 @@ describe('_readStdin', () => {
     process.stdin.removeAllListeners('end')
     process.stdin.removeAllListeners('error')
   })
+
+  test('removes its listeners after resolving (no leak)', async () => {
+    const command = new TheCommand([])
+    const before = {
+      data: process.stdin.listenerCount('data'),
+      end: process.stdin.listenerCount('end'),
+      error: process.stdin.listenerCount('error')
+    }
+    const promise = command._readStdin()
+    process.stdin.emit('data', Buffer.from('x\n'))
+    process.stdin.emit('end')
+    await promise
+    expect(process.stdin.listenerCount('data')).toBe(before.data)
+    expect(process.stdin.listenerCount('end')).toBe(before.end)
+    expect(process.stdin.listenerCount('error')).toBe(before.error)
+  })
+
+  test('removes its listeners after rejecting (no leak)', async () => {
+    const command = new TheCommand([])
+    const before = process.stdin.listenerCount('error')
+    const promise = command._readStdin()
+    process.stdin.emit('error', new Error('boom'))
+    await expect(promise).rejects.toThrow('boom')
+    expect(process.stdin.listenerCount('error')).toBe(before)
+  })
 })
 
 describe('buildCommandList', () => {

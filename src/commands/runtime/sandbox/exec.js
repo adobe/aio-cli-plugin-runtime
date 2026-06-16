@@ -76,9 +76,26 @@ class SandboxExec extends RuntimeBaseCommand {
   _readStdin () {
     return new Promise((resolve, reject) => {
       const chunks = []
-      process.stdin.on('data', chunk => chunks.push(chunk))
-      process.stdin.on('end', () => resolve(Buffer.concat(chunks).toString()))
-      process.stdin.on('error', reject)
+      const onData = chunk => chunks.push(chunk)
+      const onEnd = () => {
+        teardown()
+        resolve(Buffer.concat(chunks).toString())
+      }
+      const onError = err => {
+        teardown()
+        reject(err)
+      }
+      /**
+       * Detach all stdin listeners so repeated calls don't leak handlers.
+       */
+      function teardown () {
+        process.stdin.removeListener('data', onData)
+        process.stdin.removeListener('end', onEnd)
+        process.stdin.removeListener('error', onError)
+      }
+      process.stdin.on('data', onData)
+      process.stdin.on('end', onEnd)
+      process.stdin.on('error', onError)
     })
   }
 
