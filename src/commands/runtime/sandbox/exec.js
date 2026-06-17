@@ -26,9 +26,15 @@ const DEFAULT_COMMAND_TIMEOUT_MS = 30000
 
 class SandboxExec extends RuntimeBaseCommand {
   async run () {
+    // Start reading piped stdin before the async parse below: on some platforms
+    // (notably Windows PowerShell) the piped data and EOF arrive during the
+    // parse, and attaching listeners afterwards would miss them.
+    const stdinPromise = process.stdin.isTTY === true ? Promise.resolve('') : this._readStdin()
+    stdinPromise.catch(() => {}) // parse may reject first; avoid an unhandled rejection
+
     const { args, flags } = await this.parse(SandboxExec)
 
-    const stdinText = process.stdin.isTTY === true ? '' : await this._readStdin()
+    const stdinText = await stdinPromise
     const commands = buildCommandList(args.command, stdinText)
 
     if (commands.length === 0) {
