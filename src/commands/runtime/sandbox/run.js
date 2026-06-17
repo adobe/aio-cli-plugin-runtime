@@ -18,7 +18,9 @@ const {
   buildNetworkPolicy,
   parsePortFlags,
   parseEgressFlags,
-  splitArgvAtDoubleDash
+  splitArgvAtDoubleDash,
+  logPolicy,
+  logPreviewUrls
 } = require('../../../sandbox-helpers')
 
 const EXEC_TIMEOUT_MS = 30000
@@ -72,12 +74,12 @@ class SandboxRun extends RuntimeBaseCommand {
     const { flags } = await this.parse(SandboxRun, cliArgs)
 
     if (commandArgs.length > 0) {
-      this._failUsage('This command only supports interactive use. Omit "-- <command>" and type commands when prompted.')
+      this._failUsage('This command only supports interactive use. Type commands when prompted, or use "aio runtime sandbox exec" for one-shot or scripted commands.')
       return
     }
 
     if (process.stdin.isTTY !== true) {
-      this._failUsage('This command requires an interactive terminal. Piped stdin is not supported.')
+      this._failUsage('This command requires an interactive terminal. Piped stdin is not supported; use "aio runtime sandbox exec" to run a piped list of commands.')
       return
     }
 
@@ -101,8 +103,8 @@ class SandboxRun extends RuntimeBaseCommand {
       })
       this.log(`Created: ${sandbox.id}`)
 
-      this._logPolicy(policy)
-      await this._logPreviewUrls(sandbox, ports)
+      logPolicy(policy, msg => this.log(msg))
+      await logPreviewUrls(sandbox, ports, msg => this.log(msg))
 
       this.log('\nSandbox ready. Type "exit" to destroy and quit.\n')
 
@@ -129,34 +131,6 @@ class SandboxRun extends RuntimeBaseCommand {
   _failUsage (message) {
     process.stderr.write(`${message}\n`)
     process.exitCode = 2
-  }
-
-  _logPolicy (policy) {
-    if (!policy) {
-      this.log('Network policy: default-deny (DNS + NATS only)')
-      return
-    }
-    if (policy.network.egress === 'allow-all') {
-      this.log('Network policy: allow-all egress')
-      return
-    }
-    this.log('Network policy: custom egress')
-    policy.network.egress.forEach(rule => {
-      const proto = rule.protocol || 'TCP'
-      const l7 = rule.rules ? ' ' + rule.rules.map(r => `${r.methods.join(',')}:${r.pathPattern}`).join(' ') : ''
-      this.log(`  - ${rule.host}:${rule.port} (${proto})${l7}`)
-    })
-  }
-
-  async _logPreviewUrls (sandbox, ports) {
-    if (!ports) {
-      return
-    }
-
-    this.log('Preview URLs:')
-    for (const port of ports) {
-      this.log(`  - ${port}: ${await sandbox.getUrl(port)}`)
-    }
   }
 
   async _repl (rl, sandbox) {

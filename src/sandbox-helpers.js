@@ -134,9 +134,80 @@ function buildNetworkPolicy (egressArgs) {
   return { network: { egress: parseEgressFlags(egressArgs) } }
 }
 
+/**
+ * Build the ordered list of commands for a non-interactive `exec` run. The
+ * one-shot command runs first, followed by each newline-separated command read
+ * from piped stdin; blank lines are dropped. Both are complete command strings
+ * (the one-shot is quoted by the user) and are passed through verbatim.
+ *
+ * @param {string|undefined} command the one-shot command, or undefined
+ * @param {string} stdinText raw piped stdin contents
+ * @returns {string[]} ordered commands to execute
+ */
+function buildCommandList (command, stdinText) {
+  const commands = []
+  if (command) {
+    commands.push(command)
+  }
+  if (stdinText) {
+    for (const line of stdinText.split('\n')) {
+      const trimmed = line.trim()
+      if (trimmed) {
+        commands.push(trimmed)
+      }
+    }
+  }
+  return commands
+}
+
+/**
+ * Log a human-readable summary of the sandbox network policy.
+ *
+ * @param {object|undefined} policy sandbox policy, or undefined for default-deny
+ * @param {Function} log logger called with each line
+ */
+function logPolicy (policy, log) {
+  if (!policy) {
+    log('Network policy: default-deny (DNS + NATS only)')
+    return
+  }
+  if (policy.network.egress === 'allow-all') {
+    log('Network policy: allow-all egress')
+    return
+  }
+  log('Network policy: custom egress')
+  policy.network.egress.forEach(rule => {
+    const proto = rule.protocol || 'TCP'
+    const l7 = rule.rules ? ' ' + rule.rules.map(r => `${r.methods.join(',')}:${r.pathPattern}`).join(' ') : ''
+    log(`  - ${rule.host}:${rule.port} (${proto})${l7}`)
+  })
+}
+
+/**
+ * Log the preview URL for each exposed port, or nothing when no ports.
+ *
+ * @param {object} sandbox sandbox instance exposing getUrl(port)
+ * @param {number[]|undefined} ports exposed ports
+ * @param {Function} log logger called with each line
+ * @returns {Promise<void>} resolves once all URLs are logged
+ */
+async function logPreviewUrls (sandbox, ports, log) {
+  if (!ports) {
+    return
+  }
+
+  log('Preview URLs:')
+  for (const port of ports) {
+    log(`  - ${port}: ${await sandbox.getUrl(port)}`)
+  }
+}
+
 module.exports = {
   buildNetworkPolicy,
   parsePortFlags,
   parseEgressFlags,
-  splitArgvAtDoubleDash
+  splitArgvAtDoubleDash,
+  buildCommandList,
+  logPolicy,
+  logPreviewUrls
 }

@@ -304,6 +304,7 @@ describe('run', () => {
     await command.run()
 
     expect(stderr.output).toMatch('only supports interactive use')
+    expect(stderr.output).toMatch('aio runtime sandbox exec')
     expect(stderr.output).not.toMatch('CLIError')
     expect(process.exitCode).toBe(2)
     expect(handleError).not.toHaveBeenCalled()
@@ -322,6 +323,7 @@ describe('run', () => {
     await command.run()
 
     expect(stderr.output).toMatch('Piped stdin is not supported')
+    expect(stderr.output).toMatch('aio runtime sandbox exec')
     expect(stderr.output).not.toMatch('CLIError')
     expect(process.exitCode).toBe(2)
     expect(handleError).not.toHaveBeenCalled()
@@ -338,6 +340,7 @@ describe('run', () => {
     await command.run()
 
     expect(stderr.output).toMatch('Piped stdin is not supported')
+    expect(stderr.output).toMatch('aio runtime sandbox exec')
     expect(stderr.output).not.toMatch('CLIError')
     expect(process.exitCode).toBe(2)
     expect(handleError).not.toHaveBeenCalled()
