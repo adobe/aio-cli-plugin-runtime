@@ -10,6 +10,7 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
+const fs = require('node:fs')
 const { Sandbox } = require('@adobe/aio-lib-sandbox')
 const { Args, Flags } = require('@oclif/core')
 const RuntimeBaseCommand = require('../../../RuntimeBaseCommand')
@@ -26,21 +27,21 @@ const DEFAULT_COMMAND_TIMEOUT_MS = 30000
 
 class SandboxExec extends RuntimeBaseCommand {
   async run () {
-    // Start reading piped stdin before the async parse below: on some platforms
-    // (notably Windows PowerShell) the piped data and EOF arrive during the
-    // parse, and attaching listeners afterwards would miss them.
-    const stdinPromise = process.stdin.isTTY === true ? Promise.resolve('') : this._readStdin()
-    // Avoid an unhandled rejection if parse rejects before we await this; a real
-    // stdin read error still surfaces at the `await stdinPromise` below.
-    stdinPromise.catch(() => {})
-
     const { args, flags } = await this.parse(SandboxExec)
 
-    const stdinText = await stdinPromise
-    const commands = buildCommandList(args.command, stdinText)
+    let listText = ''
+    if (flags.file) {
+      try {
+        listText = this._readFile(flags.file)
+      } catch (err) {
+        this._failUsage(`Cannot read --file "${flags.file}": ${err.message || err}`)
+        return
+      }
+    }
+    const commands = buildCommandList(args.command, listText)
 
     if (commands.length === 0) {
-      this._failUsage('No commands to run. Pass a quoted command (e.g. \'node --version\') and/or pipe a newline-separated list on stdin. For an interactive session use "aio runtime sandbox run".')
+      this._failUsage('No commands to run. Pass a quoted command (e.g. \'node --version\') and/or a command list with --file. For an interactive session use "aio runtime sandbox run".')
       return
     }
 
@@ -81,30 +82,8 @@ class SandboxExec extends RuntimeBaseCommand {
     }
   }
 
-  _readStdin () {
-    return new Promise((resolve, reject) => {
-      const chunks = []
-      const onData = chunk => chunks.push(chunk)
-      const onEnd = () => {
-        teardown()
-        resolve(Buffer.concat(chunks).toString())
-      }
-      const onError = err => {
-        teardown()
-        reject(err)
-      }
-      /**
-       * Detach all stdin listeners so repeated calls don't leak handlers.
-       */
-      function teardown () {
-        process.stdin.removeListener('data', onData)
-        process.stdin.removeListener('end', onEnd)
-        process.stdin.removeListener('error', onError)
-      }
-      process.stdin.on('data', onData)
-      process.stdin.on('end', onEnd)
-      process.stdin.on('error', onError)
-    })
+  _readFile (filePath) {
+    return fs.readFileSync(filePath, 'utf8')
   }
 
   _failUsage (message) {
@@ -139,9 +118,9 @@ access.
 
 Create a sandbox and run one or more commands non-interactively, then destroy it.
 
-Provide a one-shot command as a quoted argument and/or pipe a newline-separated
-list of commands on stdin. When both are given, the one-shot command runs first,
-followed by the piped commands in order.
+Provide a one-shot command as a quoted argument and/or a newline-separated list
+of commands via --file. When both are given, the one-shot command runs first,
+followed by the list in order.
 
 Each command runs in a fresh process. Shell state (working directory, env
 exports) does not persist between commands. Chain commands to work around
@@ -185,6 +164,10 @@ SandboxExec.flags = {
   'fail-fast': Flags.boolean({
     description: 'stop execution when a command returns a non-zero exit code',
     default: false
+  }),
+  file: Flags.string({
+    char: 'f',
+    description: 'path to a file with a newline-separated list of commands to run'
   })
 }
 
@@ -197,10 +180,10 @@ SandboxExec.args = {
 
 SandboxExec.examples = [
   '<%= config.bin %> <%= command.id %> "node --version"',
-  '<%= config.bin %> <%= command.id %> < commands.txt',
-  '<%= config.bin %> <%= command.id %> "node --version" < commands.txt',
-  '<%= config.bin %> <%= command.id %> -e allow-all -p 5173 < commands.txt',
-  '<%= config.bin %> <%= command.id %> --fail-fast --command-timeout 120000 < commands.txt'
+  '<%= config.bin %> <%= command.id %> --file commands.txt',
+  '<%= config.bin %> <%= command.id %> "node --version" --file commands.txt',
+  '<%= config.bin %> <%= command.id %> -e allow-all -p 5173 --file commands.txt',
+  '<%= config.bin %> <%= command.id %> --fail-fast --command-timeout 120000 --file commands.txt'
 ]
 
 SandboxExec.aliases = ['rt:sandbox:exec']

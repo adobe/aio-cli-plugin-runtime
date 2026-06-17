@@ -17,6 +17,9 @@ const TheCommand = require('../../../../src/commands/runtime/sandbox/exec.js')
 const RuntimeBaseCommand = require('../../../../src/RuntimeBaseCommand.js')
 const { Sandbox } = require('@adobe/aio-lib-sandbox')
 const { logPolicy, logPreviewUrls } = require('../../../../src/sandbox-helpers')
+const fs = require('node:fs')
+const os = require('node:os')
+const path = require('node:path')
 
 /**
  * Build a fake `Sandbox` object suitable for stubbing Sandbox.create resolutions.
@@ -65,56 +68,21 @@ test('flags', async () => {
   // exec-specific: --command-timeout is the per-command cap, default 30s
   expect(TheCommand.flags['command-timeout'].default).toBe(30000)
   expect(TheCommand.flags['fail-fast']).toBeDefined()
+  expect(TheCommand.flags.file.char).toBe('f')
   // inherits base flags
   expect(TheCommand.flags.apihost).toBeDefined()
 })
 
-describe('_readStdin', () => {
-  test('collects piped chunks until end', async () => {
+describe('_readFile', () => {
+  test('reads file contents as utf8', () => {
     const command = new TheCommand([])
-    const promise = command._readStdin()
-    process.stdin.emit('data', Buffer.from('echo one\n'))
-    process.stdin.emit('data', Buffer.from('echo two\n'))
-    process.stdin.emit('end')
-    await expect(promise).resolves.toBe('echo one\necho two\n')
-    process.stdin.removeAllListeners('data')
-    process.stdin.removeAllListeners('end')
-    process.stdin.removeAllListeners('error')
-  })
-
-  test('rejects on stdin error', async () => {
-    const command = new TheCommand([])
-    const promise = command._readStdin()
-    process.stdin.emit('error', new Error('stdin boom'))
-    await expect(promise).rejects.toThrow('stdin boom')
-    process.stdin.removeAllListeners('data')
-    process.stdin.removeAllListeners('end')
-    process.stdin.removeAllListeners('error')
-  })
-
-  test('removes its listeners after resolving (no leak)', async () => {
-    const command = new TheCommand([])
-    const before = {
-      data: process.stdin.listenerCount('data'),
-      end: process.stdin.listenerCount('end'),
-      error: process.stdin.listenerCount('error')
+    const tmp = path.join(os.tmpdir(), `exec-readfile-${Date.now()}.txt`)
+    fs.writeFileSync(tmp, 'echo hi\n')
+    try {
+      expect(command._readFile(tmp)).toBe('echo hi\n')
+    } finally {
+      fs.unlinkSync(tmp)
     }
-    const promise = command._readStdin()
-    process.stdin.emit('data', Buffer.from('x\n'))
-    process.stdin.emit('end')
-    await promise
-    expect(process.stdin.listenerCount('data')).toBe(before.data)
-    expect(process.stdin.listenerCount('end')).toBe(before.end)
-    expect(process.stdin.listenerCount('error')).toBe(before.error)
-  })
-
-  test('removes its listeners after rejecting (no leak)', async () => {
-    const command = new TheCommand([])
-    const before = process.stdin.listenerCount('error')
-    const promise = command._readStdin()
-    process.stdin.emit('error', new Error('boom'))
-    await expect(promise).rejects.toThrow('boom')
-    expect(process.stdin.listenerCount('error')).toBe(before)
   })
 })
 
@@ -196,7 +164,6 @@ describe('run', () => {
   let command
   let handleError
   let sandbox
-  const originalStdinIsTTY = process.stdin.isTTY
   const originalExitCode = process.exitCode
 
   beforeEach(async () => {
@@ -205,18 +172,14 @@ describe('run', () => {
     sandbox = fakeSandbox()
     Sandbox.create.mockReset()
     Sandbox.create.mockResolvedValue(sandbox)
-    jest.spyOn(command, '_readStdin').mockResolvedValue('')
-    Object.defineProperty(process.stdin, 'isTTY', { value: false, configurable: true })
   })
 
   afterEach(() => {
     process.exitCode = originalExitCode
-    Object.defineProperty(process.stdin, 'isTTY', { value: originalStdinIsTTY, configurable: true })
   })
 
   test('runs a single one-shot command and destroys', async () => {
     command.argv = ['node --version']
-    command._readStdin.mockResolvedValue('')
     sandbox.exec.mockResolvedValueOnce({ stdout: 'v25.9.0\n', stderr: '', exitCode: 0 })
 
     await command.run()
@@ -225,36 +188,6 @@ describe('run', () => {
     expect(stdout.output).toMatch('v25.9.0')
     expect(stdout.output).toMatch('[exit: 0]')
     expect(sandbox.destroy).toHaveBeenCalled()
-  })
-
-  test('runs piped commands in order', async () => {
-    command.argv = []
-    command._readStdin.mockResolvedValue('echo one\necho two\n')
-
-    await command.run()
-
-    expect(sandbox.exec).toHaveBeenNthCalledWith(1, 'echo one', { timeout: 30000 })
-    expect(sandbox.exec).toHaveBeenNthCalledWith(2, 'echo two', { timeout: 30000 })
-  })
-
-  test('one-shot runs before piped commands', async () => {
-    command.argv = ['node --version']
-    command._readStdin.mockResolvedValue('echo after\n')
-
-    await command.run()
-
-    expect(sandbox.exec).toHaveBeenNthCalledWith(1, 'node --version', { timeout: 30000 })
-    expect(sandbox.exec).toHaveBeenNthCalledWith(2, 'echo after', { timeout: 30000 })
-  })
-
-  test('does not read stdin on a TTY', async () => {
-    Object.defineProperty(process.stdin, 'isTTY', { value: true, configurable: true })
-    command.argv = ['true']
-
-    await command.run()
-
-    expect(command._readStdin).not.toHaveBeenCalled()
-    expect(sandbox.exec).toHaveBeenCalledWith('true', { timeout: 30000 })
   })
 
   test('defaults the per-command timeout to 30s when --command-timeout is omitted', async () => {
@@ -273,9 +206,62 @@ describe('run', () => {
     expect(sandbox.exec).toHaveBeenCalledWith('true', { timeout: 5000 })
   })
 
+  test('--file reads a newline-separated command list', async () => {
+    jest.spyOn(command, '_readFile').mockReturnValue('echo a\necho b\n')
+    command.argv = ['--file', 'cmds.txt']
+
+    await command.run()
+
+    expect(command._readFile).toHaveBeenCalledWith('cmds.txt')
+    expect(sandbox.exec).toHaveBeenNthCalledWith(1, 'echo a', { timeout: 30000 })
+    expect(sandbox.exec).toHaveBeenNthCalledWith(2, 'echo b', { timeout: 30000 })
+  })
+
+  test('--file with a one-shot command runs the one-shot first', async () => {
+    jest.spyOn(command, '_readFile').mockReturnValue('echo from-file\n')
+    command.argv = ['--file', 'cmds.txt', 'echo from-arg']
+
+    await command.run()
+
+    expect(sandbox.exec).toHaveBeenNthCalledWith(1, 'echo from-arg', { timeout: 30000 })
+    expect(sandbox.exec).toHaveBeenNthCalledWith(2, 'echo from-file', { timeout: 30000 })
+  })
+
+  test('-f is the short flag for --file', async () => {
+    jest.spyOn(command, '_readFile').mockReturnValue('echo from-file\n')
+    command.argv = ['-f', 'cmds.txt']
+
+    await command.run()
+
+    expect(command._readFile).toHaveBeenCalledWith('cmds.txt')
+    expect(sandbox.exec).toHaveBeenCalledTimes(1)
+    expect(sandbox.exec).toHaveBeenCalledWith('echo from-file', { timeout: 30000 })
+  })
+
+  test('--file with an unreadable path errors before creating a sandbox', async () => {
+    jest.spyOn(command, '_readFile').mockImplementation(() => { throw new Error('ENOENT: no such file') })
+    command.argv = ['--file', 'missing.txt']
+
+    await command.run()
+
+    expect(stderr.output).toMatch(/Cannot read --file/)
+    expect(process.exitCode).toBe(2)
+    expect(Sandbox.create).not.toHaveBeenCalled()
+  })
+
+  test('--file read error without .message stringifies the thrown value', async () => {
+    jest.spyOn(command, '_readFile').mockImplementation(() => { throw 'plain failure' }) // eslint-disable-line no-throw-literal
+    command.argv = ['--file', 'missing.txt']
+
+    await command.run()
+
+    expect(stderr.output).toMatch(/Cannot read --file "missing.txt": plain failure/)
+    expect(process.exitCode).toBe(2)
+  })
+
   test('--fail-fast stops on first non-zero exit and sets exit code', async () => {
-    command.argv = ['--fail-fast']
-    command._readStdin.mockResolvedValue('bad\ngood\n')
+    jest.spyOn(command, '_readFile').mockReturnValue('bad\ngood\n')
+    command.argv = ['--fail-fast', '--file', 'cmds.txt']
     sandbox.exec.mockResolvedValueOnce({ stdout: '', stderr: 'nope\n', exitCode: 1 })
 
     await command.run()
@@ -287,8 +273,8 @@ describe('run', () => {
   })
 
   test('without --fail-fast runs all and exits with last non-zero code', async () => {
-    command.argv = []
-    command._readStdin.mockResolvedValue('first\nsecond\nthird\n')
+    jest.spyOn(command, '_readFile').mockReturnValue('first\nsecond\nthird\n')
+    command.argv = ['--file', 'cmds.txt']
     sandbox.exec
       .mockResolvedValueOnce({ stdout: '', stderr: 'e1\n', exitCode: 3 })
       .mockResolvedValueOnce({ stdout: 'ok\n', stderr: '', exitCode: 0 })
@@ -301,8 +287,8 @@ describe('run', () => {
   })
 
   test('exits 0 when all commands succeed', async () => {
-    command.argv = []
-    command._readStdin.mockResolvedValue('a\nb\n')
+    jest.spyOn(command, '_readFile').mockReturnValue('a\nb\n')
+    command.argv = ['--file', 'cmds.txt']
     process.exitCode = 0
 
     await command.run()
@@ -311,10 +297,8 @@ describe('run', () => {
     expect(process.exitCode).toBe(0)
   })
 
-  test('errors when no command is provided on a TTY', async () => {
-    Object.defineProperty(process.stdin, 'isTTY', { value: true, configurable: true })
+  test('errors when no command and no --file is provided', async () => {
     command.argv = []
-    command._readStdin.mockResolvedValue('')
 
     await command.run()
 
