@@ -30,7 +30,9 @@ class SandboxExec extends RuntimeBaseCommand {
     // (notably Windows PowerShell) the piped data and EOF arrive during the
     // parse, and attaching listeners afterwards would miss them.
     const stdinPromise = process.stdin.isTTY === true ? Promise.resolve('') : this._readStdin()
-    stdinPromise.catch(() => {}) // parse may reject first; avoid an unhandled rejection
+    // Avoid an unhandled rejection if parse rejects before we await this; a real
+    // stdin read error still surfaces at the `await stdinPromise` below.
+    stdinPromise.catch(() => {})
 
     const { args, flags } = await this.parse(SandboxExec)
 
