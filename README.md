@@ -27,6 +27,7 @@ Adobe I/O Runtime plugin for the Adobe I/O CLI
 <!-- toc -->
 * [aio-cli-plugin-runtime](#aio-cli-plugin-runtime)
 * [Usage](#usage)
+* [Skills](#skills)
 * [Commands](#commands)
 <!-- tocstop -->
 
@@ -37,6 +38,47 @@ $ # OR
 $ aio discover -i
 $ aio runtime --help
 ```
+
+# Skills
+
+This repository includes [agent skills](https://github.com/vercel-labs/skills) that teach coding agents (Cursor, Claude Code, Codex, and others) how to use `aio runtime` commands.
+
+Install all skills:
+
+```sh
+npx skills add adobe/aio-cli-plugin-runtime
+```
+
+Install a specific skill:
+
+```sh
+npx skills add adobe/aio-cli-plugin-runtime --skill aio-runtime-deploy
+```
+
+Target a specific agent:
+
+```sh
+npx skills add adobe/aio-cli-plugin-runtime -a cursor
+npx skills add adobe/aio-cli-plugin-runtime -a claude-code -a codex
+```
+
+Install globally (available in all projects):
+
+```sh
+npx skills add adobe/aio-cli-plugin-runtime --global
+```
+
+### Available skills
+
+| Skill | Description |
+|-------|-------------|
+| `aio-runtime-setup` | Plugin install, auth, namespace, and property configuration |
+| `aio-runtime-actions` | Create, update, invoke, and manage actions |
+| `aio-runtime-deploy` | Deploy from YAML manifests (sync, undeploy, report) |
+| `aio-runtime-debug` | Activations, logs, results, and troubleshooting |
+| `aio-runtime-events` | Triggers, rules, and action sequences |
+| `aio-runtime-api` | HTTP API routes and REST endpoints |
+| `aio-runtime-log-forwarding` | Log forwarding to Splunk, New Relic, Azure, and more |
 
 # Commands
 <!-- commands -->
