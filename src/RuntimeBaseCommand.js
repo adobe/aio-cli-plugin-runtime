@@ -96,7 +96,19 @@ class RuntimeBaseCommand extends Command {
 
     if (err) {
       let pretty = err.message || ''
-      if (err.name === 'OpenWhiskError') {
+      const connectionErrors = [err, err.error, err.cause]
+      const isConnectionReset = connectionErrors.some(error => {
+        if (!error) return false
+        return error.code === 'ECONNRESET' ||
+          /ECONNRESET/i.test(error.message || '') ||
+          /socket hang up/i.test(error.message || '') ||
+          /(ECONNRESET|socket hang up)/i.test(typeof error.error === 'string' ? error.error : '')
+      })
+
+      if (isConnectionReset) {
+        pretty = 'the connection to the Runtime API was interrupted (socket hang up / ECONNRESET). ' +
+          'Please try again in a few moments. Before you do, run `aio app use` to get the latest Adobe Developer Console configuration file.'
+      } else if (err.name === 'OpenWhiskError') {
         if (err.error && err.error.error) {
           pretty = err.error.error.toLowerCase()
           if (err.statusCode) pretty = `${pretty} (${getStatusCode(err.statusCode)})`

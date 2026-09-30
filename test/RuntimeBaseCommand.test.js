@@ -302,6 +302,32 @@ describe('instance methods', () => {
       expect(command.error).toHaveBeenCalledWith('msg: an error' + suffix)
     })
 
+    test('connection reset gives actionable Runtime API guidance', async () => {
+      command.error = jest.fn()
+      const cause = Object.assign(new Error('read ECONNRESET'), { code: 'ECONNRESET' })
+      const err = new OpenWhiskError('Unknown Error From API: read ECONNRESET', cause)
+
+      await command.handleError('failed to list the activations', err)
+
+      expect(command.error).toHaveBeenCalledWith(
+        'failed to list the activations: the connection to the Runtime API was interrupted (socket hang up / ECONNRESET). ' +
+        'Please try again in a few moments. Before you do, run `aio app use` to get the latest Adobe Developer Console configuration file.' +
+        suffix
+      )
+    })
+
+    test('socket hang up gives actionable Runtime API guidance', async () => {
+      command.error = jest.fn()
+
+      await command.handleError('failed to list the activations', new Error('socket hang up'))
+
+      expect(command.error).toHaveBeenCalledWith(
+        'failed to list the activations: the connection to the Runtime API was interrupted (socket hang up / ECONNRESET). ' +
+        'Please try again in a few moments. Before you do, run `aio app use` to get the latest Adobe Developer Console configuration file.' +
+        suffix
+      )
+    })
+
     test('openwhisk error, with internal error', async () => {
       command.error = jest.fn()
       const err = new Error('is')
